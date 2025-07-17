@@ -71,7 +71,7 @@ val b2BodyId.mass: Float
   get() = Box2d.b2Body_GetMass(this)
 
 val b2BodyId.world: b2WorldId get() = Box2d.b2Body_GetWorld(this)
-//val b2BodyId.name: String get() = Box2d.b2Body_GetName(this)
+// val b2BodyId.name: String get() = Box2d.b2Body_GetName(this)
 
 val b2WorldId.gravity: b2Vec2 get() = Box2d.b2World_GetGravity(this)
 

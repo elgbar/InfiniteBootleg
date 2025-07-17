@@ -1,10 +1,10 @@
 package no.elg.infiniteBootleg.core.world.ecs.system.event
 
-//object PhysicsSystem : EventSystem<PhysicsEvent, PhysicsEventQueueComponent>(
+// object PhysicsSystem : EventSystem<PhysicsEvent, PhysicsEventQueueComponent>(
 //  family = entityWithPhysicsEventFamily,
 //  eventType = PhysicsEvent::class,
 //  queueMapper = PhysicsEventQueueComponent.Companion.mapper
-//) {
+// ) {
 //
 //  inline fun <reified T : Any> PhysicsEvent.getOtherFixtureUserData(entity: Entity, filter: (userData: Any?) -> Boolean): T? {
 //    val userDataA: Any? = fixtureA?.userData
@@ -37,4 +37,4 @@ package no.elg.infiniteBootleg.core.world.ecs.system.event
 //      is PhysicsEvent.PreSolveContactEvent -> Unit
 //    }
 //  }
-//}
+// }

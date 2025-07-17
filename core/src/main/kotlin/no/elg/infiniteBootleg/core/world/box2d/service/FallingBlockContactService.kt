@@ -1,21 +1,21 @@
 package no.elg.infiniteBootleg.core.world.box2d.service
 
-//import com.badlogic.ashley.core.Entity
-//import io.github.oshai.kotlinlogging.KotlinLogging
-//import no.elg.infiniteBootleg.core.main.Main
-//import no.elg.infiniteBootleg.core.util.isAir
-//import no.elg.infiniteBootleg.core.util.isBeingRemoved
-//import no.elg.infiniteBootleg.core.util.isNotAir
-//import no.elg.infiniteBootleg.core.world.blocks.Block
-//import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldX
-//import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
-//import no.elg.infiniteBootleg.core.world.chunks.Chunk
-//import no.elg.infiniteBootleg.core.world.ecs.components.MaterialComponent.Companion.materialOrNull
-//import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
-//import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem.getOtherFixtureUserData
-//import no.elg.infiniteBootleg.protobuf.Packets
+// import com.badlogic.ashley.core.Entity
+// import io.github.oshai.kotlinlogging.KotlinLogging
+// import no.elg.infiniteBootleg.core.main.Main
+// import no.elg.infiniteBootleg.core.util.isAir
+// import no.elg.infiniteBootleg.core.util.isBeingRemoved
+// import no.elg.infiniteBootleg.core.util.isNotAir
+// import no.elg.infiniteBootleg.core.world.blocks.Block
+// import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldX
+// import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
+// import no.elg.infiniteBootleg.core.world.chunks.Chunk
+// import no.elg.infiniteBootleg.core.world.ecs.components.MaterialComponent.Companion.materialOrNull
+// import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
+// import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem.getOtherFixtureUserData
+// import no.elg.infiniteBootleg.protobuf.Packets
 //
-//object FallingBlockContactService {
+// object FallingBlockContactService {
 //
 //  private val logger = KotlinLogging.logger {}
 //
@@ -52,4 +52,4 @@ package no.elg.infiniteBootleg.core.world.box2d.service
 //      }
 //    }
 //  }
-//}
+// }

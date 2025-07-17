@@ -1,11 +1,11 @@
-//package no.elg.infiniteBootleg.core.world.ecs.components.events
+// package no.elg.infiniteBootleg.core.world.ecs.components.events
 //
-//import com.badlogic.gdx.box2d.structs.b2ShapeId
-//import com.badlogic.gdx.physics.box2d.ContactImpulse
-//import com.badlogic.gdx.physics.box2d.Fixture
-//import com.badlogic.gdx.physics.box2d.Manifold
+// import com.badlogic.gdx.box2d.structs.b2ShapeId
+// import com.badlogic.gdx.physics.box2d.ContactImpulse
+// import com.badlogic.gdx.physics.box2d.Fixture
+// import com.badlogic.gdx.physics.box2d.Manifold
 //
-//sealed interface PhysicsEvent : ECSEvent {
+// sealed interface PhysicsEvent : ECSEvent {
 //
 //  val fixtureA: b2ShapeId?
 //  val fixtureB: Fixture?
@@ -24,4 +24,4 @@
 //  data class BlockRemovedEvent(override val fixtureA: Fixture, val compactLocation: Long) : PhysicsEvent {
 //    override val fixtureB: Fixture? = null
 //  }
-//}
+// }

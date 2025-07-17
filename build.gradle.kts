@@ -61,7 +61,8 @@ allprojects {
       ktlint().setEditorConfigPath("$rootDir/.editorconfig").editorConfigOverride(
         mapOf(
           "ktlint_function_signature_rule_force_multiline_when_parameter_count_greater_or_equal_than" to "5",
-          "ktlint_function_signature_body_expression_wrapping" to "multiline"
+          "ktlint_function_signature_body_expression_wrapping" to "multiline",
+          "ktlint_standard_no-empty-file" to "disabled" //TMP, TODO REMOVE
         )
       )
     }
@@ -88,9 +89,9 @@ subprojects {
 
   ext["assetsDir"] = File("../core/src/main/resources")
 
-//  tasks.named("classes") {
-//    dependsOn("spotlessApply")
-//  }
+  tasks.named("classes") {
+    dependsOn("spotlessApply")
+  }
 
   tasks.withType<KotlinCompilationTask<*>> {
     compilerOptions {
