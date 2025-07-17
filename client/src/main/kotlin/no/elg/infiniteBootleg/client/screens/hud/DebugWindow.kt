@@ -335,47 +335,78 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           booleanGetter = Settings::renderBox2dDebug,
           onToggle = ClientMain.inst().console.exec::debBox
         )
-      }
-      section {
         toggleableDebugButton(
           "Box2D draw shapes",
           onAnyElementChanged = onAnyElementChanged,
           booleanGetter = box2dDebug::drawShapes,
           onToggle = ClientMain.inst().console.exec::drawShapes
         )
+        toggleableDebugButton(
+          "Box2D draw bounds",
+          onAnyElementChanged = onAnyElementChanged,
+          booleanGetter = box2dDebug::drawBounds,
+          onToggle = ClientMain.inst().console.exec::drawBounds
+        )
+        toggleableDebugButton(
+          "Box2D draw islands",
+          onAnyElementChanged = onAnyElementChanged,
+          booleanGetter = box2dDebug::drawIslands,
+          onToggle = ClientMain.inst().console.exec::drawIslands
+        )
+      }
+      section {
+        toggleableDebugButton(
+          "Box2D draw mass",
+          onAnyElementChanged = onAnyElementChanged,
+          booleanGetter = box2dDebug::drawMass,
+          onToggle = ClientMain.inst().console.exec::drawMass
+        )
+      }
+      // These buttons does not do anything, but are here for future use
+//      section {
 //        toggleableDebugButton(
 //          "Box2D draw joints",
 //          onAnyElementChanged = onAnyElementChanged,
-//          booleanGetter = box2dDebug::isDrawJoints,
+//          booleanGetter = box2dDebug::drawJoints,
 //          onToggle = ClientMain.inst().console.exec::drawJoints
 //        )
 //        toggleableDebugButton(
-//          "Box2D draw AABBs",
+//          "Box2D draw joints extra",
 //          onAnyElementChanged = onAnyElementChanged,
-//          booleanGetter = box2dDebug::isDrawAABBs,
-//          onToggle = ClientMain.inst().console.exec::drawAABBs
+//          booleanGetter = box2dDebug::drawJointExtras,
+//          onToggle = ClientMain.inst().console.exec::drawJointExtras
 //        )
 //        toggleableDebugButton(
-//          "Box2D draw inactiveBodies",
+//          "Box2D draw drawBodyNames",
 //          onAnyElementChanged = onAnyElementChanged,
-//          booleanGetter = box2dDebug::isDrawInactiveBodies,
-//          onToggle = ClientMain.inst().console.exec::drawInactiveBodies
-//        )
-      }
-      section {
-//        toggleableDebugButton(
-//          "Box2D draw velocities",
-//          onAnyElementChanged = onAnyElementChanged,
-//          booleanGetter = box2dDebug::isDrawVelocities,
-//          onToggle = ClientMain.inst().console.exec::drawVelocities
+//          booleanGetter = box2dDebug::drawBodyNames,
+//          onToggle = ClientMain.inst().console.exec::drawBodyNames
 //        )
 //        toggleableDebugButton(
-//          "Box2D draw contacts",
+//          "Box2D draw contactFeatures",
 //          onAnyElementChanged = onAnyElementChanged,
-//          booleanGetter = box2dDebug::isDrawContacts,
-//          onToggle = ClientMain.inst().console.exec::drawContacts
+//          booleanGetter = box2dDebug::drawContactFeatures,
+//          onToggle = ClientMain.inst().console.exec::drawContactFeatures
 //        )
-      }
+//        toggleableDebugButton(
+//          "Box2D draw graphColors",
+//          onAnyElementChanged = onAnyElementChanged,
+//          booleanGetter = box2dDebug::drawGraphColors,
+//          onToggle = ClientMain.inst().console.exec::drawGraphColors
+//        )
+//        toggleableDebugButton(
+//          "Box2D draw frictionImpulses",
+//          onAnyElementChanged = onAnyElementChanged,
+//          booleanGetter = box2dDebug::drawFrictionImpulses,
+//          onToggle = ClientMain.inst().console.exec::drawFrictionImpulses
+//        )
+//        toggleableDebugButton(
+//          "Box2D draw contactImpulses",
+//          onAnyElementChanged = onAnyElementChanged,
+//          booleanGetter = box2dDebug::drawContactImpulses,
+//          onToggle = ClientMain.inst().console.exec::drawContactImpulses
+//        )
+//      }
       sep()
       section {
         toggleableDebugButton("Vsync", onAnyElementChanged = onAnyElementChanged, booleanGetter = Settings::vsync, onToggle = { Settings.vsync = !Settings.vsync })
