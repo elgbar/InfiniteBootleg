@@ -5,7 +5,7 @@ import com.badlogic.gdx.box2d.enums.b2BodyType
 import com.badlogic.gdx.box2d.structs.b2BodyDef
 import com.badlogic.gdx.box2d.structs.b2BodyId
 import com.badlogic.gdx.box2d.structs.b2ShapeId
-import com.badlogic.gdx.box2d.structs.b2Vec2
+import com.badlogic.gdx.jnigen.runtime.pointer.VoidPointer
 import com.badlogic.gdx.utils.LongMap
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
 import no.elg.infiniteBootleg.core.util.isNotAir
 import no.elg.infiniteBootleg.core.world.blocks.Block
+import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE_F
 import no.elg.infiniteBootleg.core.world.world.World
@@ -62,7 +63,8 @@ class ChunkBody(val chunk: Chunk) :
 
   /**calculate the shape of the chunk (box2d)*/
   val bodyDef: b2BodyDef = Box2d.b2DefaultBodyDef().apply {
-    position.set(chunk.chunkX * CHUNK_SIZE_F, chunk.chunkY * CHUNK_SIZE_F)
+//    position.set(chunk.chunkX * CHUNK_SIZE_F, chunk.chunkY * CHUNK_SIZE_F)
+    position = makeB2Vec2(chunk.chunkX * CHUNK_SIZE_F + 0.5f, chunk.chunkY * CHUNK_SIZE_F + 0.5f)
     fixedRotation(true)
     type(b2BodyType.b2_staticBody)
   }
@@ -111,11 +113,10 @@ class ChunkBody(val chunk: Chunk) :
   fun removeBlock(block: Block) {
     val world = chunk.world
     world.postBox2dRunnable {
-      shapeMap.get(compactInt(block.localX, block.localY))?.also { fixture ->
-//        Box2d.fixture.filter(Filters.NON_INTERACTIVE__GROUND_FILTER)
-        Box2d.b2Shape_SetFilter(fixture, Filters.NON_INTERACTIVE__GROUND_FILTER)
-//        fixture.userData = null //TODO userdata
-//        world.engine.queuePhysicsEvent(PhysicsEvent.BlockRemovedEvent(fixture, block.compactWorldLoc)) //TODO events
+      shapeMap.get(compactInt(block.localX, block.localY))?.also { shapeId ->
+        shapeId.filter = Filters.NON_INTERACTIVE__GROUND_FILTER
+        shapeId.userData = VoidPointer.NULL
+        world.engine.queuePhysicsEvent(PhysicsEvent.BlockRemovedEvent(fixture, block.compactWorldLoc)) //TODO events
       }
     }
   }
@@ -131,7 +132,7 @@ class ChunkBody(val chunk: Chunk) :
       def.filter = filter
 //      userData(block)//TODO userdata
     }
-    val polygon = Box2d.b2MakeOffsetBox(0.5f, 0.5f, b2Vec2().set(block.localX.toFloat(), block.localY.toFloat()), NO_ROTATION)
+    val polygon = Box2d.b2MakeOffsetBox(0.5f, 0.5f, makeB2Vec2(block.localX, block.localY), NO_ROTATION)
     Box2d.b2CreatePolygonShape(bodyId, chainShape.asPointer(), polygon.asPointer())
   }
 

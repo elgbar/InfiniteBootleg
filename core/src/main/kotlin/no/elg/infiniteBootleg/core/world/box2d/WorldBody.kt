@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.core.util.Compacted2Float
 import no.elg.infiniteBootleg.core.util.EntityFlags.INVALID_FLAG
 import no.elg.infiniteBootleg.core.util.EntityFlags.enableFlag
 import no.elg.infiniteBootleg.core.util.FailureWatchdog
+import no.elg.infiniteBootleg.core.util.MAX_WORLD_VEL
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.util.isBeingRemoved
 import no.elg.infiniteBootleg.core.world.BOX2D_LOCK
@@ -38,15 +39,12 @@ open class WorldBody(private val world: World) :
   init {
     synchronized(BOX2D_LOCK) {
       val worldDef = Box2d.b2DefaultWorldDef()
-      worldDef.gravity().apply {
-        x(X_WORLD_GRAVITY)
-        y(Y_WORLD_GRAVITY)
-      }
+      worldDef.gravity = makeB2Vec2(X_WORLD_GRAVITY, Y_WORLD_GRAVITY)
+      worldDef.maximumLinearSpeed(MAX_WORLD_VEL)
       box2dWorld = Box2d.b2CreateWorld(worldDef.asPointer())
-      Box2d.b2World_IsValid(box2dWorld).also { isValid ->
-        if (!isValid) {
-          throw IllegalStateException("Box2D world is not valid")
-        }
+
+      if (!box2dWorld.isValid) {
+        throw IllegalStateException("Box2D world is not valid")
       }
 //      box2dWorld.setContactListener(contactManager)
     }
@@ -117,7 +115,7 @@ open class WorldBody(private val world: World) :
 
   @GuardedBy("BOX2D_LOCK")
   private fun createBodyNow(def: b2BodyDef, callback: (b2BodyId) -> Unit) {
-    val body: b2BodyId = Box2d.b2CreateBody(box2dWorld, def.asPointer())
+    val body: b2BodyId = box2dWorld.createBody(def)
     callback(body)
 //    Box2d.b2Body_SetUserData() // https://github.com/libgdx/gdx-box2d/blob/master/README.md#working-with-voidpointer-context-or-user-data
 //    val userData = body.userData
@@ -164,7 +162,7 @@ open class WorldBody(private val world: World) :
     }
     synchronized(BOX2D_LOCK) {
       box2dWatchdog.watch {
-        Box2d.b2World_Step(box2dWorld, BOX2D_TIME_STEP, BOX2D_SUB_STEP_COUNT)
+        box2dWorld.step(BOX2D_TIME_STEP, BOX2D_SUB_STEP_COUNT)
       }
 
 //      handlePhysicsBodyEvents()
@@ -227,7 +225,7 @@ open class WorldBody(private val world: World) :
         return
       }
       disposed = true
-      Box2d.b2DestroyWorld(box2dWorld)
+      box2dWorld.dispose()
     }
   }
 

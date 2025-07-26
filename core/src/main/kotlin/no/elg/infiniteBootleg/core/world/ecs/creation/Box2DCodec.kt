@@ -238,8 +238,8 @@ internal fun createBody2DBodyComponent(
 ) {
   val bodyDef: b2BodyDef = Box2d.b2DefaultBodyDef()
   bodyDef.type(b2BodyType.b2_dynamicBody)
-  bodyDef.position.set(worldX, worldY)
-  bodyDef.linearVelocity.set(dx, dy)
+  bodyDef.position = makeB2Vec2(worldX + 0.5f, worldY + 0.5f)
+  bodyDef.linearVelocity = makeB2Vec2(dx, dy)
   val fixedRotation = true
   bodyDef.fixedRotation(fixedRotation)
   bodyDefModifier(bodyDef)
