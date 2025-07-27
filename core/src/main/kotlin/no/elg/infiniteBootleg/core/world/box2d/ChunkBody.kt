@@ -10,6 +10,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.api.Updatable
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
 import no.elg.infiniteBootleg.core.util.LocalCoord
+import no.elg.infiniteBootleg.core.util.isLazyInitialized
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
 import no.elg.infiniteBootleg.core.util.isNotAir
 import no.elg.infiniteBootleg.core.world.blocks.Block
@@ -27,7 +28,9 @@ class ChunkBody(val chunk: Chunk) :
   Updatable,
   CheckableDisposable {
 
-  private val chunkShapes: Array<b2ShapeId?> = arrayOfNulls(Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE)
+  //unsynchronized lazy is ok since this will only be accessed from the physics thread
+  // we also want it lazy to not allocate chunk shapes for empty chunks
+  private val chunkShapes: Array<b2ShapeId?> by lazy(LazyThreadSafetyMode.NONE) { arrayOfNulls(Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE) }
 
   @Suppress("NOTHING_TO_INLINE")
   private inline fun shapeIndex(localX: LocalCoord, localY: LocalCoord): Int = localX + localY * Chunk.CHUNK_SIZE
@@ -48,8 +51,10 @@ class ChunkBody(val chunk: Chunk) :
       synchronized(chunkBodyLock) {
         oldBody = field
         field = value
-        chunkShapes.forEach { it?.userData = null } // clear user data
-        Arrays.fill(chunkShapes, null)
+        if (::chunkShapes.isLazyInitialized()) {
+          chunkShapes.forEach { it?.userData = null }
+          Arrays.fill(chunkShapes, null)
+        }
       }
       if (oldBody != null) {
         // We should now be fine to destroy the old body

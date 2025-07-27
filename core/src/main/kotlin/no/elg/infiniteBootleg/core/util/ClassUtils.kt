@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.core.util
 
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty0
+import kotlin.reflect.jvm.isAccessible
 
 inline fun <reified T : Any> sealedSubclassObjectInstances(): List<T> = sealedSubclassObjectInstances(T::class)
 
@@ -20,3 +22,13 @@ fun <T : Any> sealedSubclassObjectInstances(klazz: KClass<out T>): List<T> =
   }.also {
     if (it.isEmpty()) error("Sealed $klazz has no object instances")
   }
+
+fun KProperty0<*>.isLazyInitialized(): Boolean {
+  this.isAccessible = true
+  val property = this.getDelegate()
+  return if (property is Lazy<*>) {
+    property.isInitialized()
+  } else {
+    error("Property $this is not lazy initialized")
+  }
+}
