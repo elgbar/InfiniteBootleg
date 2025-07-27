@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.Constants
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.box2d.gravityScale
+import no.elg.infiniteBootleg.core.world.box2d.userData
 import no.elg.infiniteBootleg.core.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.LoadableMapper
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityOrZero
@@ -65,8 +66,8 @@ class Box2DBodyComponent(body: b2BodyId, val type: ProtoWorld.Entity.Box2D.BodyT
       disposed = true
       val currentBody = internalBody ?: return
       this.internalBody = null
-//      val entity = currentBody.userData as Entity //todo userdata
-//      entity.world.worldBody.destroyBody(currentBody)
+      val entity = currentBody.userData as Entity // todo userdata
+      entity.world.worldBody.destroyBody(currentBody)
     }
   }
 

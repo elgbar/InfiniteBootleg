@@ -59,7 +59,6 @@ import no.elg.infiniteBootleg.core.util.toVector2i
 import no.elg.infiniteBootleg.core.util.worldToBlock
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.util.worldXYtoChunkCompactLoc
-import no.elg.infiniteBootleg.core.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.core.world.Direction
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.WorldMetadata
@@ -1195,7 +1194,7 @@ abstract class World(
     }
 
     worldTicker.stop()
-    synchronized(BOX2D_LOCK) { worldBody.dispose() }
+    worldBody.dispose()
     chunkColumnsManager.dispose()
     chunkLoader.dispose()
     metadata.dispose()

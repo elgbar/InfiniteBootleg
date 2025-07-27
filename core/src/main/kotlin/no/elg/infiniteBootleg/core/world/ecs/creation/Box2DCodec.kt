@@ -23,6 +23,7 @@ import no.elg.infiniteBootleg.core.world.box2d.Filters
 import no.elg.infiniteBootleg.core.world.box2d.NO_ROTATION
 import no.elg.infiniteBootleg.core.world.box2d.makeB2Vec2
 import no.elg.infiniteBootleg.core.world.box2d.set
+import no.elg.infiniteBootleg.core.world.box2d.userData
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.blockEntityFamily
@@ -123,9 +124,9 @@ fun EngineEntity.createDoorBodyComponent(world: World, worldX: WorldCoord, world
       def.isSensor(true)
       def.enableSensorEvents(true)
       def.filter = Filters.EN__GROUND_FILTER
-//    def.userData(userData) // TODO userdata
     }
-    Box2d.b2CreatePolygonShape(this, shapeDef.asPointer(), polygon.asPointer())
+    val shapeId = Box2d.b2CreatePolygonShape(this, shapeDef.asPointer(), polygon.asPointer())
+    shapeId.userData = entity
   }
 }
 
@@ -157,7 +158,6 @@ fun EngineEntity.createFallingBlockBodyComponent(
   ) {
     val polygon = Box2d.b2MakeSquare(0.45f)
     val shapeDef = Box2d.b2DefaultShapeDef().also { def ->
-//    def.userData(userData) // TODO userdata
       def.isSensor(true)
       def.enableSensorEvents(true)
       def.filter = Filters.GR_FB__FALLING_BLOCK_FILTER
@@ -166,7 +166,7 @@ fun EngineEntity.createFallingBlockBodyComponent(
         friction(Constants.DEFAULT_FIXTURE_FRICTION)
       }
     }
-    Box2d.b2CreatePolygonShape(this, shapeDef.asPointer(), polygon.asPointer())
+    Box2d.b2CreatePolygonShape(this, shapeDef.asPointer(), polygon.asPointer()).also { it.userData = entity }
   }
 }
 
@@ -208,12 +208,11 @@ fun EngineEntity.createSpellBodyComponent(
       radius(size)
     }
     val shapeDef = Box2d.b2DefaultShapeDef().also { def ->
-//    def.userData(userData) // TODO userdata
       def.isSensor(true)
       def.enableSensorEvents(true)
       def.filter = Filters.GR_FB__FALLING_BLOCK_FILTER
     }
-    Box2d.b2CreateCircleShape(this, shapeDef.asPointer(), polygon.asPointer())
+    Box2d.b2CreateCircleShape(this, shapeDef.asPointer(), polygon.asPointer()).also { it.userData = entity }
   }
 }
 
@@ -250,7 +249,7 @@ internal fun createBody2DBodyComponent(
       entity.world.worldBody.destroyBody(it)
       return@createBody
     }
-//    it.userData = entity
+    it.userData = entity
 
     beforeBodyComponentAdded(it)
     entity += Box2DBodyComponent(it, serializationType, width, height, fixedRotation)
@@ -265,16 +264,14 @@ internal fun createBody2DBodyComponent(
 private fun createPlayerCapsule(body: b2BodyId, userData: Any, friction: Float = Constants.DEFAULT_FIXTURE_FRICTION, defineShape: () -> b2Capsule) {
   val shape = defineShape()
   playerShapeDef.material().friction(friction)
-//  playerShapeDef.userData(userData) // TODO userdata
-  Box2d.b2CreateCapsuleShape(body, playerShapeDef.asPointer(), shape.asPointer())
+  Box2d.b2CreateCapsuleShape(body, playerShapeDef.asPointer(), shape.asPointer()).also { it.userData = userData }
 }
 
 private fun createPlayerPolygon(body: b2BodyId, userData: Any, friction: Float = Constants.DEFAULT_FIXTURE_FRICTION, defineShape: () -> b2Polygon) {
   val shape = defineShape()
   playerShapeDef.material().friction(friction)
-//  playerShapeDef.userData(userData) // TODO userdata
 
-  Box2d.b2CreatePolygonShape(body, playerShapeDef.asPointer(), shape.asPointer())
+  Box2d.b2CreatePolygonShape(body, playerShapeDef.asPointer(), shape.asPointer()).also { it.userData = userData }
 }
 
 private fun createSecondaryPlayerFixture(
@@ -296,10 +293,9 @@ private fun createSecondaryPlayerFixture(
     isSensor(true)
     enableSensorEvents(true)
     filter = Filters.GR__ENTITY_FILTER
-//  userData(userData) // TODO userdata
   }
 
-  Box2d.b2CreatePolygonShape(body, shapeDef.asPointer(), polygon.asPointer())
+  Box2d.b2CreatePolygonShape(body, shapeDef.asPointer(), polygon.asPointer()).also { it.userData = userData }
 }
 
 private fun createPlayerTouchAreaFixture(body: b2BodyId, userData: String, side: Int) {

@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.core.util.Compacted2Float
 import no.elg.infiniteBootleg.core.util.EntityFlags.INVALID_FLAG
 import no.elg.infiniteBootleg.core.util.EntityFlags.enableFlag
 import no.elg.infiniteBootleg.core.util.FailureWatchdog
+import no.elg.infiniteBootleg.core.util.IllegalAction
 import no.elg.infiniteBootleg.core.util.MAX_WORLD_VEL
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.util.isBeingRemoved
@@ -118,35 +119,34 @@ open class WorldBody(private val world: World) :
     val body: b2BodyId = box2dWorld.createBody(def)
     callback(body)
 //    Box2d.b2Body_SetUserData() // https://github.com/libgdx/gdx-box2d/blob/master/README.md#working-with-voidpointer-context-or-user-data
-//    val userData = body.userData
-//    if (userData == null) {
-//      IllegalAction.STACKTRACE.handle { "Userdata not added when creating body" }
-//    }
+    val userData = body.userData
+    if (userData == null) {
+      IllegalAction.STACKTRACE.handle { "Userdata not added when creating body" }
+    }
   }
 
   /**
    * Destroy the given body, this method can be called from any thread
    *
-   * @param bodyId
-   * The body to destroy
+   * @param body The body to destroy
    */
-  fun destroyBody(bodyId: b2BodyId) {
+  fun destroyBody(body: b2BodyId) {
     postBox2dRunnable {
-      require(Box2d.b2Body_IsValid(bodyId)) {
+      require(body.isValid) {
         "Cannot destroy body that is not valid" // , userData: ${body.userData}"
       }
 //      require(!box2dWorld.isLocked) {
 //        "Cannot destroy body when box2d world is locked, to fix this schedule the destruction either sync or async, userData: ${body.userData}"
 //      }
-      if (!Box2d.b2Body_IsEnabled(bodyId)) {
+      if (!body.isEnabled) {
         logger.error {
-          "Trying to destroy an disabled body, the program will probably crash" // , userData: ${body.userData}"
+          "Trying to destroy an disabled body, the program will probably crash, userData: ${body.userData}"
         }
       }
 
       // TODO do cleanup entities when the body is destroyed
 //      body.fixtureList.asSequence().map { it.userData }.filterIsInstance<Entity>().forEach { world.removeEntity(it, DespawnReason.CHUNK_UNLOADED) }
-      Box2d.b2DestroyBody(bodyId)
+      body.dispose()
     }
   }
 

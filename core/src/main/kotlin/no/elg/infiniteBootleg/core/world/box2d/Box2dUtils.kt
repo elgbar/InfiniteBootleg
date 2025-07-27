@@ -23,6 +23,10 @@ import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.decompactLocXf
 import no.elg.infiniteBootleg.core.util.decompactLocYf
 import no.elg.infiniteBootleg.core.util.toDegrees
+import no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager.Companion.createVoidPointer
+import no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager.Companion.deferenceVoidPointer
+import no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager.Companion.remove
+import kotlin.reflect.KMutableProperty0
 
 val NO_ROTATION: b2Rot = Box2d.b2MakeRot(0f)
 
@@ -52,10 +56,9 @@ inline val b2Vec2.y get() = y()
 
 fun Compacted2Float.tob2Vec2(): b2Vec2 = b2Vec2().set(x = this.decompactLocXf(), y = this.decompactLocYf())
 
-
-///////////////
+// /////////////
 //  b2BodyId //
-///////////////
+// /////////////
 
 var b2BodyId.isAwake: Boolean
   get() = Box2d.b2Body_IsAwake(this)
@@ -97,33 +100,48 @@ fun b2BodyId.applyForceToCenter(force: b2Vec2, wake: Boolean) {
   Box2d.b2Body_ApplyForceToCenter(this, force, wake)
 }
 
-fun b2BodyId.destroy() {
+fun b2BodyId.dispose() {
+  userData = null
+  // TODo how to handle desstruction of shape userdata?
+//  Box2d.b2Body_GetShapes(this).forEach { shapeId ->
+//    shapeId.setUserData(this.world, null)
+//  }
   Box2d.b2DestroyBody(this)
 }
 
-fun b2BodyId.createPolygonShape(shapeDef: b2ShapeDef, polygon: b2Polygon): b2ShapeId {
-  return Box2d.b2CreatePolygonShape(this, shapeDef.asPointer(), polygon.asPointer())
-}
+fun b2BodyId.createPolygonShape(shapeDef: b2ShapeDef, polygon: b2Polygon): b2ShapeId = Box2d.b2CreatePolygonShape(this, shapeDef.asPointer(), polygon.asPointer())
 
-fun b2BodyId.createCircleShape(shapeDef: b2ShapeDef, circle: b2Circle): b2ShapeId {
-  return Box2d.b2CreateCircleShape(this, shapeDef.asPointer(), circle.asPointer())
-}
+fun b2BodyId.createCircleShape(shapeDef: b2ShapeDef, circle: b2Circle): b2ShapeId = Box2d.b2CreateCircleShape(this, shapeDef.asPointer(), circle.asPointer())
 
-fun b2BodyId.createCapsuleShape(shapeDef: b2ShapeDef, capsule: b2Capsule): b2ShapeId {
-  return Box2d.b2CreateCapsuleShape(this, shapeDef.asPointer(), capsule.asPointer())
-}
+fun b2BodyId.createCapsuleShape(shapeDef: b2ShapeDef, capsule: b2Capsule): b2ShapeId = Box2d.b2CreateCapsuleShape(this, shapeDef.asPointer(), capsule.asPointer())
 
-///////////////
+var b2BodyId.userDataPointer: VoidPointer
+  get() = Box2d.b2Body_GetUserData(this)
+  set(value) = Box2d.b2Body_SetUserData(this, value)
+
+var b2BodyId.userData: Any?
+  get() = deferenceVoidPointer(userDataPointer)
+  set(value) {
+    genericSetUserData(value, this::userDataPointer)
+  }
+
+// /////////////
 // b2WorldId //
-///////////////
+// /////////////
 
 var b2WorldId.gravity: b2Vec2
   get() = Box2d.b2World_GetGravity(this)
   set(value) = Box2d.b2World_SetGravity(this, value)
 
-var b2WorldId.userData: VoidPointer
+var b2WorldId.userDataPointer: VoidPointer
   get() = Box2d.b2World_GetUserData(this)
   set(value) = Box2d.b2World_SetUserData(this, value)
+
+var b2WorldId.userData: Any?
+  get() = deferenceVoidPointer(userDataPointer)
+  set(value) {
+    genericSetUserData(value, this::userDataPointer)
+  }
 
 var b2WorldId.restitutionThreshold: Float
   get() = Box2d.b2World_GetRestitutionThreshold(this)
@@ -147,17 +165,16 @@ fun b2WorldId.dispose() {
   Box2d.b2DestroyWorld(this)
 }
 
-
-///////////////
+// /////////////
 //   b2Rot   //
-///////////////
+// /////////////
 
 val b2Rot.radians: Radians get() = Box2d.b2Rot_GetAngle(this)
 val b2Rot.degrees: Degrees get() = radians.toDegrees()
 
-///////////////
+// /////////////
 // b2ShapeId //
-///////////////
+// /////////////
 
 var b2ShapeId.filter: b2Filter
   get() = Box2d.b2Shape_GetFilter(this)
@@ -165,8 +182,46 @@ var b2ShapeId.filter: b2Filter
     Box2d.b2Shape_SetFilter(this, value)
   }
 
-var b2ShapeId.userData: VoidPointer
+fun b2ShapeId.dispose(updateBodyMass: Boolean = true) {
+  userData = null
+  Box2d.b2DestroyShape(this, updateBodyMass)
+}
+
+/**
+ * Interact directly with the user data pointer of a shape.
+ *
+ * This might lead to memory leaks if the pointer is not removed from [VoidPointerManager]
+ */
+private var b2ShapeId.userDataPointer: VoidPointer
   get() = Box2d.b2Shape_GetUserData(this)
   set(value) {
     Box2d.b2Shape_SetUserData(this, value)
   }
+
+var b2ShapeId.userData: Any?
+  get() = deferenceVoidPointer(userDataPointer)
+  set(value) {
+    genericSetUserData(value, this::userDataPointer)
+  }
+
+/**
+ * Correctly set the user data pointer of a shape. Handles `null` values by removing the pointer from the [VoidPointerManager].
+ */
+private fun genericSetUserData(value: Any?, property: KMutableProperty0<VoidPointer>) {
+  if (value == null) {
+    remove(property.get())
+    property.set(VoidPointer.NULL)
+  } else {
+    property.set(createVoidPointer(value))
+  }
+}
+
+/**
+ * @return Whether the pointer cannot be used
+ */
+val VoidPointer.isInvalid: Boolean get() = isFreed || isNull
+
+/**
+ * @return Whether the pointer can be used
+ */
+val VoidPointer.isValid: Boolean get() = !isInvalid
