@@ -5,18 +5,18 @@ import com.badlogic.gdx.box2d.enums.b2BodyType
 import com.badlogic.gdx.box2d.structs.b2BodyDef
 import com.badlogic.gdx.box2d.structs.b2BodyId
 import com.badlogic.gdx.box2d.structs.b2ShapeId
-import com.badlogic.gdx.utils.LongMap
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.api.Updatable
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
-import no.elg.infiniteBootleg.core.util.compactInt
+import no.elg.infiniteBootleg.core.util.LocalCoord
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
 import no.elg.infiniteBootleg.core.util.isNotAir
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE_F
 import no.elg.infiniteBootleg.core.world.world.World
+import java.util.Arrays
 
 private val logger = KotlinLogging.logger {}
 
@@ -27,7 +27,10 @@ class ChunkBody(val chunk: Chunk) :
   Updatable,
   CheckableDisposable {
 
-  private val shapeMap = LongMap<b2ShapeId>()
+  private val chunkShapes: Array<b2ShapeId?> = arrayOfNulls(Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE)
+
+  @Suppress("NOTHING_TO_INLINE")
+  private inline fun shapeIndex(localX: LocalCoord, localY: LocalCoord): Int = localX + localY * Chunk.CHUNK_SIZE
 
   private val chunkBodyLock = Any()
 
@@ -45,7 +48,8 @@ class ChunkBody(val chunk: Chunk) :
       synchronized(chunkBodyLock) {
         oldBody = field
         field = value
-        shapeMap.clear()
+        chunkShapes.forEach { it?.userData = null } // clear user data
+        Arrays.fill(chunkShapes, null)
       }
       if (oldBody != null) {
         // We should now be fine to destroy the old body
@@ -109,14 +113,10 @@ class ChunkBody(val chunk: Chunk) :
   }
 
   fun removeBlock(block: Block) {
-    removeBlock(block, box2dBody ?: return)
-  }
-
-  fun removeBlock(block: Block, bodyId: b2BodyId) {
     val world = chunk.world
     world.postBox2dRunnable {
-      shapeMap.get(compactInt(block.localX, block.localY))?.also { shapeId ->
-        shapeId.dispose()
+      chunkShapes[shapeIndex(block.localX, block.localY)]?.also { shapeId ->
+        shapeId.dispose() // just remove it
 //        shapeId.filter = Filters.NON_INTERACTIVE__GROUND_FILTER
 //        shapeId.setUserData(bodyId.world, null)
 //        world.engine.queuePhysicsEvent(PhysicsEvent.BlockRemovedEvent(fixture, block.compactWorldLoc)) //TODO events
@@ -135,9 +135,8 @@ class ChunkBody(val chunk: Chunk) :
       def.filter = filter
     }
     val polygon = Box2d.b2MakeOffsetBox(0.5f, 0.5f, makeB2Vec2(block.localX, block.localY), NO_ROTATION)
-    val shapeId = Box2d.b2CreatePolygonShape(bodyId, chainShape.asPointer(), polygon.asPointer())
-    shapeId.userData = block
-    shapeMap.put(compactInt(block.localX, block.localY), shapeId)
+    val shapeId = Box2d.b2CreatePolygonShape(bodyId, chainShape.asPointer(), polygon.asPointer()).also { it.userData = block }
+    chunkShapes[shapeIndex(block.localX, block.localY)] = shapeId
   }
 
   fun addBlocks(blocks: Sequence<Block>, box2dBody: b2BodyId? = null) {
