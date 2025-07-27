@@ -140,7 +140,7 @@ class ChunkBody(val chunk: Chunk) :
       def.filter = filter
     }
     val polygon = Box2d.b2MakeOffsetBox(0.5f, 0.5f, makeB2Vec2(block.localX, block.localY), NO_ROTATION)
-    val shapeId = Box2d.b2CreatePolygonShape(bodyId, chainShape.asPointer(), polygon.asPointer()).also { it.userData = block }
+    val shapeId = bodyId.createPolygonShape(chainShape, polygon, block)
     chunkShapes[shapeIndex(block.localX, block.localY)] = shapeId
   }
 

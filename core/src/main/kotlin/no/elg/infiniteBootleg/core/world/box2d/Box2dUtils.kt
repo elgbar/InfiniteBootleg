@@ -109,11 +109,14 @@ fun b2BodyId.dispose() {
   Box2d.b2DestroyBody(this)
 }
 
-fun b2BodyId.createPolygonShape(shapeDef: b2ShapeDef, polygon: b2Polygon): b2ShapeId = Box2d.b2CreatePolygonShape(this, shapeDef.asPointer(), polygon.asPointer())
+fun b2BodyId.createPolygonShape(shapeDef: b2ShapeDef, polygon: b2Polygon, userData: Any? = null): b2ShapeId =
+  Box2d.b2CreatePolygonShape(this, shapeDef.asPointer(), polygon.asPointer()).also { shape -> userData?.also { shape.userData = it } }
 
-fun b2BodyId.createCircleShape(shapeDef: b2ShapeDef, circle: b2Circle): b2ShapeId = Box2d.b2CreateCircleShape(this, shapeDef.asPointer(), circle.asPointer())
+fun b2BodyId.createCircleShape(shapeDef: b2ShapeDef, circle: b2Circle, userData: Any? = null): b2ShapeId =
+  Box2d.b2CreateCircleShape(this, shapeDef.asPointer(), circle.asPointer()).also { shape -> userData?.also { shape.userData = it } }
 
-fun b2BodyId.createCapsuleShape(shapeDef: b2ShapeDef, capsule: b2Capsule): b2ShapeId = Box2d.b2CreateCapsuleShape(this, shapeDef.asPointer(), capsule.asPointer())
+fun b2BodyId.createCapsuleShape(shapeDef: b2ShapeDef, capsule: b2Capsule, userData: Any? = null): b2ShapeId =
+  Box2d.b2CreateCapsuleShape(this, shapeDef.asPointer(), capsule.asPointer()).also { shape -> userData?.also { shape.userData = it } }
 
 var b2BodyId.userDataPointer: VoidPointer
   get() = Box2d.b2Body_GetUserData(this)
@@ -162,6 +165,7 @@ fun b2WorldId.getBodyEvents(): b2BodyEvents = Box2d.b2World_GetBodyEvents(this)
 fun b2WorldId.createBody(bodyDef: b2BodyDef): b2BodyId = Box2d.b2CreateBody(this, bodyDef.asPointer())
 
 fun b2WorldId.dispose() {
+  userData = null
   Box2d.b2DestroyWorld(this)
 }
 
