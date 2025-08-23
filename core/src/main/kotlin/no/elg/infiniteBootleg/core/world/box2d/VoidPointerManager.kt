@@ -25,18 +25,19 @@ class VoidPointerManager {
    * If the object is null, a null pointer will be returned
    */
   fun createPointer(obj: Any?): VoidPointer {
+    ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
     if (obj == null) {
       return VoidPointer.NULL
     }
-    ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
     val existingPointer = objToAddr.getLong(obj)
-    if (existingPointer != NOT_IN_MANAGER) {
-      return VoidPointer(existingPointer, false)
+    return if (existingPointer != NOT_IN_MANAGER) {
+      
+      VoidPointer(existingPointer, false)
     } else {
       val id = nextId()
       objToAddr.put(obj, id)
       addrToObj.put(id, obj)
-      return VoidPointer(id, false)
+      VoidPointer(id, false)
     }
   }
 
