@@ -27,7 +27,7 @@ import no.elg.infiniteBootleg.core.util.LocalCoord
 import no.elg.infiniteBootleg.core.util.chunkToWorld
 import no.elg.infiniteBootleg.core.util.getNoisePositive
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
-import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsync
+import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.safeUse
 import no.elg.infiniteBootleg.core.world.Direction
 import no.elg.infiniteBootleg.core.world.Material
@@ -108,11 +108,11 @@ class ChunkRenderer(private val worldRender: WorldRender) :
    * @param prioritize If the chunk should be placed at the front of the queue being rendered
    */
   fun queueRendering(chunk: TexturedChunk, prioritize: Boolean) {
-    launchOnMultithreadedAsync {
+    launchOnMultithreadedAsyncSuspendable {
       val pos: ChunkCompactLoc = chunk.compactLocation
       synchronized(QUEUE_LOCK) {
         if (chunk === curr) {
-          return@launchOnMultithreadedAsync
+          return@launchOnMultithreadedAsyncSuspendable
         }
 
         // Time used to prioritize the chunk, a chunk added a while a go should be prioritized over a chunk added just now with prioritize = true to not get stale chunk textures

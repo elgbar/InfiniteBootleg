@@ -7,7 +7,7 @@ import ktx.collections.component1
 import ktx.collections.component2
 import no.elg.infiniteBootleg.client.world.chunks.TexturedChunkImpl
 import no.elg.infiniteBootleg.core.api.Renderer
-import no.elg.infiniteBootleg.core.util.launchOnAsync
+import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_TEXTURE_SIZE
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_TEXTURE_SIZE_F
@@ -44,7 +44,7 @@ class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer
       for (chunkX in horizontalStart until horizontalEnd) {
         val maybeLoadedChunk = worldRender.world.getChunk(chunkX, chunkY, false)
         if (maybeLoadedChunk == null) {
-          launchOnAsync { worldRender.world.loadChunk(chunkX, chunkY) }
+          launchOnAsyncSuspendable { worldRender.world.loadChunk(chunkX, chunkY) }
           continue
         }
         val chunk = maybeLoadedChunk as? TexturedChunkImpl ?: error("Chunk is not a TexturedChunkImpl: $maybeLoadedChunk")

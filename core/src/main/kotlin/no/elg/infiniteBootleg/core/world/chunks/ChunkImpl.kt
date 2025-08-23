@@ -30,8 +30,8 @@ import no.elg.infiniteBootleg.core.util.dst2
 import no.elg.infiniteBootleg.core.util.isAir
 import no.elg.infiniteBootleg.core.util.isInsideChunk
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
-import no.elg.infiniteBootleg.core.util.launchOnAsync
-import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsync
+import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
+import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.singleLinePrinter
 import no.elg.infiniteBootleg.core.util.stringifyChunkToWorld
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
@@ -230,7 +230,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
       if (block != null) {
         chunkBody.addBlock(block)
       }
-      launchOnAsync { chunkColumn.updateTopBlock(localX, chunkY.chunkToWorld(localY)) }
+      launchOnAsyncSuspendable { chunkColumn.updateTopBlock(localX, chunkY.chunkToWorld(localY)) }
     }
 
     if (!initializing && !bothAirish) {
@@ -273,7 +273,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
           // as it might cancel updates to blocks that will not be updated in the next update
           recalculateLightJob?.cancel()
         }
-        recalculateLightJob = launchOnMultithreadedAsync {
+        recalculateLightJob = launchOnMultithreadedAsyncSuspendable {
           doUpdateLightMultipleSources0(sources, checkDistance)
         }
       }
@@ -427,7 +427,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     dirty()
     chunkBody.update()
     chunkListeners.registerListeners()
-    launchOnAsync {
+    launchOnAsyncSuspendable {
       delay(200L)
       updateAllBlockLights()
     }

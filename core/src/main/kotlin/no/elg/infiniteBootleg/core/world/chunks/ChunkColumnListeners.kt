@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.core.world.chunks
 import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.events.chunks.ChunkLoadedEvent
-import no.elg.infiniteBootleg.core.util.launchOnAsync
+import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag
 
@@ -22,7 +22,7 @@ class ChunkColumnListeners : Disposable {
       if (worldToChunkLight == eventChunk.chunkY || worldToChunkSolid == eventChunk.chunkY) {
         val flagLight = if (worldToChunkLight == eventChunk.chunkY) FeatureFlag.BLOCKS_LIGHT_FLAG else 0
         val flagSolid = if (worldToChunkSolid == eventChunk.chunkY) FeatureFlag.SOLID_FLAG else 0
-        launchOnAsync {
+        launchOnAsyncSuspendable {
           chunkColumn.updateTopBlockWithoutHint(localX, flagLight or flagSolid)
         }
       }

@@ -32,7 +32,7 @@ import no.elg.infiniteBootleg.core.events.api.RegisteredEventListener
 import no.elg.infiniteBootleg.core.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.core.items.Item
 import no.elg.infiniteBootleg.core.items.Item.Companion.displayName
-import no.elg.infiniteBootleg.core.util.launchOnMain
+import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.safeUse
 import no.elg.infiniteBootleg.core.util.withColor
 
@@ -67,13 +67,13 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
     events = arrayOf(
       registerListener<ContainerEvent.ContentChanged>({ it.container === container || it.owner?.toInterfaceId() == interfaceId }) {
         val serverContainer = this.container
-        launchOnMain {
+        launchOnMainSuspendable {
           serverContainer.content.copyInto(container.content)
           updateAllSlots()
         }
       },
       registerListener<InterfaceEvent.Opening>(filter) {
-        launchOnMain {
+        launchOnMainSuspendable {
           delay(1) // to make sure the window is fully initialized
           updateAllSlots()
           centerWindow()

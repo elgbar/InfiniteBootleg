@@ -8,7 +8,7 @@ import no.elg.infiniteBootleg.client.screens.ConnectingScreen
 import no.elg.infiniteBootleg.core.console.clientSideServerBoundMarker
 import no.elg.infiniteBootleg.core.net.ChannelHandlerContextWrapper
 import no.elg.infiniteBootleg.core.net.ServerClient
-import no.elg.infiniteBootleg.core.util.launchOnMain
+import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.protobuf.Packets
 
 private val logger = KotlinLogging.logger {}
@@ -22,7 +22,7 @@ class ClientBoundHandler(private val client: ServerClient) : SimpleChannelInboun
   }
 
   override fun channelInactive(ctx: ChannelHandlerContext) {
-    launchOnMain {
+    launchOnMainSuspendable {
       val serverClient = ClientMain.inst().serverClient
       if (serverClient != null) {
         val sharedInformation = serverClient.sharedInformation

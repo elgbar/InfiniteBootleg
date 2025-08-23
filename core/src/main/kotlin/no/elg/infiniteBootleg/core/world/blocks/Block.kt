@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.chunkToWorld
 import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.isInsideChunk
-import no.elg.infiniteBootleg.core.util.launchOnAsync
+import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.Direction
 import no.elg.infiniteBootleg.core.world.Material
@@ -105,7 +105,7 @@ interface Block :
      * Remove this block by setting it to air, done asynchronous
      */
     fun Block.removeAsync(updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true, postRemove: () -> Unit = {}) {
-      launchOnAsync {
+      launchOnAsyncSuspendable {
         remove(updateTexture, prioritize, sendUpdatePacket)
         postRemove()
       }

@@ -17,7 +17,7 @@ import no.elg.infiniteBootleg.core.events.api.EventsTracker
 import no.elg.infiniteBootleg.core.util.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.core.util.INITIAL_INSTANT_BREAK
 import no.elg.infiniteBootleg.core.util.INITIAL_INTERACT_RADIUS
-import no.elg.infiniteBootleg.core.util.launchOnAsync
+import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
@@ -175,7 +175,7 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           { false },
           {
             world.render.chunkColumnsInView.forEach {
-              launchOnAsync {
+              launchOnAsyncSuspendable {
                 for (localX in 0 until Chunk.CHUNK_SIZE) {
                   world.getChunkColumn(it).updateTopBlockWithoutHint(localX)
                 }

@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.core.console
 
 import com.badlogic.gdx.utils.Disposable
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.core.util.launchOnMain
+import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import java.io.Console
 import java.util.Scanner
 
@@ -30,7 +30,7 @@ class SystemConsoleReader(private val consoleHandler: GameConsoleHandler) :
         var read: String?
         try {
           read = openScanner.nextLine()
-          launchOnMain { consoleHandler.execCommand(read) }
+          launchOnMainSuspendable { consoleHandler.execCommand(read) }
         } catch (e: Exception) {
           logger.error(e) { "Console reader closed due to exception" }
           dispose()

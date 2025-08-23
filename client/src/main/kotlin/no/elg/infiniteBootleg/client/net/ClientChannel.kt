@@ -15,7 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import no.elg.infiniteBootleg.client.screens.ConnectingScreen
 import no.elg.infiniteBootleg.core.net.ServerClient
 import no.elg.infiniteBootleg.core.util.createEventLoopGroup
-import no.elg.infiniteBootleg.core.util.launchOnMain
+import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.protobuf.Packets
 
 /**
@@ -54,7 +54,7 @@ class ClientChannel(val client: ServerClient) {
         ConnectingScreen.info = "${e.javaClass.simpleName}: ${e.message}"
         return
       }
-      launchOnMain(block = onConnect)
+      launchOnMainSuspendable(block = onConnect)
       if (::channel.isInitialized) {
         // Wait until the connection is closed
         channel.closeFuture().sync()

@@ -48,9 +48,9 @@ import no.elg.infiniteBootleg.core.util.isAir
 import no.elg.infiniteBootleg.core.util.isBlockInsideRadius
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
 import no.elg.infiniteBootleg.core.util.isNotAir
-import no.elg.infiniteBootleg.core.util.launchOnAsync
+import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnBox2d
-import no.elg.infiniteBootleg.core.util.launchOnMain
+import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.partitionCount
 import no.elg.infiniteBootleg.core.util.singleLinePrinter
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
@@ -244,7 +244,7 @@ abstract class World(
     EventManager.oneShotListener<InitialChunksOfWorldLoadedEvent> {
       if (Main.Companion.isAuthoritative) {
         // Add a delay to make sure the light is calculated
-        launchOnAsync {
+        launchOnAsyncSuspendable {
           delay(200L)
           EventManager.dispatchEvent(WorldLoadedEvent(world))
         }
@@ -252,7 +252,7 @@ abstract class World(
     }
 
     EventManager.oneShotListener<WorldLoadedEvent> {
-      launchOnMain {
+      launchOnMainSuspendable {
         logger.debug { "Handling InitialChunksOfWorldLoadedEvent, adding systems to the engine" }
         addSystems()
         metadata.isLoaded = true

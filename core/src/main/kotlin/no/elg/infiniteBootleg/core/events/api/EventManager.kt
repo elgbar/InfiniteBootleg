@@ -5,8 +5,8 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager.dispatchEventAsync
-import no.elg.infiniteBootleg.core.util.launchOnAsync
-import no.elg.infiniteBootleg.core.util.launchOnEvents
+import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
+import no.elg.infiniteBootleg.core.util.launchOnEventsSuspendable
 import java.lang.Boolean.TRUE
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.reflect.KClass
@@ -101,7 +101,7 @@ object EventManager {
 
   fun removeOneShotRef(listener: EventListener<out Event>) {
     // Remove from another thread to not cause concurrent modification
-    launchOnAsync {
+    launchOnAsyncSuspendable {
       val storedThis = oneShotStrongRefs.getIfPresent(listener)
       if (storedThis != null) {
         storedThis.removeListener()
@@ -118,7 +118,7 @@ object EventManager {
    * @param event The event to notify about
    */
   inline fun <reified T : Event> dispatchEventAsync(event: T, reason: String? = null) {
-    launchOnEvents { dispatchEvent(T::class, event, reason) }
+    launchOnEventsSuspendable { dispatchEvent(T::class, event, reason) }
   }
 
   /**

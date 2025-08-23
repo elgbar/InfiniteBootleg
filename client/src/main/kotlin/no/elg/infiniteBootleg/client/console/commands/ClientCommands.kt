@@ -30,8 +30,8 @@ import no.elg.infiniteBootleg.core.net.serverBoundClientDisconnectPacket
 import no.elg.infiniteBootleg.core.util.asWorldSeed
 import no.elg.infiniteBootleg.core.util.chunkToWorld
 import no.elg.infiniteBootleg.core.util.getStaticField
-import no.elg.infiniteBootleg.core.util.launchOnAsync
-import no.elg.infiniteBootleg.core.util.launchOnMain
+import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
+import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.toAbled
 import no.elg.infiniteBootleg.core.util.worldToChunk
@@ -362,7 +362,7 @@ class ClientCommands : CommonCommands() {
   @ConsoleDoc(description = "Teleport to given world coordinate", paramDescriptions = ["World x coordinate", "World y coordinate"])
   fun tp(worldX: Float, worldY: Float) {
     val clientWorld = clientWorld ?: return
-    launchOnAsync {
+    launchOnAsyncSuspendable {
       val entities = clientWorld.controlledPlayerEntities
       if (entities.size() > 0) {
         world?.loadChunk(worldX.worldToChunk(), worldY.worldToChunk())
@@ -383,7 +383,7 @@ class ClientCommands : CommonCommands() {
   @ConsoleDoc(description = "Teleport the camera to given world coordinate", paramDescriptions = ["World x coordinate", "World y coordinate"])
   fun lookAt(worldX: Float, worldY: Float) {
     val clientWorld = clientWorld ?: return
-    launchOnAsync {
+    launchOnAsyncSuspendable {
       clientWorld.render.lookAt(worldX, worldY)
       logger.info { "Teleported camera to ${stringifyCompactLoc(worldX, worldY)}" }
     }
@@ -579,9 +579,9 @@ class ClientCommands : CommonCommands() {
     val dy = 1
     val chunkXs = world.render.chunksInView.run { (horizontalStart + dx).chunkToWorld(0) until (horizontalEnd - dx).chunkToWorld(CHUNK_SIZE) }
     val y = (world.render.chunksInView.verticalEnd - dy).chunkToWorld(0)
-    launchOnMain {
+    launchOnMainSuspendable {
       for (x in chunkXs) {
-        launchOnAsync {
+        launchOnAsyncSuspendable {
           world.setBlock(x, y + LIGHT_SOURCE_LOOK_BLOCKS, Material.Sand, prioritize = true)
           world.setBlock(x, y, Material.Torch, prioritize = true)
         }
@@ -596,10 +596,10 @@ class ClientCommands : CommonCommands() {
     val dy = 1
     val chunkXs = world.render.chunksInView.run { (horizontalStart + dx).chunkToWorld(0) until (horizontalEnd - dx).chunkToWorld(CHUNK_SIZE) }
     val y = (world.render.chunksInView.verticalEnd - dy).chunkToWorld(0)
-    launchOnMain {
+    launchOnMainSuspendable {
       for (x in chunkXs) {
         coroutineScope {
-          launchOnAsync { world.setBlock(x, y, Material.Sand, prioritize = true) }
+          launchOnAsyncSuspendable { world.setBlock(x, y, Material.Sand, prioritize = true) }
         }
         delay(delayMillis)
       }

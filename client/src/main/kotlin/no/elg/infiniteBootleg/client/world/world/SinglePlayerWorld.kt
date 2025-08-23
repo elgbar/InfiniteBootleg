@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager.dispatchEvent
-import no.elg.infiniteBootleg.core.util.launchOnAsync
+import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.TransientEntityTag.Companion.isTransientEntity
 import no.elg.infiniteBootleg.core.world.ecs.creation.createNewPlayer
 import no.elg.infiniteBootleg.core.world.ecs.load
@@ -30,7 +30,7 @@ class SinglePlayerWorld(generator: ChunkGenerator, seed: Long, worldName: String
       this@SinglePlayerWorld.createNewPlayer()
     }
 
-    launchOnAsync {
+    launchOnAsyncSuspendable {
       // blocking, will prevent InitialChunksOfWorldLoadedEvent from being dispatched until all chunks are loaded
       render.chunkLocationsInView.forEach(::loadChunk)
       logger.debug { "Loaded initial chunks" }

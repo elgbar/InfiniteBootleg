@@ -22,8 +22,8 @@ import no.elg.infiniteBootleg.core.net.serverBoundClientSecretResponse
 import no.elg.infiniteBootleg.core.net.serverBoundEntityRequest
 import no.elg.infiniteBootleg.core.net.serverBoundHeartbeat
 import no.elg.infiniteBootleg.core.net.serverBoundPacketBuilder
-import no.elg.infiniteBootleg.core.util.launchOnAsync
-import no.elg.infiniteBootleg.core.util.launchOnMain
+import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
+import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.util.toCompact
 import no.elg.infiniteBootleg.core.util.worldToChunk
@@ -102,14 +102,14 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
   when (packet.type) {
     // Gameplay related packets
     DX_HEARTBEAT -> if (packet.hasHeartbeat()) handleHeartbeat()
-    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { launchOnAsync { asyncHandleMoveEntity(it) } }
-    DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { launchOnAsync { asyncHandleBlockUpdate(it) } }
-    CB_SPAWN_ENTITY -> packet.spawnEntityOrNull?.let { launchOnAsync { asyncHandleSpawnEntity(it) } }
-    CB_UPDATE_CHUNK -> packet.updateChunkOrNull?.let { launchOnAsync { asyncHandleUpdateChunk(it) } }
-    CB_DESPAWN_ENTITY -> packet.despawnEntityOrNull?.let { launchOnAsync { asyncHandleDespawnEntity(it) } }
-    DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { launchOnAsync { asyncHandleBreakingBlock(it) } }
-    DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { launchOnAsync { asyncHandleContainerUpdate(it) } }
-    CB_HOLDING_ITEM -> packet.holdingItemOrNull?.let { launchOnAsync { asyncHandleHoldingItem(it) } }
+    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { launchOnAsyncSuspendable { asyncHandleMoveEntity(it) } }
+    DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { launchOnAsyncSuspendable { asyncHandleBlockUpdate(it) } }
+    CB_SPAWN_ENTITY -> packet.spawnEntityOrNull?.let { launchOnAsyncSuspendable { asyncHandleSpawnEntity(it) } }
+    CB_UPDATE_CHUNK -> packet.updateChunkOrNull?.let { launchOnAsyncSuspendable { asyncHandleUpdateChunk(it) } }
+    CB_DESPAWN_ENTITY -> packet.despawnEntityOrNull?.let { launchOnAsyncSuspendable { asyncHandleDespawnEntity(it) } }
+    DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { launchOnAsyncSuspendable { asyncHandleBreakingBlock(it) } }
+    DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { launchOnAsyncSuspendable { asyncHandleContainerUpdate(it) } }
+    CB_HOLDING_ITEM -> packet.holdingItemOrNull?.let { launchOnAsyncSuspendable { asyncHandleHoldingItem(it) } }
 
     // Login related packets
     DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let { handleSecretExchange(it) }
@@ -227,7 +227,7 @@ private fun ServerClient.handleLoginSuccess() {
       player.box2d.enableGravity()
       logger.debug { "Server sent the entity to control" }
 
-      launchOnMain {
+      launchOnMainSuspendable {
         started = true
         ClientMain.inst().screen = WorldScreen(world, false)
         dispatchEvent(WorldLoadedEvent(world)) // must be after setting the world screen for the event to be listened to
@@ -240,7 +240,7 @@ private fun ServerClient.handleLoginSuccess() {
 
 private fun ServerClient.handleStartGame(startGame: StartGame) {
   logger.debug { "Initialization okay, loading world" }
-  launchOnMain {
+  launchOnMainSuspendable {
     if (startGame.controlling.entityType != PLAYER) {
       ctx.fatal("Can only control a player, got ${startGame.controlling.entityType}")
     }

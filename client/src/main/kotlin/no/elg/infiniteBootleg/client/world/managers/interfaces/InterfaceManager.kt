@@ -12,7 +12,7 @@ import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.events.chunks.ChunkUnloadedEvent
 import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.core.inventory.container.InterfaceId
-import no.elg.infiniteBootleg.core.util.launchOnMain
+import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.ownedContainerOrNull
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
@@ -67,7 +67,7 @@ class InterfaceManager(private val world: ClientWorld) : Disposable {
 
   private fun getOrCreate(interfaceId: InterfaceId, createIfMissing: () -> IBVisWindow?): CompletableFuture<IBVisWindow?> =
     CompletableFuture<IBVisWindow?>().also { future ->
-      launchOnMain {
+      launchOnMainSuspendable {
         synchronized(interfaces) {
           interfaces[interfaceId] ?: createIfMissing()
         }.also { future.complete(it) }

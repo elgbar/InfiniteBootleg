@@ -9,7 +9,7 @@ import io.netty.channel.Channel
 import no.elg.infiniteBootleg.core.net.SharedInformation
 import no.elg.infiniteBootleg.core.net.clientBoundSpawnEntity
 import no.elg.infiniteBootleg.core.util.IllegalAction
-import no.elg.infiniteBootleg.core.util.launchOnMain
+import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.required.EntityTypeComponent.Companion.isType
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
@@ -88,7 +88,7 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
 
   private fun onEntityAdd(player: Entity) {
     if (player.shouldSendToClients) {
-      launchOnMain {
+      launchOnMainSuspendable {
         ServerMain.inst().packetSender.broadcastToInView(clientBoundSpawnEntity(player), player, excludeEntity = false)
       }
     }

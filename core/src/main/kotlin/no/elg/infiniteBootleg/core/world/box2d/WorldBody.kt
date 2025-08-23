@@ -11,6 +11,7 @@ import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.api.Ticking
 import no.elg.infiniteBootleg.core.events.api.ThreadType
+import no.elg.infiniteBootleg.core.events.api.ThreadType.Companion.launchOnThreadType
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
 import no.elg.infiniteBootleg.core.util.Compacted2Float
 import no.elg.infiniteBootleg.core.util.EntityFlags.INVALID_FLAG

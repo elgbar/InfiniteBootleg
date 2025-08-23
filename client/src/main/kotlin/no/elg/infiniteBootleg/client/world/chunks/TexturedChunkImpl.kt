@@ -7,7 +7,7 @@ import com.google.errorprone.annotations.concurrent.GuardedBy
 import no.elg.infiniteBootleg.client.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.core.util.ChunkCoord
 import no.elg.infiniteBootleg.core.util.WorldCompactLocArray
-import no.elg.infiniteBootleg.core.util.launchOnMain
+import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
@@ -92,7 +92,7 @@ class TexturedChunkImpl(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord) :
   private fun disposeFbo() {
     synchronized(chunkBody) {
       fbo?.also { oldFbo ->
-        launchOnMain {
+        launchOnMainSuspendable {
           oldFbo.dispose()
         }
         fbo = null

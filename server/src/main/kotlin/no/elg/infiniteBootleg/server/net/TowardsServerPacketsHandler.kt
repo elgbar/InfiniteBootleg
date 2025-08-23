@@ -27,8 +27,8 @@ import no.elg.infiniteBootleg.core.util.ChunkCoord
 import no.elg.infiniteBootleg.core.util.Util
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.generateUUIDFromString
-import no.elg.infiniteBootleg.core.util.launchOnAsync
-import no.elg.infiniteBootleg.core.util.launchOnMain
+import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
+import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.toCompact
 import no.elg.infiniteBootleg.core.util.toComponentsString
@@ -86,9 +86,9 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
   logPacket(serverSideServerBoundMarker, packet)
   when (packet.type) {
     Packets.Packet.Type.DX_HEARTBEAT -> handleHeartbeat(ctx)
-    Packets.Packet.Type.DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { launchOnMain { handleMovePlayer(ctx, it) } }
+    Packets.Packet.Type.DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { launchOnMainSuspendable { handleMovePlayer(ctx, it) } }
     Packets.Packet.Type.DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let {
-      launchOnAsync {
+      launchOnAsyncSuspendable {
         asyncHandleBlockUpdate(
           ctx,
           it
@@ -99,7 +99,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
     Packets.Packet.Type.SB_CONTENT_REQUEST -> packet.contentRequestOrNull?.let { handleContentRequest(ctx, it) }
 
     Packets.Packet.Type.DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let {
-      launchOnAsync {
+      launchOnAsyncSuspendable {
         asyncHandleBreakingBlock(
           ctx,
           it
@@ -108,7 +108,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
     }
 
     Packets.Packet.Type.DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let {
-      launchOnAsync {
+      launchOnAsyncSuspendable {
         asyncHandleContainerUpdate(
           ctx,
           it
@@ -117,7 +117,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
     }
 
     Packets.Packet.Type.SB_SELECT_SLOT -> packet.updateSelectedSlotOrNull?.let {
-      launchOnAsync {
+      launchOnAsyncSuspendable {
         asyncHandleUpdateSelectedSlot(
           ctx,
           it
@@ -125,10 +125,10 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
       }
     }
 
-    Packets.Packet.Type.SB_LOGIN -> packet.loginOrNull?.let { launchOnMain { handleLoginPacket(ctx, it) } }
-    Packets.Packet.Type.SB_CLIENT_WORLD_LOADED -> launchOnAsync { asyncHandleClientsWorldLoaded(ctx) }
+    Packets.Packet.Type.SB_LOGIN -> packet.loginOrNull?.let { launchOnMainSuspendable { handleLoginPacket(ctx, it) } }
+    Packets.Packet.Type.SB_CLIENT_WORLD_LOADED -> launchOnAsyncSuspendable { asyncHandleClientsWorldLoaded(ctx) }
     Packets.Packet.Type.DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let {
-      launchOnMain {
+      launchOnMainSuspendable {
         handleSecretExchange(
           ctx,
           it
@@ -136,9 +136,9 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
       }
     }
 
-    Packets.Packet.Type.DX_DISCONNECT -> launchOnMain { handleDisconnect(ctx, packet.disconnectOrNull) }
+    Packets.Packet.Type.DX_DISCONNECT -> launchOnMainSuspendable { handleDisconnect(ctx, packet.disconnectOrNull) }
     Packets.Packet.Type.DX_WORLD_SETTINGS -> packet.worldSettingsOrNull?.let {
-      launchOnMain {
+      launchOnMainSuspendable {
         handleWorldSettings(
           ctx,
           it
@@ -146,7 +146,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
       }
     }
 
-    Packets.Packet.Type.SB_CAST_SPELL -> launchOnAsync { asyncHandleCastSpell(ctx) }
+    Packets.Packet.Type.SB_CAST_SPELL -> launchOnAsyncSuspendable { asyncHandleCastSpell(ctx) }
 
     Packets.Packet.Type.UNRECOGNIZED -> ctx.fatal("Unknown packet type received by server: ${packet.type}")
     else -> {
@@ -165,19 +165,19 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
 
 private fun handleContentRequest(ctx: ChannelHandlerContextWrapper, contentRequest: Packets.ContentRequest) {
   // Chunk request
-  contentRequest.chunkLocationOrNull?.let { launchOnAsync { asyncHandleChunkRequest(ctx, it.x, it.y) } }
+  contentRequest.chunkLocationOrNull?.let { launchOnAsyncSuspendable { asyncHandleChunkRequest(ctx, it.x, it.y) } }
   // Entity request
   if (contentRequest.hasEntityRef()) {
     val entityId: String = contentRequest.entityRef.id
     val requestedEntities = ctx.getSharedInformation()?.requestedEntities ?: return
     requestedEntities.get(entityId) {
-      launchOnAsync { asyncHandleEntityRequest(ctx, entityId) }
+      launchOnAsyncSuspendable { asyncHandleEntityRequest(ctx, entityId) }
     }
   }
   // Container
   contentRequest.containerOwner?.let { owner: ProtoWorld.ContainerOwner ->
-    launchOnAsync {
-      asyncHandleContainerRequest(ctx, owner.fromProto() ?: return@launchOnAsync)
+    launchOnAsyncSuspendable {
+      asyncHandleContainerRequest(ctx, owner.fromProto() ?: return@launchOnAsyncSuspendable)
     }
   }
 }

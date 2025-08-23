@@ -8,7 +8,7 @@ import ktx.ashley.remove
 import ktx.collections.gdxSetOf
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.distCubed
-import no.elg.infiniteBootleg.core.util.launchOnAsync
+import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.materialOrAir
@@ -37,7 +37,7 @@ object ExplosiveBlockSystem : IteratingSystem(explosiveBlockFamily, UPDATE_PRIOR
       val worldX = positionComponent.blockX
       val worldY = positionComponent.blockY
       val world = entity.world
-      launchOnAsync { explosiveComponent.explode(world, worldX, worldY) }
+      launchOnAsyncSuspendable { explosiveComponent.explode(world, worldX, worldY) }
     }
   }
 

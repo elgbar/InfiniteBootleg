@@ -7,7 +7,7 @@ import no.elg.infiniteBootleg.core.api.Ticking
 import no.elg.infiniteBootleg.core.events.WorldRareTickedEvent
 import no.elg.infiniteBootleg.core.events.WorldTickedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
-import no.elg.infiniteBootleg.core.util.launchOnAsync
+import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.ViewableChunk
@@ -41,12 +41,12 @@ internal class WorldTickee(private val world: World) : Ticking {
           logger.warn { "Found null chunk when ticking world" }
         } else if (chunk.isDisposed) {
           logger.warn { "Found disposed chunk ${stringifyCompactLoc(chunk)} when ticking world" }
-          launchOnAsync {
+          launchOnAsyncSuspendable {
             world.unloadChunk(chunk, force = true)
           }
         } else if (unloadQuota > 0 && chunk.allowedToUnload && world.render.isOutOfView(chunk) && (chunk is ViewableChunk && tick - chunk.lastViewedTick > chunkUnloadTime)) {
           unloadQuota--
-          launchOnAsync {
+          launchOnAsyncSuspendable {
             world.unloadChunk(chunk)
           }
         }
