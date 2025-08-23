@@ -6,14 +6,17 @@ import com.badlogic.gdx.box2d.structs.b2BodyEvents
 import com.badlogic.gdx.box2d.structs.b2BodyId
 import com.badlogic.gdx.box2d.structs.b2Capsule
 import com.badlogic.gdx.box2d.structs.b2Circle
+import com.badlogic.gdx.box2d.structs.b2ContactEvents
 import com.badlogic.gdx.box2d.structs.b2Filter
 import com.badlogic.gdx.box2d.structs.b2Polygon
 import com.badlogic.gdx.box2d.structs.b2Rot
+import com.badlogic.gdx.box2d.structs.b2SensorEvents
 import com.badlogic.gdx.box2d.structs.b2ShapeDef
 import com.badlogic.gdx.box2d.structs.b2ShapeId
 import com.badlogic.gdx.box2d.structs.b2Vec2
 import com.badlogic.gdx.box2d.structs.b2WorldId
 import com.badlogic.gdx.jnigen.runtime.pointer.VoidPointer
+import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.util.Compacted2Float
 import no.elg.infiniteBootleg.core.util.Compacted2Int
 import no.elg.infiniteBootleg.core.util.Degrees
@@ -161,12 +164,15 @@ fun b2WorldId.step(timeStep: Float, subStepCount: Int) {
 }
 
 fun b2WorldId.getBodyEvents(): b2BodyEvents = Box2d.b2World_GetBodyEvents(this)
+fun b2WorldId.getSensorEvents(): b2SensorEvents = Box2d.b2World_GetSensorEvents(this)
+fun b2WorldId.getContactEvents(): b2ContactEvents = Box2d.b2World_GetContactEvents(this)
 
 fun b2WorldId.createBody(bodyDef: b2BodyDef): b2BodyId = Box2d.b2CreateBody(this, bodyDef.asPointer())
 
 fun b2WorldId.dispose() {
   userData = null
   Box2d.b2DestroyWorld(this)
+  VoidPointerManager.globalVPM.clean()
 }
 
 // /////////////
@@ -212,11 +218,13 @@ var b2ShapeId.userData: Any?
  * Correctly set the user data pointer of a shape. Handles `null` values by removing the pointer from the [VoidPointerManager].
  */
 private fun genericSetUserData(value: Any?, property: KMutableProperty0<VoidPointer>) {
-  if (value == null) {
-    remove(property.get())
-    property.set(VoidPointer.NULL)
-  } else {
-    property.set(createVoidPointer(value))
+  ThreadType.PHYSICS.launchOrRun {
+    if (value == null) {
+      remove(property.get())
+      property.set(VoidPointer.NULL)
+    } else {
+      property.set(createVoidPointer(value))
+    }
   }
 }
 

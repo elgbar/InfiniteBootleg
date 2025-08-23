@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.core.world.ecs.components
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.box2d.structs.b2BodyId
+import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
@@ -12,6 +13,7 @@ import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.Constants
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.box2d.gravityScale
+import no.elg.infiniteBootleg.core.world.box2d.isValid
 import no.elg.infiniteBootleg.core.world.box2d.userData
 import no.elg.infiniteBootleg.core.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.LoadableMapper
@@ -31,6 +33,8 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.FALLING_
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.PLAYER
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.SPELL
 
+private val logger = KotlinLogging.logger {}
+
 /**
  *
  * @param box2dWidth  The height of this entity in box2d view
@@ -41,6 +45,16 @@ class Box2DBodyComponent(body: b2BodyId, val type: ProtoWorld.Entity.Box2D.BodyT
   CheckableDisposable {
 
   private var internalBody: b2BodyId? = body
+    get() {
+      val field = field ?: return null
+      return if (field.isValid) {
+        field
+      } else {
+        logger.warn { "Body was disposed without the Box2DBodyComponent noticing it, ${hudDebug()}" }
+        disposed = true
+        null
+      }
+    }
   private var disposed = false
 
   val halfBox2dWidth: Float get() = box2dWidth / 2f
@@ -72,7 +86,7 @@ class Box2DBodyComponent(body: b2BodyId, val type: ProtoWorld.Entity.Box2D.BodyT
   }
 
   override fun hudDebug(): String =
-    "type: $type, gravity ${body.gravityScale}, size ${stringifyCompactLoc(box2dWidth, box2dHeight)}, disposed? $disposed" // , userdata ${internalBody?.userData}" //TODO userdata
+    "type: $type, gravity ${body.gravityScale}, size ${stringifyCompactLoc(box2dWidth, box2dHeight)}, disposed? $disposed, userdata ${internalBody?.userData}"
 
   companion object : LoadableMapper<Box2DBodyComponent, ProtoWorld.Entity, (Entity) -> Unit>() {
     val Entity.box2dBody get() = box2d.body

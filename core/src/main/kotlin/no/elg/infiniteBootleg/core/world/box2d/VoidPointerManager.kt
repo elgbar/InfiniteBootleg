@@ -1,16 +1,20 @@
 package no.elg.infiniteBootleg.core.world.box2d
 
 import com.badlogic.gdx.jnigen.runtime.pointer.VoidPointer
+import io.github.oshai.kotlinlogging.KotlinLogging
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap
 import no.elg.infiniteBootleg.core.events.api.ThreadType
+import no.elg.infiniteBootleg.core.world.BOX2D_LOCK
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * Not thread-safe
  */
 class VoidPointerManager {
 
-  private var id: Long = 1 // Start at 1 to avoid 0 being a valid pointer, which is used for null pointers
+  private var id: Long = START_ID
   private val addrToObj = Long2ObjectOpenHashMap<Any>()
   private val objToAddr = Object2LongOpenHashMap<Any>().also { it.defaultReturnValue(NOT_IN_MANAGER) }
 
@@ -72,10 +76,28 @@ class VoidPointerManager {
     return addrToObj.get(id)
   }
 
+  fun clean() {
+    synchronized(BOX2D_LOCK) {
+      if (addrToObj.isNotEmpty() || objToAddr.isNotEmpty()) {
+        logger.warn { "Memory leak: still referencing objects" }
+        logger.info { "Memory leak (${addrToObj.size}): Objects: $addrToObj" }
+        logger.info { "Memory leak (${objToAddr.size}): Addresses: $objToAddr" }
+      }
+      addrToObj.clear()
+      objToAddr.clear()
+      id = START_ID
+    }
+  }
+
   companion object {
     private const val NOT_IN_MANAGER = Long.MIN_VALUE
 
-    // TODO make a vpm per world
+    /**
+     * Start at 1 to avoid 0 being a valid pointer, which is used for null pointers
+     */
+    private const val START_ID = 1L
+
+    // TODO make a VoidPointerManager per world
     val globalVPM: VoidPointerManager = VoidPointerManager()
 
     fun createVoidPointer(obj: Any?): VoidPointer = globalVPM.createPointer(obj)
