@@ -380,4 +380,9 @@ open class CommonCommands : CommandExecutor() {
       logger.info { system::class.simpleName + " (${system.priority})" }
     }
   }
+
+  @HiddenCommand
+  fun gc() {
+    System.gc()
+  }
 }
