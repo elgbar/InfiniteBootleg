@@ -16,6 +16,7 @@ import com.badlogic.gdx.box2d.structs.b2ShapeId
 import com.badlogic.gdx.box2d.structs.b2Vec2
 import com.badlogic.gdx.box2d.structs.b2WorldId
 import com.badlogic.gdx.jnigen.runtime.pointer.VoidPointer
+import no.elg.infiniteBootleg.core.Settings.handleInvalidBox2dRef
 import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.util.Compacted2Float
 import no.elg.infiniteBootleg.core.util.Compacted2Int
@@ -26,9 +27,6 @@ import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.decompactLocXf
 import no.elg.infiniteBootleg.core.util.decompactLocYf
 import no.elg.infiniteBootleg.core.util.toDegrees
-import no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager.Companion.createVoidPointer
-import no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager.Companion.deferenceVoidPointer
-import no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager.Companion.remove
 import kotlin.reflect.KMutableProperty0
 
 val NO_ROTATION: b2Rot = Box2d.b2MakeRot(0f)
@@ -105,10 +103,6 @@ fun b2BodyId.applyForceToCenter(force: b2Vec2, wake: Boolean) {
 
 fun b2BodyId.dispose() {
   userData = null
-  // TODo how to handle desstruction of shape userdata?
-//  Box2d.b2Body_GetShapes(this).forEach { shapeId ->
-//    shapeId.setUserData(this.world, null)
-//  }
   Box2d.b2DestroyBody(this)
 }
 
@@ -122,11 +116,22 @@ fun b2BodyId.createCapsuleShape(shapeDef: b2ShapeDef, capsule: b2Capsule, userDa
   Box2d.b2CreateCapsuleShape(this, shapeDef.asPointer(), capsule.asPointer()).also { shape -> userData?.also { shape.userData = it } }
 
 var b2BodyId.userDataPointer: VoidPointer
-  get() = Box2d.b2Body_GetUserData(this)
-  set(value) = Box2d.b2Body_SetUserData(this, value)
+  get() = if (Box2d.b2Body_IsValid(this)) {
+    Box2d.b2Body_GetUserData(this)
+  } else {
+    handleInvalidBox2dRef.handle { "Tried to get user data from invalid body $this" }
+    VoidPointer.NULL
+  }
+  set(value) {
+    if (Box2d.b2Body_IsValid(this)) {
+      Box2d.b2Body_SetUserData(this, value)
+    } else {
+      handleInvalidBox2dRef.handle { "Tried to set user data on invalid body $this" }
+    }
+  }
 
 var b2BodyId.userData: Any?
-  get() = deferenceVoidPointer(userDataPointer)
+  get() = VoidPointerManager.deferenceVoidPointer(userDataPointer)
   set(value) {
     genericSetUserData(value, this::userDataPointer)
   }
@@ -140,11 +145,22 @@ var b2WorldId.gravity: b2Vec2
   set(value) = Box2d.b2World_SetGravity(this, value)
 
 var b2WorldId.userDataPointer: VoidPointer
-  get() = Box2d.b2World_GetUserData(this)
-  set(value) = Box2d.b2World_SetUserData(this, value)
+  get() = if (Box2d.b2World_IsValid(this)) {
+    Box2d.b2World_GetUserData(this)
+  } else {
+    handleInvalidBox2dRef.handle { "Tried to get user data from invalid world $this" }
+    VoidPointer.NULL
+  }
+  set(value) {
+    if (Box2d.b2World_IsValid(this)) {
+      Box2d.b2World_SetUserData(this, value)
+    } else {
+      handleInvalidBox2dRef.handle { "Tried to set user data on invalid world $this" }
+    }
+  }
 
 var b2WorldId.userData: Any?
-  get() = deferenceVoidPointer(userDataPointer)
+  get() = VoidPointerManager.deferenceVoidPointer(userDataPointer)
   set(value) {
     genericSetUserData(value, this::userDataPointer)
   }
@@ -203,13 +219,22 @@ fun b2ShapeId.dispose(updateBodyMass: Boolean = true) {
  * This might lead to memory leaks if the pointer is not removed from [VoidPointerManager]
  */
 private var b2ShapeId.userDataPointer: VoidPointer
-  get() = Box2d.b2Shape_GetUserData(this)
+  get() = if (Box2d.b2Shape_IsValid(this)) {
+    Box2d.b2Shape_GetUserData(this)
+  } else {
+    handleInvalidBox2dRef.handle { "Tried to get user data from invalid shape $this" }
+    VoidPointer.NULL
+  }
   set(value) {
-    Box2d.b2Shape_SetUserData(this, value)
+    if (Box2d.b2Shape_IsValid(this)) {
+      Box2d.b2Shape_SetUserData(this, value)
+    } else {
+      handleInvalidBox2dRef.handle { "Tried to set user data on invalid shape $this" }
+    }
   }
 
 var b2ShapeId.userData: Any?
-  get() = deferenceVoidPointer(userDataPointer)
+  get() = VoidPointerManager.deferenceVoidPointer(userDataPointer)
   set(value) {
     genericSetUserData(value, this::userDataPointer)
   }
@@ -220,10 +245,11 @@ var b2ShapeId.userData: Any?
 private fun genericSetUserData(value: Any?, property: KMutableProperty0<VoidPointer>) {
   ThreadType.PHYSICS.launchOrRun {
     if (value == null) {
-      remove(property.get())
+      val pointer = property.get()
+      VoidPointerManager.removePointer(pointer)
       property.set(VoidPointer.NULL)
     } else {
-      property.set(createVoidPointer(value))
+      property.set(VoidPointerManager.createVoidPointer(value))
     }
   }
 }

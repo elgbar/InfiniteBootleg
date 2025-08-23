@@ -99,6 +99,7 @@ object Settings {
 
   var handleWrongThreadAsyncEvents: IllegalAction = IllegalAction.STACKTRACE
   var handleChangingBlockInDeposedChunk: IllegalAction = IllegalAction.STACKTRACE
+  var handleInvalidBox2dRef: IllegalAction = IllegalAction.STACKTRACE
 
   var enableCameraFollowLerp = true
 
