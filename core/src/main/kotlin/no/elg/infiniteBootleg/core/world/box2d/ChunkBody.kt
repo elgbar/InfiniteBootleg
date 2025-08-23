@@ -121,12 +121,8 @@ class ChunkBody(val chunk: Chunk) :
   fun removeBlock(block: Block) {
     val world = chunk.world
     world.postBox2dRunnable {
-      chunkShapes[shapeIndex(block.localX, block.localY)]?.also { shapeId ->
-        shapeId.dispose() // just remove it
-//        shapeId.filter = Filters.NON_INTERACTIVE__GROUND_FILTER
-//        shapeId.setUserData(bodyId.world, null)
-//        world.engine.queuePhysicsEvent(PhysicsEvent.BlockRemovedEvent(fixture, block.compactWorldLoc)) //TODO events
-      }
+      chunkShapes[shapeIndex(block.localX, block.localY)]?.dispose()
+      chunkShapes[shapeIndex(block.localX, block.localY)] = null
     }
   }
 
@@ -142,6 +138,7 @@ class ChunkBody(val chunk: Chunk) :
     }
     val polygon = Box2d.b2MakeOffsetBox(0.5f, 0.5f, makeB2Vec2(block.localX, block.localY), NO_ROTATION)
     val shapeId = bodyId.createPolygonShape(chainShape, polygon, block)
+    chunkShapes[shapeIndex(block.localX, block.localY)]?.dispose()
     chunkShapes[shapeIndex(block.localX, block.localY)] = shapeId
   }
 
