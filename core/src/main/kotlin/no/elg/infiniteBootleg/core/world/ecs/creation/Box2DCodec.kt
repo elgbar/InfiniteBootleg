@@ -72,7 +72,7 @@ fun EngineEntity.createPlayerBodyComponent(
     afterBodyComponentAdded = whenReady
   ) {
     val body = this
-    createPlayerCapsule(body, body) {
+    createPlayerCapsule(body, entity) {
 //      set(playerVertices)
       b2Capsule().apply {
         center1.set(0f, 0f)
