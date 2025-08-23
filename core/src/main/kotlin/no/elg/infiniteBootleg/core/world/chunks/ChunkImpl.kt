@@ -224,6 +224,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
       dirty(prioritize)
     }
     if (!bothAirish) {
+      // Note chunkBody must be called after the body is inserted into the chunk
       if (currBlock != null) {
         chunkBody.removeBlock(currBlock)
       }

@@ -11,7 +11,6 @@ import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.api.Ticking
 import no.elg.infiniteBootleg.core.events.api.ThreadType
-import no.elg.infiniteBootleg.core.events.api.ThreadType.Companion.launchOnThreadType
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
 import no.elg.infiniteBootleg.core.util.Compacted2Float
 import no.elg.infiniteBootleg.core.util.EntityFlags.INVALID_FLAG
@@ -79,7 +78,7 @@ open class WorldBody(private val world: World) :
   fun postBox2dRunnable(runnable: () -> Unit) = postRunnable.postRunnable(runnable)
 
   internal fun updateChunk(chunkBody: ChunkBody) {
-    postRunnable.postRunnable {
+    ThreadType.PHYSICS.launchOrRun {
       if (chunkBody.shouldCreateBody()) {
         createBodyNow(chunkBody.bodyDef, chunkBody::onBodyCreated)
       }
@@ -110,7 +109,7 @@ open class WorldBody(private val world: World) :
    * @param def The definition of the body to create
    */
   fun createBody(def: b2BodyDef, callback: (b2BodyId) -> Unit) {
-    postBox2dRunnable {
+    ThreadType.PHYSICS.launchOrRun {
       createBodyNow(def, callback)
     }
   }
@@ -119,10 +118,9 @@ open class WorldBody(private val world: World) :
   private fun createBodyNow(def: b2BodyDef, callback: (b2BodyId) -> Unit) {
     val body: b2BodyId = box2dWorld.createBody(def)
     callback(body)
-//    Box2d.b2Body_SetUserData() // https://github.com/libgdx/gdx-box2d/blob/master/README.md#working-with-voidpointer-context-or-user-data
     val userData = body.userData
     if (userData == null) {
-      IllegalAction.STACKTRACE.handle { "Userdata not added when creating body" }
+      IllegalAction.STACKTRACE.handle { "Userdata not added when creating body. Tried to c${body.userDataPointer.isValid}" }
     }
   }
 
@@ -132,7 +130,7 @@ open class WorldBody(private val world: World) :
    * @param body The body to destroy
    */
   fun destroyBody(body: b2BodyId) {
-    postBox2dRunnable {
+    ThreadType.PHYSICS.launchOrRun {
       require(body.isValid) {
         "Cannot destroy body that is not valid" // , userData: ${body.userData}"
       }
@@ -202,7 +200,7 @@ open class WorldBody(private val world: World) :
     upperY: Number,
     callback: ((Set<Pair<b2BodyId, Entity>>) -> Unit)
   ) {
-    postBox2dRunnable {
+    ThreadType.PHYSICS.launchOrRun {
       val entities = mutableSetOf<Pair<b2BodyId, Entity>>()
 //      val queryCallback: (Fixture) -> Boolean = {
 //        val body = it.body

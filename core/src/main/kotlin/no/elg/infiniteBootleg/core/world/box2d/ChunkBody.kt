@@ -8,6 +8,7 @@ import com.badlogic.gdx.box2d.structs.b2ShapeId
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.api.Updatable
+import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
 import no.elg.infiniteBootleg.core.util.LocalCoord
 import no.elg.infiniteBootleg.core.util.isLazyInitialized
@@ -28,7 +29,7 @@ class ChunkBody(val chunk: Chunk) :
   Updatable,
   CheckableDisposable {
 
-  //unsynchronized lazy is ok since this will only be accessed from the physics thread
+  // unsynchronized lazy is ok since this will only be accessed from the physics thread
   // we also want it lazy to not allocate chunk shapes for empty chunks
   private val chunkShapes: Array<b2ShapeId?> by lazy(LazyThreadSafetyMode.NONE) { arrayOfNulls(Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE) }
 
@@ -104,8 +105,8 @@ class ChunkBody(val chunk: Chunk) :
   @GuardedBy("BOX2D_LOCK")
   fun onBodyCreated(tmpBody: b2BodyId) {
     val blocks = chunk.asSequence().filterNotNull().filter(Block::isNotAir)
-    addBlocks(blocks, tmpBody)
     tmpBody.userData = this
+    addBlocks(blocks, tmpBody)
 
     // if this got disposed while creating the new chunk fixture, this is the easiest cleanup solution
     if (isDisposed) {
@@ -144,27 +145,26 @@ class ChunkBody(val chunk: Chunk) :
     chunkShapes[shapeIndex(block.localX, block.localY)] = shapeId
   }
 
-  fun addBlocks(blocks: Sequence<Block>, box2dBody: b2BodyId? = null) {
-    chunk.world.postBox2dRunnable {
+  fun addBlocks(blocks: Sequence<Block>, box2dBody: b2BodyId? = null) =
+    ThreadType.PHYSICS.launchOrRun {
       val body = box2dBody ?: this.box2dBody
       if (body == null) {
         update()
-        return@postBox2dRunnable
-      }
-      for (block in blocks) {
-        addBlockNow(block, body)
+      } else {
+        for (block in blocks) {
+          addBlockNow(block, body)
+        }
       }
     }
-  }
 
   fun addBlock(block: Block, box2dBody: b2BodyId? = null) {
-    chunk.world.postBox2dRunnable {
+    ThreadType.PHYSICS.launchOrRun {
       val body = box2dBody ?: this.box2dBody
       if (body == null) {
         update()
-        return@postBox2dRunnable
+      } else {
+        addBlockNow(block, body)
       }
-      addBlockNow(block, body)
     }
   }
 
