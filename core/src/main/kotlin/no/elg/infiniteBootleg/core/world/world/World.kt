@@ -26,6 +26,7 @@ import no.elg.infiniteBootleg.core.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.core.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.core.events.WorldSpawnUpdatedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
+import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.events.chunks.ChunkLoadedEvent
 import no.elg.infiniteBootleg.core.items.Item.Companion.fullName
 import no.elg.infiniteBootleg.core.main.Main
@@ -1192,14 +1193,18 @@ abstract class World(
     if (!isTransient) {
       WorldLoader.deleteLockFile(uuid)
     }
-
-    worldTicker.stop()
-    worldBody.dispose()
-    chunkColumnsManager.dispose()
-    chunkLoader.dispose()
     metadata.dispose()
-    engine.dispose()
-    logger.debug { "$this have been fully disposed" }
+    logger.debug { "Switching thread for disposal of $this to physics thread" }
+    ThreadType.PHYSICS.launchOrRun {
+      logger.debug { "Continuing disposal of $this" }
+      // Some of these (e.g., engine) must be done from the physics thread
+      engine.dispose()
+      worldTicker.stop()
+      chunkColumnsManager.dispose()
+      chunkLoader.dispose()
+      worldBody.dispose()
+      logger.debug { "$this have been fully disposed" }
+    }
   }
 
   companion object {

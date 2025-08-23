@@ -29,9 +29,9 @@ class VoidPointerManager {
     if (obj == null) {
       return VoidPointer.NULL
     }
+    require(obj !is VoidPointer) { "Cannot create a pointer to a VoidPointer" }
     val existingPointer = objToAddr.getLong(obj)
     return if (existingPointer != NOT_IN_MANAGER) {
-      
       VoidPointer(existingPointer, false)
     } else {
       val id = nextId()
@@ -42,10 +42,10 @@ class VoidPointerManager {
   }
 
   private fun removePointer(pointer: VoidPointer): Boolean {
+    ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
     if (pointer.isInvalid) {
       return false
     }
-    ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
     val id = pointer.getPointer()
     val obj = addrToObj.remove(id) ?: return false
     val addr = objToAddr.removeLong(obj)
@@ -65,7 +65,7 @@ class VoidPointerManager {
   fun remove(obj: Any?): Boolean =
     when (obj) {
       null -> false
-      is VoidPointer -> this@VoidPointerManager.removePointer(obj)
+      is VoidPointer -> removePointer(obj)
       else -> removeObject(obj)
     }
 
@@ -83,6 +83,8 @@ class VoidPointerManager {
         logger.warn { "Memory leak: still referencing objects" }
         logger.info { "Memory leak (${addrToObj.size}): Objects: $addrToObj" }
         logger.info { "Memory leak (${objToAddr.size}): Addresses: $objToAddr" }
+      } else {
+        logger.debug { "No memory leak!" }
       }
       addrToObj.clear()
       objToAddr.clear()
@@ -106,6 +108,6 @@ class VoidPointerManager {
     fun deferenceVoidPointer(pointer: VoidPointer): Any? = globalVPM.deferencePointer(pointer)
 
     fun removePointer(pointer: VoidPointer): Boolean = globalVPM.removePointer(pointer)
-    fun remove(pointer: Any?): Boolean = globalVPM.remove(pointer)
+    fun remove(obj: Any?): Boolean = globalVPM.remove(obj)
   }
 }
