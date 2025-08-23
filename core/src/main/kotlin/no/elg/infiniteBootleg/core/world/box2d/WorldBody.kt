@@ -6,6 +6,7 @@ import com.badlogic.gdx.box2d.structs.b2BodyDef
 import com.badlogic.gdx.box2d.structs.b2BodyEvents
 import com.badlogic.gdx.box2d.structs.b2BodyId
 import com.badlogic.gdx.box2d.structs.b2BodyMoveEvent
+import com.badlogic.gdx.box2d.structs.b2ShapeId
 import com.badlogic.gdx.box2d.structs.b2WorldId
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -25,6 +26,7 @@ import no.elg.infiniteBootleg.core.world.ticker.PostRunnableHandler
 import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker.Companion.BOX2D_SUB_STEP_COUNT
 import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker.Companion.BOX2D_TIME_STEP
 import no.elg.infiniteBootleg.core.world.world.World
+import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 
 private val logger = KotlinLogging.logger {}
 
@@ -131,20 +133,17 @@ open class WorldBody(private val world: World) :
    */
   fun destroyBody(body: b2BodyId) {
     ThreadType.PHYSICS.launchOrRun {
-      require(body.isValid) {
-        "Cannot destroy body that is not valid" // , userData: ${body.userData}"
-      }
-//      require(!box2dWorld.isLocked) {
-//        "Cannot destroy body when box2d world is locked, to fix this schedule the destruction either sync or async, userData: ${body.userData}"
-//      }
+      require(body.isValid) { "Cannot destroy body that is not valid" }
       if (!body.isEnabled) {
-        logger.error {
-          "Trying to destroy an disabled body, the program will probably crash, userData: ${body.userData}"
-        }
+        logger.error { "Trying to destroy an disabled body, the program will probably crash, userData: ${body.userData}" }
       }
 
-      // TODO do cleanup entities when the body is destroyed
-//      body.fixtureList.asSequence().map { it.userData }.filterIsInstance<Entity>().forEach { world.removeEntity(it, DespawnReason.CHUNK_UNLOADED) }
+      body.shapes.mapNotNull(b2ShapeId::userData).forEach {
+        if (it is Entity) {
+          world.removeEntity(it, DespawnReason.CHUNK_UNLOADED)
+        }
+        VoidPointerManager.remove(it)
+      }
       body.dispose()
     }
   }

@@ -101,6 +101,16 @@ fun b2BodyId.applyForceToCenter(force: b2Vec2, wake: Boolean) {
   Box2d.b2Body_ApplyForceToCenter(this, force, wake)
 }
 
+val b2BodyId.shapes: List<b2ShapeId>
+  get() {
+    val shapeCount = Box2d.b2Body_GetShapeCount(this)
+    if (shapeCount == 0) return emptyList()
+    val b2ShapeIdPointer = b2ShapeId.b2ShapeIdPointer(shapeCount, true)
+    val stored = Box2d.b2Body_GetShapes(this, b2ShapeIdPointer, shapeCount)
+    require(shapeCount == stored)
+    return (0..<stored).map(b2ShapeIdPointer::get)
+  }
+
 fun b2BodyId.dispose() {
   userData = null
   Box2d.b2DestroyBody(this)
