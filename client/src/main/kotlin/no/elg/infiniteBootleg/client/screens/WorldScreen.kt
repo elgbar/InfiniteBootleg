@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.client.screens
 
 import com.badlogic.gdx.Gdx
 import io.github.oshai.kotlinlogging.KotlinLogging
-import ktx.assets.disposeSafely
+import ktx.assets.dispose
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.screens.hud.DebugWindow
 import no.elg.infiniteBootleg.client.screens.hud.addDebugOverlay
@@ -77,7 +77,7 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     world.save()
     super.dispose()
     ClientMain.inst().updateStatus(null)
-    world.disposeSafely()
+    world.dispose { it.printStackTrace() }
     hud.dispose()
   }
 
