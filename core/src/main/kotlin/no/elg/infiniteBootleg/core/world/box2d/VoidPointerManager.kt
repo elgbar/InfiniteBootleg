@@ -65,7 +65,7 @@ class VoidPointerManager {
   fun remove(obj: Any?): Boolean =
     when (obj) {
       null -> false
-      is VoidPointer -> removePointer(obj)
+      is VoidPointer -> this@VoidPointerManager.removePointer(obj)
       else -> removeObject(obj)
     }
 
@@ -105,7 +105,7 @@ class VoidPointerManager {
 
     fun deferenceVoidPointer(pointer: VoidPointer): Any? = globalVPM.deferencePointer(pointer)
 
-    fun remove(pointer: VoidPointer): Boolean = globalVPM.removePointer(pointer)
+    fun removePointer(pointer: VoidPointer): Boolean = globalVPM.removePointer(pointer)
     fun remove(pointer: Any?): Boolean = globalVPM.remove(pointer)
   }
 }
