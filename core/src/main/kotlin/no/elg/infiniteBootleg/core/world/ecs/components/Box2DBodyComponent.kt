@@ -12,9 +12,9 @@ import no.elg.infiniteBootleg.core.util.CheckableDisposable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.Constants
 import no.elg.infiniteBootleg.core.world.blocks.Block
-import no.elg.infiniteBootleg.core.world.box2d.gravityScale
-import no.elg.infiniteBootleg.core.world.box2d.isValid
-import no.elg.infiniteBootleg.core.world.box2d.userData
+import no.elg.infiniteBootleg.core.world.box2d.extensions.gravityScale
+import no.elg.infiniteBootleg.core.world.box2d.extensions.isValid
+import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
 import no.elg.infiniteBootleg.core.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.LoadableMapper
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityOrZero

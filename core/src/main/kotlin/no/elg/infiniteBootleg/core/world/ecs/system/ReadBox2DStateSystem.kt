@@ -5,10 +5,10 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.box2d.structs.b2BodyId
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.world.Direction
-import no.elg.infiniteBootleg.core.world.box2d.component1
-import no.elg.infiniteBootleg.core.world.box2d.component2
-import no.elg.infiniteBootleg.core.world.box2d.position
-import no.elg.infiniteBootleg.core.world.box2d.velocity
+import no.elg.infiniteBootleg.core.world.box2d.extensions.component1
+import no.elg.infiniteBootleg.core.world.box2d.extensions.component2
+import no.elg.infiniteBootleg.core.world.box2d.extensions.position
+import no.elg.infiniteBootleg.core.world.box2d.extensions.velocity
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody

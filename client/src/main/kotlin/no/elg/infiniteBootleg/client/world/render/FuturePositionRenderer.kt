@@ -7,11 +7,11 @@ import no.elg.infiniteBootleg.core.api.Renderer
 import no.elg.infiniteBootleg.core.util.isNotAir
 import no.elg.infiniteBootleg.core.util.withColor
 import no.elg.infiniteBootleg.core.util.worldToScreen
-import no.elg.infiniteBootleg.core.world.box2d.gravity
-import no.elg.infiniteBootleg.core.world.box2d.gravityScale
-import no.elg.infiniteBootleg.core.world.box2d.world
-import no.elg.infiniteBootleg.core.world.box2d.x
-import no.elg.infiniteBootleg.core.world.box2d.y
+import no.elg.infiniteBootleg.core.world.box2d.extensions.gravity
+import no.elg.infiniteBootleg.core.world.box2d.extensions.gravityScale
+import no.elg.infiniteBootleg.core.world.box2d.extensions.world
+import no.elg.infiniteBootleg.core.world.box2d.extensions.x
+import no.elg.infiniteBootleg.core.world.box2d.extensions.y
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.SpellStateComponent.Companion.spellStateComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.spellEntityFamily
@@ -23,8 +23,8 @@ class FuturePositionRenderer(private val worldRender: ClientWorldRender) : Rende
 
   @Suppress("NOTHING_TO_INLINE")
   private inline fun futurePoint(startingPos: Double, startingVel: Double, gravity: Double, n: Double): Double {
-    val stepVelocity = startingVel * WorldBox2DTicker.Companion.BOX2D_TIME_STEP
-    val stepGravity = WorldBox2DTicker.Companion.BOX2D_TIME_STEP * WorldBox2DTicker.Companion.BOX2D_TIME_STEP * gravity
+    val stepVelocity = startingVel * WorldBox2DTicker.BOX2D_TIME_STEP
+    val stepGravity = WorldBox2DTicker.BOX2D_TIME_STEP * WorldBox2DTicker.BOX2D_TIME_STEP * gravity
 
     return startingPos + n * stepVelocity + 0.5 * (n * n + n) * stepGravity
   }

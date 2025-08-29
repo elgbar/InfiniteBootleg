@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.box2d.structs.b2Vec2
 import com.badlogic.gdx.math.Vector2
 import com.google.protobuf.TextFormat
-import no.elg.infiniteBootleg.core.world.box2d.makeB2Vec2
+import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2Vec2
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityRef
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f

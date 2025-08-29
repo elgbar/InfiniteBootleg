@@ -22,6 +22,17 @@ import no.elg.infiniteBootleg.core.util.MAX_WORLD_VEL
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.util.isBeingRemoved
 import no.elg.infiniteBootleg.core.world.BOX2D_LOCK
+import no.elg.infiniteBootleg.core.world.box2d.extensions.compactToFloat
+import no.elg.infiniteBootleg.core.world.box2d.extensions.compactToInt
+import no.elg.infiniteBootleg.core.world.box2d.extensions.createBody
+import no.elg.infiniteBootleg.core.world.box2d.extensions.dispose
+import no.elg.infiniteBootleg.core.world.box2d.extensions.isEnabled
+import no.elg.infiniteBootleg.core.world.box2d.extensions.isValid
+import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2Vec2
+import no.elg.infiniteBootleg.core.world.box2d.extensions.shapes
+import no.elg.infiniteBootleg.core.world.box2d.extensions.step
+import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
+import no.elg.infiniteBootleg.core.world.box2d.extensions.userDataPointer
 import no.elg.infiniteBootleg.core.world.ticker.PostRunnableHandler
 import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker.Companion.BOX2D_SUB_STEP_COUNT
 import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker.Companion.BOX2D_TIME_STEP
@@ -201,6 +212,8 @@ open class WorldBody(private val world: World) :
   ) {
     ThreadType.PHYSICS.launchOrRun {
       val entities = mutableSetOf<Pair<b2BodyId, Entity>>()
+//      box2dWorld.overlapAABB()
+
 //      val queryCallback: (Fixture) -> Boolean = {
 //        val body = it.body
 //        (body.userData as? Entity)?.also { entity -> entities += body to entity }

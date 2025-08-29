@@ -22,9 +22,9 @@ import no.elg.infiniteBootleg.core.util.FLY_VEL
 import no.elg.infiniteBootleg.core.util.MAX_X_VEL
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Tool
-import no.elg.infiniteBootleg.core.world.box2d.mass
-import no.elg.infiniteBootleg.core.world.box2d.set
-import no.elg.infiniteBootleg.core.world.box2d.velocity
+import no.elg.infiniteBootleg.core.world.box2d.extensions.mass
+import no.elg.infiniteBootleg.core.world.box2d.extensions.set
+import no.elg.infiniteBootleg.core.world.box2d.extensions.velocity
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.InputEventQueueComponent

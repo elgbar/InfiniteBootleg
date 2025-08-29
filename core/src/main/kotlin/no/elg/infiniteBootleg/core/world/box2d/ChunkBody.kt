@@ -15,6 +15,10 @@ import no.elg.infiniteBootleg.core.util.isLazyInitialized
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
 import no.elg.infiniteBootleg.core.util.isNotAir
 import no.elg.infiniteBootleg.core.world.blocks.Block
+import no.elg.infiniteBootleg.core.world.box2d.extensions.createPolygonShape
+import no.elg.infiniteBootleg.core.world.box2d.extensions.dispose
+import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2Vec2
+import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE_F
 import no.elg.infiniteBootleg.core.world.world.World

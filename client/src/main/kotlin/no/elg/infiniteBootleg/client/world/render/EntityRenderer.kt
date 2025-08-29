@@ -24,10 +24,10 @@ import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.core.world.Staff
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.box2d.degrees
-import no.elg.infiniteBootleg.core.world.box2d.position
-import no.elg.infiniteBootleg.core.world.box2d.rotation
-import no.elg.infiniteBootleg.core.world.box2d.x
-import no.elg.infiniteBootleg.core.world.box2d.y
+import no.elg.infiniteBootleg.core.world.box2d.extensions.position
+import no.elg.infiniteBootleg.core.world.box2d.extensions.rotation
+import no.elg.infiniteBootleg.core.world.box2d.extensions.x
+import no.elg.infiniteBootleg.core.world.box2d.extensions.y
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d

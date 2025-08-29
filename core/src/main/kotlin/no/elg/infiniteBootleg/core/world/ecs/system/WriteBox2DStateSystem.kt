@@ -2,10 +2,10 @@ package no.elg.infiniteBootleg.core.world.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.box2d.structs.b2BodyId
-import no.elg.infiniteBootleg.core.world.box2d.isAwake
-import no.elg.infiniteBootleg.core.world.box2d.makeB2Vec2
-import no.elg.infiniteBootleg.core.world.box2d.position
-import no.elg.infiniteBootleg.core.world.box2d.velocity
+import no.elg.infiniteBootleg.core.world.box2d.extensions.isAwake
+import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2Vec2
+import no.elg.infiniteBootleg.core.world.box2d.extensions.position
+import no.elg.infiniteBootleg.core.world.box2d.extensions.velocity
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_LAST
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody

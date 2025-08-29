@@ -19,7 +19,7 @@ import no.elg.infiniteBootleg.core.util.isNeighbor
 import no.elg.infiniteBootleg.core.util.isWithinRadius
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.queryEntities
-import no.elg.infiniteBootleg.core.world.box2d.isAwake
+import no.elg.infiniteBootleg.core.world.box2d.extensions.isAwake
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag.isBlocksLightFlag
 
 class ChunkListeners(private val chunk: ChunkImpl) : Disposable {

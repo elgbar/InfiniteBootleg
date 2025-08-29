@@ -5,7 +5,7 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.math.Vector2
 import ktx.ashley.remove
 import no.elg.infiniteBootleg.core.world.Constants
-import no.elg.infiniteBootleg.core.world.box2d.gravityScale
+import no.elg.infiniteBootleg.core.world.box2d.extensions.gravityScale
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.system.AuthoritativeSystem
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
