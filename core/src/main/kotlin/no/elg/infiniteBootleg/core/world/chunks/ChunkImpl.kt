@@ -53,14 +53,14 @@ private val logger = KotlinLogging.logger {}
 
 open class ChunkImpl(final override val world: World, final override val chunkX: ChunkCoord, final override val chunkY: ChunkCoord) : Chunk {
 
-  val blocks: Array<Array<Block?>> = Array(Chunk.Companion.CHUNK_SIZE) { arrayOfNulls(Chunk.Companion.CHUNK_SIZE) }
+  val blocks: Array<Array<Block?>> = Array(Chunk.CHUNK_SIZE) { arrayOfNulls(Chunk.CHUNK_SIZE) }
 
   /**Single 1d array stored in a row major order*/
-  private val blockLights = Array(Chunk.Companion.CHUNK_SIZE * Chunk.Companion.CHUNK_SIZE) { i ->
+  private val blockLights = Array(Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE) { i ->
     BlockLight(
       this,
-      i / Chunk.Companion.CHUNK_SIZE,
-      i % Chunk.Companion.CHUNK_SIZE
+      i / Chunk.CHUNK_SIZE,
+      i % Chunk.CHUNK_SIZE
     )
   }
 
@@ -133,8 +133,8 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
 
       // test if all the blocks in this chunk has the material air
       isAllAir = true
-      outer@ for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
-        for (localY in 0 until Chunk.Companion.CHUNK_SIZE) {
+      outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
+        for (localY in 0 until Chunk.CHUNK_SIZE) {
           val b = blocks[localX][localY]
           if (b != null && b.material !== Material.Air) {
             isAllAir = false
@@ -246,7 +246,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     if (Main.isMultiplayer && sendUpdatePacket && isValid && !bothAirish && !block.isMarkerBlock()) {
       val worldX = chunkX.chunkToWorld(localX)
       val worldY = chunkY.chunkToWorld(localY)
-      Main.Companion.inst().packetSender.sendDuplexPacketInView(
+      Main.inst().packetSender.sendDuplexPacketInView(
         ifIsServer = { clientBoundBlockUpdate(worldX, worldY, block) to compactLocation },
         ifIsClient = { serverBoundBlockUpdate(worldX, worldY, block) }
       )
@@ -257,7 +257,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
   private fun isNoneWithinDistance(sources: WorldCompactLocArray, worldX: WorldCoord, worldY: WorldCoord): Boolean {
     for ((srcX: WorldCoord, srcY: WorldCoord) in sources) {
       val dstFromChange2blk = dst2(worldX, worldY, srcX, srcY)
-      if (dstFromChange2blk <= World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW) {
+      if (dstFromChange2blk <= World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW) {
         return false
       }
     }
@@ -288,8 +288,8 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     if (Settings.renderLight) {
       val anyRecalculated = AtomicBoolean(false)
       coroutineScope {
-        for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
-          for (localY in Chunk.Companion.CHUNK_SIZE - 1 downTo 0) {
+        for (localX in 0 until Chunk.CHUNK_SIZE) {
+          for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
             if (checkDistance &&
               isNoneWithinDistance(
                 sources,
@@ -345,14 +345,14 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     return object : MutableIterator<Block?> {
       var x = 0
       var y = 0
-      override fun hasNext(): Boolean = y < Chunk.Companion.CHUNK_SIZE - 1 || x < Chunk.Companion.CHUNK_SIZE
+      override fun hasNext(): Boolean = y < Chunk.CHUNK_SIZE - 1 || x < Chunk.CHUNK_SIZE
 
       override fun next(): Block? {
-        if (x == Chunk.Companion.CHUNK_SIZE) {
+        if (x == Chunk.CHUNK_SIZE) {
           x = 0
           y++
         }
-        if (y >= Chunk.Companion.CHUNK_SIZE) {
+        if (y >= Chunk.CHUNK_SIZE) {
           throw NoSuchElementException()
         }
         return getRawBlock(x++, y)
@@ -438,8 +438,8 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     world.worldBody.queryEntities(
       chunkX.chunkToWorld(),
       chunkY.chunkToWorld(),
-      chunkX.chunkToWorld(Chunk.Companion.CHUNK_SIZE),
-      chunkY.chunkToWorld(Chunk.Companion.CHUNK_SIZE),
+      chunkX.chunkToWorld(Chunk.CHUNK_SIZE),
+      chunkY.chunkToWorld(Chunk.CHUNK_SIZE),
       callback
     )
 
@@ -486,20 +486,20 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
         )
       }"
     }
-    checkChunkCorrupt(protoChunk, protoChunk.blocksCount == Chunk.Companion.CHUNK_SIZE * Chunk.Companion.CHUNK_SIZE) {
-      "Invalid number of blocks. Expected ${Chunk.Companion.CHUNK_SIZE * Chunk.Companion.CHUNK_SIZE}, but got ${protoChunk.blocksCount}"
+    checkChunkCorrupt(protoChunk, protoChunk.blocksCount == Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE) {
+      "Invalid number of blocks. Expected ${Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE}, but got ${protoChunk.blocksCount}"
     }
 
     var index = 0
     val protoBlocks = protoChunk.blocksList
     synchronized(blocks) {
-      for (localY in 0 until Chunk.Companion.CHUNK_SIZE) {
-        for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
+      for (localY in 0 until Chunk.CHUNK_SIZE) {
+        for (localX in 0 until Chunk.CHUNK_SIZE) {
           checkChunkCorrupt(protoChunk, blocks[localX][localY] == null) {
             "Double assemble of ${stringifyCompactLoc(localX, localY)} in chunk ${stringifyCompactLoc(chunkPosition)}"
           }
           val protoBlock = protoBlocks[index++]
-          blocks[localX][localY] = Block.Companion.fromProto(world, this, localX, localY, protoBlock)
+          blocks[localX][localY] = Block.fromProto(world, this, localX, localY, protoBlock)
         }
       }
     }
@@ -541,12 +541,12 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
   }
 
   companion object {
-    val AIR_BLOCK_PROTO: ProtoWorld.Block = Block.Companion.save(Material.Air).build()
+    val AIR_BLOCK_PROTO: ProtoWorld.Block = Block.save(Material.Air).build()
     val NOT_CHECKING_DISTANCE = LongArray(0)
 
     @Suppress("NOTHING_TO_INLINE")
     @Contract(pure = true)
-    private inline fun blockMapIndex(localX: LocalCoord, localY: LocalCoord): Int = localX * Chunk.Companion.CHUNK_SIZE + localY
+    private inline fun blockMapIndex(localX: LocalCoord, localY: LocalCoord): Int = localX * Chunk.CHUNK_SIZE + localY
 
     @Contract(pure = true)
     private fun areBothAirish(blockA: Block?, blockB: Block?): Boolean = blockA.isAir(markerIsAir = false) && blockB.isAir(markerIsAir = false)

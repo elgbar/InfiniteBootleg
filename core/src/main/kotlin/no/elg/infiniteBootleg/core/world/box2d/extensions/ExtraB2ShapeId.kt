@@ -5,6 +5,8 @@ import com.badlogic.gdx.box2d.structs.b2Filter
 import com.badlogic.gdx.box2d.structs.b2ShapeId
 import com.badlogic.gdx.jnigen.runtime.pointer.VoidPointer
 import no.elg.infiniteBootleg.core.Settings.handleInvalidBox2dRef
+import no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager
+import no.elg.infiniteBootleg.core.world.box2d.genericSetUserData
 
 var b2ShapeId.filter: b2Filter
   get() = Box2d.b2Shape_GetFilter(this)
@@ -20,7 +22,7 @@ fun b2ShapeId.dispose(updateBodyMass: Boolean = true) {
 /**
  * Interact directly with the user data pointer of a shape.
  *
- * This might lead to memory leaks if the pointer is not removed from [no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager]
+ * This might lead to memory leaks if the pointer is not removed from [VoidPointerManager]
  */
 private var b2ShapeId.userDataPointer: VoidPointer
   get() = if (Box2d.b2Shape_IsValid(this)) {
@@ -38,7 +40,7 @@ private var b2ShapeId.userDataPointer: VoidPointer
   }
 
 var b2ShapeId.userData: Any?
-  get() = _root_ide_package_.no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager.Companion.deferenceVoidPointer(userDataPointer)
+  get() = VoidPointerManager.deferenceVoidPointer(userDataPointer)
   set(value) {
-    _root_ide_package_.no.elg.infiniteBootleg.core.world.box2d.genericSetUserData(value, this::userDataPointer)
+    genericSetUserData(value, this::userDataPointer)
   }

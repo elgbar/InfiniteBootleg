@@ -56,7 +56,7 @@ class ChunkRenderer(private val worldRender: WorldRender) :
 
   private val batch: SpriteBatch = SpriteBatch().also {
     it.projectionMatrix =
-      Matrix4().setToOrtho2D(0f, 0f, Chunk.Companion.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.Companion.CHUNK_TEXTURE_SIZE.toFloat())
+      Matrix4().setToOrtho2D(0f, 0f, Chunk.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat())
   }
 
   // long = SystemTimeMillis
@@ -90,10 +90,10 @@ class ChunkRenderer(private val worldRender: WorldRender) :
       val (time: SystemTimeMillis, chunkTimeBucket: ObjectSortedSet<TexturedChunk>) = renderTimeAdded.firstEntry() ?: let {
         chunksInRenderQueue = 0
         return null
-      }
-      val chunk = chunkTimeBucket.removeFirst()
-      if (chunkTimeBucket.isEmpty()) {
-        renderTimeAdded.remove(time)
+    }
+    val chunk = chunkTimeBucket.removeFirst()
+    if (chunkTimeBucket.isEmpty()) {
+      renderTimeAdded.remove(time)
       }
       chunkLocToTimeAdded.remove(chunk.compactLocation)
       chunksInRenderQueue = chunkLocToTimeAdded.size
@@ -175,7 +175,7 @@ class ChunkRenderer(private val worldRender: WorldRender) :
           EventManager.dispatchEvent(
             ChunkTextureChangeRejectedEvent(
               candidateChunk.compactLocation,
-              ChunkTextureChangeRejectedEvent.Companion.CHUNK_INVALID_REASON
+              ChunkTextureChangeRejectedEvent.CHUNK_INVALID_REASON
             )
           )
           continue
@@ -186,7 +186,7 @@ class ChunkRenderer(private val worldRender: WorldRender) :
           EventManager.dispatchEvent(
             ChunkTextureChangeRejectedEvent(
               candidateChunk.compactLocation,
-              ChunkTextureChangeRejectedEvent.Companion.CHUNK_OUT_OF_VIEW_REASON
+              ChunkTextureChangeRejectedEvent.CHUNK_OUT_OF_VIEW_REASON
             )
           )
           continue
@@ -197,7 +197,7 @@ class ChunkRenderer(private val worldRender: WorldRender) :
           EventManager.dispatchEvent(
             ChunkTextureChangeRejectedEvent(
               candidateChunk.compactLocation,
-              ChunkTextureChangeRejectedEvent.Companion.CHUNK_ABOVE_TOP_BLOCK_REASON
+              ChunkTextureChangeRejectedEvent.CHUNK_ABOVE_TOP_BLOCK_REASON
             )
           )
           continue
@@ -225,12 +225,12 @@ class ChunkRenderer(private val worldRender: WorldRender) :
       Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
       Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
       batch.safeUse { _ ->
-        for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
+        for (localX in 0 until Chunk.CHUNK_SIZE) {
           val topLightBlockHeight = chunkColumn.topBlockHeight(
             localX,
             ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
           )
-          for (localY in 0 until Chunk.Companion.CHUNK_SIZE) {
+          for (localY in 0 until Chunk.CHUNK_SIZE) {
             batch.color = Color.WHITE
             val block = chunk.getRawBlock(localX, localY)
             val material = block.materialOrAir()
@@ -238,8 +238,8 @@ class ChunkRenderer(private val worldRender: WorldRender) :
             val secondaryTexture: RotatableTextureRegion?
 
             val worldY = chunk.chunkY.chunkToWorld(localY)
-            val dx = localX * Block.Companion.BLOCK_TEXTURE_SIZE_F
-            val dy = localY * Block.Companion.BLOCK_TEXTURE_SIZE_F
+            val dx = localX * Block.BLOCK_TEXTURE_SIZE_F
+            val dy = localY * Block.BLOCK_TEXTURE_SIZE_F
 
             val isMarker = block.isMarkerBlock()
             if (material.invisibleBlock || isMarker) {
@@ -310,25 +310,25 @@ class ChunkRenderer(private val worldRender: WorldRender) :
     batch.draw(
       upperHalf.textureRegion,
       dx,
-      dy + Block.Companion.HALF_BLOCK_TEXTURE_SIZE_F,
-      Block.Companion.BLOCK_TEXTURE_SIZE_F,
-      Block.Companion.HALF_BLOCK_TEXTURE_SIZE_F
+      dy + Block.HALF_BLOCK_TEXTURE_SIZE_F,
+      Block.BLOCK_TEXTURE_SIZE_F,
+      Block.HALF_BLOCK_TEXTURE_SIZE_F
     )
-    batch.draw(lowerHalf.textureRegion, dx, dy, Block.Companion.BLOCK_TEXTURE_SIZE_F, Block.Companion.HALF_BLOCK_TEXTURE_SIZE_F)
+    batch.draw(lowerHalf.textureRegion, dx, dy, Block.BLOCK_TEXTURE_SIZE_F, Block.HALF_BLOCK_TEXTURE_SIZE_F)
   }
 
   private fun drawRotatedTexture(texture: RotatableTextureRegion, dx: Float, dy: Float, rotation: Int) {
     if (rotation == NO_ROTATION || !texture.rotationAllowed) {
-      batch.draw(texture.textureRegion, dx, dy, Block.Companion.BLOCK_TEXTURE_SIZE_F, Block.Companion.BLOCK_TEXTURE_SIZE_F)
+      batch.draw(texture.textureRegion, dx, dy, Block.BLOCK_TEXTURE_SIZE_F, Block.BLOCK_TEXTURE_SIZE_F)
     } else {
       batch.draw(
         texture.textureRegion,
         dx,
         dy,
-        Block.Companion.HALF_BLOCK_TEXTURE_SIZE_F,
-        Block.Companion.HALF_BLOCK_TEXTURE_SIZE_F,
-        Block.Companion.BLOCK_TEXTURE_SIZE_F,
-        Block.Companion.BLOCK_TEXTURE_SIZE_F,
+        Block.HALF_BLOCK_TEXTURE_SIZE_F,
+        Block.HALF_BLOCK_TEXTURE_SIZE_F,
+        Block.BLOCK_TEXTURE_SIZE_F,
+        Block.BLOCK_TEXTURE_SIZE_F,
         1f,
         1f,
         rotation.toFloat()
@@ -344,18 +344,18 @@ class ChunkRenderer(private val worldRender: WorldRender) :
     rotation: Int
   ) {
     val texture = textureRegion.textureRegion
-    val tileWidth = texture.regionWidth / BlockLight.Companion.LIGHT_RESOLUTION
-    val tileHeight = texture.regionHeight / BlockLight.Companion.LIGHT_RESOLUTION
+    val tileWidth = texture.regionWidth / BlockLight.LIGHT_RESOLUTION
+    val tileHeight = texture.regionHeight / BlockLight.LIGHT_RESOLUTION
     val split = splitCache.computeIfAbsent(texture) { t: TextureRegion -> t.split(tileWidth, tileHeight) }
     var ry = 0
     val splitLength = split.size
     while (ry < splitLength) {
-      val regions = split[BlockLight.Companion.LIGHT_RESOLUTION - ry - 1]
+      val regions = split[BlockLight.LIGHT_RESOLUTION - ry - 1]
       var rx = 0
       val regionsLength = regions.size
       while (rx < regionsLength) {
         val region = regions[rx]
-        val brightness: Brightness = lights[BlockLight.Companion.lightMapIndex(rx, ry)]
+        val brightness: Brightness = lights[BlockLight.lightMapIndex(rx, ry)]
         batch.setColor(brightness, brightness, brightness, 1f)
         if (textureRegion.rotationAllowed || rotation == 0) {
           batch.draw(
@@ -402,7 +402,7 @@ class ChunkRenderer(private val worldRender: WorldRender) :
 
   companion object {
 
-    const val LIGHT_SUBBLOCK_SIZE = Block.Companion.BLOCK_TEXTURE_SIZE_F / BlockLight.Companion.LIGHT_RESOLUTION
+    const val LIGHT_SUBBLOCK_SIZE = Block.BLOCK_TEXTURE_SIZE_F / BlockLight.LIGHT_RESOLUTION
     const val HALF_LIGHT_SUBBLOCK_SIZE = LIGHT_SUBBLOCK_SIZE * 0.5f
 
     const val CAVE_CLEAR_COLOR_R = 0.408824f
