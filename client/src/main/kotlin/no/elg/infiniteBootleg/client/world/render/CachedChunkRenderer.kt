@@ -11,7 +11,6 @@ import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_TEXTURE_SIZE
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_TEXTURE_SIZE_F
-import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn
 
 class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
@@ -55,7 +54,7 @@ class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer
           chunkY == verticalStart ||
           chunkX == horizontalStart ||
           chunkX == horizontalEnd - 1 ||
-          (chunk.isAllAir && chunk.chunkColumn.isChunkAboveTopBlock(chunk.chunkY, ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG))
+          (chunk.chunkColumn.isChunkAboveTopBlock(chunk.chunkY) && chunk.isAllAir)
         ) {
           continue
         }

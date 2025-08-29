@@ -85,20 +85,19 @@ class ChunkRenderer(private val worldRender: WorldRender) :
       it.setFrequency(1.0)
     }
 
+  @GuardedBy("QUEUE_LOCK")
   private fun nextChunk(): TexturedChunk? {
-    return synchronized(QUEUE_LOCK) {
-      val (time: SystemTimeMillis, chunkTimeBucket: ObjectSortedSet<TexturedChunk>) = renderTimeAdded.firstEntry() ?: let {
-        chunksInRenderQueue = 0
-        return null
+    val (time: SystemTimeMillis, chunkTimeBucket: ObjectSortedSet<TexturedChunk>) = renderTimeAdded.firstEntry() ?: let {
+      chunksInRenderQueue = 0
+      return null
     }
     val chunk = chunkTimeBucket.removeFirst()
     if (chunkTimeBucket.isEmpty()) {
       renderTimeAdded.remove(time)
-      }
-      chunkLocToTimeAdded.remove(chunk.compactLocation)
-      chunksInRenderQueue = chunkLocToTimeAdded.size
-      chunk
     }
+    chunkLocToTimeAdded.remove(chunk.compactLocation)
+    chunksInRenderQueue = chunkLocToTimeAdded.size
+    return chunk
   }
 
   /**
@@ -191,7 +190,7 @@ class ChunkRenderer(private val worldRender: WorldRender) :
           )
           continue
         }
-        if (candidateChunk.isAllAir && candidateChunk.chunkColumn.isChunkAboveTopBlock(candidateChunk.chunkY)) {
+        if (candidateChunk.chunkColumn.isChunkAboveTopBlock(candidateChunk.chunkY) && candidateChunk.isAllAir) {
           candidateChunk.setAllSkyAir() // Chunks above top block should always be rendered as air
 
           EventManager.dispatchEvent(
