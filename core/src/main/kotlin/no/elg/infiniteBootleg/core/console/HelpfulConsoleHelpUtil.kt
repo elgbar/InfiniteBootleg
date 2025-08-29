@@ -88,8 +88,10 @@ object HelpfulConsoleHelpUtil {
             "but there are too ${if (names.size < params.size) "few" else "many"} names. Expected ${params.size} names found ${names.size}"
         }
       }
+      return names
+    } else {
+      return null
     }
-    return null
   }
 
   private fun createCmdPrefix(method: Method): StringBuilder = StringBuilder().append(method.name).append(" ")
