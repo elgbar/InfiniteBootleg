@@ -79,7 +79,7 @@ abstract class GameConsoleHandler :
         logger.error { "Unknown command: '$commandPart'" }
       } else {
         logger.error { "Unknown command. Perhaps you meant" }
-        for (potentialMethod in potentialMethods) {
+        for (potentialMethod in potentialMethods.filterNot { DEFAULT_ENDING in it }) {
           logger.error { potentialMethod }
         }
       }

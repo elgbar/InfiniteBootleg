@@ -20,7 +20,7 @@ object HelpfulConsoleHelpUtil {
       logger.info { "Command does not exist." }
       return
     }
-    for (m in methods.sortedBy(Method::getName)) {
+    for (m in methods) {
       val sb = createCmdPrefix(m)
       val annotation: Annotation? = m.getDeclaredAnnotation(ConsoleDoc::class.java)
       if (annotation != null) {
@@ -48,7 +48,7 @@ object HelpfulConsoleHelpUtil {
   }
 
   fun printCommands(console: Console, exec: CommandExecutor) {
-    for (method in getRelevantMethods(console, exec, null).sortedBy(Method::getName)) {
+    for (method in getRelevantMethods(console, exec, null)) {
       if (allowedToExecute(method)) {
         val sb = createCmdPrefix(method)
         sb.appendCmdSignature(method)
@@ -68,7 +68,7 @@ object HelpfulConsoleHelpUtil {
     return this
   }
 
-  private fun StringBuilder.cmdArgs(params: Array<Class<*>>, names: Array<String>?, argNr: Int): StringBuilder {
+  private fun StringBuilder.cmdArgs(params: Array<Class<*>>, names: Array<out String>?, argNr: Int): StringBuilder {
     append('<').append(params[argNr].simpleName)
     if (names != null && argNr < names.size) {
       append(' ').append(names[argNr].replace('_', '-').replace(' ', '-'))
@@ -76,14 +76,9 @@ object HelpfulConsoleHelpUtil {
     return append("> ")
   }
 
-  fun generateCommandSignature(method: Method): String? =
-    if ("\$default" in method.name) {
-      null
-    } else {
-      createCmdPrefix(method).appendCmdSignature(method).toString()
-    }
+  fun generateCommandSignature(method: Method): String? = createCmdPrefix(method).appendCmdSignature(method).toString()
 
-  private fun getArgNames(method: Method, params: Array<Class<*>>): Array<String>? {
+  private fun getArgNames(method: Method, params: Array<Class<*>>): Array<out String>? {
     val annotation = method.getDeclaredAnnotation(CmdArgNames::class.java)
     if (annotation != null) {
       val names: Array<out String> = annotation.getAnnotation(CmdArgNames::class.java).value
@@ -105,9 +100,9 @@ object HelpfulConsoleHelpUtil {
    * @param console The console used
    * @param exec The executor to get the methods from, will look at all superclasses
    * @param command Command method to get, if null no filtering will be done
-   * @return All relevant command method
+   * @return All relevant command method in alphabetical order
    */
-  private fun getRelevantMethods(console: Console, exec: CommandExecutor, command: String?): Set<Method> {
+  private fun getRelevantMethods(console: Console, exec: CommandExecutor, command: String?): List<Method> {
     val methods: MutableSet<Method> = HashSet()
     var clazz: Class<*> = exec.javaClass
     while (clazz != Any::class.java) {
@@ -121,6 +116,22 @@ object HelpfulConsoleHelpUtil {
     if (methods.isEmpty()) {
       logger.warn { "Failed to find any relevant methods" }
     }
-    return methods
+    methods.removeAll { it.name.endsWith(DEFAULT_ENDING) }
+    return methods.sortedBy { it -> it.name + it.parameterTypes.map { it.name } }
+  }
+
+  fun filterComands(commands: Iterable<String>): List<String> {
+    val sorted = commands.sorted()
+    val filtered = mutableListOf<String>()
+    var lastCommand: String? = null
+    for (command in sorted) {
+      if (command != lastCommand) {
+        filtered.add(command)
+        lastCommand = command
+      }
+    }
+    return filtered
   }
 }
+
+const val DEFAULT_ENDING = $$"$default"
