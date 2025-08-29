@@ -5,6 +5,7 @@ import com.strongjoshua.console.CommandExecutor
 import com.strongjoshua.console.annotation.ConsoleDoc
 import com.strongjoshua.console.annotation.HiddenCommand
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.delay
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.console.AuthoritativeOnly
 import no.elg.infiniteBootleg.core.console.CmdArgNames
@@ -16,6 +17,7 @@ import no.elg.infiniteBootleg.core.net.clientBoundWorldSettings
 import no.elg.infiniteBootleg.core.net.serverBoundWorldSettings
 import no.elg.infiniteBootleg.core.util.ChunkCoord
 import no.elg.infiniteBootleg.core.util.IllegalAction
+import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.toAbled
 import no.elg.infiniteBootleg.core.util.toTitleCase
@@ -85,6 +87,53 @@ open class CommonCommands : CommandExecutor() {
   // /////////////////
   // OPEN COMMANDS //
   // /////////////////
+
+  @ConsoleDoc(description = "Run command delayed")
+  @CmdArgNames("delayMs", "command")
+  fun delayed(delayMs: Long, command: String) {
+    launchOnMainSuspendable {
+      delay(delayMs)
+      Main.inst().console.execCommand(command)
+    }
+    logger.info { "Scheduled command '$command' to run in $delayMs ms" }
+  }
+
+  @ConsoleDoc(description = "Run command delayed with one arg")
+  @CmdArgNames("delayMs", "command", "arg1")
+  fun delayed(delayMs: Long, command: String, arg1: String) {
+    delayed(delayMs, "$command $arg1")
+  }
+
+  @ConsoleDoc(description = "Run command delayed with two args")
+  @CmdArgNames("delayMs", "command", "arg1", "arg2")
+  fun delayed(delayMs: Long, command: String, arg1: String, arg2: String) {
+    delayed(delayMs, "$command $arg1 $arg2")
+  }
+
+  @ConsoleDoc(description = "Run command delayed with three args")
+  @CmdArgNames("delayMs", "command", "arg1", "arg2", "arg3")
+  fun delayed(
+    delayMs: Long,
+    command: String,
+    arg1: String,
+    arg2: String,
+    arg3: String
+  ) {
+    delayed(delayMs, "$command $arg1 $arg2 $arg3")
+  }
+
+  @ConsoleDoc(description = "Run command delayed with four args")
+  @CmdArgNames("delayMs", "command", "arg1", "arg2", "arg3", "arg4")
+  fun delayed(
+    delayMs: Long,
+    command: String,
+    arg1: String,
+    arg2: String,
+    arg3: String,
+    arg4: String
+  ) {
+    delayed(delayMs, "$command $arg1 $arg2 $arg3 $arg4")
+  }
 
   @AuthoritativeOnly
   @ConsoleDoc(description = "Print the world seed")
