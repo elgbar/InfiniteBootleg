@@ -12,6 +12,8 @@ import com.badlogic.gdx.utils.LongMap
 import com.badlogic.gdx.utils.ObjectSet
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
+import it.unimi.dsi.fastutil.Hash.FAST_LOAD_FACTOR
+import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
@@ -37,6 +39,7 @@ import no.elg.infiniteBootleg.core.util.LocalCoord
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.util.WorldCompactLocArray
 import no.elg.infiniteBootleg.core.util.WorldCoord
+import no.elg.infiniteBootleg.core.util.WorldCoordFloat
 import no.elg.infiniteBootleg.core.util.WorldCoordNumber
 import no.elg.infiniteBootleg.core.util.chunkOffset
 import no.elg.infiniteBootleg.core.util.compactInt
@@ -1076,8 +1079,8 @@ abstract class World(
    * @return An Axis-Aligned Bounding Box of blocks
    */
   fun getBlocksAABB(
-    worldX: Float,
-    worldY: Float,
+    worldX: WorldCoordFloat,
+    worldY: WorldCoordFloat,
     offsetX: Float,
     offsetY: Float,
     raw: Boolean,
@@ -1099,7 +1102,7 @@ abstract class World(
     val startY = MathUtils.floor(worldY)
     val maxX = worldX + offsetX
     val maxY = worldY + offsetY
-    val invalidChunks = LongMap<Chunk>(0, 0.95f)
+    var invalidChunks: Long2ObjectMap<Chunk>? = null
     while (x <= maxX) {
       var y = startY
       while (y <= maxY) {
@@ -1107,7 +1110,7 @@ abstract class World(
           return blocks ?: EMPTY_BLOCKS_ARRAY
         }
         val chunkPos = compactInt(x.worldToChunk(), y.worldToChunk())
-        if (invalidChunks.containsKey(chunkPos)) {
+        if (invalidChunks != null && invalidChunks.containsKey(chunkPos)) {
           y++
           // No point in checking this chunk again
           continue
@@ -1115,6 +1118,12 @@ abstract class World(
         val chunk: Chunk? = getChunk(chunkPos, loadChunk)
         if (chunk.invalid()) {
           y++
+          if (invalidChunks == null) {
+            // Conservative estimate on how many chunks we may encounter, we don't expect them to be
+            val estimatedChunks = (offsetX.worldToChunk() + 1) * (offsetY.worldToChunk() + 1)
+            // When estimated chunks are very low it should be faster to use linear probing. A cutoff of 4 is conservative approximately when hash map may be faster
+            invalidChunks = if (estimatedChunks <= 4) Long2ObjectArrayMap<Chunk>(estimatedChunks) else Long2ObjectOpenHashMap<Chunk>(1, FAST_LOAD_FACTOR)
+          }
           invalidChunks.put(chunkPos, chunk)
           continue
         }
