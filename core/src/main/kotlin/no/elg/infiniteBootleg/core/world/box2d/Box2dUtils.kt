@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.core.world.box2d
 
 import com.badlogic.gdx.box2d.Box2d
+import com.badlogic.gdx.box2d.structs.b2QueryFilter
 import com.badlogic.gdx.box2d.structs.b2Rot
 import com.badlogic.gdx.jnigen.runtime.closure.Closure
 import com.badlogic.gdx.jnigen.runtime.closure.ClosureObject
@@ -12,6 +13,11 @@ import no.elg.infiniteBootleg.core.util.toDegrees
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.reflect.KMutableProperty0
+
+val ALLOW_ALL_QUERY_FILTER = b2QueryFilter().also { filter ->
+//  filter.categoryBits(Long.MIN_VALUE)
+  filter.maskBits(Long.MIN_VALUE)
+}
 
 // ////////////
 //   b2Rot   //

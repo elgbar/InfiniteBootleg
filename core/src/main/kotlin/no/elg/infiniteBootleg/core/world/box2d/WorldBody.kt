@@ -28,7 +28,9 @@ import no.elg.infiniteBootleg.core.world.box2d.extensions.createBody
 import no.elg.infiniteBootleg.core.world.box2d.extensions.dispose
 import no.elg.infiniteBootleg.core.world.box2d.extensions.isEnabled
 import no.elg.infiniteBootleg.core.world.box2d.extensions.isValid
+import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2AABB
 import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2Vec2
+import no.elg.infiniteBootleg.core.world.box2d.extensions.overlapAABB
 import no.elg.infiniteBootleg.core.world.box2d.extensions.shapes
 import no.elg.infiniteBootleg.core.world.box2d.extensions.step
 import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
@@ -212,14 +214,12 @@ open class WorldBody(private val world: World) :
   ) {
     ThreadType.PHYSICS.launchOrRun {
       val entities = mutableSetOf<Pair<b2BodyId, Entity>>()
-//      box2dWorld.overlapAABB()
-
-//      val queryCallback: (Fixture) -> Boolean = {
-//        val body = it.body
-//        (body.userData as? Entity)?.also { entity -> entities += body to entity }
-//        true
-//      }
-//      box2dWorld.QueryAABB(queryCallback, lowerX.toFloat(), lowerY.toFloat(), upperX.toFloat(), upperY.toFloat()) // blocking
+      val aabb = makeB2AABB(lowerX, lowerY, upperX, upperY)
+      box2dWorld.overlapAABB(aabb) { shapeId, _ ->
+        val body = Box2d.b2Shape_GetBody(shapeId)
+        (body.userData as? Entity)?.also { entity -> entities += body to entity }
+        true // continue query
+      }
       callback(entities)
     }
   }

@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package no.elg.infiniteBootleg.core.world.box2d.extensions
 
 import com.badlogic.gdx.box2d.Box2d
@@ -44,7 +46,7 @@ var b2BodyId.gravityScale: Float
 var b2BodyId.position: b2Vec2
   get() = Box2d.b2Body_GetPosition(this)
   set(value) {
-    Box2d.b2Body_SetTransform(this, value, _root_ide_package_.no.elg.infiniteBootleg.core.world.box2d.NO_ROTATION)
+    Box2d.b2Body_SetTransform(this, value, no.elg.infiniteBootleg.core.world.box2d.NO_ROTATION)
   }
 
 var b2BodyId.velocity: b2Vec2
@@ -116,9 +118,9 @@ var b2BodyId.userDataPointer: VoidPointer
   }
 
 var b2BodyId.userData: Any?
-  get() = _root_ide_package_.no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager.Companion.deferenceVoidPointer(userDataPointer)
+  get() = no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager.deferenceVoidPointer(userDataPointer)
   set(value) {
-    _root_ide_package_.no.elg.infiniteBootleg.core.world.box2d.genericSetUserData(value, this::userDataPointer)
+    no.elg.infiniteBootleg.core.world.box2d.genericSetUserData(value, this::userDataPointer)
   }
 
 /**

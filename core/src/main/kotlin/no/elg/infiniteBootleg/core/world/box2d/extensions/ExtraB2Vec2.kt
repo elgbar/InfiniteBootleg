@@ -16,6 +16,7 @@ fun makeB2Vec2(x: Float, y: Float): b2Vec2 =
     this.y(y)
   }
 
+fun b2Vec2.set(x: Number, y: Number): b2Vec2 = set(x.toFloat(), y.toFloat())
 fun b2Vec2.set(x: Float, y: Float): b2Vec2 =
   apply {
     x(x)
