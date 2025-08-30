@@ -151,3 +151,4 @@ tests/
 /core/src/main/resources/logs/*
 /client/build/
 /server/build/
+/libgdx-box2d/

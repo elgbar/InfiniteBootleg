@@ -172,10 +172,7 @@ class ChunkRenderer(private val worldRender: WorldRender) :
         val candidateChunk = nextChunk() ?: return
         if (candidateChunk.isInvalid) {
           EventManager.dispatchEvent(
-            ChunkTextureChangeRejectedEvent(
-              candidateChunk.compactLocation,
-              ChunkTextureChangeRejectedEvent.CHUNK_INVALID_REASON
-            )
+            ChunkTextureChangeRejectedEvent(candidateChunk.compactLocation, ChunkTextureChangeRejectedEvent.CHUNK_INVALID_REASON)
           )
           continue
         }
