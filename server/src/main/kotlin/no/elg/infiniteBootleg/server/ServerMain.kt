@@ -35,16 +35,6 @@ class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<Headles
   lateinit var serverWorld: ServerWorld
     private set
 
-  init {
-    val onShutdown = Runnable {
-      packetSender.broadcast(clientBoundDisconnectPlayerPacket("Server closed"))
-      serverWorld.save()
-      serverWorld.dispose()
-      dispose()
-    }
-    Runtime.getRuntime().addShutdownHook(Thread(onShutdown))
-  }
-
   override fun isAuthorizedToChange(entity: Entity): Boolean = true
 
   override fun render() {
@@ -57,11 +47,18 @@ class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<Headles
     super.create()
 
     // TODO load world name from some config
-    val serverWorld1 = ServerWorld(PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed, "Server World")
-    serverWorld = serverWorld1
+    serverWorld = ServerWorld(PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed, "Server World")
     serverWorld.initialize()
 
-    packetSender = ServerPacketSender(serverWorld1)
+    packetSender = ServerPacketSender(serverWorld)
+
+    // Add shutdown hook after the lateinit fields have been initialized
+    val onShutdown = Runnable {
+      packetSender.broadcast(clientBoundDisconnectPlayerPacket("Server closed"))
+      serverWorld.save()
+      dispose()
+    }
+    Runtime.getRuntime().addShutdownHook(Thread(onShutdown))
 
     val serverThread: Thread = Thread.ofPlatform()
       .name("Server")
@@ -85,7 +82,7 @@ class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<Headles
       }
 
     EventManager.oneShotListener { event: WorldLoadedEvent ->
-      if (event.world === serverWorld1) {
+      if (event.world === world) {
         logger.info { "Server world is ready, starting server thread" }
         serverThread.start()
       }
@@ -102,6 +99,6 @@ class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<Headles
 
   companion object {
 
-    fun inst(): ServerMain = Main.Companion.inst() as? ServerMain ?: throw IllegalStateException("Cannot get server main as a client")
+    fun inst(): ServerMain = Main.inst() as? ServerMain ?: throw IllegalStateException("Cannot get server main as a client")
   }
 }
