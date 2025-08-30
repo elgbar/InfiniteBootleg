@@ -200,6 +200,12 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
         val ashleyScreenX = (position.x - box2d.halfBox2dWidth).worldToScreen()
         val ashleyScreenY = (position.y - box2d.halfBox2dHeight).worldToScreen()
         drawBox2d(box2d, texture, ashleyScreenX, ashleyScreenY)
+
+        batch.color = BOX2D_COLOR
+        val screenX = (centerPos.x).worldToScreen()
+        val screenY = (centerPos.y).worldToScreen()
+        drawBox2d(box2d, texture, screenX, screenY)
+
         batch.color = Color.WHITE
       }
 
@@ -223,5 +229,6 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
   companion object {
     var globalAnimationTimer = 0f
     val ASHLEY_COLOR = Color(1f, 0f, 0f, 0.5f)
+    val BOX2D_COLOR = Color(0f, 0f, 1f, 0.5f)
   }
 }
