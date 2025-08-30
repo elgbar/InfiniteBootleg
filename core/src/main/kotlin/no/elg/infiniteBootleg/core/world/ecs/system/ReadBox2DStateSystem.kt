@@ -10,41 +10,36 @@ import no.elg.infiniteBootleg.core.world.box2d.extensions.component2
 import no.elg.infiniteBootleg.core.world.box2d.extensions.position
 import no.elg.infiniteBootleg.core.world.box2d.extensions.velocity
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
-import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
+import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
-import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.setVelocity
+import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
-import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
 import kotlin.math.abs
 
 /**
  * Read the position of the entity from the box2D entity
  */
-object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_BEFORE_EVENTS) {
+object ReadBox2DStateSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_BEFORE_EVENTS) {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val body = entity.box2dBody
 
     readPosition(entity, body)
-    readVelocity(entity, body)
+    entity.velocityComponentOrNull?.also { velComp ->
+      readVelocity(entity, body, velComp)
+    }
   }
 
   private fun readPosition(entity: Entity, body: b2BodyId) {
-    if (!entity.updateBox2DPosition) {
-      val newPosition = body.position
-      entity.positionComponent.setPosition(newPosition)
-    }
+    val newPosition = body.position
+    entity.positionComponent.setPosition(newPosition)
   }
 
-  private fun readVelocity(entity: Entity, body: b2BodyId) {
+  private fun readVelocity(entity: Entity, body: b2BodyId, velComp: VelocityComponent) {
     val (newDx, newDy) = body.velocity
-
-    if (!entity.updateBox2DVelocity) {
-      entity.setVelocity(newDx, newDy)
-      entity.updateBox2DVelocity = false
-    }
+    velComp.setAshleyVelocity(newDx, newDy)
 
     val lookDirection = entity.lookDirectionComponentOrNull ?: return
     if (abs(newDx) > MIN_VELOCITY_TO_FLIP && Main.inst().isAuthorizedToChange(entity)) {

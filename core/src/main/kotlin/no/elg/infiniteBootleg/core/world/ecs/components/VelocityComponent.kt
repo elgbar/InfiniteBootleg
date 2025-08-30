@@ -45,6 +45,14 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
 
   override fun hudDebug(): String = stringifyCompactLoc(dx, dy)
 
+  /**
+   * Set the entity velocity without updating the Box2D body. Use with caution.
+   */
+  fun setAshleyVelocity(newDx: Float, newDy: Float) {
+    this.dx = newDx.coerceIn(-maxDx, maxDx)
+    this.dy = newDy.coerceIn(-maxDy, maxDy)
+  }
+
   companion object : EntityLoadableMapper<VelocityComponent>() {
 
     const val EFFECTIVE_ZERO = 0.01f
@@ -59,8 +67,7 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
     inline fun Entity.setVelocity(velocity: Vector2) = setVelocity(velocity.x, velocity.y)
     fun Entity.setVelocity(dx: Float, dy: Float) {
       velocityComponentOrNull?.also {
-        it.dx = dx.coerceIn(-it.maxDx, it.maxDx)
-        it.dy = dy.coerceIn(-it.maxDy, it.maxDy)
+        it.setAshleyVelocity(dx, dy)
         this.updateBox2DVelocity = true
       }
     }
