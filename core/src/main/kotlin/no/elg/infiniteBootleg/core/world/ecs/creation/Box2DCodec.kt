@@ -203,7 +203,7 @@ fun EngineEntity.createSpellBodyComponent(
       fixedRotation(false)
       angularVelocity((90f * sqrt(dx * dx + dy * dy)).toRadians())
       angularDamping(0f)
-      rotation(Box2d.b2MakeRot(22.5f.toRadians()))
+      rotation = Box2d.b2MakeRot(22.5f.toRadians())
       gravityScale(0f)
     },
     afterBodyComponentAdded = onReady
