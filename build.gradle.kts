@@ -14,7 +14,7 @@ plugins {
 }
 
 tasks.named<Wrapper>("wrapper") {
-  distributionType = Wrapper.DistributionType.BIN
+  distributionType = Wrapper.DistributionType.ALL
 }
 
 fun getGitVersion(): String {
