@@ -29,7 +29,7 @@ object Filters {
     categoryBits(ENTITY_CATEGORY)
     maskBits(GROUND_CATEGORY)
   }
-  val GR_EN_ENTITY_FILTER: b2Filter = Box2d.b2DefaultFilter().apply {
+  val GR_EN__ENTITY_FILTER: b2Filter = Box2d.b2DefaultFilter().apply {
     categoryBits(ENTITY_CATEGORY)
     maskBits(GROUND_CATEGORY or ENTITY_CATEGORY)
   }

@@ -307,7 +307,7 @@ private fun createPlayerTouchAreaFixture(body: b2BodyId, userData: String, side:
 }
 
 private val playerShapeDef: b2ShapeDef = Box2d.b2DefaultShapeDef().also { def ->
-  def.filter = Filters.GR_EN_ENTITY_FILTER
+  def.filter = Filters.GR_EN__ENTITY_FILTER
 //  def.fixedRotation(true)
 //  density = Constants.DEFAULT_FIXTURE_DENSITY
   def.material().restitution(0f)
