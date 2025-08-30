@@ -180,7 +180,11 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     if (!world.worldTicker.isPaused) {
       globalAnimationTimer += Gdx.graphics.deltaTime
     }
-    for (entity in entities) {
+
+    // Sort entities so that block entities are rendered behind other entities(centerPos.x - box2d.halfBox2dWidth).worldToScreen()
+    // (centerPos.y - box2d.halfBox2dHeight).worldToScreen()
+    val sortedEntities = entities.sortedBy { it.materialComponentOrNull == null }
+    for (entity in sortedEntities) {
       val box2d: Box2DBodyComponent = entity.box2d
 
       @Suppress("GDXKotlinFlushInsideLoop")
