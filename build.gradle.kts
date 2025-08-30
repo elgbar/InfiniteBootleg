@@ -231,6 +231,10 @@ project(":server") {
 project(":core") {
   plugins.apply("com.google.protobuf")
 
+  tasks.named("clean") {
+    finalizedBy(tasks.named("generateProto"))
+  }
+
   protobuf {
     protoc {
       artifact = rootProject.libs.protobuf.protoc.get().toString()
