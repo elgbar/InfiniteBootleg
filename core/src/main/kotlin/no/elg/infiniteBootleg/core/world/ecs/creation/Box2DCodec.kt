@@ -75,9 +75,10 @@ fun EngineEntity.createPlayerBodyComponent(
     createPlayerCapsule(body, entity) {
 //      set(playerVertices)
       b2Capsule().apply {
-        center1.set(0f, 0f)
-        center2.set(PLAYER_HEIGHT / 2f, 0f)
-        radius(PLAYER_WIDTH / 2f)
+        val halfWidth = PLAYER_WIDTH / 2f
+        center1 = center1.set(0f, halfWidth - (PLAYER_HEIGHT / 2f))
+        center2 = center2.set(0f, (PLAYER_HEIGHT / 2f) - halfWidth)
+        radius(halfWidth)
       }
     }
 //    createPlayerPolygon(body, PLAYERS_FOOT_USER_DATA) {
