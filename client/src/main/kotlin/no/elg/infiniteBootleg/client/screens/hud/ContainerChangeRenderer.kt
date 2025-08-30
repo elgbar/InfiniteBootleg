@@ -30,7 +30,7 @@ class ContainerChangeRenderer :
   Renderer,
   Disposable {
 
-  private val screenRenderer: ScreenRenderer get() = ClientMain.Companion.inst().screenRenderer
+  private val screenRenderer: ScreenRenderer get() = ClientMain.inst().screenRenderer
 
   private val knownContainers = ObjectOpenHashSet<Container>()
   private val changeHandlers = ObjectOpenHashSet<EventDisplayData>()

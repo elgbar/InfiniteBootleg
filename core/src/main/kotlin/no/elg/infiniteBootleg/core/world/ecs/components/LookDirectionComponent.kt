@@ -22,7 +22,7 @@ data class LookDirectionComponent(var direction: Direction = Direction.WEST) : E
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): LookDirectionComponent? {
       val vector = protoEntity.lookDirection.direction
-      val direction = Direction.Companion.valueOf(vector)
+      val direction = Direction.valueOf(vector)
       return safeWith { LookDirectionComponent(direction) }
     }
   }

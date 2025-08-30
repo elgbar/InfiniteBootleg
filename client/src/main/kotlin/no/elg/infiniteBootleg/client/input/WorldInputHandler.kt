@@ -26,7 +26,7 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) :
   Disposable {
 
   override fun keyDown(keycode: Int): Boolean {
-    if (keycode != Input.Keys.TAB && (ClientMain.inst().shouldIgnoreWorldInput() || (Main.Companion.isMultiplayer && keycode != Input.Keys.F3))) {
+    if (keycode != Input.Keys.TAB && (ClientMain.inst().shouldIgnoreWorldInput() || (Main.isMultiplayer && keycode != Input.Keys.F3))) {
       return false
     }
     when (keycode) {
@@ -76,8 +76,8 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) :
     }
     val camera = worldRender.camera
     camera.zoom = (camera.zoom + (amountY * SCROLL_SPEED)).coerceIn(
-      WorldRender.Companion.MIN_ZOOM,
-      WorldRender.Companion.MAX_ZOOM
+      WorldRender.MIN_ZOOM,
+      WorldRender.MAX_ZOOM
     )
     worldRender.update()
     return true

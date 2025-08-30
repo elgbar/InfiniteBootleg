@@ -78,7 +78,7 @@ abstract class ECSEventQueueComponent<T : ECSEvent> : EntitySavableComponent {
       event: T,
       noinline filter: (Entity) -> Boolean = ALLOW_ALL_FILTER
     ) {
-      if (Main.Companion.inst().world?.worldTicker?.isPaused != false) {
+      if (Main.inst().world?.worldTicker?.isPaused != false) {
         KotlinLogging.logger {}.debug { "Dropping queued event as the world ticker is paused" }
         return
       }

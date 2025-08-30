@@ -21,7 +21,7 @@ fun Engine.createContainerEntity(world: World, worldX: WorldCoord, worldY: World
     entity.authoritativeOnly = true
     entity.safeWith {
       val container = ContainerImpl(entity.nameOrNull ?: "Container")
-      val owner = ContainerOwner.Companion.from(worldX, worldY)
+      val owner = ContainerOwner.from(worldX, worldY)
       ContainerComponent(OwnedContainer(owner, container))
     }
   }

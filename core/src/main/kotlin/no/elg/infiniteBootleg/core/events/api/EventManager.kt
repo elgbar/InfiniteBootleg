@@ -60,7 +60,7 @@ object EventManager {
 
     eventListeners.put(listener, TRUE)
     eventsTracker?.onListenerRegistered(eventClass, listener)
-    return RegisteredEventListener.Companion.createRegisteredEventListener(listener, eventClass)
+    return RegisteredEventListener.createRegisteredEventListener(listener, eventClass)
   }
 
   /**

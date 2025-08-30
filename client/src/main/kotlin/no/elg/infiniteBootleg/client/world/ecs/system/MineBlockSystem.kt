@@ -30,7 +30,7 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
   }
 
   fun CurrentlyBreakingComponent.sendCurrentProgress(zeroProgress: Boolean = false) {
-    if (Main.Companion.isServerClient && breaking.isNotEmpty()) {
+    if (Main.isServerClient && breaking.isNotEmpty()) {
       ClientMain.inst().serverClient.sendServerBoundPacket {
         val progresses = breaking.values.map { it.toBreakingProgress(zeroProgress) }
         serverBoundBreakingBlock(progresses)

@@ -22,7 +22,7 @@ sealed interface ContainerElement {
 
   val displayName: String get() = (this as? Enum<*>)?.name ?: this::class.simpleName ?: itemType.name
 
-  fun toItem(maxStock: UInt = Item.Companion.DEFAULT_MAX_STOCK, stock: UInt = Item.Companion.DEFAULT_MAX_STOCK): Item
+  fun toItem(maxStock: UInt = Item.DEFAULT_MAX_STOCK, stock: UInt = Item.DEFAULT_MAX_STOCK): Item
 
   companion object : ProtoConverter<ContainerElement, ProtoElement> {
 

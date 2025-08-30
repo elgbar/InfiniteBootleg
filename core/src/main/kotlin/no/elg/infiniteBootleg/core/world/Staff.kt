@@ -71,7 +71,7 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
     //    val textureRegion: RotatableTextureRegion get() = ClientMain.inst().assets.staffTexture
     fun ProtoElement.Staff.fromProto(): Staff =
       Staff(
-        wood = Wood.Companion.fromProto(wood),
+        wood = Wood.fromProto(wood),
         gems = (listOf(primaryGem) + secondaryGemsList).mapNotNull(Gem.Companion::fromProto),
         rings = ringsList.mapNotNull(Ring.Companion::fromProto)
       )

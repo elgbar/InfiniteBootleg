@@ -19,7 +19,7 @@ val ContainerElement.textureRegion: RotatableTextureRegion?
   }
 
 private fun TexturedContainerElement.findTextures(): RotatableTextureRegion =
-  if (Main.Companion.isServer) {
+  if (Main.isServer) {
     serverRotatableTextureRegion()
   } else {
     ClientMain.inst().assets.findTextureOrNull(rotatableTextureName(textureName), rotationAllowed = true)

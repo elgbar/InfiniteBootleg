@@ -26,7 +26,7 @@ data class ChunkColumnUpdatedEvent(val chunkX: ChunkCoord, val localX: LocalCoor
     val minY = min(oldTopWorldY, newTopWorldY).toFloat()
     val maxY = max(oldTopWorldY, newTopWorldY).toFloat()
     val offset = maxY - minY
-    World.Companion.getLocationsAABBFromCorner(worldX.toFloat(), maxY, 0f, offset)
+    World.getLocationsAABBFromCorner(worldX.toFloat(), maxY, 0f, offset)
   }
   override val reason: String
     get() = "Chunk column updated with flag ${ChunkColumn.Companion.FeatureFlag.featureFlagToString(flag)}"

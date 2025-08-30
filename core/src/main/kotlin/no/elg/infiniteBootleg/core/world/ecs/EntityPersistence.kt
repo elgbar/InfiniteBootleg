@@ -144,39 +144,39 @@ fun World.load(protoEntity: ProtoWorld.Entity, chunk: Chunk? = null, configure: 
   val world = this
   return engine.futureEntity { future ->
     // Required components
-    EntityTypeComponent.Companion.load(this, protoEntity)
-    IdComponent.Companion.load(this, protoEntity)
-    PositionComponent.Companion.load(this, protoEntity)
-    WorldComponent.Companion.load(this, protoEntity) { world }
+    EntityTypeComponent.load(this, protoEntity)
+    IdComponent.load(this, protoEntity)
+    PositionComponent.load(this, protoEntity)
+    WorldComponent.load(this, protoEntity) { world }
 
     protoEntity.tagsOrNull?.let {
-      AuthoritativeOnlyTag.Companion.load(this, it)
-      CanBeOutOfBoundsTag.Companion.load(this, it)
-      FlyingTag.Companion.load(this, it)
-      FollowedByCameraTag.Companion.load(this, it)
-      GravityAffectedTag.Companion.load(this, it)
-      IgnorePlaceableCheckTag.Companion.load(this, it)
-      LeafDecayTag.Companion.load(this, it)
+      AuthoritativeOnlyTag.load(this, it)
+      CanBeOutOfBoundsTag.load(this, it)
+      FlyingTag.load(this, it)
+      FollowedByCameraTag.load(this, it)
+      GravityAffectedTag.load(this, it)
+      IgnorePlaceableCheckTag.load(this, it)
+      LeafDecayTag.load(this, it)
     }
 
     // inventory
-    ContainerComponent.Companion.load(this, protoEntity)
-    HotbarComponent.Companion.load(this, protoEntity)
+    ContainerComponent.load(this, protoEntity)
+    HotbarComponent.load(this, protoEntity)
 
-    DoorComponent.Companion.load(this, protoEntity)
-    ExplosiveComponent.Companion.load(this, protoEntity)
-    GroundedComponent.Companion.load(this, protoEntity)
-    InputEventQueueComponent.Companion.load(this, protoEntity)
-    KillableComponent.Companion.load(this, protoEntity)
-    LocallyControlledComponent.Companion.load(this, protoEntity)
-    LookDirectionComponent.Companion.load(this, protoEntity)
-    MaterialComponent.Companion.load(this, protoEntity)
-    NameComponent.Companion.load(this, protoEntity)
-    OccupyingBlocksComponent.Companion.load(this, protoEntity)
+    DoorComponent.load(this, protoEntity)
+    ExplosiveComponent.load(this, protoEntity)
+    GroundedComponent.load(this, protoEntity)
+    InputEventQueueComponent.load(this, protoEntity)
+    KillableComponent.load(this, protoEntity)
+    LocallyControlledComponent.load(this, protoEntity)
+    LookDirectionComponent.load(this, protoEntity)
+    MaterialComponent.load(this, protoEntity)
+    NameComponent.load(this, protoEntity)
+    OccupyingBlocksComponent.load(this, protoEntity)
 //    PhysicsEventQueueComponent.Companion.load(this, protoEntity)
-    TextureRegionNameComponent.Companion.load(this, protoEntity)
-    TintedComponent.Companion.load(this, protoEntity)
-    VelocityComponent.Companion.load(this, protoEntity)
+    TextureRegionNameComponent.load(this, protoEntity)
+    TintedComponent.load(this, protoEntity)
+    VelocityComponent.load(this, protoEntity)
 
     // Load box2d body last, as it depends on other components
     val futureCompleter: () -> (Entity) -> Unit = {
@@ -187,7 +187,7 @@ fun World.load(protoEntity: ProtoWorld.Entity, chunk: Chunk? = null, configure: 
     }
 
     if (protoEntity.checkShouldLoad(futureCompleter)) {
-      Box2DBodyComponent.Companion.load(this, protoEntity, futureCompleter)
+      Box2DBodyComponent.load(this, protoEntity, futureCompleter)
     } else {
       futureCompleter()(entity)
     }

@@ -17,10 +17,10 @@ class AuthoritativeWorldContainerManager(engine: Engine) :
   private val internalContainers = ConcurrentHashMap<ContainerOwner, OwnedContainer>()
 
   private val entityListeners = listOf(
-    ContainerOwnerListener(internalContainers, engine, entityContainerFamily) { ContainerOwner.Companion.from(it) },
+    ContainerOwnerListener(internalContainers, engine, entityContainerFamily) { ContainerOwner.from(it) },
     ContainerOwnerListener(internalContainers, engine, blockContainerFamily) {
       val pos = it.positionComponent
-      ContainerOwner.Companion.from(pos.blockX, pos.blockY)
+      ContainerOwner.from(pos.blockX, pos.blockY)
     }
   )
 

@@ -80,8 +80,8 @@ class PerlinChunkGenerator(override val seed: Long) :
   override fun getHeight(worldX: WorldCoord): Int = heightAt(worldX)
 
   override fun generate(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk {
-    val chunk = Main.Companion.inst().chunkFactory.createChunk(world, chunkX, chunkY)
-    for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
+    val chunk = Main.inst().chunkFactory.createChunk(world, chunkX, chunkY)
+    for (localX in 0 until Chunk.CHUNK_SIZE) {
       val worldX = chunkX.chunkToWorld(localX)
       val biome = getBiome(worldX)
       val genHeight = heightAt(worldX)
@@ -90,7 +90,7 @@ class PerlinChunkGenerator(override val seed: Long) :
       if (chunkY == genChunkY) {
         biome.fillUpTo(seed, chunk, localX, genHeight.chunkOffset() + 1, genHeight)
       } else if (chunkY < genChunkY) {
-        biome.fillUpTo(seed, chunk, localX, Chunk.Companion.CHUNK_SIZE, genHeight)
+        biome.fillUpTo(seed, chunk, localX, Chunk.CHUNK_SIZE, genHeight)
       }
 
       // generate caves (where there is something to generate them in
@@ -104,7 +104,7 @@ class PerlinChunkGenerator(override val seed: Long) :
   }
 
   override fun generateFeatures(chunk: Chunk) {
-    for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
+    for (localX in 0 until Chunk.CHUNK_SIZE) {
       val worldX = chunk.chunkX.chunkToWorld(localX)
       val biome = getBiome(worldX)
       val genHeight = heightAt(worldX)
@@ -130,7 +130,7 @@ class PerlinChunkGenerator(override val seed: Long) :
     val worldChunkY = chunkY.chunkToWorld()
     val localX = worldX.chunkOffset()
     val worldXd = worldX.toDouble()
-    for (localY in 0 until Chunk.Companion.CHUNK_SIZE) {
+    for (localY in 0 until Chunk.CHUNK_SIZE) {
       val worldY = worldChunkY + localY
       val worldYd = worldY.toDouble()
 

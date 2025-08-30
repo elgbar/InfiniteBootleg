@@ -52,7 +52,7 @@ open class CommonCommands : CommandExecutor() {
   /**
    * Returns the current world if any, will not log an error when not found
    */
-  protected val worldSilent: World? get() = Main.Companion.inst().world
+  protected val worldSilent: World? get() = Main.inst().world
 
   protected fun findEntity(nameOrId: String): Entity? {
     val world = world ?: return null
@@ -195,7 +195,7 @@ open class CommonCommands : CommandExecutor() {
     val old = worldTime.timeScale
     worldTime.timeScale = scale
     logger.info { "Changed time scale from $old to $scale" }
-    Main.Companion.inst().packetSender.sendDuplexPacket(
+    Main.inst().packetSender.sendDuplexPacket(
       { clientBoundWorldSettings(null, null, scale) }
     ) { serverBoundWorldSettings(null, null, scale) }
   }
@@ -204,7 +204,7 @@ open class CommonCommands : CommandExecutor() {
   fun toggleTime() {
     Settings.dayTicking = !Settings.dayTicking
     logger.info { "Time is now " + (if (Settings.dayTicking) "" else "not ") + "ticking" }
-    Main.Companion.inst().packetSender.sendDuplexPacket(
+    Main.inst().packetSender.sendDuplexPacket(
       { clientBoundWorldSettings(null, null, if (Settings.dayTicking) 1f else 0f) }
     ) { serverBoundWorldSettings(null, null, if (Settings.dayTicking) 1f else 0f) }
   }
@@ -217,12 +217,12 @@ open class CommonCommands : CommandExecutor() {
       timeOfDay.toFloat()
     } catch (ignored: NumberFormatException) {
       when (timeOfDay.lowercase(Locale.getDefault())) {
-        "dawn" -> WorldTime.Companion.DAWN_TIME
-        "day", "sunrise" -> WorldTime.Companion.SUNRISE_TIME
-        "midday", "noon" -> WorldTime.Companion.MIDDAY_TIME
-        "sunset" -> WorldTime.Companion.SUNSET_TIME
-        "dusk" -> WorldTime.Companion.DUSK_TIME
-        "midnight", "night" -> WorldTime.Companion.MIDNIGHT_TIME
+        "dawn" -> WorldTime.DAWN_TIME
+        "day", "sunrise" -> WorldTime.SUNRISE_TIME
+        "midday", "noon" -> WorldTime.MIDDAY_TIME
+        "sunset" -> WorldTime.SUNSET_TIME
+        "dusk" -> WorldTime.DUSK_TIME
+        "midnight", "night" -> WorldTime.MIDNIGHT_TIME
         "end" -> Int.MAX_VALUE.toFloat()
         else -> {
           logger.error { "Unknown time of day, try sunrise, midday, sunset or midnight" }
@@ -242,7 +242,7 @@ open class CommonCommands : CommandExecutor() {
     val worldTime = world.worldTime
     val old = worldTime.time
     worldTime.time = time
-    Main.Companion.inst().packetSender.sendDuplexPacket(
+    Main.inst().packetSender.sendDuplexPacket(
       { clientBoundWorldSettings(null, time, null) }
     ) { serverBoundWorldSettings(null, time, null) }
     logger.info { "Changed time from $old to $time" }
@@ -309,9 +309,9 @@ open class CommonCommands : CommandExecutor() {
   fun trackEvents() {
     val eventTracker = EventManager.getOrCreateEventsTracker()
     if (eventTracker.logAnything) {
-      eventTracker.log = EventsTracker.Companion.LOG_NOTHING
+      eventTracker.log = EventsTracker.LOG_NOTHING
     } else {
-      eventTracker.log = EventsTracker.Companion.LOG_EVERYTHING
+      eventTracker.log = EventsTracker.LOG_EVERYTHING
     }
     logger.info { "Events are now ${if (eventTracker.logAnything) "" else "not "}tracked" }
   }

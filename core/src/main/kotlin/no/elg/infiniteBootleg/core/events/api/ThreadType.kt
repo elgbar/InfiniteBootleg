@@ -111,9 +111,9 @@ enum class ThreadType {
       val threadName = currentThread.name
       if (currentThread === MainDispatcher.mainThread) {
         return RENDER
-      } else if (threadName.startsWith(WorldBox2DTicker.Companion.BOX2D_TICKER_TAG_PREFIX, false)) {
+      } else if (threadName.startsWith(WorldBox2DTicker.BOX2D_TICKER_TAG_PREFIX, false)) {
         return PHYSICS
-      } else if (threadName.startsWith(WorldTicker.Companion.WORLD_TICKER_TAG_PREFIX, false)) {
+      } else if (threadName.startsWith(WorldTicker.WORLD_TICKER_TAG_PREFIX, false)) {
         return TICKER
       } else if (isThreadNameAsync(threadName)) {
         return ASYNC

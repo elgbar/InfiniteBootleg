@@ -29,22 +29,22 @@ private val logger = KotlinLogging.logger {}
 class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord, initialTopSolid: WorldCoordArray? = null, initialTopLight: WorldCoordArray? = null) :
   ChunkColumn {
 
-  private val topWorldYSolid = IntArray(Chunk.Companion.CHUNK_SIZE)
-  private val topWorldYLight = IntArray(Chunk.Companion.CHUNK_SIZE)
-  private val syncLocks = Array(Chunk.Companion.CHUNK_SIZE) { Any() }
+  private val topWorldYSolid = IntArray(Chunk.CHUNK_SIZE)
+  private val topWorldYLight = IntArray(Chunk.CHUNK_SIZE)
+  private val syncLocks = Array(Chunk.CHUNK_SIZE) { Any() }
 
   init {
     if (initialTopSolid != null && initialTopLight != null) {
-      require(initialTopSolid.size == Chunk.Companion.CHUNK_SIZE) {
-        "Chunk column was given initial top solid blocks with wrong size! Expected ${Chunk.Companion.CHUNK_SIZE}, got ${initialTopSolid.size}"
+      require(initialTopSolid.size == Chunk.CHUNK_SIZE) {
+        "Chunk column was given initial top solid blocks with wrong size! Expected ${Chunk.CHUNK_SIZE}, got ${initialTopSolid.size}"
       }
-      require(initialTopLight.size == Chunk.Companion.CHUNK_SIZE) {
-        "Chunk column was given initial top light blocks with wrong size! Expected ${Chunk.Companion.CHUNK_SIZE}, got ${initialTopLight.size}"
+      require(initialTopLight.size == Chunk.CHUNK_SIZE) {
+        "Chunk column was given initial top light blocks with wrong size! Expected ${Chunk.CHUNK_SIZE}, got ${initialTopLight.size}"
       }
-      initialTopSolid.copyInto(topWorldYSolid, endIndex = Chunk.Companion.CHUNK_SIZE)
-      initialTopLight.copyInto(topWorldYLight, endIndex = Chunk.Companion.CHUNK_SIZE)
+      initialTopSolid.copyInto(topWorldYSolid, endIndex = Chunk.CHUNK_SIZE)
+      initialTopLight.copyInto(topWorldYLight, endIndex = Chunk.CHUNK_SIZE)
     } else {
-      for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
+      for (localX in 0 until Chunk.CHUNK_SIZE) {
         val worldX = getWorldX(localX)
         val height = world.chunkLoader.generator.getHeight(worldX)
         topWorldYSolid[localX] = height
@@ -54,7 +54,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord
   }
 
   override fun topBlockHeight(localX: LocalCoord, features: ChunkColumnFeatureFlag): WorldCoord {
-    require(localX in 0 until Chunk.Companion.CHUNK_SIZE) { "Local x is out of bounds. localX: $localX" }
+    require(localX in 0 until Chunk.CHUNK_SIZE) { "Local x is out of bounds. localX: $localX" }
     val solid = if (features.isSolidFlag()) topWorldYSolid[localX] else Int.MIN_VALUE
     val light = if (features.isBlocksLightFlag()) topWorldYLight[localX] else Int.MIN_VALUE
     val max = max(light, solid)
@@ -65,8 +65,8 @@ class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord
   override fun topBlock(localX: LocalCoord, features: ChunkColumnFeatureFlag): Block? = getWorldBlock(localX, topBlockHeight(localX, features))
 
   override fun isChunkAboveTopBlock(chunkY: ChunkCoord, features: ChunkColumnFeatureFlag): Boolean {
-    val maxWorldY = chunkY.chunkToWorld(Chunk.Companion.CHUNK_SIZE - 1)
-    for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
+    val maxWorldY = chunkY.chunkToWorld(Chunk.CHUNK_SIZE - 1)
+    for (localX in 0 until Chunk.CHUNK_SIZE) {
       if (!isBlockAboveTopBlock(localX, maxWorldY, features)) {
         return false
       }
@@ -151,7 +151,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord
     rule: (block: Block) -> Boolean
   ): Boolean {
     if (nextChunk.isValid && !nextChunk.isAllAir) {
-      for (nextLocalY in Chunk.Companion.CHUNK_SIZE - 1 downTo 0) {
+      for (nextLocalY in Chunk.CHUNK_SIZE - 1 downTo 0) {
         val nextBlock = nextChunk.getRawBlock(localX, nextLocalY)
         if (isValidTopBlock(nextBlock, rule)) {
           setTopBlock(top, localX, nextBlock.worldY, expectedCurrentTopWorldY)
@@ -222,7 +222,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord
     }
 
   companion object {
-    const val MAX_CHUNKS_TO_LOOK = Chunk.Companion.CHUNK_SIZE
+    const val MAX_CHUNKS_TO_LOOK = Chunk.CHUNK_SIZE
     fun fromProtobuf(world: World, protoCC: ProtoWorld.ChunkColumn): ChunkColumn =
       ChunkColumnImpl(world, protoCC.chunkX, protoCC.topSolidBlocksList.toIntArray(), protoCC.topTransparentBlocksList.toIntArray())
   }

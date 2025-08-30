@@ -27,7 +27,7 @@ import kotlin.math.floor
  */
 
 @Contract(pure = true)
-inline fun WorldCoord.worldToChunk(): ChunkCoord = this shr Chunk.Companion.CHUNK_SIZE_SHIFT
+inline fun WorldCoord.worldToChunk(): ChunkCoord = this shr Chunk.CHUNK_SIZE_SHIFT
 
 /**
  * @param this@worldToChunk The world coordinate to convert
@@ -57,7 +57,7 @@ inline fun WorldCompactLoc.worldToChunkY(): ChunkCoord = decompactLocY().worldTo
 inline fun ChunkCoord.chunkToWorld(offset: LocalCoord): WorldCoord = chunkToWorld() + offset
 
 @Contract(pure = true)
-inline fun ChunkCoord.chunkToWorld(): WorldCoord = this shl Chunk.Companion.CHUNK_SIZE_SHIFT
+inline fun ChunkCoord.chunkToWorld(): WorldCoord = this shl Chunk.CHUNK_SIZE_SHIFT
 
 @Contract(pure = true)
 inline fun ChunkCompactLoc.chunkToWorld(localCoords: LocalCompactLoc): WorldCompactLoc = compactChunkToWorld(this, localCoords.decompactLocX(), localCoords.decompactLocY())
@@ -75,7 +75,7 @@ inline fun WorldCoordNumber.worldToBlock(): WorldCoord = floor(this.toDouble()).
  * @return The world coordinate to translated to screen coordinates
  */
 @Contract(pure = true)
-inline fun WorldCoordNumber.worldToScreen(): Float = toFloat() * Block.Companion.BLOCK_TEXTURE_SIZE
+inline fun WorldCoordNumber.worldToScreen(): Float = toFloat() * Block.BLOCK_TEXTURE_SIZE
 
 /**
  * Calculate the offset the given world coordinate have in its chunk
@@ -99,7 +99,7 @@ inline fun WorldCompactLoc.chunkOffsetY(): LocalCoord = this.decompactLocY().chu
  * (exclusive)
  */
 @Contract(pure = true)
-inline fun isInsideChunk(localX: LocalCoord, localY: LocalCoord): Boolean = localX >= 0 && localX < Chunk.Companion.CHUNK_SIZE && localY >= 0 && localY < Chunk.Companion.CHUNK_SIZE
+inline fun isInsideChunk(localX: LocalCoord, localY: LocalCoord): Boolean = localX >= 0 && localX < Chunk.CHUNK_SIZE && localY >= 0 && localY < Chunk.CHUNK_SIZE
 
 /**
  * @param localX The chunk local x coordinate
@@ -107,15 +107,15 @@ inline fun isInsideChunk(localX: LocalCoord, localY: LocalCoord): Boolean = loca
  * @return If given x and y are on the edge of a chunk, while still inside the chunk
  */
 @Contract(pure = true)
-inline fun isInnerEdgeOfChunk(localCoord: LocalCoord): Boolean = localCoord == 0 || localCoord == Chunk.Companion.CHUNK_SIZE - 1
+inline fun isInnerEdgeOfChunk(localCoord: LocalCoord): Boolean = localCoord == 0 || localCoord == Chunk.CHUNK_SIZE - 1
 
 @Contract(pure = true)
 inline fun Block.findWhichInnerEdgesOfChunk(): List<Direction> =
   mutableListOf<Direction>().also {
     if (localX == 0) it += Direction.WEST
-    if (localX == Chunk.Companion.CHUNK_SIZE - 1) it += Direction.EAST
+    if (localX == Chunk.CHUNK_SIZE - 1) it += Direction.EAST
     if (localY == 0) it += Direction.SOUTH
-    if (localY == Chunk.Companion.CHUNK_SIZE - 1) it += Direction.NORTH
+    if (localY == Chunk.CHUNK_SIZE - 1) it += Direction.NORTH
   }
 
 /**
@@ -150,10 +150,10 @@ fun Chunk.closestBlockTo(block: Block): LocalCompactLoc {
   val localX = when (horizontalDirectionTo(other)) {
     HorizontalDirection.WESTWARD -> 0
     HorizontalDirection.HORIZONTALLY_ALIGNED -> block.localX
-    HorizontalDirection.EASTWARD -> Chunk.Companion.CHUNK_SIZE - 1
+    HorizontalDirection.EASTWARD -> Chunk.CHUNK_SIZE - 1
   }
   val localY = when (verticalDirectionTo(other)) {
-    VerticalDirection.NORTHWARD -> Chunk.Companion.CHUNK_SIZE - 1
+    VerticalDirection.NORTHWARD -> Chunk.CHUNK_SIZE - 1
     VerticalDirection.VERTICALLY_ALIGNED -> block.localY
     VerticalDirection.SOUTHWARD -> 0
   }
@@ -313,7 +313,7 @@ fun isBlockInsideRadius(
   targetBlockX: WorldCoord,
   targetBlockY: WorldCoord,
   radius: Double
-): Boolean = Vector2.dst2(worldX, worldY, targetBlockX + World.Companion.HALF_BLOCK_SIZE, targetBlockY + World.Companion.HALF_BLOCK_SIZE) < radius * radius
+): Boolean = Vector2.dst2(worldX, worldY, targetBlockX + World.HALF_BLOCK_SIZE, targetBlockY + World.HALF_BLOCK_SIZE) < radius * radius
 
 @Contract(pure = true)
 fun isBlockInsideRadius(

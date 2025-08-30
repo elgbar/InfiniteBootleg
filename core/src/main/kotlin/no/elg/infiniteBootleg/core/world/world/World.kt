@@ -176,7 +176,7 @@ abstract class World(
     name = name,
     seed = seed,
     spawn = compactInt(0, generator.getHeight(0)),
-    isTransient = forceTransient || !Settings.loadWorldFromDisk || Main.Companion.isServerClient
+    isTransient = forceTransient || !Settings.loadWorldFromDisk || Main.isServerClient
   )
 
   /**
@@ -246,7 +246,7 @@ abstract class World(
     val world: World = this
 
     EventManager.oneShotListener<InitialChunksOfWorldLoadedEvent> {
-      if (Main.Companion.isAuthoritative) {
+      if (Main.isAuthoritative) {
         // Add a delay to make sure the light is calculated
         launchOnAsyncSuspendable {
           delay(200L)
@@ -471,9 +471,9 @@ abstract class World(
       time = this@World.worldTime.time
       timeScale = this@World.worldTime.timeScale
       spawn = this@World.spawn.toVector2i()
-      generator = ChunkGenerator.Companion.getGeneratorType(chunkLoader.generator)
+      generator = ChunkGenerator.getGeneratorType(chunkLoader.generator)
       chunkColumns += chunkColumnsManager.toProtobuf()
-      if (Main.Companion.isSingleplayer) {
+      if (Main.isSingleplayer) {
         controlledPlayerEntities.firstOrNull()?.save(toAuthoritative = true, ignoreTransient = true)?.also {
           player = it
         }
@@ -674,7 +674,7 @@ abstract class World(
   ): Block? =
     actionOnBlock(worldX, worldY, false) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock null
-      val block = Block.Companion.fromProto(this, chunk, localX, localY, protoBlock)
+      val block = Block.fromProto(this, chunk, localX, localY, protoBlock)
       chunk.setBlock(localX, localY, block, updateTexture, prioritize, sendUpdatePacket)
     }
 
@@ -737,7 +737,7 @@ abstract class World(
     if (canPlaceBlock(blockX, blockY, false)) {
       return true
     }
-    for (direction in Direction.Companion.CARDINAL) {
+    for (direction in Direction.CARDINAL) {
       if (canPlaceBlock(blockX + direction.dx, blockY + direction.dy, false)) {
         return true
       }

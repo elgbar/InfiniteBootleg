@@ -42,7 +42,7 @@ object Settings {
    * The ticks per seconds to use by default. Changing this will only apply to new instances
    * created.
    */
-  var tps = TickerImpl.Companion.DEFAULT_TICKS_PER_SECOND
+  var tps = TickerImpl.DEFAULT_TICKS_PER_SECOND
 
   var dayTicking = false
 
@@ -133,6 +133,6 @@ object Settings {
   var savePeriodSeconds: Float = 60f
     set(value) {
       field = value.coerceAtLeast(1f)
-      Main.Companion.inst().world?.updateSavePeriod()
+      Main.inst().world?.updateSavePeriod()
     }
 }

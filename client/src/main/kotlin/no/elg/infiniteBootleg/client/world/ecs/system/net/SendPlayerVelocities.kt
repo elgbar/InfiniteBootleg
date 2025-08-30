@@ -23,7 +23,7 @@ object SendPlayerVelocities : IntervalIteratingSystem(basicDynamicEntityFamily, 
     if (Main.inst().isAuthorizedToChange(entity)) {
       entity.velocityComponent.toVector2(vel)
       if (!vel.isZero(EFFECTIVE_ZERO)) {
-        ClientMain.Companion.inst().serverClient?.sendServerBoundPacket {
+        ClientMain.inst().serverClient?.sendServerBoundPacket {
           serverBoundMoveEntityPacket(entity)
         }
       }

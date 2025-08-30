@@ -95,7 +95,7 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<InGameC
   private val watchdog = FailureWatchdog("render")
 
   init {
-    check(!Main.Companion.isServer) { "Cannot create client main as a server!" }
+    check(!Main.isServer) { "Cannot create client main as a server!" }
   }
 
   override fun createConsole(): InGameConsoleHandler = InGameConsoleHandler()
@@ -117,7 +117,7 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<InGameC
 
     Runtime.getRuntime().addShutdownHook(
       Thread {
-        if (Main.Companion.isClient) {
+        if (Main.isClient) {
           serverClient?.dispose()
         }
       }
@@ -135,7 +135,7 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<InGameC
   }
 
   override fun render() {
-    if (Main.Companion.isServer) {
+    if (Main.isServer) {
       return
     }
     Gdx.gl.glClearColor(CLEAR_COLOR_R, CLEAR_COLOR_G, CLEAR_COLOR_B, CLEAR_COLOR_A)
@@ -159,7 +159,7 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<InGameC
     logger.trace { "World status updated: Multiplayer? $isMultiplayer, Singleplayer? $isSingleplayer" }
   }
 
-  override fun isAuthorizedToChange(entity: Entity): Boolean = world?.isAuthorizedToChange(entity) ?: Main.Companion.isAuthoritative
+  override fun isAuthorizedToChange(entity: Entity): Boolean = world?.isAuthorizedToChange(entity) ?: Main.isAuthoritative
 
   fun shouldNotIgnoreWorldInput(): Boolean = !shouldIgnoreWorldInput()
 

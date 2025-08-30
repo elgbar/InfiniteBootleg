@@ -29,7 +29,7 @@ data class Wood(val type: WoodType, val rating: WoodRating) :
     }
 
   companion object {
-    fun fromProto(proto: ProtoElement.Staff.Wood): Wood = Wood(WoodType.Companion.valueOf(proto.type), WoodRating.valueOf(proto.rating))
+    fun fromProto(proto: ProtoElement.Staff.Wood): Wood = Wood(WoodType.valueOf(proto.type), WoodRating.valueOf(proto.rating))
   }
 }
 
@@ -50,7 +50,7 @@ data class Gem(val type: GemType, val rating: GemRating) :
     }
 
   companion object {
-    fun fromProto(proto: ProtoElement.Staff.Gem): Gem? = GemType.Companion.valueOf(proto.type)?.let { gemType -> Gem(gemType, GemRating.valueOf(proto.rating)) }
+    fun fromProto(proto: ProtoElement.Staff.Gem): Gem? = GemType.valueOf(proto.type)?.let { gemType -> Gem(gemType, GemRating.valueOf(proto.rating)) }
   }
 }
 
@@ -70,7 +70,7 @@ data class Ring(val type: RingType<RingRating?>, val rating: RingRating?) :
 
   companion object {
     fun fromProto(proto: ProtoElement.Staff.Ring): Ring? =
-      RingType.Companion.valueOf(proto.type)?.let { ringType ->
+      RingType.valueOf(proto.type)?.let { ringType ->
         Ring(
           ringType,
           if (proto.hasRating()) RingRating.valueOf(proto.rating) else null

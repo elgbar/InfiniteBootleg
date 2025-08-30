@@ -27,6 +27,6 @@ class AutoSortedContainer(name: String, size: Int = DEFAULT_SIZE, private val so
   }
 
   companion object {
-    val defaultSortOrder = SortOrder.Companion.compileComparator(false, SortOrder.Companion.ELEM_NAME_DESC, SortOrder.Companion.AMOUNT_DESC)
+    val defaultSortOrder = SortOrder.compileComparator(false, SortOrder.ELEM_NAME_DESC, SortOrder.AMOUNT_DESC)
   }
 }

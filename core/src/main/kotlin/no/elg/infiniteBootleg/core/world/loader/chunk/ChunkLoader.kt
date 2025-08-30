@@ -37,7 +37,7 @@ abstract class ChunkLoader(val generator: ChunkGenerator) : Disposable {
 
   fun loadChunkFromProto(protoChunk: ProtoWorld.Chunk): Chunk? {
     val chunkPosition = protoChunk.position
-    val chunk = Main.Companion.inst().chunkFactory.createChunk(world, chunkPosition.x, chunkPosition.y)
+    val chunk = Main.inst().chunkFactory.createChunk(world, chunkPosition.x, chunkPosition.y)
 
     try {
       if (fullyLoadChunk(chunk, protoChunk)) {

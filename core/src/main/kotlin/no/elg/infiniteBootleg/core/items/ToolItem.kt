@@ -8,8 +8,7 @@ import no.elg.infiniteBootleg.core.world.Tool
  * @property maxStock The maximum charge of this item
  * @property stock The current charge of this item, **not included in the equals method**
  */
-data class ToolItem(override val element: Tool, override val maxStock: UInt = Item.Companion.DEFAULT_MAX_STOCK, override val stock: UInt = Item.Companion.DEFAULT_MAX_STOCK) :
-  Item {
+data class ToolItem(override val element: Tool, override val maxStock: UInt = Item.DEFAULT_MAX_STOCK, override val stock: UInt = Item.DEFAULT_MAX_STOCK) : Item {
 
   override val itemType: ItemType get() = ItemType.TOOL
 

@@ -41,7 +41,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
         }
         val contentItem = content[index]
         if (contentItem == null) {
-          val toAdd = amountNotAdded.coerceAtMost(Item.Companion.DEFAULT_MAX_STOCK)
+          val toAdd = amountNotAdded.coerceAtMost(Item.DEFAULT_MAX_STOCK)
           amountNotAdded -= toAdd
           content[index] = element.toItem(stock = toAdd)
         } else {

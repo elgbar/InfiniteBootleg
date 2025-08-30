@@ -55,7 +55,7 @@ class ServerPacketSender(private val world: ServerWorld) : PacketSender {
   }
 
   fun broadcast(packet: Packet, filter: ChannelMatcher = ChannelMatchers.all()) {
-    ServerBoundHandler.Companion.channels.writeAndFlush(packet, filter)
+    ServerBoundHandler.channels.writeAndFlush(packet, filter)
   }
 
   @Deprecated("Use sendDuplexPacketInView instead when on the server")

@@ -5,6 +5,7 @@ import no.elg.infiniteBootleg.core.main.Main
 import java.time.ZonedDateTime
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.reflect.KClass
+
 private val logger = KotlinLogging.logger {}
 
 /**
@@ -26,7 +27,7 @@ class EventsTracker(var log: Int = LOG_NOTHING) {
   val logEventListenersChange get() = log and LOG_EVENT_LISTENERS_CHANGE != 0
 
   fun onEventListenedTo(event: Event, listener: EventListener<out Event>) {
-    val recordedEvent = EventListenedToEvent(event, listener, Thread.currentThread().name, Main.Companion.inst().world?.tick, ZonedDateTime.now())
+    val recordedEvent = EventListenedToEvent(event, listener, Thread.currentThread().name, Main.inst().world?.tick, ZonedDateTime.now())
     recorded += recordedEvent
     if (logEventsListenedTo) {
       logger.info { "Event $event listened to $recordedEvent" }
@@ -34,7 +35,7 @@ class EventsTracker(var log: Int = LOG_NOTHING) {
   }
 
   fun onEventDispatched(event: Event) {
-    val recordedEvent = RecordedEvent(event, Thread.currentThread().name, Main.Companion.inst().world?.tick, ZonedDateTime.now())
+    val recordedEvent = RecordedEvent(event, Thread.currentThread().name, Main.inst().world?.tick, ZonedDateTime.now())
     recorded += recordedEvent
     if (logEventsDispatched) {
       logger.info { "Event dispatched: $recordedEvent" }
@@ -42,7 +43,7 @@ class EventsTracker(var log: Int = LOG_NOTHING) {
   }
 
   fun onListenerRegistered(eventClass: KClass<out Event>, listener: EventListener<out Event>) {
-    val recordedEvent = ListenerEvent("registered", eventClass, listener, Thread.currentThread().name, Main.Companion.inst().world?.tick, ZonedDateTime.now())
+    val recordedEvent = ListenerEvent("registered", eventClass, listener, Thread.currentThread().name, Main.inst().world?.tick, ZonedDateTime.now())
     recorded += recordedEvent
     if (logEventListenersChange) {
       logger.info { "Listener registered for ${eventClass.simpleName}: $listener" }
@@ -50,7 +51,7 @@ class EventsTracker(var log: Int = LOG_NOTHING) {
   }
 
   fun onListenerUnregistered(eventClass: KClass<out Event>, listener: EventListener<out Event>) {
-    val recordedEvent = ListenerEvent("unregistered", eventClass, listener, Thread.currentThread().name, Main.Companion.inst().world?.tick, ZonedDateTime.now())
+    val recordedEvent = ListenerEvent("unregistered", eventClass, listener, Thread.currentThread().name, Main.inst().world?.tick, ZonedDateTime.now())
     recorded += recordedEvent
     if (logEventListenersChange) {
       logger.info { "Listener UN-registered for ${eventClass.simpleName}: $listener" }

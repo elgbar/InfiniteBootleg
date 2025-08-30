@@ -71,7 +71,7 @@ abstract class ProgramArgs(args: Array<String>) {
       logger.info { "Running commands '$value' as initial commands" }
       for (cmd in value.split(";").dropLastWhile { it.isEmpty() }) {
         executeAfterCreate.add {
-          Main.Companion.inst().console.execCommand(cmd)
+          Main.inst().console.execCommand(cmd)
         }
       }
     }

@@ -60,8 +60,8 @@ class Box2DBodyComponent(body: b2BodyId, val type: ProtoWorld.Entity.Box2D.BodyT
   val halfBox2dWidth: Float get() = box2dWidth / 2f
   val halfBox2dHeight: Float get() = box2dHeight / 2f
 
-  val worldWidth: Float get() = box2dWidth * Block.Companion.BLOCK_TEXTURE_SIZE
-  val worldHeight: Float get() = box2dHeight * Block.Companion.BLOCK_TEXTURE_SIZE
+  val worldWidth: Float get() = box2dWidth * Block.BLOCK_TEXTURE_SIZE
+  val worldHeight: Float get() = box2dHeight * Block.BLOCK_TEXTURE_SIZE
 
   override val isDisposed get() = disposed
 

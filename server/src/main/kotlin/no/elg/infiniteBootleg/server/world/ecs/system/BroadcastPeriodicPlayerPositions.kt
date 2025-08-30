@@ -15,6 +15,6 @@ object BroadcastPeriodicPlayerPositions : IntervalIteratingSystem(basicDynamicEn
 
   override fun processEntity(entity: Entity) {
     entity.velocityComponent.toVector2(vel)
-    ServerMain.Companion.inst().packetSender.broadcastToInView(clientBoundMoveEntity(entity), entity, excludeEntity = false)
+    ServerMain.inst().packetSender.broadcastToInView(clientBoundMoveEntity(entity), entity, excludeEntity = false)
   }
 }

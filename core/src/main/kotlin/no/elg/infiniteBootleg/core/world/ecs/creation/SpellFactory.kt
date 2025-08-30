@@ -32,7 +32,7 @@ fun Engine.createSpellEntity(
 
     // BASIC_DYNAMIC_ENTITY_ARRAY
     safeWith { VelocityComponent(dx, dy) }
-    safeWith { TextureRegionNameComponent(InfAssets.Companion.SPELL_TEXTURE) }
+    safeWith { TextureRegionNameComponent(InfAssets.SPELL_TEXTURE) }
     safeWith { TintedComponent(Color.RED) }
     this.entity.isTransientEntity = true
 

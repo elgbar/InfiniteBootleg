@@ -44,7 +44,7 @@ class EntityMarkerBlock(override val chunk: Chunk, override val localX: LocalCoo
     }
   }
 
-  override fun save(): ProtoWorld.Block = ChunkImpl.Companion.AIR_BLOCK_PROTO
+  override fun save(): ProtoWorld.Block = ChunkImpl.AIR_BLOCK_PROTO
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

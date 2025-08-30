@@ -46,9 +46,9 @@ class InfAssetsImpl : InfAssets {
   override lateinit var playerWalkingTextures: Animation<RotatableTextureRegion>
 
   private fun createFont(pts: Int): BitmapFont {
-    val generator = FreeTypeFontGenerator(Gdx.files.internal(InfAssets.Companion.FONTS_FOLDER + "UbuntuMono-R.ttf"))
+    val generator = FreeTypeFontGenerator(Gdx.files.internal(InfAssets.FONTS_FOLDER + "UbuntuMono-R.ttf"))
     val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
-    parameter.size = pts * ClientMain.Companion.scale
+    parameter.size = pts * ClientMain.scale
     parameter.minFilter = Texture.TextureFilter.Linear
     parameter.magFilter = Texture.TextureFilter.MipMapLinearLinear
     parameter.genMipMaps = true
@@ -92,43 +92,43 @@ class InfAssetsImpl : InfAssets {
     }
 
   override fun loadAssets() {
-    safeTextureAtlas = SafeTextureAtlas(InfAssets.Companion.TEXTURES_BLOCK_FILE)
+    safeTextureAtlas = SafeTextureAtlas(InfAssets.TEXTURES_BLOCK_FILE)
 
-    breakableBlockTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.Companion.BREAKING_BLOCK_TEXTURE, false)
-    handTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.Companion.HAND_TEXTURE, false)
-    playerTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.Companion.PLAYER_TEXTURE, false)
-    doorOpenTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.Companion.DOOR_OPEN_TEXTURE, false)
-    doorClosedTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.Companion.DOOR_CLOSED_TEXTURE, false)
-    visibleAirTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.Companion.VISIBLE_AIR_TEXTURE, false)
-    pickaxeTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.Companion.PICKAXE_TEXTURE, false)
-    staffTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.Companion.STICK_TEXTURE, false)
-    spellTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.Companion.SPELL_TEXTURE, false)
+    breakableBlockTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.BREAKING_BLOCK_TEXTURE, false)
+    handTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.HAND_TEXTURE, false)
+    playerTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.PLAYER_TEXTURE, false)
+    doorOpenTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.DOOR_OPEN_TEXTURE, false)
+    doorClosedTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.DOOR_CLOSED_TEXTURE, false)
+    visibleAirTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.VISIBLE_AIR_TEXTURE, false)
+    pickaxeTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.PICKAXE_TEXTURE, false)
+    staffTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.STICK_TEXTURE, false)
+    spellTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.SPELL_TEXTURE, false)
 
     breakingBlockTextures = (1..9).map {
-      safeTextureAtlas.findRotationAwareRegion(InfAssets.Companion.BREAK_TEXTURE_PREFIX, false, it)
+      safeTextureAtlas.findRotationAwareRegion(InfAssets.BREAK_TEXTURE_PREFIX, false, it)
     }.toTypedArray()
 
-    playerIdleTextures = findAnimation(InfAssets.Companion.PLAYER_IDLE_PREFIX, 3, 0.35f, startIndex = 1)
-    playerWalkingTextures = findAnimation(InfAssets.Companion.PLAYER_WALKING_PREFIX, 2, 0.2f, startIndex = 0)
+    playerIdleTextures = findAnimation(InfAssets.PLAYER_IDLE_PREFIX, 3, 0.35f, startIndex = 1)
+    playerWalkingTextures = findAnimation(InfAssets.PLAYER_WALKING_PREFIX, 2, 0.2f, startIndex = 0)
 
-    skyTexture = InfAssets.Companion.createTextureRegion(
-      ClientMain.Companion.CLEAR_COLOR_R,
-      ClientMain.Companion.CLEAR_COLOR_G,
-      ClientMain.Companion.CLEAR_COLOR_B,
-      ClientMain.Companion.CLEAR_COLOR_A
+    skyTexture = InfAssets.createTextureRegion(
+      ClientMain.CLEAR_COLOR_R,
+      ClientMain.CLEAR_COLOR_G,
+      ClientMain.CLEAR_COLOR_B,
+      ClientMain.CLEAR_COLOR_A
     )
-    caveTexture = InfAssets.Companion.createTextureRegion(
-      ChunkRenderer.Companion.CAVE_CLEAR_COLOR_R,
-      ChunkRenderer.Companion.CAVE_CLEAR_COLOR_G,
-      ChunkRenderer.Companion.CAVE_CLEAR_COLOR_B,
-      ClientMain.Companion.CLEAR_COLOR_A
+    caveTexture = InfAssets.createTextureRegion(
+      ChunkRenderer.CAVE_CLEAR_COLOR_R,
+      ChunkRenderer.CAVE_CLEAR_COLOR_G,
+      ChunkRenderer.CAVE_CLEAR_COLOR_B,
+      ClientMain.CLEAR_COLOR_A
     )
-    whiteTexture = InfAssets.Companion.createTextureRegion(Color.WHITE)
-    skylightDebugTexture = InfAssets.Companion.createTextureRegion(Color.YELLOW, 0.5f)
-    luminanceDebugTexture = InfAssets.Companion.createTextureRegion(Color.FIREBRICK, 0.5f)
+    whiteTexture = InfAssets.createTextureRegion(Color.WHITE)
+    skylightDebugTexture = InfAssets.createTextureRegion(Color.YELLOW, 0.5f)
+    luminanceDebugTexture = InfAssets.createTextureRegion(Color.FIREBRICK, 0.5f)
 
     // Do some dummy work to load textures and constructors
-    logger.debug { "Loaded ${Material.Companion.normalMaterials.size} materials" }
+    logger.debug { "Loaded ${Material.normalMaterials.size} materials" }
     TextureNeighbor.generateNeighborMap(safeTextureAtlas.regions)
 
     loadInfBootSkin()

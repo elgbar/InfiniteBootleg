@@ -58,7 +58,7 @@ object ExplosiveBlockSystem : IteratingSystem(explosiveBlockFamily, UPDATE_PRIOR
             block.worldY
           ) * hardness * abs(MathUtils.random.nextGaussian() + RESISTANCE)
           val otherBlockEntity = block.entity
-          if (dist < strength * strength && (otherBlockEntity == null || otherBlockEntity.hasNot(ExplosiveComponent.Companion.mapper))) {
+          if (dist < strength * strength && (otherBlockEntity == null || otherBlockEntity.hasNot(ExplosiveComponent.mapper))) {
             destroyed.add(block)
           }
         }

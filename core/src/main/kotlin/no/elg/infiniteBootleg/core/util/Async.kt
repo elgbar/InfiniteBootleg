@@ -44,12 +44,12 @@ fun launchOnMultithreadedAsyncSuspendable(start: CoroutineStart = CoroutineStart
 fun launchOnWorldTickerSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(WorldTickCoroutineDispatcher, start = start, block = block)
 
-fun launchOnWorldTicker(block: () -> Unit) = Main.Companion.inst().world?.postWorldTickerRunnable(block)
+fun launchOnWorldTicker(block: () -> Unit) = Main.inst().world?.postWorldTickerRunnable(block)
 
 fun launchOnBox2dSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(Box2DTickCoroutineDispatcher, start = start, block = block)
 
-fun launchOnBox2d(block: () -> Unit) = Main.Companion.inst().world?.postBox2dRunnable(block) ?: error("No world is currently active, cannot post Box2D runnable.")
+fun launchOnBox2d(block: () -> Unit) = Main.inst().world?.postBox2dRunnable(block) ?: error("No world is currently active, cannot post Box2D runnable.")
 
 object WorldTickCoroutineDispatcher : CoroutineDispatcher() {
   override fun dispatch(context: CoroutineContext, block: Runnable) {

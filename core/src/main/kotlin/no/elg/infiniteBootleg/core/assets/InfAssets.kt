@@ -72,10 +72,10 @@ interface InfAssets {
     fun createTextureRegion(color: Color, a: Float): RotatableTextureRegion = createTextureRegion(color.r, color.g, color.b, a)
     fun createTextureRegion(r: Float, g: Float, b: Float, a: Float): RotatableTextureRegion {
       val name = "GENERATED FROM $r, $g, $b, $a"
-      return if (Main.Companion.isServer) {
+      return if (Main.isServer) {
         RotatableTextureRegion(null, false, name)
       } else {
-        Pixmap(Block.Companion.BLOCK_TEXTURE_SIZE, Block.Companion.BLOCK_TEXTURE_SIZE, Pixmap.Format.RGBA4444).useDispose {
+        Pixmap(Block.BLOCK_TEXTURE_SIZE, Block.BLOCK_TEXTURE_SIZE, Pixmap.Format.RGBA4444).useDispose {
           it.setColor(r, g, b, a)
           it.fill()
           TextureRegion(Texture(it)).disallowedRotation(name)

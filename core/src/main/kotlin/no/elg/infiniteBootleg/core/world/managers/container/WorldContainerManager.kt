@@ -18,11 +18,11 @@ interface WorldContainerManager {
    * Find a container at the given world coordinates
    * @return a future that will complete with the container at the given world coordinates or a failed future if none is found
    */
-  fun find(worldX: WorldCoord, worldY: WorldCoord): CompletableFuture<OwnedContainer> = find(ContainerOwner.Companion.from(worldX, worldY))
+  fun find(worldX: WorldCoord, worldY: WorldCoord): CompletableFuture<OwnedContainer> = find(ContainerOwner.from(worldX, worldY))
 
   /**
    * Find a container at the given world coordinates
    * @return a future that will complete with the container at the given world coordinates or a failed future if none is found
    */
-  fun find(entity: Entity): CompletableFuture<OwnedContainer> = find(ContainerOwner.Companion.from(entity))
+  fun find(entity: Entity): CompletableFuture<OwnedContainer> = find(ContainerOwner.from(entity))
 }

@@ -21,9 +21,9 @@ interface WorldTicker : Ticker {
 }
 
 class CommonWorldTicker(world: World, tick: Boolean) : WorldTicker {
-  private val ticker = TickerImpl(WorldTickee(world), WorldTicker.Companion.WORLD_TICKER_TAG_PREFIX + world.name, tick, Settings.tps, TickerImpl.DEFAULT_NAG_DELAY)
+  private val ticker = TickerImpl(WorldTickee(world), WorldTicker.WORLD_TICKER_TAG_PREFIX + world.name, tick, Settings.tps, TickerImpl.DEFAULT_NAG_DELAY)
   override val box2DTicker: WorldBox2DTicker = WorldBox2DTicker(world, tick)
-  private val logger = KotlinLogging.logger(WorldTicker.Companion.WORLD_TICKER_TAG_PREFIX + world.name)
+  private val logger = KotlinLogging.logger(WorldTicker.WORLD_TICKER_TAG_PREFIX + world.name)
 
   override fun start() {
     check(!ticker.isStarted) { "World has already been started" }

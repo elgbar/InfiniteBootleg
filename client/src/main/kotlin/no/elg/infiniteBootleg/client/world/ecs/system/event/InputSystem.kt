@@ -46,7 +46,7 @@ import kotlin.math.sign
 object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
   controlledEntityWithInputEventFamily,
   InputEvent::class,
-  InputEventQueueComponent.Companion.mapper
+  InputEventQueueComponent.mapper
 ) {
 
   override fun beforeAllHandle() {
@@ -75,7 +75,7 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
       Input.Buttons.RIGHT -> {
         val block = world.getBlock(inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY) ?: return
         if (block.material == Material.Container) {
-          val owner = ContainerOwner.Companion.from(inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY)
+          val owner = ContainerOwner.from(inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY)
           world.worldContainerManager.find(owner).thenApply { container ->
             container?.open()
           }

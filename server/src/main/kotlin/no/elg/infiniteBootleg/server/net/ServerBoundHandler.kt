@@ -57,7 +57,7 @@ class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
     logger.debug { "client inactive (player $playerId) (curr active ${clients.size} clients, ${channels.size} channels)" }
     if (client != null) {
       client.heartbeatTask?.cancel(false)
-      ServerMain.Companion.inst().serverWorld.disconnectPlayer(client.entityId, false)
+      ServerMain.inst().serverWorld.disconnectPlayer(client.entityId, false)
     }
   }
 

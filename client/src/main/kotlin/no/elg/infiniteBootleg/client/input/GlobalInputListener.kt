@@ -20,8 +20,8 @@ object GlobalInputListener : InputAdapter() {
           screen.debugMenu.close()
           screen.staffMenu.close()
         }
-        if (Main.Companion.inst().console.isVisible) {
-          Main.Companion.inst().console.isVisible = false
+        if (Main.inst().console.isVisible) {
+          Main.inst().console.isVisible = false
         }
       }
 
@@ -44,7 +44,7 @@ object GlobalInputListener : InputAdapter() {
       }
 
       Input.Keys.F8 -> {
-        if (Main.Companion.isClient) {
+        if (Main.isClient) {
           val screen = ClientMain.inst().screen
           if (screen is WorldScreen) {
             screen.staffMenu.toggleShown(screen.stage)
@@ -53,7 +53,7 @@ object GlobalInputListener : InputAdapter() {
       }
 
       Input.Keys.F7 -> {
-        if (Main.Companion.isClient) {
+        if (Main.isClient) {
           val screen = ClientMain.inst().screen
           if (screen is WorldScreen) {
             screen.debugMenu.toggleShown()

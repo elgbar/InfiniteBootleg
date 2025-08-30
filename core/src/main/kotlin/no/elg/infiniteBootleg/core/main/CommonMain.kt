@@ -64,7 +64,7 @@ abstract class CommonMain<CONSOLE : GameConsoleHandler>(private val progArgs: Pr
 
     Runtime.getRuntime().addShutdownHook(
       Thread {
-        if (Main.Companion.isAuthoritative) {
+        if (Main.isAuthoritative) {
           val activeWorld = world
           activeWorld?.save()
           activeWorld?.dispose()

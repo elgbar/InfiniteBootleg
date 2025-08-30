@@ -42,8 +42,8 @@ fun EngineEntity.withRequiredComponents(
   worldY: WorldCoordNumber,
   id: String? = null
 ) {
-  safeWith { EntityTypeComponent.Companion.getType(entityType) }
-  safeWith { id?.let { IdComponent(it) } ?: IdComponent.Companion.createRandomId() }
+  safeWith { EntityTypeComponent.getType(entityType) }
+  safeWith { id?.let { IdComponent(it) } ?: IdComponent.createRandomId() }
   safeWith { WorldComponent(world) }
   safeWith { PositionComponent(worldX.toFloat(), worldY.toFloat()) }
 }

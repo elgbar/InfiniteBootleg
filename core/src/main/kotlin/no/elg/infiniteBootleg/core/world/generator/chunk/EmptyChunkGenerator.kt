@@ -15,7 +15,7 @@ import no.elg.infiniteBootleg.core.world.world.World
 class EmptyChunkGenerator : ChunkGenerator {
 
   override fun generate(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk =
-    Main.Companion.inst().chunkFactory.createChunk(world, chunkX, chunkY).also {
+    Main.inst().chunkFactory.createChunk(world, chunkX, chunkY).also {
       it.finishLoading()
     }
 

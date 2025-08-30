@@ -20,7 +20,7 @@ import no.elg.infiniteBootleg.core.assets.InfAssets
 import no.elg.infiniteBootleg.core.main.Main
 
 fun InfAssets.loadInfBootSkin() {
-  if (Main.Companion.isClient) {
+  if (Main.isClient) {
     // Only load vis ui on clients
     with(VisUI.getSkin() as Skin) {
       val notFlippedFont = font20pt

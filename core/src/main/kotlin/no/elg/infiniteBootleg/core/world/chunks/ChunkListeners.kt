@@ -57,7 +57,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
       registerListenerConditionally { event: BlockChangedEvent ->
         // Note: there are multiple events registered in the same listener
         val block = event.oldOrNewBlock ?: return@registerListenerConditionally
-        onBlockChangeAwakeBox2dBodies(block)
+//        onBlockChangeAwakeBox2dBodies(block)
         onBlockChangedUpdateTexture(block)
       },
       /*

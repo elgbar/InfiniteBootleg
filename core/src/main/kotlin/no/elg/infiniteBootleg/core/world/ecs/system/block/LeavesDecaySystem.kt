@@ -47,7 +47,7 @@ object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_D
         val loc = stack.removeLast()
         seen.add(loc)
         event?.also(EventManager::dispatchEvent)
-        for (dir in Direction.Companion.CARDINAL) {
+        for (dir in Direction.CARDINAL) {
           val nextLoc = relativeCompact(loc.decompactLocX(), loc.decompactLocY(), dir)
           if (!isWithin(srcLoc, nextLoc, DESPAWN_LEAVES_RADIUS)) {
             // Block is too far away to be connected

@@ -123,7 +123,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
 
   fun lookAt(loc: WorldCompactLoc) = lookAt(loc.decompactLocX(), loc.decompactLocY())
   fun lookAt(worldX: WorldCoordNumber, worldY: WorldCoordNumber) {
-    camera.position.set(worldX.toFloat() * Block.Companion.BLOCK_TEXTURE_SIZE, worldY.toFloat() * Block.Companion.BLOCK_TEXTURE_SIZE, 0f)
+    camera.position.set(worldX.toFloat() * Block.BLOCK_TEXTURE_SIZE, worldY.toFloat() * Block.BLOCK_TEXTURE_SIZE, 0f)
     update()
   }
 
@@ -164,18 +164,18 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
 
   override fun update() {
     camera.update()
-    box2dDebugM4.set(camera.combined).scl(Block.Companion.BLOCK_TEXTURE_SIZE_F)
+    box2dDebugM4.set(camera.combined).scl(Block.BLOCK_TEXTURE_SIZE_F)
     val width = camera.viewportWidth * camera.zoom
     val height = camera.viewportHeight * camera.zoom
     val w = width * abs(camera.up.y) + height * abs(camera.up.x)
     val h = height * abs(camera.up.y) + width * abs(camera.up.x)
     viewBound[camera.position.x - w / 2, camera.position.y - h / 2, w] = h
-    chunksInView.horizontalStart = MathUtils.floor(viewBound.x / Chunk.Companion.CHUNK_TEXTURE_SIZE) - WorldRender.CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS
+    chunksInView.horizontalStart = MathUtils.floor(viewBound.x / Chunk.CHUNK_TEXTURE_SIZE) - WorldRender.CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS
     chunksInView.horizontalEnd =
-      (MathUtils.floor((viewBound.x + viewBound.width + Chunk.Companion.CHUNK_TEXTURE_SIZE) / Chunk.Companion.CHUNK_TEXTURE_SIZE) + WorldRender.CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS)
-    chunksInView.verticalStart = MathUtils.floor(viewBound.y / Chunk.Companion.CHUNK_TEXTURE_SIZE) - WorldRender.CHUNKS_IN_VIEW_PADDING_RENDER
+      (MathUtils.floor((viewBound.x + viewBound.width + Chunk.CHUNK_TEXTURE_SIZE) / Chunk.CHUNK_TEXTURE_SIZE) + WorldRender.CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS)
+    chunksInView.verticalStart = MathUtils.floor(viewBound.y / Chunk.CHUNK_TEXTURE_SIZE) - WorldRender.CHUNKS_IN_VIEW_PADDING_RENDER
     chunksInView.verticalEnd =
-      (MathUtils.floor((viewBound.y + viewBound.height + Chunk.Companion.CHUNK_TEXTURE_SIZE) / Chunk.Companion.CHUNK_TEXTURE_SIZE) + WorldRender.CHUNKS_IN_VIEW_PADDING_RENDER)
+      (MathUtils.floor((viewBound.y + viewBound.height + Chunk.CHUNK_TEXTURE_SIZE) / Chunk.CHUNK_TEXTURE_SIZE) + WorldRender.CHUNKS_IN_VIEW_PADDING_RENDER)
     if (abs(lastZoom - camera.zoom) > WorldRender.SKYLIGHT_ZOOM_THRESHOLD) {
       lastZoom = camera.zoom
     }

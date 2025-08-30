@@ -93,7 +93,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
         val nx = neighbor.worldX + 0.5
         val ny = neighbor.worldY + 0.5
         val distCubed1 = distCubed(cellX, cellY, nx, ny)
-        val f = World.Companion.LIGHT_SOURCE_LOOK_BLOCKS * World.Companion.LIGHT_SOURCE_LOOK_BLOCKS
+        val f = World.LIGHT_SOURCE_LOOK_BLOCKS * World.LIGHT_SOURCE_LOOK_BLOCKS
         val distCubed = distCubed1 / f
         val negSignum = -sign(distCubed)
         val intensity = 1 + (negSignum * distCubed)
@@ -206,8 +206,8 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
     chunk.world.getBlocksAABBFromCenter(
       worldX + 0.5f,
       worldY + 0.5f,
-      World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_F,
-      World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_F,
+      World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_F,
+      World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_F,
       raw = true,
       loadChunk = false,
       includeAir = false,
@@ -217,7 +217,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
   fun findSkylightBlocks(worldX: WorldCoord, worldY: WorldCoord): GdxArray<Block> {
     var skyblocks: GdxArray<Block>? = null
     // Since we're not creating air blocks above, we will instead just load
-    for (offsetWorldX: LocalCoord in -World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA..World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA) {
+    for (offsetWorldX: LocalCoord in -World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA..World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA) {
       val topWorldX: WorldCoord = worldX + offsetWorldX
       val topWorldY: WorldCoord = chunk.world.getTopBlockWorldY(
         topWorldX,
@@ -270,7 +270,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
         }
       }
     }
-    return skyblocks ?: World.Companion.EMPTY_BLOCKS_ARRAY
+    return skyblocks ?: World.EMPTY_BLOCKS_ARRAY
   }
 
   /**
@@ -289,7 +289,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
         worldY.toInt(),
         block.worldX,
         block.worldY
-      ) <= World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW
+      ) <= World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW
 
   /**
    * Given two y-coordinates ([worldYA] and [worldYB]) get a column of blocks between the two
@@ -301,14 +301,14 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
     worldYA: Float,
     worldYB: Float
   ): GdxArray<Block> {
-    val worldYTop = min(max(worldYA, worldYB), worldY + World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
-    val worldYBtm = max(min(worldYA, worldYB), worldY - World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
+    val worldYTop = min(max(worldYA, worldYB), worldY + World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
+    val worldYBtm = max(min(worldYA, worldYB), worldY - World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
     val columnHeight = worldYTop - worldYBtm
     if (columnHeight <= 0) {
       // The bottom world y-coordinate is below (or at) the top world y-coordinate!
       // This means the worldY coordinate is too far away from the potential skylight column
       // thus no skylight can reach this block
-      return World.Companion.EMPTY_BLOCKS_ARRAY
+      return World.EMPTY_BLOCKS_ARRAY
     }
     return chunk.world.getBlocksAABB(topWorldX, worldYBtm, 0f, columnHeight, raw = false, loadChunk = false, includeAir = true) { it ->
       skylightBlockFilter(worldX, worldY, it)

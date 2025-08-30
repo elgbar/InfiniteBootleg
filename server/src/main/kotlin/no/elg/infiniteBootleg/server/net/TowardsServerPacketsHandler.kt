@@ -184,7 +184,7 @@ private fun handleContentRequest(ctx: ChannelHandlerContextWrapper, contentReque
 
 private fun handleWorldSettings(ctx: ChannelHandlerContextWrapper, worldSettings: Packets.WorldSettings) {
   logger.info { "handleWorldSettings: spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}" }
-  val world = ServerMain.Companion.inst().serverWorld
+  val world = ServerMain.inst().serverWorld
   var spawn: Long? = null
   var time: Float? = null
   var timeScale: Float? = null
@@ -247,7 +247,7 @@ private fun handleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: Pack
     player.setVelocity(moveEntity.velocity)
 
     // Only set look direction if it exists on the entity from before
-    moveEntity.lookDirectionOrNull?.let { player.lookDirectionComponentOrNull?.direction = Direction.Companion.valueOf(it) }
+    moveEntity.lookDirectionOrNull?.let { player.lookDirectionComponentOrNull?.direction = Direction.valueOf(it) }
   }
 }
 
@@ -264,7 +264,7 @@ private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchan
       ctx.fatal("Wrong shared information returned by client")
       return
     }
-    val player = Main.Companion.inst().world?.getEntity(shared.entityId)
+    val player = Main.inst().world?.getEntity(shared.entityId)
     if (player != null) {
       ctx.writeAndFlushPacket(clientBoundStartGamePacket(player))
     } else {
@@ -290,7 +290,7 @@ private fun handleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.
   }
   logger.debug { "Login request received by user '$username', entityId '$entityId'" }
 
-  val world = ServerMain.Companion.inst().serverWorld
+  val world = ServerMain.inst().serverWorld
 
   if (world.hasPlayer(entityId)) {
     ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(Packets.ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN))
@@ -334,12 +334,12 @@ private fun asyncHandleBlockUpdate(ctx: ChannelHandlerContextWrapper, blockUpdat
   val worldX = blockUpdate.pos.x
   val worldY = blockUpdate.pos.y
   if (isLocInView(ctx, worldX, worldY)) {
-    ServerMain.Companion.inst().serverWorld.setBlock(worldX, worldY, blockUpdate.blockOrNull, true)
+    ServerMain.inst().serverWorld.setBlock(worldX, worldY, blockUpdate.blockOrNull, true)
   }
 }
 
 private fun asyncHandleChunkRequest(ctx: ChannelHandlerContextWrapper, chunkX: ChunkCoord, chunkY: ChunkCoord) {
-  val serverWorld = ServerMain.Companion.inst().serverWorld
+  val serverWorld = ServerMain.inst().serverWorld
 
   // Only send chunks which the player is allowed to see
   if (isChunkInView(ctx, chunkX, chunkY)) {
@@ -351,7 +351,7 @@ private fun asyncHandleChunkRequest(ctx: ChannelHandlerContextWrapper, chunkX: C
 }
 
 private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
-  val world = ServerMain.Companion.inst().serverWorld
+  val world = ServerMain.inst().serverWorld
   val shared = ctx.getSharedInformation()
   val player = ctx.getCurrentPlayer()
   if (player == null || shared == null) {
@@ -404,12 +404,12 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
       ctx.channel().close()
       ctx.channel().disconnect()
     }
-  }, SharedInformation.Companion.HEARTBEAT_PERIOD_MS, SharedInformation.Companion.HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
+  }, SharedInformation.HEARTBEAT_PERIOD_MS, SharedInformation.HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
   logger.info { "Player ${player.name} joined" }
 }
 
 private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entityId: String) {
-  val world = ServerMain.Companion.inst().serverWorld
+  val world = ServerMain.inst().serverWorld
 
   val entity = world.getEntity(entityId) ?: run {
     ctx.writeAndFlushPacket(clientBoundDespawnEntity(entityId, Packets.DespawnEntity.DespawnReason.UNKNOWN_ENTITY))
@@ -431,7 +431,7 @@ private fun asyncHandleContainerUpdate(ctx: ChannelHandlerContextWrapper, contai
   // TODO check that the player can do this
   // FIXME make sure not to broadcast when no changes are made
   val (owner, container) = containerUpdate.worldContainer.fromProto()
-  ServerMain.Companion.inst().serverWorld.worldContainerManager.find(owner).thenApply { serverOwnedContainer ->
+  ServerMain.inst().serverWorld.worldContainerManager.find(owner).thenApply { serverOwnedContainer ->
     container.content.copyInto(serverOwnedContainer.container.content)
   }
   ServerMain.inst().packetSender.broadcast(
@@ -447,7 +447,7 @@ private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
 }
 
 private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, owner: ContainerOwner) {
-  ServerMain.Companion.inst().serverWorld.worldContainerManager.find(owner).thenApply { ownedContainer ->
+  ServerMain.inst().serverWorld.worldContainerManager.find(owner).thenApply { ownedContainer ->
     if (ownedContainer == null) {
       logger.warn { "Failed to find container for $owner" }
     } else {
@@ -476,7 +476,7 @@ private fun ChannelHandlerContextWrapper.getSharedInformation(): SharedInformati
 
 private fun ChannelHandlerContextWrapper.getCurrentPlayer(): Entity? {
   val uuid = getSharedInformation() ?: return null
-  return ServerMain.Companion.inst().serverWorld.getPlayer(uuid)
+  return ServerMain.inst().serverWorld.getPlayer(uuid)
 }
 
 /**

@@ -61,7 +61,7 @@ sealed interface ContainerOwner {
     /**
      * Check if the owner is valid in the current world
      */
-    fun ContainerOwner.isValid(): Boolean = Main.Companion.inst().world?.let { isValid(it) } ?: false
+    fun ContainerOwner.isValid(): Boolean = Main.inst().world?.let { isValid(it) } ?: false
 
     override fun ProtoContainerOwner.fromProto(): ContainerOwner? =
       when (this.ownerCase) {

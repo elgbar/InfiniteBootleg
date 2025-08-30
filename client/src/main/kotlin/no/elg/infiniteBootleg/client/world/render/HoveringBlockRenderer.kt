@@ -31,7 +31,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
 
   override fun render() {
     val world = worldRender.world
-    if (Main.Companion.isServerClient) {
+    if (Main.isServerClient) {
       ClientMain.inst().serverClient?.breakingBlockCache?.asMap()?.forEach { (blockWorldLoc, rawProgress) ->
         renderBreakingOverlay(world, blockWorldLoc, rawProgress)
       }
@@ -53,7 +53,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
         breakableBlocks.forEach { blockWorldLoc ->
           if (isBreaking) {
             val rawProgress: Progress = breakingComponent?.breaking?.get(blockWorldLoc)?.progressHandler?.progress ?: run { 0f }
-            if (Main.Companion.isServerClient) {
+            if (Main.isServerClient) {
               ClientMain.inst().serverClient?.let {
                 val serverProgress = it.breakingBlockCache.getIfPresent(blockWorldLoc)
                 if (serverProgress != null && serverProgress > rawProgress) {
@@ -91,21 +91,21 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
   private fun renderPlaceableBlock(world: World, texture: TextureRegion, blockWorldLoc: WorldCompactLoc, overrideAlpha: Float? = null) {
     val (blockWorldX, blockWorldY) = blockWorldLoc
     val averageBrightness = if (Settings.renderLight) {
-      val blockBrightness = world.getBlockLight(blockWorldX, blockWorldY)?.averageBrightness ?: BlockLight.Companion.FULL_BRIGHTNESS
-      if (blockBrightness == BlockLight.Companion.COMPLETE_DARKNESS) {
+      val blockBrightness = world.getBlockLight(blockWorldX, blockWorldY)?.averageBrightness ?: BlockLight.FULL_BRIGHTNESS
+      if (blockBrightness == BlockLight.COMPLETE_DARKNESS) {
         // no need to render a black block
         return
       }
       blockBrightness
     } else {
-      BlockLight.Companion.FULL_BRIGHTNESS
+      BlockLight.FULL_BRIGHTNESS
     }
     val alpha = overrideAlpha ?: (1f - averageBrightness).coerceAtLeast(0.33f)
     worldRender.batch.withColor(averageBrightness, averageBrightness, averageBrightness, alpha) {
-      val mouseScreenX = blockWorldX * Block.Companion.BLOCK_TEXTURE_SIZE
-      val mouseScreenY = blockWorldY * Block.Companion.BLOCK_TEXTURE_SIZE
-      val diffFromBlockSizeX = Math.floorMod(mouseScreenX, Block.Companion.BLOCK_TEXTURE_SIZE).toFloat()
-      val diffFromBlockSizeY = Math.floorMod(mouseScreenY, Block.Companion.BLOCK_TEXTURE_SIZE).toFloat()
+      val mouseScreenX = blockWorldX * Block.BLOCK_TEXTURE_SIZE
+      val mouseScreenY = blockWorldY * Block.BLOCK_TEXTURE_SIZE
+      val diffFromBlockSizeX = Math.floorMod(mouseScreenX, Block.BLOCK_TEXTURE_SIZE).toFloat()
+      val diffFromBlockSizeY = Math.floorMod(mouseScreenY, Block.BLOCK_TEXTURE_SIZE).toFloat()
       it.draw(
         texture,
         // Draw the block aligned to the block grid
@@ -113,8 +113,8 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
         mouseScreenY - diffFromBlockSizeY,
         0f,
         0f,
-        Block.Companion.BLOCK_TEXTURE_SIZE_F,
-        Block.Companion.BLOCK_TEXTURE_SIZE_F,
+        Block.BLOCK_TEXTURE_SIZE_F,
+        Block.BLOCK_TEXTURE_SIZE_F,
         1f,
         1f,
         0f

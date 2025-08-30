@@ -31,7 +31,7 @@ fun Entity.interactableBlocks(
   interactionRadius: Float
 ): Sequence<Long> {
   val (worldX, worldY) = this.position
-  return World.Companion.getLocationsWithin(centerBlockX, centerBlockY, radius).asSequence()
+  return World.getLocationsWithin(centerBlockX, centerBlockY, radius).asSequence()
     .filter { worldLoc: WorldCompactLoc -> world.isChunkLoaded(worldLoc.worldToChunk()) }
     .filter { (targetX, targetY) ->
       ignorePlaceableCheck ||

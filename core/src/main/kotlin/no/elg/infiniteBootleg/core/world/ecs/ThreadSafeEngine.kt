@@ -189,6 +189,6 @@ class ThreadSafeEngine :
   override fun dispose() {
     removeAllEntities()
     removeAllSystems()
-    ECSEventQueueComponent.Companion.entitiesCache.clear()
+    ECSEventQueueComponent.entitiesCache.clear()
   }
 }

@@ -231,7 +231,7 @@ sealed interface Material : ContainerElement {
     requireNotNull(validChunk) { "No valid chunk found" }
     require(validChunk.isNotDisposed) { "Chunk has been disposed" }
     return BlockImpl(validChunk, localX, localY, this).also { block ->
-      if (Main.Companion.isAuthoritative) {
+      if (Main.isAuthoritative) {
         // Blocks client side should not have any entity in them
         val futureEntity = protoEntity?.let { world.load(it, validChunk) } ?: createNew?.invoke(world, validChunk.worldX + localX, validChunk.worldY + localY, this)
         futureEntity?.thenApply { entity: Entity ->

@@ -89,8 +89,8 @@ private fun EntityKt.Dsl.addCommonPlayerComponentsProto(
   name = playerName
   grounded = ProtoWorld.Entity.Grounded.getDefaultInstance()
   killable = killable {
-    health = KillableComponent.Companion.DEFAULT_MAX_HEALTH
-    maxHealth = KillableComponent.Companion.DEFAULT_MAX_HEALTH
+    health = KillableComponent.DEFAULT_MAX_HEALTH
+    maxHealth = KillableComponent.DEFAULT_MAX_HEALTH
   }
   ownedContainer = ownedContainer {
     owner = containerOwner { entityOwner = this@addCommonPlayerComponentsProto.ref }
@@ -109,7 +109,7 @@ private fun EntityKt.Dsl.addCommonPlayerComponentsProto(
 
 private fun EntityKt.Dsl.addCommonClientPlayerComponentsProto(controlled: Boolean) {
   if (controlled) {
-    inputEvent = InputEventQueueComponent.Companion.PROTO_INPUT_EVENT
+    inputEvent = InputEventQueueComponent.PROTO_INPUT_EVENT
     locallyControlled = locallyControlled {
       instantBreak = INITIAL_INSTANT_BREAK
       brushRadius = INITIAL_BRUSH_SIZE
@@ -124,13 +124,13 @@ private fun EntityKt.Dsl.addCommonClientPlayerComponentsProto(controlled: Boolea
     }
   }
   texture = texture {
-    texture = InfAssets.Companion.PLAYER_TEXTURE
+    texture = InfAssets.PLAYER_TEXTURE
   }
 }
 
 fun World.createNewPlayer(): CompletableFuture<Entity> = load(createNewProtoPlayer())
 
-fun World.createNewProtoPlayer(controlled: Boolean = Main.Companion.isSingleplayer, configure: EntityKt.Dsl.() -> Unit = {}): ProtoWorld.Entity =
+fun World.createNewProtoPlayer(controlled: Boolean = Main.isSingleplayer, configure: EntityKt.Dsl.() -> Unit = {}): ProtoWorld.Entity =
   entity {
     val world = this@createNewProtoPlayer
     val (spawnX, spawnY) = world.spawn

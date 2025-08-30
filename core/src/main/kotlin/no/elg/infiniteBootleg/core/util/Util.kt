@@ -26,7 +26,7 @@ object Util {
   val version: String by lazy {
     val calcHash = "#${countCommits()}-${getLastGitCommitID()}@${getLastCommitDate("iso8601-strict")}"
     val savedHash = try {
-      Gdx.files.internal(Main.Companion.VERSION_FILE).readString()
+      Gdx.files.internal(Main.VERSION_FILE).readString()
     } catch (e: Exception) {
       FALLBACK_VERSION
     }
@@ -35,7 +35,7 @@ object Util {
       return@lazy FALLBACK_VERSION
     }
     if (savedHash != calcHash && FALLBACK_VERSION != calcHash) {
-      val versionFile = Gdx.files.absolute(Main.Companion.VERSION_FILE)
+      val versionFile = Gdx.files.absolute(Main.VERSION_FILE)
       try {
         versionFile.writeString(calcHash, false)
       } catch (e: Exception) {

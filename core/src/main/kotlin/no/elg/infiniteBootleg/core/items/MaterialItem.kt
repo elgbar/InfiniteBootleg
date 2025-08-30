@@ -9,11 +9,7 @@ import no.elg.infiniteBootleg.core.world.Material
  * @property maxStock The maximum charge of this item
  * @property stock The current charge of this item, **not included in the equals method**
  */
-data class MaterialItem(
-  override val element: Material,
-  override val maxStock: UInt = Item.Companion.DEFAULT_MAX_STOCK,
-  override val stock: UInt = Item.Companion.DEFAULT_MAX_STOCK
-) : Item {
+data class MaterialItem(override val element: Material, override val maxStock: UInt = Item.DEFAULT_MAX_STOCK, override val stock: UInt = Item.DEFAULT_MAX_STOCK) : Item {
 
   override val itemType: ItemType get() = ItemType.BLOCK
 

@@ -49,7 +49,7 @@ class NettyServer {
       logger.info {
         "Binding server to port @|bold,green ${Settings.port}|@@|white . Server was ready in |@@|bold ${
           diffTimePretty(
-            Main.Companion.inst().startTime
+            Main.inst().startTime
           )
         }|@"
       }

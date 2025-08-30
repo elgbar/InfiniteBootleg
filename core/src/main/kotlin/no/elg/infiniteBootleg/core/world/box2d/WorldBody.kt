@@ -108,7 +108,7 @@ open class WorldBody(private val world: World) :
       return
     }
     entity.enableFlag(INVALID_FLAG)
-    if (ThreadType.Companion.isCurrentThreadType(ThreadType.PHYSICS)) {
+    if (ThreadType.isCurrentThreadType(ThreadType.PHYSICS)) {
       // OK to remove at once since this is the only thread we can remove entities from
       world.engine.removeEntity(entity)
     } else {

@@ -22,7 +22,7 @@ object WorldLoader {
   private val WORLD_LOCK_LOCK = Any()
   const val WORLD_INFO_PATH = "world.dat"
 
-  fun getWorldFolder(uuid: String): FileHandle = Gdx.files.external(Main.Companion.WORLD_FOLDER + uuid)
+  fun getWorldFolder(uuid: String): FileHandle = Gdx.files.external(Main.WORLD_FOLDER + uuid)
 
   fun getWorldLockFile(uuid: String): FileHandle = getWorldFolder(uuid).child(LOCK_FILE_NAME)
 
