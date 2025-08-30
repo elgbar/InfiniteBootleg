@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.core.console.GameConsoleHandler
 import no.elg.infiniteBootleg.core.logging.Slf4jApplicationLogger
 import no.elg.infiniteBootleg.core.util.Util
 import no.elg.infiniteBootleg.core.util.diffTimePretty
+import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkFactory
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkImplFactory
@@ -61,6 +62,9 @@ abstract class CommonMain<CONSOLE : GameConsoleHandler>(private val progArgs: Pr
       logger.warn { "Failed to install jansi" }
     }
     logger.info { "Version ${Util.version}" }
+
+    // Need to eager initialize materials list (kotlin bug?)
+    Material.materials
 
     Runtime.getRuntime().addShutdownHook(
       Thread {

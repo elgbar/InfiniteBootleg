@@ -55,7 +55,6 @@ class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<Headles
     // Add shutdown hook after the lateinit fields have been initialized
     val onShutdown = Runnable {
       packetSender.broadcast(clientBoundDisconnectPlayerPacket("Server closed"))
-      serverWorld.save()
       dispose()
     }
     Runtime.getRuntime().addShutdownHook(Thread(onShutdown))
