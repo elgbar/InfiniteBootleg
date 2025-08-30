@@ -73,7 +73,6 @@ fun EngineEntity.createPlayerBodyComponent(
   ) {
     val body = this
     createPlayerCapsule(body, entity) {
-//      set(playerVertices)
       b2Capsule().apply {
         val halfWidth = PLAYER_WIDTH / 2f
         center1 = center1.set(0f, halfWidth - (PLAYER_HEIGHT / 2f))
@@ -81,18 +80,6 @@ fun EngineEntity.createPlayerBodyComponent(
         radius(halfWidth)
       }
     }
-//    createPlayerPolygon(body, PLAYERS_FOOT_USER_DATA) {
-//      Box2d.b2MakeOffsetBox(
-//        /* halfWidth = */
-//        PLAYER_WIDTH / 4f,
-//        /* halfHeight = */
-//        ESSENTIALLY_ZERO,
-//        /* center = */
-//        makeB2Vec2(0f, -PLAYER_HEIGHT / 2f - A_LITTLE_MORE_THAN_ESSENTIALLY_ZERO),
-//        /* rotation = */
-//        NO_ROTATION
-//      )
-//    }
     val radius = 0.5f
     createSecondaryPlayerFixture(body, HOLE_DETECTOR_USER_DATA, halfWidth = radius, halfHeight = radius, centerY = -(PLAYER_HEIGHT) / 2f - radius)
     createPlayerTouchAreaFixture(body, PLAYERS_LEFT_ARM_USER_DATA, -1)
