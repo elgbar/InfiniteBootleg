@@ -33,6 +33,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.MaterialComponent.Companion.materialComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.TintedComponent.Companion.tintedComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.EFFECTIVE_ZERO
@@ -202,11 +203,22 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
         drawBox2d(box2d, texture, ashleyScreenX, ashleyScreenY)
 
         batch.color = BOX2D_COLOR
-        val screenX = (centerPos.x).worldToScreen()
-        val screenY = (centerPos.y).worldToScreen()
+        val screenX = (centerPos.x - box2d.halfBox2dWidth).worldToScreen()
+        val screenY = (centerPos.y - box2d.halfBox2dHeight).worldToScreen()
         drawBox2d(box2d, texture, screenX, screenY)
 
         batch.color = Color.WHITE
+      }
+
+      val activeScreenX: Float
+      val activeScreenY: Float
+      if (entity.materialComponentOrNull != null) {
+        val position = box2d.body.position
+        activeScreenX = (position.x - box2d.halfBox2dWidth).worldToScreen()
+        activeScreenY = (position.y - box2d.halfBox2dHeight).worldToScreen()
+      } else {
+        activeScreenX = (centerPos.x - box2d.halfBox2dWidth).worldToScreen()
+        activeScreenY = (centerPos.y - box2d.halfBox2dHeight).worldToScreen()
       }
 
       setupEntityLight(centerPos, box2d)
@@ -215,13 +227,9 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       entity.tintedComponentOrNull?.also {
         batch.color = tmpColor.set(batch.color).mul(it.tint)
       }
-
-      val screenX = (centerPos.x - box2d.halfBox2dWidth).worldToScreen()
-      val screenY = (centerPos.y - box2d.halfBox2dHeight).worldToScreen()
-
-      drawBox2d(box2d, texture, screenX, screenY)
-      drawHolding(entity, entity.selectedElement, screenX, screenY)
-      drawName(entity, box2d, screenX, screenY)
+      drawBox2d(box2d, texture, activeScreenX, activeScreenY)
+      drawHolding(entity, entity.selectedElement, activeScreenX, activeScreenY)
+      drawName(entity, box2d, activeScreenX, activeScreenY)
       debugEntityLight()
     }
   }

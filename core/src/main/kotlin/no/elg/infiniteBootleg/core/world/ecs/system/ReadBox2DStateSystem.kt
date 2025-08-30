@@ -10,26 +10,26 @@ import no.elg.infiniteBootleg.core.world.box2d.extensions.component2
 import no.elg.infiniteBootleg.core.world.box2d.extensions.position
 import no.elg.infiniteBootleg.core.world.box2d.extensions.velocity
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
-import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
+import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
-import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityComponentOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import kotlin.math.abs
 
 /**
- * Read the position of the entity from the box2D entity
+ * Read the position of the entity from **dynamic** the box2D entity
+ *
+ * We do not read or update entities without the [no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent], as they should never be moved once placed.
+ * They may also a difference in box2d and ashley position.
  */
-object ReadBox2DStateSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_BEFORE_EVENTS) {
+object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_BEFORE_EVENTS) {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val body = entity.box2dBody
 
     readPosition(entity, body)
-    entity.velocityComponentOrNull?.also { velComp ->
-      readVelocity(entity, body, velComp)
-    }
+    readVelocity(entity, body)
   }
 
   private fun readPosition(entity: Entity, body: b2BodyId) {
@@ -37,9 +37,9 @@ object ReadBox2DStateSystem : IteratingSystem(basicStandaloneEntityFamily, UPDAT
     entity.positionComponent.setPosition(newPosition)
   }
 
-  private fun readVelocity(entity: Entity, body: b2BodyId, velComp: VelocityComponent) {
+  private fun readVelocity(entity: Entity, body: b2BodyId) {
     val (newDx, newDy) = body.velocity
-    velComp.setAshleyVelocity(newDx, newDy)
+    entity.velocityComponent.setAshleyVelocity(newDx, newDy)
 
     val lookDirection = entity.lookDirectionComponentOrNull ?: return
     if (abs(newDx) > MIN_VELOCITY_TO_FLIP && Main.inst().isAuthorizedToChange(entity)) {
