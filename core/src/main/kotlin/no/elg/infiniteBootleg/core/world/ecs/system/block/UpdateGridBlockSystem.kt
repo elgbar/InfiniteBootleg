@@ -26,8 +26,9 @@ object UpdateGridBlockSystem : IteratingSystem(standaloneGridOccupyingBlocksFami
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val world = entity.world
     val pos = entity.positionComponent
-    val halfBox2dWidth = entity.box2d.halfBox2dWidth
-    val halfBox2dHeight = entity.box2d.halfBox2dHeight
+    val box2d = entity.box2d
+    val halfBox2dWidth = box2d.halfBox2dWidth
+    val halfBox2dHeight = box2d.halfBox2dHeight
 
     // Note: raw must be false to properly update the lights while lights are falling
     // Note 2: loadChunk must be false as the entity should then be handled as out of bounds

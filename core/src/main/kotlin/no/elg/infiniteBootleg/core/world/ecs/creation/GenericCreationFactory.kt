@@ -23,6 +23,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
 import java.util.UUID
+import java.util.concurrent.CompletableFuture
 
 const val ESSENTIALLY_ZERO = 0.001f
 const val A_LITTLE_MORE_THAN_ESSENTIALLY_ZERO = 0.01f
@@ -74,12 +75,13 @@ fun Engine.createBlockEntity(
   material: Material,
   wantedFamilies: Array<Pair<Family, String>> = emptyArray(),
   additionalConfiguration: EngineEntity.() -> Unit = {}
-) = futureEntity { future ->
-  withRequiredComponents(ProtoWorld.Entity.EntityType.BLOCK, world, worldX, worldY)
-  safeWith { MaterialComponent(material) }
-  additionalConfiguration()
-  checkFamilies(entity, arrayOf(blockEntityFamily to "blockEntityFamily", *wantedFamilies))
+): CompletableFuture<Entity> =
+  futureEntity { future ->
+    withRequiredComponents(ProtoWorld.Entity.EntityType.BLOCK, world, worldX, worldY)
+    safeWith { MaterialComponent(material) }
+    additionalConfiguration()
+    checkFamilies(entity, arrayOf(blockEntityFamily to "blockEntityFamily", *wantedFamilies))
 
-  // OK to complete now, as this entity does not contain a box2d component
-  future.complete(Unit)
-}
+    // OK to complete now, as this entity does not contain a box2d component
+    future.complete(Unit)
+  }

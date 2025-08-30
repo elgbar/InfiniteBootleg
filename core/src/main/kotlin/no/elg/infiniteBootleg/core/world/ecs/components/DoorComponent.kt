@@ -24,7 +24,7 @@ class DoorComponent : EntitySavableComponent {
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): DoorComponent? = safeWith { DoorComponent() }
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasDoor()
-    val PROTO_DOOR = ProtoWorld.Entity.Door.getDefaultInstance()
+    val PROTO_DOOR: ProtoWorld.Entity.Door = ProtoWorld.Entity.Door.getDefaultInstance()
   }
 
   override fun EntityKt.Dsl.save() {
