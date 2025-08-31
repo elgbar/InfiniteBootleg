@@ -44,7 +44,6 @@ val b2ShapeId.world: b2WorldId
 val b2ShapeId.parentChain: b2ChainId
   get() = Box2d.b2Shape_GetParentChain(this)
 
-
 var b2ShapeId.filter: b2Filter
   get() = Box2d.b2Shape_GetFilter(this)
   set(value) = Box2d.b2Shape_SetFilter(this, value)
@@ -65,13 +64,11 @@ var b2ShapeId.surfaceMaterial: b2SurfaceMaterial
   get() = Box2d.b2Shape_GetSurfaceMaterial(this)
   set(value) = Box2d.b2Shape_SetSurfaceMaterial(this, value)
 
-
 var b2ShapeId.density: Float
   get() = Box2d.b2Shape_GetDensity(this)
   set(value) = setDensity(value, true)
 
-fun b2ShapeId.setDensity(value: Float, updateBodyMass: Boolean) =
-  Box2d.b2Shape_SetDensity(this, value, updateBodyMass)
+fun b2ShapeId.setDensity(value: Float, updateBodyMass: Boolean) = Box2d.b2Shape_SetDensity(this, value, updateBodyMass)
 
 val b2ShapeId.contactCapacity: Int
   get() = Box2d.b2Shape_GetContactCapacity(this)
@@ -84,7 +81,6 @@ val b2ShapeId.aabb: b2AABB
 
 val b2ShapeId.massData: b2MassData
   get() = Box2d.b2Shape_GetMassData(this)
-
 
 val b2ShapeId.circle: b2Circle
   get() = Box2d.b2Shape_GetCircle(this)
@@ -100,18 +96,13 @@ val b2ShapeId.capsule: b2Capsule
 val b2ShapeId.polygon: b2Polygon
   get() = Box2d.b2Shape_GetPolygon(this)
 
-fun b2ShapeId.setCircle(circle: b2Circle.b2CirclePointer) =
-  Box2d.b2Shape_SetCircle(this, circle)
+fun b2ShapeId.setCircle(circle: b2Circle.b2CirclePointer) = Box2d.b2Shape_SetCircle(this, circle)
 
-fun b2ShapeId.setCapsule(capsule: b2Capsule.b2CapsulePointer) =
-  Box2d.b2Shape_SetCapsule(this, capsule)
+fun b2ShapeId.setCapsule(capsule: b2Capsule.b2CapsulePointer) = Box2d.b2Shape_SetCapsule(this, capsule)
 
-fun b2ShapeId.setSegment(segment: b2Segment.b2SegmentPointer) =
-  Box2d.b2Shape_SetSegment(this, segment)
+fun b2ShapeId.setSegment(segment: b2Segment.b2SegmentPointer) = Box2d.b2Shape_SetSegment(this, segment)
 
-fun b2ShapeId.setPolygon(polygon: b2Polygon.b2PolygonPointer) =
-  Box2d.b2Shape_SetPolygon(this, polygon)
-
+fun b2ShapeId.setPolygon(polygon: b2Polygon.b2PolygonPointer) = Box2d.b2Shape_SetPolygon(this, polygon)
 
 var b2ShapeId.sensorEventsEnabled: Boolean
   get() = Box2d.b2Shape_AreSensorEventsEnabled(this)
@@ -129,21 +120,15 @@ var b2ShapeId.hitEventsEnabled: Boolean
   get() = Box2d.b2Shape_AreHitEventsEnabled(this)
   set(value) = Box2d.b2Shape_EnableHitEvents(this, value)
 
+fun b2ShapeId.getContactData(buffer: b2ContactData.b2ContactDataPointer, capacity: Int): Int = Box2d.b2Shape_GetContactData(this, buffer, capacity)
 
-fun b2ShapeId.getContactData(buffer: b2ContactData.b2ContactDataPointer, capacity: Int): Int =
-  Box2d.b2Shape_GetContactData(this, buffer, capacity)
+fun b2ShapeId.getSensorOverlaps(buffer: b2ShapeId.b2ShapeIdPointer, capacity: Int): Int = Box2d.b2Shape_GetSensorOverlaps(this, buffer, capacity)
 
-fun b2ShapeId.getSensorOverlaps(buffer: b2ShapeId.b2ShapeIdPointer, capacity: Int): Int =
-  Box2d.b2Shape_GetSensorOverlaps(this, buffer, capacity)
+fun b2ShapeId.closestPoint(target: b2Vec2): b2Vec2 = Box2d.b2Shape_GetClosestPoint(this, target)
 
-fun b2ShapeId.closestPoint(target: b2Vec2): b2Vec2 =
-  Box2d.b2Shape_GetClosestPoint(this, target)
+fun b2ShapeId.rayCast(input: b2RayCastInput.b2RayCastInputPointer): b2CastOutput = Box2d.b2Shape_RayCast(this, input)
 
-fun b2ShapeId.rayCast(input: b2RayCastInput.b2RayCastInputPointer): b2CastOutput =
-  Box2d.b2Shape_RayCast(this, input)
-
-fun b2ShapeId.testPoint(point: b2Vec2): Boolean =
-  Box2d.b2Shape_TestPoint(this, point)
+fun b2ShapeId.testPoint(point: b2Vec2): Boolean = Box2d.b2Shape_TestPoint(this, point)
 
 fun b2ShapeId.dispose(updateBodyMass: Boolean = true) {
   userData = null
