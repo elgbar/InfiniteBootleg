@@ -3,9 +3,7 @@ package no.elg.infiniteBootleg.core.world.box2d
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.box2d.Box2d
 import com.badlogic.gdx.box2d.structs.b2BodyDef
-import com.badlogic.gdx.box2d.structs.b2BodyEvents
 import com.badlogic.gdx.box2d.structs.b2BodyId
-import com.badlogic.gdx.box2d.structs.b2BodyMoveEvent
 import com.badlogic.gdx.box2d.structs.b2ShapeId
 import com.badlogic.gdx.box2d.structs.b2WorldId
 import com.google.errorprone.annotations.concurrent.GuardedBy
@@ -82,7 +80,7 @@ open class WorldBody(private val world: World) :
 
   private val postRunnable = PostRunnableHandler()
 
-//  private val contactManager = ContactManager(world.engine)
+  private val contactEventManager = ContactManager(box2dWorld, world.engine)
 
   /**
    * Posts a [Runnable] on the physics thread.
@@ -108,11 +106,8 @@ open class WorldBody(private val world: World) :
       return
     }
     entity.enableFlag(INVALID_FLAG)
-    if (ThreadType.isCurrentThreadType(ThreadType.PHYSICS)) {
-      // OK to remove at once since this is the only thread we can remove entities from
+    ThreadType.PHYSICS.launchOrRun {
       world.engine.removeEntity(entity)
-    } else {
-      postRunnable.postRunnable { world.engine.removeEntity(entity) }
     }
   }
 
@@ -174,24 +169,14 @@ open class WorldBody(private val world: World) :
     synchronized(BOX2D_LOCK) {
       box2dWatchdog.watch {
         box2dWorld.step(BOX2D_TIME_STEP, BOX2D_SUB_STEP_COUNT)
+        contactEventManager.postBox2dStepEvents()
       }
-
-//      handlePhysicsBodyEvents()
 
       ashleyWatchdog.watch {
         world.engine.update(BOX2D_TIME_STEP)
       }
 
       postRunnable.executeRunnables()
-    }
-  }
-
-  fun handlePhysicsBodyEvents() {
-    val events: b2BodyEvents = Box2d.b2World_GetBodyEvents(box2dWorld)
-    val moveEvents = events.moveEvents()
-    for (i in 0 until events.moveCount()) {
-      val event: b2BodyMoveEvent = moveEvents[i]
-      // TODO ?
     }
   }
 

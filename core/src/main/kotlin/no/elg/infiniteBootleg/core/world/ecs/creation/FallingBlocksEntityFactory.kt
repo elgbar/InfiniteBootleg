@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.core.world.Material.Companion.fromProto
 import no.elg.infiniteBootleg.core.world.TexturedContainerElement
 import no.elg.infiniteBootleg.core.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.authoritativeOnly
@@ -56,7 +57,7 @@ fun Engine.createFallingBlockStandaloneEntity(
     }
 
     // This entity will handle input events
-//    with<PhysicsEventQueueComponent>()
+    with<PhysicsEventQueueComponent>()
     safeWith { MaterialComponent(material) }
     with<OccupyingBlocksComponent>()
     createFallingBlockBodyComponent(world, worldX, worldY, dx, dy) {

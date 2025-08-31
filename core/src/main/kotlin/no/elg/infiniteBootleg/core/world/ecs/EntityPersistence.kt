@@ -31,6 +31,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent.Companion.occupyingBlocksComponentOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent.Companion.textureRegionNameComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.TintedComponent
@@ -173,7 +174,7 @@ fun World.load(protoEntity: ProtoWorld.Entity, chunk: Chunk? = null, configure: 
     MaterialComponent.load(this, protoEntity)
     NameComponent.load(this, protoEntity)
     OccupyingBlocksComponent.load(this, protoEntity)
-//    PhysicsEventQueueComponent.Companion.load(this, protoEntity)
+    PhysicsEventQueueComponent.Companion.load(this, protoEntity)
     TextureRegionNameComponent.load(this, protoEntity)
     TintedComponent.load(this, protoEntity)
     VelocityComponent.load(this, protoEntity)

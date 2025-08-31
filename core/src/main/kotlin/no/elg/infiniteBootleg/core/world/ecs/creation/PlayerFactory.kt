@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.InputEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.KillableComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.controlledEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.controlledEntityWithInputEventFamily
 import no.elg.infiniteBootleg.core.world.ecs.drawableEntitiesFamily
@@ -116,7 +117,7 @@ private fun EntityKt.Dsl.addCommonClientPlayerComponentsProto(controlled: Boolea
       interactRadius = INITIAL_INTERACT_RADIUS
     }
   }
-//  physicsEvent = PhysicsEventQueueComponent.Companion.PROTO_PHYSICS_EVENT
+  physicsEvent = PhysicsEventQueueComponent.PROTO_PHYSICS_EVENT
   lookDirection = lookDirection {
     direction = vector2i {
       x = 0
