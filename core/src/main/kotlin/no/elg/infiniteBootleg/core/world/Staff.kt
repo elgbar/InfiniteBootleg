@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.core.items.Item
 import no.elg.infiniteBootleg.core.items.ItemType
 import no.elg.infiniteBootleg.core.items.StaffItem
+import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.core.world.magic.Equippable
 import no.elg.infiniteBootleg.core.world.magic.Gem
 import no.elg.infiniteBootleg.core.world.magic.MutableSpellState
@@ -45,11 +46,11 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
     rings.forEach { it.onSpellCast(state, spellEntity) }
   }
 
-//  fun onSpellLand(state: SpellState, spellEntity: Entity, event: PhysicsEvent.ContactBeginsEvent) {
-//    wood.onSpellLand(state, spellEntity)
-//    gems.forEach { it.onSpellLand(state, spellEntity) }
-//    rings.forEach { it.onSpellLand(state, spellEntity) }
-//  }
+  fun onSpellLand(state: SpellState, spellEntity: Entity, event: PhysicsEvent.ContactBeginsEvent) {
+    wood.onSpellLand(state, spellEntity)
+    gems.forEach { it.onSpellLand(state, spellEntity) }
+    rings.forEach { it.onSpellLand(state, spellEntity) }
+  }
 
   override fun onEquip(entity: Entity) {
     wood.onEquip(entity)
