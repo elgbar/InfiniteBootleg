@@ -27,9 +27,8 @@ object AuthoritativeFallingBlockPhysicsEventHandler : PhysicsSystem.PhysicsEvent
     val newX: Int = positionComp.blockX
     val newY: Int = positionComp.blockY - 1
     val world = entity.world
-    if (entity.isBeingRemoved) {
-      return
-    }
+
+    //Fixme: sandtest fails to properly make start of each chunk (lower left corner) to fall!
     world.removeEntity(entity, Packets.DespawnEntity.DespawnReason.NATURAL)
 
     var deltaY = 0
