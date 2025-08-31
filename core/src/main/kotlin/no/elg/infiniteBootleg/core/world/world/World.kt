@@ -271,6 +271,11 @@ abstract class World(
   protected open fun addEntityListeners(engine: Engine) {}
   protected open fun additionalSystems(): Set<EntitySystem> = setOf()
 
+  /**
+   * Allow for each system to be potentially configured after being added to the engine
+   */
+  protected open fun configureSystem(system: EntitySystem) {}
+
   private fun initializeEngine(): ThreadSafeEngine {
     val engine = ThreadSafeEngine()
     ensureUniquenessListener(engine)
@@ -294,6 +299,8 @@ abstract class World(
     engine.addSystem(RemoveStaleEntitiesSystem())
     engine.addSystem(ValidateGroundContactSystem)
     additionalSystems().forEach(engine::addSystem)
+
+    engine.systems.forEach(::configureSystem)
   }
 
   open fun initialize() {
