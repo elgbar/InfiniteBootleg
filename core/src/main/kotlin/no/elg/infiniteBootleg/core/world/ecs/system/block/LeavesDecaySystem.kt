@@ -26,9 +26,9 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.
 import no.elg.infiniteBootleg.core.world.ecs.leafBlockFamily
 import no.elg.infiniteBootleg.core.world.ecs.system.api.FamilyEntitySystem
 
-object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_DEFAULT), AuthoritativeSystem {
-
-  private const val DESPAWN_LEAVES_RADIUS = 5f
+class LeavesDecaySystem :
+  FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_DEFAULT),
+  AuthoritativeSystem {
 
   private val stack: LongQueue = LongQueue()
   private val seen: LongSet = LongOpenHashSet()
@@ -77,5 +77,9 @@ object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_D
       stack.clear()
       seen.clear()
     }
+  }
+
+  companion object {
+    private const val DESPAWN_LEAVES_RADIUS = 5f
   }
 }

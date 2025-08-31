@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.core.console
+package no.elg.infiniteBootleg.client.console
 
 import io.github.oshai.kotlinlogging.Marker
 import io.github.oshai.kotlinlogging.slf4j.toKotlinLogging

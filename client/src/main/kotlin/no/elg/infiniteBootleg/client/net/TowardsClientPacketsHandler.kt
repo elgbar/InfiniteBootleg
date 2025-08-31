@@ -2,12 +2,12 @@ package no.elg.infiniteBootleg.client.net
 
 import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
+import no.elg.infiniteBootleg.client.console.clientSideClientBoundMarker
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.screens.ConnectingScreen
 import no.elg.infiniteBootleg.client.screens.WorldScreen
 import no.elg.infiniteBootleg.client.world.managers.container.ServerClientWorldContainerManager
 import no.elg.infiniteBootleg.client.world.world.ServerClientWorld
-import no.elg.infiniteBootleg.core.console.clientSideClientBoundMarker
 import no.elg.infiniteBootleg.core.console.logPacket
 import no.elg.infiniteBootleg.core.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.core.events.WorldLoadedEvent

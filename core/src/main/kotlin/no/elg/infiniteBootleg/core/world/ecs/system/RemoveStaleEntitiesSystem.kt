@@ -12,7 +12,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 
 private val logger = KotlinLogging.logger {}
 
-object RemoveStaleEntitiesSystem : IteratingSystem(staleEntityFamily, UPDATE_PRIORITY_LAST) {
+class RemoveStaleEntitiesSystem : IteratingSystem(staleEntityFamily, UPDATE_PRIORITY_LAST) {
 
   private val seenEntities = HashSet<Entity>()
 

@@ -150,6 +150,9 @@ const val UPDATE_PRIORITY_DEFAULT = 0
 const val UPDATE_PRIORITY_LATE = 1_000
 const val UPDATE_PRIORITY_LAST = 2_000
 
+const val BEFORE = -1
+const val AFTER = 1
+
 fun ensureUniquenessListener(engine: Engine) {
   if (Settings.enableUniquenessEntityIdCheck) {
     val knownIds = ObjectOpenHashSet<String>()

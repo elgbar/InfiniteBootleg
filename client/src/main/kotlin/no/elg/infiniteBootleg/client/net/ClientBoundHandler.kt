@@ -3,9 +3,9 @@ package no.elg.infiniteBootleg.client.net
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
+import no.elg.infiniteBootleg.client.console.clientSideServerBoundMarker
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.screens.ConnectingScreen
-import no.elg.infiniteBootleg.core.console.clientSideServerBoundMarker
 import no.elg.infiniteBootleg.core.net.ChannelHandlerContextWrapper
 import no.elg.infiniteBootleg.core.net.ServerClient
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
