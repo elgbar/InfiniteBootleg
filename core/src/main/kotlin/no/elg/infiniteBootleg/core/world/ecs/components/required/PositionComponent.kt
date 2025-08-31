@@ -30,6 +30,7 @@ data class PositionComponent(var x: WorldCoordFloat, var y: WorldCoordFloat) : E
 
   val blockX: WorldCoord get() = x.worldToBlock()
   val blockY: WorldCoord get() = y.worldToBlock()
+
   val chunkX: WorldCoord get() = x.worldToChunk()
   val chunkY: WorldCoord get() = y.worldToChunk()
 

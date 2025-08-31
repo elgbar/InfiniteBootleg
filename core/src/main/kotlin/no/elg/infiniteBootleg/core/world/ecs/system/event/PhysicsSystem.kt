@@ -19,6 +19,7 @@ class PhysicsSystem :
 
   val handlers = mutableListOf<PhysicsEventHandler>().apply {
     add(SpellContactPhysicsEventHandler)
+    add(OnGroundPhysicsEventHandler)
     if (Main.isAuthoritative) {
       add(AuthoritativeFallingBlockPhysicsEventHandler)
     }
