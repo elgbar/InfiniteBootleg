@@ -17,10 +17,8 @@ package de.tomgrill.gdxtesting
 
 import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.backends.headless.HeadlessApplication
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration
 import io.mockk.mockk
-import no.elg.infiniteBootleg.main.ServerMain
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.extension.Extension
 
@@ -39,7 +37,7 @@ class GdxTestRunner :
     @BeforeAll
     fun beforeAll(gdxTestRunner: GdxTestRunner) {
       val conf = HeadlessApplicationConfiguration()
-      HeadlessApplication(ServerMain(null), conf)
+//      HeadlessApplication(ServerMain(null), conf)
       Gdx.gl = mockk(relaxed = true)
       Gdx.app = mockk(relaxed = true)
       Gdx.graphics = mockk(relaxed = true)

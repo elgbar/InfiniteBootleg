@@ -18,7 +18,6 @@ open class TestGraphic {
 
   companion object {
     init {
-      Settings.schedulerThreads = 0
       Settings.client = false
       Settings.loadWorldFromDisk = false
       Settings.debug = true

@@ -5,7 +5,7 @@ import io.mockk.mockk
 import no.elg.infiniteBootleg.core.util.directionTo
 import no.elg.infiniteBootleg.core.util.isNeighbor
 import no.elg.infiniteBootleg.core.world.Direction
-import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue

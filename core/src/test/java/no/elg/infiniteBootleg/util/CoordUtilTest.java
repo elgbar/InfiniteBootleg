@@ -1,11 +1,12 @@
 package no.elg.infiniteBootleg.util;
 
-import static no.elg.infiniteBootleg.world.chunks.Chunk.CHUNK_SIZE;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static no.elg.infiniteBootleg.core.world.chunks.Chunk.CHUNK_SIZE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import no.elg.infiniteBootleg.core.util.CoordUtilKt;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Elg
@@ -15,10 +16,10 @@ public class CoordUtilTest {
   @Test
   public void calculateOffset() {
     for (int i = 0; i < CHUNK_SIZE; i++) {
-      assertEquals("i:" + i, i, CoordUtilKt.chunkOffset(i));
+      assertEquals(i, CoordUtilKt.chunkOffset(i), "i:" + i);
     }
     for (int i = -CHUNK_SIZE; i < 0; i++) {
-      assertEquals("i:" + i, i + CHUNK_SIZE, CoordUtilKt.chunkOffset(i));
+      assertEquals(i + CHUNK_SIZE, CoordUtilKt.chunkOffset(i), "i:" + i);
     }
     assertEquals(0, CoordUtilKt.chunkOffset(CHUNK_SIZE));
     assertEquals(1, CoordUtilKt.chunkOffset(CHUNK_SIZE + 1));
