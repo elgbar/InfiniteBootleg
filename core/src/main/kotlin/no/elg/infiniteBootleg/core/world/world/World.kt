@@ -736,6 +736,26 @@ abstract class World(
     }
 
   /**
+   * Check if a given location in the world is [Material.Air] (or internally, does not exist)
+   * this is faster than a standard `getBlock(worldX, worldY).getMaterial == Material.Air` as
+   * the [getBlock] method might create a Block and store a new air
+   * block at the given location.
+   *
+   * If the chunk at the given coordinates isn't loaded yet this method return `true`
+   *
+   * **note** this does not if there are entities at this location
+   *
+   * @param worldX The x coordinate from world view
+   * @param worldY The y coordinate from world view
+   * @return If the block at the given location is not air.
+   */
+  fun isNotAirBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, markerIsAir: Boolean = true): Boolean =
+    actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
+      val chunk = nullableChunk ?: return@actionOnBlock true
+      chunk.getRawBlock(localX, localY).isNotAir(markerIsAir)
+    }
+
+  /**
    * Check whether a block can be placed at the given location
    */
   fun canEntityPlaceBlock(blockX: WorldCoord, blockY: WorldCoord, entity: Entity): Boolean {

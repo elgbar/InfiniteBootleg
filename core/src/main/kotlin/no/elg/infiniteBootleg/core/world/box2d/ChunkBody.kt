@@ -123,8 +123,8 @@ class ChunkBody(val chunk: Chunk) :
   }
 
   fun removeBlock(block: Block) {
-    val world = chunk.world
-    world.postBox2dRunnable {
+    require(block.chunk.chunkBody === this) { "Block $block does not belong to this chunk body, $this. it belongs to chunk ${block.chunk.chunkBody}" }
+    ThreadType.PHYSICS.launchOrRun {
       chunkShapes[shapeIndex(block.localX, block.localY)]?.dispose()
       chunkShapes[shapeIndex(block.localX, block.localY)] = null
     }
@@ -137,11 +137,12 @@ class ChunkBody(val chunk: Chunk) :
       else -> Filters.GR_FB__GROUND_FILTER
     }
 
-    val chainShape = Box2d.b2DefaultShapeDef().also { def ->
+    val shapeDef = Box2d.b2DefaultShapeDef().also { def ->
       def.filter = filter
+      def.enableSensorEvents(true)
     }
     val polygon = Box2d.b2MakeOffsetBox(0.5f, 0.5f, makeB2Vec2(block.localX, block.localY), NO_ROTATION)
-    val shapeId = bodyId.createPolygonShape(chainShape, polygon, block)
+    val shapeId = bodyId.createPolygonShape(shapeDef, polygon, block)
     chunkShapes[shapeIndex(block.localX, block.localY)]?.dispose()
     chunkShapes[shapeIndex(block.localX, block.localY)] = shapeId
   }
