@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.core.world.ecs.components
 
+import com.badlogic.ashley.core.Entity
 import ktx.ashley.EngineEntity
+import ktx.ashley.optionalPropertyFor
 import ktx.ashley.with
 import no.elg.infiniteBootleg.core.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.core.world.ecs.components.events.ECSEventQueueComponent
@@ -15,6 +17,8 @@ class PhysicsEventQueueComponent : ECSEventQueueComponent<PhysicsEvent>() {
   }
 
   companion object : EntityLoadableMapper<PhysicsEventQueueComponent>() {
+
+    var Entity.physicsEventQueueOrNull by optionalPropertyFor(mapper)
 
     fun queuePhysicsEvent(event: PhysicsEvent) {
       if (event.isValid()) {

@@ -32,6 +32,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent.Companion.occupyingBlocksComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent.Companion.physicsEventQueueOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent.Companion.textureRegionNameComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.TintedComponent
@@ -116,6 +117,7 @@ fun Entity.save(toAuthoritative: Boolean, ignoreTransient: Boolean = false): Pro
     trySave(this@save.doorComponentOrNull)
     trySave(this@save.explosiveComponentOrNull)
     trySave(this@save.groundedComponentOrNull)
+    trySave(this@save.physicsEventQueueOrNull)
     trySave(this@save.inputEventQueueOrNull)
     trySave(this@save.killableComponentOrNull)
     trySave(this@save.locallyControlledComponentOrNull)
@@ -123,7 +125,6 @@ fun Entity.save(toAuthoritative: Boolean, ignoreTransient: Boolean = false): Pro
     trySave(this@save.materialComponentOrNull)
     trySave(this@save.nameComponentOrNull)
     trySave(this@save.occupyingBlocksComponentOrNull)
-//    trySave(this@save.physicsEventQueueOrNull)
     trySave(this@save.textureRegionNameComponentOrNull)
     trySave(this@save.tintedComponentOrNull)
     trySave(this@save.velocityComponentOrNull)
@@ -168,13 +169,13 @@ fun World.load(protoEntity: ProtoWorld.Entity, chunk: Chunk? = null, configure: 
     ExplosiveComponent.load(this, protoEntity)
     GroundedComponent.load(this, protoEntity)
     InputEventQueueComponent.load(this, protoEntity)
+    PhysicsEventQueueComponent.load(this, protoEntity)
     KillableComponent.load(this, protoEntity)
     LocallyControlledComponent.load(this, protoEntity)
     LookDirectionComponent.load(this, protoEntity)
     MaterialComponent.load(this, protoEntity)
     NameComponent.load(this, protoEntity)
     OccupyingBlocksComponent.load(this, protoEntity)
-    PhysicsEventQueueComponent.Companion.load(this, protoEntity)
     TextureRegionNameComponent.load(this, protoEntity)
     TintedComponent.load(this, protoEntity)
     VelocityComponent.load(this, protoEntity)
