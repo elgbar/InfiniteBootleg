@@ -19,6 +19,7 @@ import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.console.CmdArgNames
 import no.elg.infiniteBootleg.core.console.commands.CommonCommands
+import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.inventory.container.Container
 import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.core.inventory.container.OwnedContainer
@@ -38,6 +39,9 @@ import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Tool
+import no.elg.infiniteBootleg.core.world.box2d.extensions.body
+import no.elg.infiniteBootleg.core.world.box2d.extensions.isValid
+import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
@@ -623,5 +627,37 @@ class ClientCommands : CommonCommands() {
 
     ClientMain.inst().screen = MainMenuScreen
     loadSingleplayerWorld(worldSeed.asWorldSeed(), forceTransient = forceTransient)
+  }
+
+  @ConsoleDoc(
+    description = "Find all entities in the chunk under the mouse pointer"
+  )
+  fun entInChunk() {
+    val world = clientWorld ?: return
+    val mouseLocator = ClientMain.inst().mouseLocator
+    mouseLocator.update(world)
+    entInChunk(mouseLocator.mouseBlockX.worldToChunk(), mouseLocator.mouseBlockY.worldToChunk())
+  }
+
+  fun mouseInfo() {
+    val world = clientWorld ?: return
+    val mouseLocator = ClientMain.inst().mouseLocator
+    mouseLocator.update(world)
+
+    val worldX = mouseLocator.mouseWorldX
+    val worldY = mouseLocator.mouseWorldY
+
+    logger.info {
+      "Mouse pos exact: ${stringifyCompactLoc(worldX, worldY)}, block: (${stringifyCompactLoc(mouseLocator.mouseBlockX, mouseLocator.mouseBlockY)})"
+    }
+
+    ThreadType.PHYSICS.launchOrRun {
+      world.worldBody.overlapAABB(worldX, worldY, 0.5f, 0.5f) { shapeId ->
+        logger.info { "shape: valid? ${shapeId.isValid}" }
+        if (shapeId.isValid) {
+          logger.info { "shape data: ${shapeId.userData} | body data ${shapeId.body.userData}" }
+        }
+      }
+    }
   }
 }

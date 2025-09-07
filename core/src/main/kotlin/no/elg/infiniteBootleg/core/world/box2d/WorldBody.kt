@@ -20,13 +20,15 @@ import no.elg.infiniteBootleg.core.util.MAX_WORLD_VEL
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.util.isBeingRemoved
 import no.elg.infiniteBootleg.core.world.BOX2D_LOCK
+import no.elg.infiniteBootleg.core.world.box2d.extensions.body
 import no.elg.infiniteBootleg.core.world.box2d.extensions.compactToFloat
 import no.elg.infiniteBootleg.core.world.box2d.extensions.compactToInt
 import no.elg.infiniteBootleg.core.world.box2d.extensions.createBody
 import no.elg.infiniteBootleg.core.world.box2d.extensions.dispose
 import no.elg.infiniteBootleg.core.world.box2d.extensions.isEnabled
 import no.elg.infiniteBootleg.core.world.box2d.extensions.isValid
-import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2AABB
+import no.elg.infiniteBootleg.core.world.box2d.extensions.makeAABBDirect
+import no.elg.infiniteBootleg.core.world.box2d.extensions.makeAABBOffset
 import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2Vec2
 import no.elg.infiniteBootleg.core.world.box2d.extensions.overlapAABB
 import no.elg.infiniteBootleg.core.world.box2d.extensions.shapes
@@ -183,23 +185,59 @@ open class WorldBody(private val world: World) :
    * @param upperX the x coordinate of the upper right corner
    * @param upperY the y coordinate of the upper right corner
    * @param callback Called for each entity found in the query AABB
+   * @param afterAllCallback called after all entities have been iterated through
    */
   fun queryEntities(
     lowerX: Number,
     lowerY: Number,
     upperX: Number,
     upperY: Number,
-    callback: ((Set<Pair<b2BodyId, Entity>>) -> Unit)
+    afterAllCallback: (Set<Entity>) -> Unit = {},
+    callback: ((b2BodyId, Entity) -> Unit)
   ) {
     ThreadType.PHYSICS.launchOrRun {
-      val entities = mutableSetOf<Pair<b2BodyId, Entity>>()
-      val aabb = makeB2AABB(lowerX, lowerY, upperX, upperY)
+      val seenEntities: MutableSet<Entity> = mutableSetOf()
+      val aabb = makeAABBDirect(lowerX, lowerY, upperX, upperY)
       box2dWorld.overlapAABB(aabb) { shapeId, _ ->
-        val body = Box2d.b2Shape_GetBody(shapeId)
-        (body.userData as? Entity)?.also { entity -> entities += body to entity }
+        if (shapeId.isValid) {
+          val body = shapeId.body
+          if (body.isValid) {
+            val entity = body.userData as? Entity ?: return@overlapAABB true
+            if (entity !in seenEntities) {
+              seenEntities += entity
+              callback(body, entity)
+            }
+          }
+        }
         true // continue query
       }
-      callback(entities)
+      afterAllCallback(seenEntities)
+    }
+  }
+
+  /**
+   * Query the world for all entities that potentially overlap the provided AABB.
+   *
+   * @param callback a user implemented callback class.
+   * @param lowerX the x coordinate of the lower left corner
+   * @param lowerY the y coordinate of the lower left corner
+   * @param upperX the x coordinate of the upper right corner
+   * @param upperY the y coordinate of the upper right corner
+   * @param callback Called for each entity found in the query AABB
+   */
+  fun overlapAABB(
+    lowerX: Float,
+    lowerY: Float,
+    offsetX: Float,
+    offsetY: Float,
+    callback: (b2ShapeId) -> Unit
+  ) {
+    ThreadType.PHYSICS.launchOrRun {
+      val aabb = makeAABBOffset(lowerX, lowerY, offsetX, offsetY)
+      box2dWorld.overlapAABB(aabb) { shapeId, _ ->
+        callback(shapeId)
+        true // continue query
+      }
     }
   }
 

@@ -434,21 +434,34 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     }
   }
 
-  override fun queryEntities(callback: ((Set<Pair<b2BodyId, Entity>>) -> Unit)) =
+  override fun queryEachEntities(callback: ((b2BodyId, Entity) -> Unit)) {
     world.worldBody.queryEntities(
       chunkX.chunkToWorld(),
       chunkY.chunkToWorld(),
       chunkX.chunkToWorld(Chunk.CHUNK_SIZE),
       chunkY.chunkToWorld(Chunk.CHUNK_SIZE),
+      EMPTY_AABB_QUERY_AFTER_ALL_CALLBACK,
       callback
     )
+  }
+
+  override fun queryAllEntities(afterAllCallback: (Set<Entity>) -> Unit) {
+    world.worldBody.queryEntities(
+      chunkX.chunkToWorld(),
+      chunkY.chunkToWorld(),
+      chunkX.chunkToWorld(Chunk.CHUNK_SIZE),
+      chunkY.chunkToWorld(Chunk.CHUNK_SIZE),
+      afterAllCallback,
+      EMPTY_AABB_QUERY_FOR_EACH_CALLBACK
+    )
+  }
 
   override fun save(): CompletableFuture<ProtoWorld.Chunk> {
     val future = CompletableFuture<ProtoWorld.Chunk>()
     val protoChunkWithoutEntities = saveBlocksOnly()
-    queryEntities { entities ->
-      val protoWorldEntities = entities.mapNotNull { (_, entity) ->
-        if (world.playersEntities.contains(entity)) {
+    queryAllEntities { entities ->
+      val protoWorldEntities = entities.mapNotNull { entity ->
+        if (entity in world.playersEntities) {
           // do not save players
           null
         } else {
@@ -543,6 +556,9 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
   companion object {
     val AIR_BLOCK_PROTO: ProtoWorld.Block = Block.save(Material.Air).build()
     val NOT_CHECKING_DISTANCE = LongArray(0)
+
+    private val EMPTY_AABB_QUERY_AFTER_ALL_CALLBACK: (Set<Entity>) -> Unit = { }
+    private val EMPTY_AABB_QUERY_FOR_EACH_CALLBACK: (b2BodyId, Entity) -> Unit = { _, _ -> }
 
     @Suppress("NOTHING_TO_INLINE")
     @Contract(pure = true)

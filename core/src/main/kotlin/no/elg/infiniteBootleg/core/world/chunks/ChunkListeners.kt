@@ -42,11 +42,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
   private fun onBlockChangeAwakeBox2dBodies(block: Block) {
     if (block.chunk == chunk) {
       // Awakens players to allow them to jump in a hole when placing a block
-      block.queryEntities {
-        for ((body, _) in it) {
-          body.isAwake = true
-        }
-      }
+      block.queryEntities { body, _ -> body.isAwake = true }
     }
   }
 
@@ -57,7 +53,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
       registerListenerConditionally { event: BlockChangedEvent ->
         // Note: there are multiple events registered in the same listener
         val block = event.oldOrNewBlock ?: return@registerListenerConditionally
-//        onBlockChangeAwakeBox2dBodies(block)
+        onBlockChangeAwakeBox2dBodies(block)
         onBlockChangedUpdateTexture(block)
       },
       /*

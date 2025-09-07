@@ -79,7 +79,8 @@ interface Block :
     /**
      * Find all entities in the block
      */
-    fun Block.queryEntities(callback: ((Set<Pair<b2BodyId, Entity>>) -> Unit)) = world.worldBody.queryEntities(worldX, worldY, worldX + BLOCK_SIZE, worldY + BLOCK_SIZE, callback)
+    fun Block.queryEntities(afterAllCallback: (Set<Entity>) -> Unit = {}, callback: ((b2BodyId, Entity) -> Unit)) =
+      world.worldBody.queryEntities(worldX, worldY, worldX + BLOCK_SIZE, worldY + BLOCK_SIZE, callback = callback)
 
     /**
      * Remove this block by setting it to air

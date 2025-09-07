@@ -172,9 +172,18 @@ interface Chunk :
   fun dirty(prioritize: Boolean = false)
 
   /**
-   * Find all entities in the chunk
+   * Find all entities in the chunk. The order is arbitrary
+   *
+   * Calls [callback] for each entity found in the chunk
    */
-  fun queryEntities(callback: ((Set<Pair<b2BodyId, Entity>>) -> Unit))
+  fun queryEachEntities(callback: ((b2BodyId, Entity) -> Unit))
+
+  /**
+   * Find all entities in the chunk. The order is arbitrary
+   *
+   * @param afterAllCallback a set of all unique entities in the chunk
+   */
+  fun queryAllEntities(afterAllCallback: (Set<Entity>) -> Unit)
 
   /**
    * @return If the chunk has been modified since creation
