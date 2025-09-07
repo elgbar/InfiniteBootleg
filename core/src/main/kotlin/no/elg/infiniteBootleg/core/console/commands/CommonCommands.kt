@@ -54,14 +54,15 @@ open class CommonCommands : CommandExecutor() {
    */
   protected val worldSilent: World? get() = Main.inst().world
 
-  protected fun findEntity(nameOrId: String): Entity? {
+  protected fun findEntity(idOrName: String): Entity? {
     val world = world ?: return null
-    return world.getEntity(nameOrId)
-      ?: world.namedEntities.find { it.nameOrNull == nameOrId }
-      ?: world.validEntities.find { it.id.startsWith(nameOrId) }
-      ?: world.namedEntities.find { it.name.startsWith(nameOrId) }
+    return world.getEntity(idOrName)
+      ?: world.namedEntities.find { it.nameOrNull == idOrName }
+      ?: world.validEntities.find { it.id.startsWith(idOrName) }
+      ?: world.namedEntities.find { it.name.startsWith(idOrName) }
+      ?: world.namedEntities.find { it.name.lowercase().startsWith(idOrName.lowercase()) }
       ?: run {
-        logger.error { "No entity with id or name '$nameOrId'" }
+        logger.error { "No entity with id or name '$idOrName'" }
         return null
       }
   }
@@ -81,6 +82,36 @@ open class CommonCommands : CommandExecutor() {
     } else {
       world.save()
       logger.info { "Saved $world" }
+    }
+  }
+
+  @AuthoritativeOnly
+  @ConsoleDoc(description = "Print the world seed")
+  fun seed() {
+    val world = world ?: return
+    logger.info { world.seed.toString() }
+  }
+
+  @AuthoritativeOnly
+  @ConsoleDoc(description = "Toggle debug")
+  fun debug() {
+    Settings.debug = !Settings.debug
+    logger.info { "Debug is now ${Settings.debug.toAbled()}" }
+  }
+
+  @AuthoritativeOnly
+  @ConsoleDoc(
+    description = "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of" +
+      " chunks, entity updates and chunks update"
+  )
+  fun pause() {
+    val world = world ?: return
+    val ticker: Ticker = world.worldTicker
+    if (ticker.isPaused) {
+      logger.error { "World is already paused" }
+    } else {
+      ticker.pause()
+      logger.info { "World is now paused" }
     }
   }
 
@@ -133,36 +164,6 @@ open class CommonCommands : CommandExecutor() {
     arg4: String
   ) {
     delayed(delayMs, "$command $arg1 $arg2 $arg3 $arg4")
-  }
-
-  @AuthoritativeOnly
-  @ConsoleDoc(description = "Print the world seed")
-  fun seed() {
-    val world = world ?: return
-    logger.info { world.seed.toString() }
-  }
-
-  @AuthoritativeOnly
-  @ConsoleDoc(description = "Toggle debug")
-  fun debug() {
-    Settings.debug = !Settings.debug
-    logger.info { "Debug is now ${Settings.debug.toAbled()}" }
-  }
-
-  @AuthoritativeOnly
-  @ConsoleDoc(
-    description = "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of" +
-      " chunks, entity updates and chunks update"
-  )
-  fun pause() {
-    val world = world ?: return
-    val ticker: Ticker = world.worldTicker
-    if (ticker.isPaused) {
-      logger.error { "World is already paused" }
-    } else {
-      ticker.pause()
-      logger.info { "World is now paused" }
-    }
   }
 
   @ConsoleDoc(description = "Resumes the world ticker. This includes Box2D world updates, light updates, unloading of chunks, entity updates and chunks update")
@@ -401,8 +402,8 @@ open class CommonCommands : CommandExecutor() {
       logger.error { "Failed to find a chunk at ${stringifyCompactLoc(chunkX, chunkY)}" }
       return
     }
-    chunk.queryEntities { entities ->
-      entities.forEach { (_, entity) ->
+    chunk.queryAllEntities { entities ->
+      entities.forEach { entity ->
         logger.info { entityNameId(entity) }
       }
       logger.info { "In total ${entities.size} entities were found in chunk ${stringifyCompactLoc(chunkX, chunkY)}" }

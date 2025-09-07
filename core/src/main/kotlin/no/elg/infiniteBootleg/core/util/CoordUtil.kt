@@ -2,6 +2,7 @@
 
 package no.elg.infiniteBootleg.core.util
 
+import com.badlogic.gdx.box2d.structs.b2Vec2
 import com.badlogic.gdx.math.Vector2
 import ktx.collections.GdxLongArray
 import no.elg.infiniteBootleg.core.world.Direction
@@ -283,6 +284,9 @@ inline fun stringifyCompactLocWithChunk(posComp: PositionComponent): String = st
 
 @Contract(pure = true)
 inline fun stringifyCompactLoc(vector: Vector2i): String = stringifyCompactLoc(vector.x, vector.y)
+
+@Contract(pure = true)
+inline fun stringifyCompactLoc(vector: b2Vec2): String = stringifyCompactLoc(vector.x(), vector.y())
 
 @Contract(pure = true)
 inline fun stringifyChunkToWorld(chunk: Chunk, localX: LocalCoord, localY: LocalCoord): String = "(${chunk.chunkX.chunkToWorld(localX)},${chunk.chunkY.chunkToWorld(localY)})"
