@@ -179,7 +179,7 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
 
         tmpVec.set(impulse, entity.velocityComponent.dy)
 
-        Box2d.b2Body_ApplyForceToCenter(bodyId, tmpVec, true)
+        Box2d.b2Body_ApplyLinearImpulseToCenter(bodyId, tmpVec, true)
       }
     }
   }
