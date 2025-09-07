@@ -5,7 +5,6 @@ import com.badlogic.gdx.box2d.enums.b2BodyType
 import com.badlogic.gdx.box2d.structs.b2BodyDef
 import com.badlogic.gdx.box2d.structs.b2BodyId
 import com.badlogic.gdx.box2d.structs.b2ShapeId
-import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.api.Updatable
 import no.elg.infiniteBootleg.core.events.api.ThreadType
@@ -27,6 +26,9 @@ import java.util.Arrays
 private val logger = KotlinLogging.logger {}
 
 /**
+ * This class will only work from the [ThreadType.PHYSICS] thread.
+ * Any public methods will either be scheduled to run on the physics thread or immediately run if already on the correct thread
+ *
  * @author Elg
  */
 class ChunkBody(val chunk: Chunk) :
@@ -40,31 +42,34 @@ class ChunkBody(val chunk: Chunk) :
   @Suppress("NOTHING_TO_INLINE")
   private inline fun shapeIndex(localX: LocalCoord, localY: LocalCoord): Int = localX + localY * Chunk.CHUNK_SIZE
 
-  private val chunkBodyLock = Any()
+  private fun updateShape(localX: LocalCoord, localY: LocalCoord, shapeId: b2ShapeId?) {
+    val shapeIndex = shapeIndex(localX, localY)
+    chunkShapes[shapeIndex]?.dispose()
+    chunkShapes[shapeIndex] = shapeId
+  }
 
   /**
    * The actual box2d body of the chunk.
    *
-   * The setter is locked under [bodyLock], the old body will automatically be destroyed.
-   *
-   * The getter is **not** locked under [bodyLock]
+   * The setter must be called from the [ThreadType.PHYSICS] thread
    */
-  @field:Volatile
   private var box2dBody: b2BodyId? = null
     set(value) {
-      val oldBody: b2BodyId?
-      synchronized(chunkBodyLock) {
-        oldBody = field
-        field = value
-        if (::chunkShapes.isLazyInitialized()) {
-          chunkShapes.forEach { it?.userData = null }
-          Arrays.fill(chunkShapes, null)
-        }
+      ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
+      val oldBody = field
+      field = value
+      if (::chunkShapes.isLazyInitialized()) {
+        chunkShapes.forEach { it?.userData = null }
+        Arrays.fill(chunkShapes, null)
       }
       if (oldBody != null) {
         // We should now be fine to destroy the old body
         chunk.world.worldBody.destroyBody(oldBody)
       }
+    }
+    get() {
+      ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
+      return field
     }
 
   @field:Volatile
@@ -73,23 +78,36 @@ class ChunkBody(val chunk: Chunk) :
   override val isDisposed: Boolean
     get() = disposed
 
-  /**calculate the shape of the chunk (box2d)*/
-  val bodyDef: b2BodyDef = Box2d.b2DefaultBodyDef().apply {
-//    position.set(chunk.chunkX * CHUNK_SIZE_F, chunk.chunkY * CHUNK_SIZE_F)
-    position = makeB2Vec2(chunk.chunkX * CHUNK_SIZE_F + 0.5f, chunk.chunkY * CHUNK_SIZE_F + 0.5f)
-    fixedRotation(true)
-    type(b2BodyType.b2_staticBody)
-  }
-
   /**
    * Update the box2d fixture of this chunk
    */
   override fun update() {
-    chunk.world.worldBody.updateChunk(this)
+    ThreadType.PHYSICS.launchOrRun {
+      tryCreateChunkBodyNow()
+    }
   }
 
-  @GuardedBy("BOX2D_LOCK")
-  fun shouldCreateBody(): Boolean {
+  /**
+   * Try to get or create the chunk body now, if it needs to be created
+   *
+   * @throws no.elg.infiniteBootleg.core.exceptions.CalledFromWrongThreadTypeException If not called from the [ThreadType.PHYSICS] thread
+   *
+   */
+  private fun tryCreateChunkBodyNow(): b2BodyId? {
+    ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
+    return if (shouldCreateBody()) {
+      val bodyDef: b2BodyDef = Box2d.b2DefaultBodyDef().apply {
+        position = makeB2Vec2(chunk.chunkX * CHUNK_SIZE_F + 0.5f, chunk.chunkY * CHUNK_SIZE_F + 0.5f)
+        fixedRotation(true)
+        type(b2BodyType.b2_staticBody)
+      }
+      chunk.world.worldBody.createBodyNow(bodyDef, this::onBodyCreated)
+    } else {
+      box2dBody
+    }
+  }
+
+  private fun shouldCreateBody(): Boolean {
     if (isDisposed) {
       return false
     }
@@ -106,8 +124,7 @@ class ChunkBody(val chunk: Chunk) :
    * @see World.postBox2dRunnable
    * @see WorldBody.postBox2dRunnable
    */
-  @GuardedBy("BOX2D_LOCK")
-  fun onBodyCreated(tmpBody: b2BodyId) {
+  private fun onBodyCreated(tmpBody: b2BodyId) {
     val blocks = chunk.asSequence().filterNotNull().filter(Block::isNotAir)
     tmpBody.userData = this
     addBlocks(blocks, tmpBody)
@@ -125,8 +142,7 @@ class ChunkBody(val chunk: Chunk) :
   fun removeBlock(block: Block) {
     require(block.chunk.chunkBody === this) { "Block $block does not belong to this chunk body, $this. it belongs to chunk ${block.chunk.chunkBody}" }
     ThreadType.PHYSICS.launchOrRun {
-      chunkShapes[shapeIndex(block.localX, block.localY)]?.dispose()
-      chunkShapes[shapeIndex(block.localX, block.localY)] = null
+      updateShape(block.localX, block.localY, null)
     }
   }
 
@@ -143,37 +159,26 @@ class ChunkBody(val chunk: Chunk) :
     }
     val polygon = Box2d.b2MakeOffsetBox(0.5f, 0.5f, makeB2Vec2(block.localX, block.localY), NO_ROTATION)
     val shapeId = bodyId.createPolygonShape(shapeDef, polygon, block)
-    chunkShapes[shapeIndex(block.localX, block.localY)]?.dispose()
-    chunkShapes[shapeIndex(block.localX, block.localY)] = shapeId
+
+    updateShape(block.localX, block.localY, shapeId)
   }
 
   fun addBlocks(blocks: Sequence<Block>, box2dBody: b2BodyId? = null) =
     ThreadType.PHYSICS.launchOrRun {
-      val body = box2dBody ?: this.box2dBody
-      if (body == null) {
-        update()
-      } else {
-        for (block in blocks) {
-          addBlockNow(block, body)
-        }
-      }
-    }
-
-  fun addBlock(block: Block, box2dBody: b2BodyId? = null) {
-    ThreadType.PHYSICS.launchOrRun {
-      val body = box2dBody ?: this.box2dBody
-      if (body == null) {
-        update()
-      } else {
+      val body = box2dBody ?: tryCreateChunkBodyNow() ?: return@launchOrRun
+      for (block in blocks) {
         addBlockNow(block, body)
       }
     }
-  }
+
+  fun addBlock(block: Block, box2dBody: b2BodyId? = null) = addBlocks(sequenceOf(block), box2dBody)
 
   override fun dispose() {
     if (isDisposed) return
     disposed = true
-    box2dBody = null
+    ThreadType.PHYSICS.launchOrRun {
+      box2dBody = null
+    }
   }
 
   override fun equals(other: Any?): Boolean {

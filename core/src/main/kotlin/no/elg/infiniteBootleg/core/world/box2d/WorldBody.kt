@@ -90,14 +90,6 @@ open class WorldBody(private val world: World) :
    */
   fun postBox2dRunnable(runnable: () -> Unit) = postRunnable.postRunnable(runnable)
 
-  internal fun updateChunk(chunkBody: ChunkBody) {
-    ThreadType.PHYSICS.launchOrRun {
-      if (chunkBody.shouldCreateBody()) {
-        createBodyNow(chunkBody.bodyDef, chunkBody::onBodyCreated)
-      }
-    }
-  }
-
   /**
    * Thread safe and fastest way to remove an entity from the world
    */
@@ -125,12 +117,14 @@ open class WorldBody(private val world: World) :
   }
 
   @GuardedBy("BOX2D_LOCK")
-  private fun createBodyNow(def: b2BodyDef, callback: (b2BodyId) -> Unit) {
-    val body: b2BodyId = box2dWorld.createBody(def)
-    callback(body)
-    val userData = body.userData
-    if (userData == null) {
-      IllegalAction.STACKTRACE.handle { "Userdata not added when creating body. Tried to c${body.userDataPointer.isValid}" }
+  fun createBodyNow(def: b2BodyDef, callback: (b2BodyId) -> Unit): b2BodyId {
+    ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
+    return box2dWorld.createBody(def).also { body ->
+      callback(body)
+      val userData = body.userData
+      if (userData == null) {
+        IllegalAction.STACKTRACE.handle { "Userdata not added when creating body. Tried to c${body.userDataPointer.isValid}" }
+      }
     }
   }
 
