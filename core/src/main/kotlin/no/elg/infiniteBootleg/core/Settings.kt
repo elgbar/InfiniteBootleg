@@ -76,7 +76,7 @@ object Settings {
 
   var renderGroundedTouchingBlocks = false
 
-  var enableThreadCheck = false
+  var assertThreadType = true
 
   /**
    * Make sure entities have unique uuid when added to the engine
@@ -102,8 +102,6 @@ object Settings {
   var handleInvalidBox2dRef: IllegalAction = IllegalAction.STACKTRACE
 
   var enableCameraFollowLerp = true
-
-  var assertThreadType = true
 
   var port = DEFAULT_PORT
 
