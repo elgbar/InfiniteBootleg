@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.core.events.api
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.async.MainDispatcher
 import ktx.log.error
+import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.exceptions.CalledFromWrongThreadTypeException
 import no.elg.infiniteBootleg.core.util.ASYNC_THREAD_NAME
 import no.elg.infiniteBootleg.core.util.EVENTS_THREAD_NAME
@@ -90,12 +91,21 @@ enum class ThreadType {
 
     fun isCurrentThreadType(expected: ThreadType): Boolean = currentThreadType() == expected
 
+    /**
+     * Makes sure this code is called from the [expected] thread type.
+     *
+     * May be disabled in [Settings.assertThreadType]
+     *
+     * @throws CalledFromWrongThreadTypeException If this is called from another thread type than the [expected]
+     */
     fun requireCorrectThreadType(expected: ThreadType, message: (() -> String)? = null) {
-      val current = currentThreadType()
-      if (current != expected) {
-        val string = "Expected event to be dispatched from $expected but was dispatched from $current"
-        val message = message?.invoke() ?: ""
-        throw CalledFromWrongThreadTypeException("$message $string")
+      if (Settings.assertThreadType) {
+        val current = currentThreadType()
+        if (current != expected) {
+          val string = "Expected event to be dispatched from $expected but was dispatched from $current"
+          val message = message?.invoke() ?: ""
+          throw CalledFromWrongThreadTypeException("$message $string")
+        }
       }
     }
 

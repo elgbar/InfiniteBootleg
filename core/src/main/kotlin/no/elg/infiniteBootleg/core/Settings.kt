@@ -103,7 +103,7 @@ object Settings {
 
   var enableCameraFollowLerp = true
 
-  var enableEventStatistics = true
+  var assertThreadType = true
 
   var port = DEFAULT_PORT
 
