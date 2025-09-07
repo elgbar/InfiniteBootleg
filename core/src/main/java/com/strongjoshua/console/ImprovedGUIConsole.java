@@ -42,6 +42,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragScrollListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.SnapshotArray;
+import com.badlogic.gdx.utils.StringBuilder;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -101,7 +102,7 @@ public class ImprovedGUIConsole extends AbstractConsole {
    * Default key toggle is apostrophe: '
    *
    * @param skin Uses skins for Label, TextField, and Table. Skin <b>must</b> contain a font called
-   *     'default-font'.
+   *             'default-font'.
    * @see Console#dispose()
    */
   public ImprovedGUIConsole(Skin skin) {
@@ -127,8 +128,8 @@ public class ImprovedGUIConsole extends AbstractConsole {
    * default processor again (this console uses a multiplexer to circumvent it). <br>
    * Default key toggle is apostrophe: '
    *
-   * @param skin Uses skins for Label, TextField, and Table. Skin <b>must</b> contain a font called
-   *     'default-font'.
+   * @param skin           Uses skins for Label, TextField, and Table. Skin <b>must</b> contain a font called
+   *                       'default-font'.
    * @param useMultiplexer If internal multiplexer should be used
    * @see Console#dispose()
    */
@@ -141,37 +142,37 @@ public class ImprovedGUIConsole extends AbstractConsole {
    * <b>***IMPORTANT***</b> Call {@link Console#dispose()} to make your {@link InputProcessor} the
    * default processor again (this console uses a multiplexer to circumvent it).
    *
-   * @param skin Uses skins for Label, TextField, and Table. Skin <b>must</b> contain a font called
-   *     'default-font'.
+   * @param skin           Uses skins for Label, TextField, and Table. Skin <b>must</b> contain a font called
+   *                       'default-font'.
    * @param useMultiplexer If internal multiplexer should be used
-   * @param keyID Sets the key used to open/close the console (default is apostrophe: ')
+   * @param keyID          Sets the key used to open/close the console (default is apostrophe: ')
    * @see Console#dispose()
    */
   public ImprovedGUIConsole(Skin skin, boolean useMultiplexer, int keyID) {
     this(
-        skin,
-        useMultiplexer,
-        keyID,
-        Window.class,
-        Table.class,
-        "default-rect",
-        TextField.class,
-        TextButton.class,
-        Label.class,
-        ScrollPane.class);
+      skin,
+      useMultiplexer,
+      keyID,
+      Window.class,
+      Table.class,
+      "default-rect",
+      TextField.class,
+      TextButton.class,
+      Label.class,
+      ScrollPane.class);
   }
 
   public ImprovedGUIConsole(
-      Skin skin,
-      boolean useMultiplexer,
-      int keyID,
-      Class<? extends Window> windowClass,
-      Class<? extends Table> tableClass,
-      String tableBackground,
-      Class<? extends TextField> textFieldClass,
-      Class<? extends TextButton> textButtonClass,
-      Class<? extends Label> labelClass,
-      Class<? extends ScrollPane> scrollPaneClass) {
+    Skin skin,
+    boolean useMultiplexer,
+    int keyID,
+    Class<? extends Window> windowClass,
+    Class<? extends Table> tableClass,
+    String tableBackground,
+    Class<? extends TextField> textFieldClass,
+    Class<? extends TextButton> textButtonClass,
+    Class<? extends Label> labelClass,
+    Class<? extends ScrollPane> scrollPaneClass) {
 
     this.tableClass = tableClass;
     this.tableBackground = tableBackground;
@@ -182,7 +183,7 @@ public class ImprovedGUIConsole extends AbstractConsole {
       labelConstructor = labelClass.getConstructor(CharSequence.class, String.class, Color.class);
     } catch (NoSuchMethodException e) {
       throw new IllegalArgumentException(
-          "Label class does not support (<String>, <String>, <Color>) constructor", e);
+        "Label class does not support (<String>, <String>, <Color>) constructor", e);
     }
     this.scrollPaneClass = scrollPaneClass;
 
@@ -205,13 +206,13 @@ public class ImprovedGUIConsole extends AbstractConsole {
 
     try {
       consoleWindow =
-          windowClass.getConstructor(String.class, Skin.class).newInstance("Console", skin);
+        windowClass.getConstructor(String.class, Skin.class).newInstance("Console", skin);
     } catch (Exception e) {
       try {
         consoleWindow = windowClass.getConstructor(String.class).newInstance("Console");
       } catch (Exception e2) {
         throw new RuntimeException(
-            "Window class does not support either (<String>, <Skin>) or (<String>) constructors.");
+          "Window class does not support either (<String>, <Skin>) or (<String>) constructors.");
       }
     }
     consoleWindow.setMovable(true);
@@ -237,7 +238,7 @@ public class ImprovedGUIConsole extends AbstractConsole {
       log.setMaxEntries(numEntries);
     } else {
       throw new IllegalArgumentException(
-          "Maximum entries must be greater than 0 or use Console.UNLIMITED_ENTRIES.");
+        "Maximum entries must be greater than 0 or use Console.UNLIMITED_ENTRIES.");
     }
   }
 
@@ -276,7 +277,7 @@ public class ImprovedGUIConsole extends AbstractConsole {
   public void setPositionPercent(float xPosPct, float yPosPct) {
     if (xPosPct > 100 || yPosPct > 100) {
       throw new IllegalArgumentException(
-          "Error: The console would be drawn outside of the screen.");
+        "Error: The console would be drawn outside of the screen.");
     }
     float w = Gdx.graphics.getWidth(), h = Gdx.graphics.getHeight();
     consoleWindow.setPosition(w * xPosPct / 100.0f, h * yPosPct / 100.0f);
@@ -510,56 +511,56 @@ public class ImprovedGUIConsole extends AbstractConsole {
 
       try {
         input =
-            textFieldClass.getConstructor(String.class, TextFieldStyle.class).newInstance("", tfs);
+          textFieldClass.getConstructor(String.class, TextFieldStyle.class).newInstance("", tfs);
       } catch (Exception e) {
         throw new RuntimeException(
-            "TextField class does not support (<String>, <Skin>) constructor.");
+          "TextField class does not support (<String>, <Skin>) constructor.");
       }
       input.setTextFieldListener(new ImprovedGUIConsole.FieldListener());
 
       try {
         submit =
-            textButtonClass.getConstructor(String.class, Skin.class).newInstance("Submit", skin);
+          textButtonClass.getConstructor(String.class, Skin.class).newInstance("Submit", skin);
       } catch (Exception e) {
         try {
           submit = textButtonClass.getConstructor(String.class).newInstance("Submit");
         } catch (Exception e2) {
           throw new RuntimeException(
-              "TextButton class does not support either (<String>, <Skin>) or (<String>)"
-                  + " constructors.");
+            "TextButton class does not support either (<String>, <Skin>) or (<String>)"
+              + " constructors.");
         }
       }
       submit.addListener(
-          new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-              submit();
-            }
-          });
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            submit();
+          }
+        });
 
       try {
         scroll =
-            scrollPaneClass.getConstructor(Actor.class, Skin.class).newInstance(logEntries, skin);
+          scrollPaneClass.getConstructor(Actor.class, Skin.class).newInstance(logEntries, skin);
       } catch (Exception e) {
         try {
           scroll = scrollPaneClass.getConstructor(Actor.class).newInstance(logEntries);
         } catch (Exception e2) {
           throw new RuntimeException(
-              "ScrollPane class does not support either (<Actor>, <Skin>) or (<Actor>)"
-                  + " constructors.");
+            "ScrollPane class does not support either (<Actor>, <Skin>) or (<Actor>)"
+              + " constructors.");
         }
       }
       scroll.setFadeScrollBars(false);
       scroll.setScrollbarsOnTop(false);
       scroll.setOverscroll(false, false);
       scroll.addListener(
-          new DragScrollListener(scroll) {
-            @Override
-            public boolean scrolled(
-                InputEvent event, float x, float y, float amountX, float amountY) {
-              return super.scrolled(event, x, y, amountX, amountY);
-            }
-          });
+        new DragScrollListener(scroll) {
+          @Override
+          public boolean scrolled(
+            InputEvent event, float x, float y, float amountX, float amountY) {
+            return super.scrolled(event, x, y, amountX, amountY);
+          }
+        });
 
       root.add(scroll).colspan(2).expand().fill().pad(4).row();
       root.add(input).expandX().fillX().pad(4);
@@ -577,15 +578,17 @@ public class ImprovedGUIConsole extends AbstractConsole {
           label = labelConstructor.newInstance("", fontName, LogLevel.DEFAULT.getColor());
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
           throw new RuntimeException(
-              "Failed to create new instance of label class " + labelClass.getSimpleName(), e);
+            "Failed to create new instance of label class " + labelClass.getSimpleName(), e);
         }
         label.setWrap(true);
         labels.add(label);
         label.addListener(
-            new ImprovedGUIConsole.LogListener(label, skin.getDrawable(tableBackground)));
+          new ImprovedGUIConsole.LogListener(label, skin.getDrawable(tableBackground)));
       }
       return label;
     }
+
+    private final StringBuilder labelStringBuilder = new StringBuilder("");
 
     void refresh() {
       if (disabled || hidden) {
@@ -599,16 +602,17 @@ public class ImprovedGUIConsole extends AbstractConsole {
       int size = entries.size;
       for (int i = 0; i < size; i++) {
         LogEntry le = entries.get(i);
+        labelStringBuilder.setLength(0);
+        labelStringBuilder.append(le.toConsoleString());
         Label label = getLogEntryLabel(i);
-
-        label.setText(" " + le.toConsoleString());
+        label.setText(labelStringBuilder);
         label.setColor(le.getColor());
         logEntries.add(label).expandX().fillX().top().left().row();
       }
       try {
         scroll.validate();
       } catch (Exception e) {
-        throw new RuntimeException(e);
+        log(e);
       }
       scroll.setScrollPercentY(1);
     }
@@ -663,9 +667,9 @@ public class ImprovedGUIConsole extends AbstractConsole {
         execCommand(s);
       } else {
         log(
-            "No command executor has been set. "
-                + "Please call setCommandExecutor for this console in your code and restart.",
-            LogLevel.ERROR);
+          "No command executor has been set. "
+            + "Please call setCommandExecutor for this console in your code and restart.",
+          LogLevel.ERROR);
       }
       input.setText("");
       return true;
@@ -710,7 +714,7 @@ public class ImprovedGUIConsole extends AbstractConsole {
 
       if (keycode == Keys.ENTER && !hidden) {
         commandHistory
-            .getNextCommand(); // Makes up arrow key repeat the same command after pressing enter
+          .getNextCommand(); // Makes up arrow key repeat the same command after pressing enter
         return display.submit();
       } else if (keycode == Keys.UP && !hidden) {
         input.setText(commandHistory.getPreviousCommand());
