@@ -13,9 +13,9 @@ import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem
 import no.elg.infiniteBootleg.protobuf.Packets
 import org.jetbrains.annotations.Async
 
-object AuthoritativeFallingBlockPhysicsEventHandler : PhysicsSystem.PhysicsEventHandler {
+private val logger = KotlinLogging.logger {}
 
-  private val logger = KotlinLogging.logger {}
+object AuthoritativeFallingBlockPhysicsEventHandler : PhysicsSystem.PhysicsEventHandler {
 
   private const val MAX_DELTA_UP = Chunk.CHUNK_SIZE
 
@@ -29,7 +29,6 @@ object AuthoritativeFallingBlockPhysicsEventHandler : PhysicsSystem.PhysicsEvent
     val newY: Int = positionComp.blockY - 1
     val world = entity.world
 
-    //Fixme: sandtest fails to properly make start of each chunk (lower left corner) to fall!
     world.removeEntity(entity, Packets.DespawnEntity.DespawnReason.NATURAL)
 
     var deltaY = 0

@@ -10,20 +10,27 @@ import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
 /**
  * [shapeIdA] and [shapeIdB] are shared instances, so copy the data you need from them
  */
-sealed class PhysicsEvent(shapeIdA: b2ShapeId?, shapeIdB: b2ShapeId?) : ECSEvent {
+sealed class PhysicsEvent(val shapeIdA: b2ShapeId?, val shapeIdB: b2ShapeId?) : ECSEvent {
 
-  val entityA: Entity? = findBodyUserData(shapeIdA) as? Entity
-  val entityB: Entity? = findBodyUserData(shapeIdB) as? Entity
-  val blockA: Block? = findBodyUserData(shapeIdA) as? Block
-  val blockB: Block? = findBodyUserData(shapeIdB) as? Block
-  val userdataA: Any? = findShapeUserData(shapeIdA)
-  val userdataB: Any? = findShapeUserData(shapeIdB)
+  val entityA: Entity? get() = userdataA as? Entity
+  val entityB: Entity? get() = userdataB as? Entity
+  val blockA: Block? get() = userdataA as? Block
+  val blockB: Block? get() = userdataB as? Block
+
+  val userdataA: Any? get() = userdataShapeA ?: userdataBodyA
+  val userdataB: Any? get() = userdataShapeB ?: userdataBodyB
+  val userdataShapeA: Any? by lazy { findShapeUserData(shapeIdA) }
+  val userdataShapeB: Any? by lazy { findShapeUserData(shapeIdB) }
+  val userdataBodyA: Any? by lazy { findBodyUserData(shapeIdA) }
+  val userdataBodyB: Any? by lazy { findBodyUserData(shapeIdB) }
 
   fun isValid(): Boolean = entityA != null || entityB != null
 
   fun getOtherEventEntity(eventEntity: Entity): Entity? = if (eventEntity === entityA) entityB else entityA
   fun getOtherEventBlock(eventEntity: Entity): Block? = if (eventEntity === entityA) blockB else blockA
   fun getOtherUserData(eventEntity: Entity): Any? = if (eventEntity === entityA) userdataB else userdataA
+  fun getOtherUserDataForShape(eventEntity: Entity): Any? = if (eventEntity === entityA) userdataShapeB else userdataShapeA
+  fun getOtherUserDataForBody(eventEntity: Entity): Any? = if (eventEntity === entityA) userdataBodyB else userdataBodyA
 
   class ContactBeginsEvent(shapeIdA: b2ShapeId?, shapeIdB: b2ShapeId?) : PhysicsEvent(shapeIdA, shapeIdB)
 
