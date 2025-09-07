@@ -7,6 +7,7 @@ import no.elg.infiniteBootleg.core.world.box2d.ObjectContactTracker
 import no.elg.infiniteBootleg.core.world.ecs.components.DoorComponent.Companion.doorComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem
+import org.jetbrains.annotations.Async
 
 object DoorService : PhysicsSystem.PhysicsEventHandler {
 
@@ -22,7 +23,7 @@ object DoorService : PhysicsSystem.PhysicsEventHandler {
     }
   }
 
-  override fun handleEvent(entity: Entity, event: PhysicsEvent) {
+  override fun handleEvent(entity: Entity, @Async.Execute event: PhysicsEvent) {
     when (event) {
       is PhysicsEvent.ContactBeginsEvent -> handleDoorContactEvent(entity, event, ObjectContactTracker<Entity>::add)
       is PhysicsEvent.ContactEndsEvent -> handleDoorContactEvent(entity, event, ObjectContactTracker<Entity>::remove)

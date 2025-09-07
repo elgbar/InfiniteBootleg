@@ -521,7 +521,7 @@ abstract class World(
   fun updateChunk(chunk: Chunk, expectedChunk: Chunk? = null, newlyGenerated: Boolean): Chunk {
     require(chunk.isValid) { "Chunk must be valid to be updated" }
     var chunkToDispose: Chunk? = null
-    val toReturn: Chunk? = writeChunks<Chunk> { writableChunks ->
+    val toReturn: Chunk? = writeChunks { writableChunks ->
       val current: Chunk? = writableChunks[chunk.compactLocation]
       return@writeChunks if (current != null && expectedChunk != null && current !== expectedChunk) {
         logger.warn { "Unexpected chunk when updating chunk, will not update chunk. Given chunk will be disposed" }

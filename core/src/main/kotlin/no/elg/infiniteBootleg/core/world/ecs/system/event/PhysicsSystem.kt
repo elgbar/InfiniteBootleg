@@ -32,6 +32,7 @@ class PhysicsSystem :
   }
 
   interface PhysicsEventHandler {
-    fun handleEvent(entity: Entity, event: PhysicsEvent)
+
+    fun handleEvent(entity: Entity, /* @Async.Execute */ event: PhysicsEvent)
   }
 }

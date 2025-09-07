@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.transients.SpellStateCom
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.SpellStateComponent.Companion.spellStateOrNull
 import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem
 import no.elg.infiniteBootleg.protobuf.Packets
+import org.jetbrains.annotations.Async
 
 object SpellContactPhysicsEventHandler : PhysicsSystem.PhysicsEventHandler {
 
@@ -22,7 +23,7 @@ object SpellContactPhysicsEventHandler : PhysicsSystem.PhysicsEventHandler {
     }
   }
 
-  override fun handleEvent(entity: Entity, event: PhysicsEvent) {
+  override fun handleEvent(entity: Entity, @Async.Execute event: PhysicsEvent) {
     if (event is PhysicsEvent.ContactBeginsEvent) {
       handleSpellContactBeginsEvent(entity, event)
     }

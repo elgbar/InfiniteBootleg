@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.events.ECSEventQueueComp
 import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import org.jetbrains.annotations.Async
 
 class PhysicsEventQueueComponent : ECSEventQueueComponent<PhysicsEvent>() {
 
@@ -20,7 +21,7 @@ class PhysicsEventQueueComponent : ECSEventQueueComponent<PhysicsEvent>() {
 
     var Entity.physicsEventQueueOrNull by optionalPropertyFor(mapper)
 
-    fun queuePhysicsEvent(event: PhysicsEvent) {
+    fun queuePhysicsEvent(@Async.Schedule event: PhysicsEvent) {
       if (event.isValid()) {
         if (event.entityA != null) {
           mapper.get(event.entityA)?.enqueue(event)

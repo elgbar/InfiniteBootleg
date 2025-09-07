@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionCompone
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem
 import no.elg.infiniteBootleg.protobuf.Packets
+import org.jetbrains.annotations.Async
 
 object AuthoritativeFallingBlockPhysicsEventHandler : PhysicsSystem.PhysicsEventHandler {
 
@@ -47,7 +48,7 @@ object AuthoritativeFallingBlockPhysicsEventHandler : PhysicsSystem.PhysicsEvent
     world.setBlock(newX, newY + deltaY, material)
   }
 
-  override fun handleEvent(entity: Entity, event: PhysicsEvent) {
+  override fun handleEvent(entity: Entity, @Async.Execute event: PhysicsEvent) {
     if (event is PhysicsEvent.ContactBeginsEvent) {
       handleFallingBlockContactBeginsEvent(entity, event)
     }
