@@ -12,25 +12,25 @@ import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
  */
 sealed class PhysicsEvent(val shapeIdA: b2ShapeId?, val shapeIdB: b2ShapeId?) : ECSEvent {
 
-  val entityA: Entity? get() = userdataA as? Entity
-  val entityB: Entity? get() = userdataB as? Entity
-  val blockA: Block? get() = userdataA as? Block
-  val blockB: Block? get() = userdataB as? Block
-
-  val userdataA: Any? get() = userdataShapeA ?: userdataBodyA
-  val userdataB: Any? get() = userdataShapeB ?: userdataBodyB
   val userdataShapeA: Any? by lazy { findShapeUserData(shapeIdA) }
   val userdataShapeB: Any? by lazy { findShapeUserData(shapeIdB) }
   val userdataBodyA: Any? by lazy { findBodyUserData(shapeIdA) }
   val userdataBodyB: Any? by lazy { findBodyUserData(shapeIdB) }
 
+  val entityA: Entity? get() = userdataShapeA as? Entity ?: userdataBodyA as? Entity
+  val entityB: Entity? get() = userdataShapeB as? Entity ?: userdataBodyB as? Entity
+  val blockA: Block? get() = userdataShapeA as? Block ?: userdataBodyA as? Block
+  val blockB: Block? get() = userdataShapeB as? Block ?: userdataBodyB as? Block
+
   fun isValid(): Boolean = entityA != null || entityB != null
 
   fun getOtherEventEntity(eventEntity: Entity): Entity? = if (eventEntity === entityA) entityB else entityA
   fun getOtherEventBlock(eventEntity: Entity): Block? = if (eventEntity === entityA) blockB else blockA
-  fun getOtherUserData(eventEntity: Entity): Any? = if (eventEntity === entityA) userdataB else userdataA
   fun getOtherUserDataForShape(eventEntity: Entity): Any? = if (eventEntity === entityA) userdataShapeB else userdataShapeA
   fun getOtherUserDataForBody(eventEntity: Entity): Any? = if (eventEntity === entityA) userdataBodyB else userdataBodyA
+
+  fun getThisUserDataForShape(eventEntity: Entity): Any? = if (eventEntity === entityA) userdataShapeA else userdataShapeB
+  fun getThisUserDataForBody(eventEntity: Entity): Any? = if (eventEntity === entityA) userdataBodyA else userdataBodyB
 
   class ContactBeginsEvent(shapeIdA: b2ShapeId?, shapeIdB: b2ShapeId?) : PhysicsEvent(shapeIdA, shapeIdB)
 

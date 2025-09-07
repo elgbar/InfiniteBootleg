@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Async
 object OnGroundPhysicsEventHandler : PhysicsSystem.PhysicsEventHandler {
 
   private fun handleTouchEvent(entity: Entity, event: PhysicsEvent, contacts: LongContactTracker, handle: LongContactTracker.(loc: Long) -> Unit) {
-    if (contacts.filter(event.getOtherUserData(entity))) {
+    if (contacts.filter(event.getThisUserDataForShape(entity))) {
       val otherEntity = event.getOtherEventBlock(entity) ?: return
       val loc = otherEntity.compactWorldLoc
       contacts.handle(loc)
