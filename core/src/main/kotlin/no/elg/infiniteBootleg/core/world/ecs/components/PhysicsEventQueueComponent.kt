@@ -26,7 +26,7 @@ class PhysicsEventQueueComponent : ECSEventQueueComponent<PhysicsEvent>() {
         if (event.entityA != null) {
           mapper.get(event.entityA)?.enqueue(event)
         }
-        if (event.entityB != null) {
+        if (event.entityB != null && event.entityB !== event.entityA) {
           mapper.get(event.entityB)?.enqueue(event)
         }
       }
