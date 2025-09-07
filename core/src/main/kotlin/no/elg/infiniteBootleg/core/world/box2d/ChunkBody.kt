@@ -127,7 +127,6 @@ class ChunkBody(val chunk: Chunk) :
   private fun onBodyCreated(tmpBody: b2BodyId) {
     val blocks = chunk.asSequence().filterNotNull().filter(Block::isNotAir)
     tmpBody.userData = this
-    addBlocks(blocks, tmpBody)
 
     // if this got disposed while creating the new chunk fixture, this is the easiest cleanup solution
     if (isDisposed) {
@@ -136,6 +135,7 @@ class ChunkBody(val chunk: Chunk) :
       chunk.world.worldBody.destroyBody(tmpBody)
     } else {
       box2dBody = tmpBody
+      addBlocks(blocks, tmpBody) // must be done after setting the box2dBody as setting it will clear the references
     }
   }
 
