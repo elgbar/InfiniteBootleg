@@ -22,7 +22,7 @@ sealed class PhysicsEvent(val shapeIdA: b2ShapeId?, val shapeIdB: b2ShapeId?) : 
   val blockA: Block? get() = userdataShapeA as? Block ?: userdataBodyA as? Block
   val blockB: Block? get() = userdataShapeB as? Block ?: userdataBodyB as? Block
 
-  fun isValid(): Boolean = entityA != null || entityB != null
+  fun hasEntity(): Boolean = entityA != null || entityB != null
 
   fun getOtherEventEntity(eventEntity: Entity): Entity? = if (eventEntity === entityA) entityB else entityA
   fun getOtherEventBlock(eventEntity: Entity): Block? = if (eventEntity === entityA) blockB else blockA
@@ -38,8 +38,10 @@ sealed class PhysicsEvent(val shapeIdA: b2ShapeId?, val shapeIdB: b2ShapeId?) : 
 
   /**
    * Material of block changed
+   *
+   * @param oldShape The old shape of the block, can be null if the block previously had no shape
    */
-  class BlockRemovedEvent(shapeIdA: b2ShapeId?, val compactLocation: Long) : PhysicsEvent(shapeIdA, null)
+  class BlockRemovedEvent(oldShape: b2ShapeId?, val compactLocation: Long) : PhysicsEvent(oldShape, null)
 
   companion object {
     fun findBodyUserData(shapeId: b2ShapeId?): Any? {

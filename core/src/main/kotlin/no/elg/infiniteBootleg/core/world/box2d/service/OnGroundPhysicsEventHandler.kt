@@ -8,7 +8,6 @@ import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem
 import org.jetbrains.annotations.Async
 
-// fixme Not working yet!
 object OnGroundPhysicsEventHandler : PhysicsSystem.PhysicsEventHandler {
 
   private fun handleTouchEvent(entity: Entity, event: PhysicsEvent, contacts: LongContactTracker, handle: LongContactTracker.(loc: Long) -> Unit) {
@@ -26,10 +25,6 @@ object OnGroundPhysicsEventHandler : PhysicsSystem.PhysicsEventHandler {
     }
   }
 
-  fun handleOnGroundContactBeginsEvent(entity: Entity, event: PhysicsEvent.ContactBeginsEvent) {
-    handleBodyEvents(entity, event, LongContactTracker::add)
-  }
-
   fun handleOnGroundBlockRemovedEvent(entity: Entity, event: PhysicsEvent.BlockRemovedEvent) {
     val grounded = entity.groundedComponentOrNull ?: return
     val blockWorldLoc = event.compactLocation
@@ -40,7 +35,8 @@ object OnGroundPhysicsEventHandler : PhysicsSystem.PhysicsEventHandler {
 
   override fun handleEvent(entity: Entity, @Async.Execute event: PhysicsEvent) {
     when (event) {
-      is PhysicsEvent.ContactBeginsEvent -> handleOnGroundContactBeginsEvent(entity, event)
+      is PhysicsEvent.ContactBeginsEvent -> handleBodyEvents(entity, event, LongContactTracker::add)
+      is PhysicsEvent.ContactEndsEvent -> handleBodyEvents(entity, event, LongContactTracker::remove)
       is PhysicsEvent.BlockRemovedEvent -> handleOnGroundBlockRemovedEvent(entity, event)
       else -> Unit
     }

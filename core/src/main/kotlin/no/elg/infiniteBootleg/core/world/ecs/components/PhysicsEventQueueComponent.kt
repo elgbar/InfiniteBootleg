@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.core.world.ecs.components
 
+import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
@@ -21,14 +22,18 @@ class PhysicsEventQueueComponent : ECSEventQueueComponent<PhysicsEvent>() {
 
     var Entity.physicsEventQueueOrNull by optionalPropertyFor(mapper)
 
-    fun queuePhysicsEvent(@Async.Schedule event: PhysicsEvent) {
-      if (event.isValid()) {
+    fun Engine.queuePhysicsEvent(@Async.Schedule event: PhysicsEvent) {
+      if (event.hasEntity()) {
+        // we know the related entity directly, so only enqueue those
         if (event.entityA != null) {
           mapper.get(event.entityA)?.enqueue(event)
         }
         if (event.entityB != null && event.entityB !== event.entityA) {
           mapper.get(event.entityB)?.enqueue(event)
         }
+      } else {
+        // no specific entity directly related, so enqueue for all entities with this component
+        queueEvent(mapper, event)
       }
     }
 

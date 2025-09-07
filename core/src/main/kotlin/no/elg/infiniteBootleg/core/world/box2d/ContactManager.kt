@@ -47,7 +47,7 @@ class ContactManager(val box2dWorld: b2WorldId, val engine: Engine) {
     }
   }
 
-  private fun handleBeginTouchEvent(shapeIdA: b2ShapeId?, shapeIdB: b2ShapeId?) = queuePhysicsEvent(PhysicsEvent.ContactBeginsEvent(shapeIdA, shapeIdB))
+  private fun handleBeginTouchEvent(shapeIdA: b2ShapeId?, shapeIdB: b2ShapeId?) = engine.queuePhysicsEvent(PhysicsEvent.ContactBeginsEvent(shapeIdA, shapeIdB))
 
-  private fun handleEndTouchEvent(shapeIdA: b2ShapeId?, shapeIdB: b2ShapeId?) = queuePhysicsEvent(PhysicsEvent.ContactEndsEvent(shapeIdA, shapeIdB))
+  private fun handleEndTouchEvent(shapeIdA: b2ShapeId?, shapeIdB: b2ShapeId?) = engine.queuePhysicsEvent(PhysicsEvent.ContactEndsEvent(shapeIdA, shapeIdB))
 }

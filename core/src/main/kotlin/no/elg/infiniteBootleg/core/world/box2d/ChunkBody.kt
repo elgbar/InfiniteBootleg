@@ -14,12 +14,15 @@ import no.elg.infiniteBootleg.core.util.isLazyInitialized
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
 import no.elg.infiniteBootleg.core.util.isNotAir
 import no.elg.infiniteBootleg.core.world.blocks.Block
+import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.core.world.box2d.extensions.createPolygonShape
 import no.elg.infiniteBootleg.core.world.box2d.extensions.dispose
 import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2Vec2
 import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE_F
+import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent.Companion.queuePhysicsEvent
+import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.core.world.world.World
 import java.util.Arrays
 
@@ -42,9 +45,16 @@ class ChunkBody(val chunk: Chunk) :
   @Suppress("NOTHING_TO_INLINE")
   private inline fun shapeIndex(localX: LocalCoord, localY: LocalCoord): Int = localX + localY * Chunk.CHUNK_SIZE
 
-  private fun updateShape(localX: LocalCoord, localY: LocalCoord, shapeId: b2ShapeId?) {
-    val shapeIndex = shapeIndex(localX, localY)
-    chunkShapes[shapeIndex]?.dispose()
+  private fun updateShape(block: Block, shapeId: b2ShapeId?) {
+    val shapeIndex = shapeIndex(block.localX, block.localY)
+    val old = chunkShapes[shapeIndex]
+    if (shapeId == null) {
+      block.world.engine.queuePhysicsEvent(PhysicsEvent.BlockRemovedEvent(old, block.compactWorldLoc))
+    } else {
+      // when needed:
+//      chunk.world.engine.queuePhysicsEvent(PhysicsEvent.BlockChangedEvent(fixture, material))
+    }
+    old?.dispose()
     chunkShapes[shapeIndex] = shapeId
   }
 
@@ -142,7 +152,7 @@ class ChunkBody(val chunk: Chunk) :
   fun removeBlock(block: Block) {
     require(block.chunk.chunkBody === this) { "Block $block does not belong to this chunk body, $this. it belongs to chunk ${block.chunk.chunkBody}" }
     ThreadType.PHYSICS.launchOrRun {
-      updateShape(block.localX, block.localY, null)
+      updateShape(block, null)
     }
   }
 
@@ -160,7 +170,7 @@ class ChunkBody(val chunk: Chunk) :
     val polygon = Box2d.b2MakeOffsetBox(0.5f, 0.5f, makeB2Vec2(block.localX, block.localY), NO_ROTATION)
     val shapeId = bodyId.createPolygonShape(shapeDef, polygon, block)
 
-    updateShape(block.localX, block.localY, shapeId)
+    updateShape(block, shapeId)
   }
 
   fun addBlocks(blocks: Sequence<Block>, box2dBody: b2BodyId? = null) =
