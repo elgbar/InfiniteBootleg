@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.client.console.commands
 
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.strongjoshua.console.annotation.ConsoleDoc
@@ -34,13 +35,17 @@ import no.elg.infiniteBootleg.core.util.getStaticField
 import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
+import no.elg.infiniteBootleg.core.util.stringifyCompactLocWithChunk
 import no.elg.infiniteBootleg.core.util.toAbled
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Tool
+import no.elg.infiniteBootleg.core.world.blocks.Block
+import no.elg.infiniteBootleg.core.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.core.world.box2d.extensions.body
 import no.elg.infiniteBootleg.core.world.box2d.extensions.isValid
+import no.elg.infiniteBootleg.core.world.box2d.extensions.position
 import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent
@@ -639,7 +644,8 @@ class ClientCommands : CommonCommands() {
     entInChunk(mouseLocator.mouseBlockX.worldToChunk(), mouseLocator.mouseBlockY.worldToChunk())
   }
 
-  fun mouseInfo() {
+  fun b2am() = b2AtMouse()
+  fun b2AtMouse() {
     val world = clientWorld ?: return
     val mouseLocator = ClientMain.inst().mouseLocator
     mouseLocator.update(world)
@@ -648,14 +654,22 @@ class ClientCommands : CommonCommands() {
     val worldY = mouseLocator.mouseWorldY
 
     logger.info {
-      "Mouse pos exact: ${stringifyCompactLoc(worldX, worldY)}, block: (${stringifyCompactLoc(mouseLocator.mouseBlockX, mouseLocator.mouseBlockY)})"
+      "Mouse pos exact: ${stringifyCompactLoc(worldX, worldY)}, block: ${stringifyCompactLoc(mouseLocator.mouseBlockX, mouseLocator.mouseBlockY)}"
+    }
+
+    fun entityInfo(userdata: Any?): String {
+      val entityName = (userdata as? Entity)?.let { "Entity ${entityNameId(it)}" }
+      val chunkBody = (userdata as? ChunkBody)?.let { "Chunk body @ ${stringifyCompactLoc(it.chunk)}" }
+      val block = (userdata as? Block)?.let { "Block @ ${stringifyCompactLocWithChunk(it)} (local ${stringifyCompactLoc(it.localX, it.localY)})" }
+      return entityName ?: chunkBody ?: block ?: userdata?.toString() ?: "null"
     }
 
     ThreadType.PHYSICS.launchOrRun {
-      world.worldBody.overlapAABB(worldX, worldY, 0.5f, 0.5f) { shapeId ->
-        logger.info { "shape: valid? ${shapeId.isValid}" }
+      world.worldBody.overlapAABB(worldX - 0.5f, worldY - 0.5f, 1f, 1f) { shapeId ->
         if (shapeId.isValid) {
-          logger.info { "shape data: ${shapeId.userData} | body data ${shapeId.body.userData}" }
+          logger.info { stringifyCompactLoc(shapeId.body.position) }
+          logger.info { "  shape data: ${entityInfo(shapeId.userData)}" }
+          logger.info { "  body data: ${entityInfo(shapeId.body.userData)}" }
         }
       }
     }
