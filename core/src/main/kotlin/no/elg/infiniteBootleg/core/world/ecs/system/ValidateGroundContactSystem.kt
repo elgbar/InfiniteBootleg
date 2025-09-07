@@ -12,7 +12,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionCompone
 
 object ValidateGroundContactSystem : IteratingSystem(allOf(GroundedComponent::class, PositionComponent::class).buildAlive(), UPDATE_PRIORITY_BEFORE_EVENTS) {
 
-  const val CUTOFF_DISTANCE: Double = 2.5
+  const val CUTOFF_DISTANCE: Double = 3.5 // todo should be based on entity size
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val grounded = entity.groundedComponent
