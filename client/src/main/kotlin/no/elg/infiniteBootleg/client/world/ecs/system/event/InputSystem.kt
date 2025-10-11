@@ -178,7 +178,7 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
         }
         val impulse = bodyId.mass * dir.value * (wantedSpeed - min(currSpeed, wantedSpeed))
 
-        tmpVec.set(impulse, entity.velocityComponent.dy)
+        tmpVec.set(impulse, 0)
 
         Box2d.b2Body_ApplyLinearImpulseToCenter(bodyId, tmpVec, true)
       }
