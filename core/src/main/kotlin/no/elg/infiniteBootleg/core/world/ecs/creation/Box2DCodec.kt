@@ -83,7 +83,7 @@ fun EngineEntity.createPlayerBodyComponent(
     }
     val radius = 0.6f
     createSecondaryPlayerFixture(body, HOLE_DETECTOR_USER_DATA, halfWidth = radius, halfHeight = radius, centerY = -(PLAYER_HEIGHT) / 2f - radius)
-    createSecondaryPlayerFixture(body, PLAYERS_FOOT_USER_DATA, halfWidth = PLAYER_WIDTH / 4f, halfHeight = ESSENTIALLY_ZERO, centerY = -(PLAYER_HEIGHT) / 2f)
+    createSecondaryPlayerFixture(body, PLAYERS_FOOT_USER_DATA, halfWidth = PLAYER_WIDTH / 4f, halfHeight = A_LITTLE_BIT, centerY = -(PLAYER_HEIGHT) / 2f - A_LITTLE_BIT)
     createPlayerTouchAreaFixture(body, PLAYERS_WEST_ARM_USER_DATA, HorizontalDirection.WESTWARD)
     createPlayerTouchAreaFixture(body, PLAYERS_EAST_ARM_USER_DATA, HorizontalDirection.EASTWARD)
   }
