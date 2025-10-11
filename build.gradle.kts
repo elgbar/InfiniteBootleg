@@ -84,7 +84,7 @@ subprojects {
   java {
     toolchain {
       // when updating also run updateDaemonJvm
-      languageVersion = JavaLanguageVersion.of(23)
+      languageVersion = JavaLanguageVersion.of(24)
     }
   }
 

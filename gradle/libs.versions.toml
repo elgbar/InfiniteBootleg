@@ -1,22 +1,22 @@
 [versions]
-kotlin = "2.2.10"
+kotlin = "2.2.20"
 gdx = "1.13.5"
 gdx-box2d = "3.1.1-0"
 ktx = "1.13.1-rc1"
-protobuf = "4.32.0"
+protobuf = "4.32.1"
 vis = "1.5.7"
 caffeine = "3.2.2"
-uuid = "5.1.0"
+uuid = "5.1.1"
 oshaiLogging = "7.0.13"
-log4j = "2.25.1"
+log4j = "2.25.2"
 junit = "5.13.4"
-mockk = "1.14.5"
+mockk = "1.14.6"
 jansi = "2.4.2"
-fastutil = "8.5.16"
-netty = "4.2.4.Final"
+fastutil = "8.5.18"
+netty = "4.2.6.Final"
 kotlinCoroutines = "1.10.2"
 
-stacktracedecoroutinator = "2.5.6"
+stacktracedecoroutinator = "2.5.7"
 spotless = "7.2.1"
 versionsPlugin = "0.52.0"
 protobufPlugin = "0.9.5"
@@ -62,7 +62,7 @@ kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutine
 kotlin-bom = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-bom", version.ref = "kotlinCoroutines" }
 
 apacheCommons-collections = { group = "org.apache.commons", name = "commons-collections4", version = "4.5.0" }
-apacheCommons-lang = { group = "org.apache.commons", name = "commons-lang3", version = "3.18.0" }
+apacheCommons-lang = { group = "org.apache.commons", name = "commons-lang3", version = "3.19.0" }
 
 caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
 uuid = { group = "com.fasterxml.uuid", name = "java-uuid-generator", version.ref = "uuid" }
@@ -70,7 +70,7 @@ visUi = { group = "com.kotcrab.vis", name = "vis-ui", version.ref = "vis" }
 inGameConsole = { group = "com.strongjoshua", name = "libgdx-inGameConsole", version = "1.0.0" }
 netty-bom = { group = "io.netty", name = "netty-bom", version.ref = "netty" }
 netty-all = { group = "io.netty", name = "netty-all", version.ref = "netty" }
-annotations = { group = "org.jetbrains", name = "annotations", version = "26.0.2" }
+annotations = { group = "org.jetbrains", name = "annotations", version = "26.0.2-1" }
 oshaiLogging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "oshaiLogging" }
 fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
 jansi = { group = "org.fusesource.jansi", name = "jansi", version.ref = "jansi" } # deprecated, replace with https://github.com/jline/jline3
