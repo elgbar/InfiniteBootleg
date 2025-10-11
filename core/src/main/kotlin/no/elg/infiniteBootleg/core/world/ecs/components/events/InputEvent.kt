@@ -9,8 +9,14 @@ sealed interface InputEvent : ECSEvent {
     val screenY: Int
   }
 
+  /**
+   * Key was just pressed down
+   */
   data class KeyDownEvent(val keycode: Int) : InputEvent
 
+  /**
+   * Key is being held down. Will be fired on the first frame it was pushed down, together with [KeyDownEvent]
+   */
   data class KeyIsDownEvent(val keycode: Int) : InputEvent
 
   data class KeyUpEvent(val keycode: Int) : InputEvent

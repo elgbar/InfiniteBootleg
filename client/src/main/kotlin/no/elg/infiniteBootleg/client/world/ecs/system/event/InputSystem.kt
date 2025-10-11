@@ -61,11 +61,11 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
       is InputEvent.KeyDownEvent -> worldEntity.keyDown(event.keycode)
       is InputEvent.TouchDownEvent -> worldEntity.openChest(event.button)
       is InputEvent.KeyIsDownEvent -> worldEntity.move(event.keycode)
+      is InputEvent.ScrolledEvent -> worldEntity.scrolled(event.amountY)
+      is InputEvent.TouchDraggedEvent -> worldEntity.mouseDragged(event.buttons, event.justPressed)
       is InputEvent.KeyTypedEvent -> Unit
       is InputEvent.KeyUpEvent -> Unit
       is InputEvent.MouseMovedEvent -> Unit
-      is InputEvent.ScrolledEvent -> worldEntity.scrolled(event.amountY)
-      is InputEvent.TouchDraggedEvent -> worldEntity.mouseDragged(event.buttons, event.justPressed)
       is InputEvent.TouchUpEvent -> Unit
       is InputEvent.SpellCastEvent -> Unit
     }
