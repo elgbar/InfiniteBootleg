@@ -14,7 +14,11 @@ import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion
 
 class GroundedTouchingArea(worldRender: ClientWorldRender) : SingleBlockDebugRenderer<List<GroundedComponent>>(worldRender) {
 
-  override val alpha: Float get() = 1f
+  override var red: Float = 1f
+  override var green: Float = 1f
+  override var blue: Float = 1f
+  override val alpha: Float get() = 0.75f
+  override val updateColorBeforeEach: Boolean = true
   override val texture: RotatableTextureRegion
     get() = ClientMain.inst().assets.whiteTexture
 
@@ -30,6 +34,15 @@ class GroundedTouchingArea(worldRender: ClientWorldRender) : SingleBlockDebugRen
   }
 
   override fun beforeRender(block: Block, batch: Batch, data: List<GroundedComponent>) {
+    val blockPos = block.compactWorldLoc
+    val isArm = data.any { groundedComponent -> blockPos in groundedComponent.leftArmContacts || blockPos in groundedComponent.rightArmContacts }
+    red = (if (isArm) 1f else 0f)
+
+    val isHole = data.any { groundedComponent -> blockPos in groundedComponent.holeContacts }
+    green = (if (isHole) 1f else 0f)
+
+    val isFeet = data.any { groundedComponent -> blockPos in groundedComponent.feetContacts }
+    blue = (if (isFeet) 1f else 0f)
   }
 
   override val isActive: Boolean

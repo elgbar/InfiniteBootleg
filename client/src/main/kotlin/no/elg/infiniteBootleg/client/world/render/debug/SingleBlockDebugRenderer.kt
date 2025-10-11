@@ -13,8 +13,12 @@ import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion
 
 abstract class SingleBlockDebugRenderer<T : Any>(protected val worldRender: ClientWorldRender) : OverlayRenderer {
 
+  protected open val red: Float = 1f
+  protected open val green: Float = 1f
+  protected open val blue: Float = 1f
   protected open val alpha: Float = 0.25f
   protected abstract val texture: RotatableTextureRegion
+  protected open val updateColorBeforeEach = false
 
   abstract fun shouldRender(block: Block, data: T): Boolean
   abstract fun beforeRender(block: Block, batch: Batch, data: T)
@@ -25,12 +29,15 @@ abstract class SingleBlockDebugRenderer<T : Any>(protected val worldRender: Clie
   abstract fun beforeAllRender(batch: Batch): T?
 
   override fun render() {
-    worldRender.batch.withColor(a = alpha) { batch ->
+    worldRender.batch.withColor(r = red, g = green, b = blue, a = alpha) { batch ->
       val beforeAllRender: T = beforeAllRender(batch) ?: return@withColor
       for (chunk: Chunk in worldRender.world.loadedChunks) {
         for (block in chunk) {
           if (block != null && shouldRender(block, beforeAllRender)) {
             beforeRender(block, batch, beforeAllRender)
+            if (updateColorBeforeEach) {
+              batch.setColor(red, green, blue, alpha)
+            }
             batch.draw(
               texture.textureRegion,
               block.worldX.toFloat().worldToScreen(),
