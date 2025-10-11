@@ -34,10 +34,8 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
       y = this@VelocityComponent.dy
     }
 
-  /**
-   * @return True if the velocity is (close to) zero in both directions.
-   */
-  fun isStill(): Boolean = dx.absoluteValue < MathUtils.FLOAT_ROUNDING_ERROR && dy.absoluteValue < MathUtils.FLOAT_ROUNDING_ERROR
+  fun isHorizontalStill(): Boolean = dx.absoluteValue < MathUtils.FLOAT_ROUNDING_ERROR
+  fun isVerticalStill(): Boolean = dy.absoluteValue < MathUtils.FLOAT_ROUNDING_ERROR
 
   init {
     require(maxDx > 0) { "Max dx velocity must be strictly positive" }

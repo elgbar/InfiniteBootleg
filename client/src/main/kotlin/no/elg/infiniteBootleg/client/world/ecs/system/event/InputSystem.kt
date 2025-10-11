@@ -166,7 +166,7 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
   }
 
   fun WorldEntity.jump() {
-    if (entity.groundedComponent.canJump && entity.velocityComponentOrNull?.isStill() ?: true) {
+    if (entity.groundedComponent.canJump && entity.velocityComponentOrNull?.isVerticalStill() ?: true) {
       setVel { oldX, _ -> oldX to JUMP_VERTICAL_VEL }
     }
   }
