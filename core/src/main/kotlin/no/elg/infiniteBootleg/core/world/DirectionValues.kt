@@ -25,10 +25,10 @@ const val SOUTHWARD = -1
  */
 const val ALIGNED = 0
 
-enum class HorizontalDirection {
-  WESTWARD,
-  HORIZONTALLY_ALIGNED,
-  EASTWARD;
+enum class HorizontalDirection(val value: Int) {
+  WESTWARD(no.elg.infiniteBootleg.core.world.WESTWARD),
+  HORIZONTALLY_ALIGNED(ALIGNED),
+  EASTWARD(no.elg.infiniteBootleg.core.world.EASTWARD);
 
   companion object {
     fun of(dx: Int): HorizontalDirection =
@@ -40,16 +40,16 @@ enum class HorizontalDirection {
   }
 }
 
-enum class VerticalDirection {
-  NORTHWARD,
-  VERTICALLY_ALIGNED,
-  SOUTHWARD;
+enum class VerticalDirection(val value: Int) {
+  NORTHWARD(no.elg.infiniteBootleg.core.world.NORTHWARD),
+  VERTICALLY_ALIGNED(ALIGNED),
+  SOUTHWARD(no.elg.infiniteBootleg.core.world.SOUTHWARD);
 
   companion object {
     fun of(dx: Int): VerticalDirection =
       when {
-        dx < 0 -> SOUTHWARD
         dx > 0 -> NORTHWARD
+        dx < 0 -> SOUTHWARD
         else -> VERTICALLY_ALIGNED
       }
   }

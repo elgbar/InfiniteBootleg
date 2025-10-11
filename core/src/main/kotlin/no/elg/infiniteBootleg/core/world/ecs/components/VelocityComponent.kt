@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.core.world.ecs.components
 
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
@@ -15,6 +16,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.UpdateBo
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
+import kotlin.math.absoluteValue
 
 class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
 
@@ -31,6 +33,11 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
       x = this@VelocityComponent.dx
       y = this@VelocityComponent.dy
     }
+
+  /**
+   * @return True if the velocity is (close to) zero in both directions.
+   */
+  fun isStill(): Boolean = dx.absoluteValue < MathUtils.FLOAT_ROUNDING_ERROR && dy.absoluteValue < MathUtils.FLOAT_ROUNDING_ERROR
 
   init {
     require(maxDx > 0) { "Max dx velocity must be strictly positive" }

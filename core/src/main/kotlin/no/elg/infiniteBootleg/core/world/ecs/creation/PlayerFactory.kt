@@ -45,8 +45,8 @@ const val PLAYER_WIDTH = 1.5f - 0.2f
 const val PLAYER_HEIGHT = 3f - 0.2f
 const val PLAYERS_FOOT_USER_DATA = "A bloody foot!"
 const val HOLE_DETECTOR_USER_DATA = "down the drain"
-const val PLAYERS_RIGHT_ARM_USER_DATA = "Righty"
-const val PLAYERS_LEFT_ARM_USER_DATA = "Left hand"
+const val PLAYERS_EAST_ARM_USER_DATA = "Righty"
+const val PLAYERS_WEST_ARM_USER_DATA = "Left hand"
 
 val COMMON_PLAYER_FAMILIES: Array<Pair<Family, String>> = arrayOf(
   playerFamily to "playerFamily",

@@ -108,8 +108,8 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
     } else {
       when (keycode) {
         Input.Keys.W -> jump()
-        Input.Keys.A -> moveHorz(-1f)
-        Input.Keys.D -> moveHorz(1f)
+        Input.Keys.A -> moveHorz(HorizontalDirection.WESTWARD)
+        Input.Keys.D -> moveHorz(HorizontalDirection.EASTWARD)
       }
     }
   }
@@ -165,17 +165,18 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
   }
 
   private fun WorldEntity.moveHorz(dir: Float) {
+  private fun WorldEntity.moveHorz(dir: HorizontalDirection) {
     world.postBox2dRunnable {
       val groundedComponent = entity.groundedComponent
       if (groundedComponent.canMove(dir)) {
         val bodyId = entity.box2dBody
-        val currSpeed = bodyId.velocity.x()
-        val wantedSpeed = dir * if (groundedComponent.onGround) {
+        val currSpeed = bodyId.velocity.x().absoluteValue
+        val wantedSpeed = if (groundedComponent.onGround) {
           MAX_X_VEL
         } else {
           MAX_X_VEL * (2f / 3f)
         }
-        val impulse = bodyId.mass * (wantedSpeed - (dir * min(abs(currSpeed), abs(wantedSpeed))))
+        val impulse = bodyId.mass * dir.value * (wantedSpeed - min(currSpeed, wantedSpeed))
 
         tmpVec.set(impulse, entity.velocityComponent.dy)
 

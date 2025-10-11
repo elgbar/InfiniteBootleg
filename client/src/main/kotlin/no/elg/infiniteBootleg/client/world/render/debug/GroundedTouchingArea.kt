@@ -35,7 +35,7 @@ class GroundedTouchingArea(worldRender: ClientWorldRender) : SingleBlockDebugRen
 
   override fun beforeRender(block: Block, batch: Batch, data: List<GroundedComponent>) {
     val blockPos = block.compactWorldLoc
-    val isArm = data.any { groundedComponent -> blockPos in groundedComponent.leftArmContacts || blockPos in groundedComponent.rightArmContacts }
+    val isArm = data.any { groundedComponent -> blockPos in groundedComponent.westArmContacts || blockPos in groundedComponent.eastArmContacts }
     red = (if (isArm) 1f else 0f)
 
     val isHole = data.any { groundedComponent -> blockPos in groundedComponent.holeContacts }

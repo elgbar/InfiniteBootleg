@@ -19,6 +19,7 @@ import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.isBeingRemoved
 import no.elg.infiniteBootleg.core.util.toRadians
 import no.elg.infiniteBootleg.core.world.Constants
+import no.elg.infiniteBootleg.core.world.HorizontalDirection
 import no.elg.infiniteBootleg.core.world.box2d.Filters
 import no.elg.infiniteBootleg.core.world.box2d.NO_ROTATION
 import no.elg.infiniteBootleg.core.world.box2d.extensions.createCapsuleShape
@@ -82,9 +83,9 @@ fun EngineEntity.createPlayerBodyComponent(
     }
     val radius = 0.5f
     createSecondaryPlayerFixture(body, HOLE_DETECTOR_USER_DATA, halfWidth = radius, halfHeight = radius, centerY = -(PLAYER_HEIGHT) / 2f - radius)
-    createSecondaryPlayerFixture(body, PLAYERS_FOOT_USER_DATA, halfWidth = PLAYER_WIDTH / 2f, halfHeight = ESSENTIALLY_ZERO, centerY = -(PLAYER_HEIGHT) / 2f)
-    createPlayerTouchAreaFixture(body, PLAYERS_LEFT_ARM_USER_DATA, -1)
-    createPlayerTouchAreaFixture(body, PLAYERS_RIGHT_ARM_USER_DATA, 1)
+    createSecondaryPlayerFixture(body, PLAYERS_FOOT_USER_DATA, halfWidth = PLAYER_WIDTH / 4f, halfHeight = ESSENTIALLY_ZERO, centerY = -(PLAYER_HEIGHT) / 2f)
+    createPlayerTouchAreaFixture(body, PLAYERS_WEST_ARM_USER_DATA, HorizontalDirection.WESTWARD)
+    createPlayerTouchAreaFixture(body, PLAYERS_EAST_ARM_USER_DATA, HorizontalDirection.EASTWARD)
   }
 }
 
@@ -290,8 +291,8 @@ private fun createSecondaryPlayerFixture(
   body.createPolygonShape(shapeDef, polygon, userData)
 }
 
-private fun createPlayerTouchAreaFixture(body: b2BodyId, userData: String, side: Int) {
-  createSecondaryPlayerFixture(body, userData, halfWidth = ESSENTIALLY_ZERO, halfHeight = PLAYER_HEIGHT / 2.3f, centerX = PLAYER_WIDTH * side / 1.5f)
+private fun createPlayerTouchAreaFixture(body: b2BodyId, userData: String, horizontalDirection: HorizontalDirection) {
+  createSecondaryPlayerFixture(body, userData, halfWidth = ESSENTIALLY_ZERO, halfHeight = PLAYER_HEIGHT / 3f, centerX = PLAYER_WIDTH * horizontalDirection.value / 1.5f)
 }
 
 private val playerShapeDef: b2ShapeDef = Box2d.b2DefaultShapeDef().also { def ->
