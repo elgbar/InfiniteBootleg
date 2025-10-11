@@ -120,10 +120,14 @@ inline fun Batch.withColor(
   crossinline action: (Batch) -> Unit
 ) {
   contract { callsInPlace(action, InvocationKind.EXACTLY_ONCE) }
-  val oldColor = this.color.cpy()
-  this.setColor(r, g, b, a)
-  action(this)
-  this.color = oldColor
+  if (r != this.color.r || g != this.color.g || b != this.color.b || a != this.color.a) {
+    val oldColor = this.color.cpy()
+    this.setColor(r, g, b, a)
+    action(this)
+    this.color = oldColor
+  } else {
+    action(this)
+  }
 }
 
 inline fun BitmapFont.withColor(
@@ -134,10 +138,14 @@ inline fun BitmapFont.withColor(
   crossinline action: (BitmapFont) -> Unit
 ) {
   contract { callsInPlace(action, InvocationKind.EXACTLY_ONCE) }
-  val oldColor = this.color.cpy()
-  this.setColor(r, g, b, a)
-  action(this)
-  this.color = oldColor
+  if (r != this.color.r || g != this.color.g || b != this.color.b || a != this.color.a) {
+    val oldColor = this.color.cpy()
+    this.setColor(r, g, b, a)
+    action(this)
+    this.color = oldColor
+  } else {
+    action(this)
+  }
 }
 
 typealias ChunkColumnFeatureFlag = Int
