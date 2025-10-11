@@ -8,7 +8,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.client.input.MouseLocator
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.Settings
-import no.elg.infiniteBootleg.core.util.JUMP_VERTICAL_VEL
 import no.elg.infiniteBootleg.core.util.breakableLocs
 import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.dstd
@@ -18,7 +17,6 @@ import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.box2d.extensions.velocity
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
-import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.setVelocity
@@ -97,12 +95,6 @@ fun canNotInteract(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean 
     lastCreateBlockTick = tick
     return false
   }
-
-fun WorldEntity.jump() {
-  if (entity.groundedComponent.onGround) {
-    setVel { oldX, _ -> oldX to JUMP_VERTICAL_VEL }
-  }
-}
 
 fun WorldEntity.setVel(modify: (oldX: Float, oldY: Float) -> (Pair<Float, Float>)) {
   val body = entity.box2dBody

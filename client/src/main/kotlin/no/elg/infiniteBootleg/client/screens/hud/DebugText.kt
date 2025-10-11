@@ -171,23 +171,25 @@ object DebugText {
     val position = player.positionComponent
     val grounded = player.groundedComponentOrNull
     val onGround = grounded?.onGround ?: false
-    val canMoveLeft = grounded?.canMoveLeft ?: false
-    val canMoveRight = grounded?.canMoveRight ?: false
+    val canJump = grounded?.canJump ?: false
+    val canMoveLeft = grounded?.canMoveWest ?: false
+    val canMoveRight = grounded?.canMoveEast ?: false
     val feetContacts = grounded?.feetContacts?.size ?: 0
     val holeContacts = grounded?.holeContacts?.size ?: 0
-    val leftArmContacts = grounded?.leftArmContacts?.size ?: 0
-    val rightArmContacts = grounded?.rightArmContacts?.size ?: 0
+    val leftArmContacts = grounded?.westArmContacts?.size ?: 0
+    val rightArmContacts = grounded?.eastArmContacts?.size ?: 0
     val flying = player.flying
     val holding = player.selectedItem?.element?.textureRegion?.name ?: "N/A"
     sb.append(
       String.format(
-        "p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) php: (% 8.2f,% 8.2f) g? %-5b (%-5b <> %-5b) (g%d h%d l%d r%d)) f? %-5b h %s",
+        "p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) php: (% 8.2f,% 8.2f) g? %-5b j? %-5b (%-5b <> %-5b) (g%d h%d l%d r%d)) f? %-5b h %s",
         position.x,
         position.y,
         velocity.dx,
         velocity.dy,
         0f, 0f,
         onGround,
+        canJump,
         canMoveLeft,
         canMoveRight,
         feetContacts,

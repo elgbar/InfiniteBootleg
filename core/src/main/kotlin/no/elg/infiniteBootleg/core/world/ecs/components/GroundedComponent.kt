@@ -29,10 +29,13 @@ class GroundedComponent :
 
   val contacts = listOf(feetContacts, holeContacts, westArmContacts, eastArmContacts)
 
+  val isStuckInHold: Boolean get() = holeContacts.size >= 2 && westArmContacts.isEmpty && eastArmContacts.isEmpty
+
   // To fix being stuck on in a 1x1 hole, allow jumping when both arms are in contact
-  val onGround: Boolean get() = feetContacts.isNotEmpty || (holeContacts.isNotEmpty && (leftArmContacts.isNotEmpty || rightArmContacts.isNotEmpty))
-  val canMoveLeft: Boolean get() = onGround || leftArmContacts.isEmpty
-  val canMoveRight: Boolean get() = onGround || rightArmContacts.isEmpty
+  val onGround: Boolean get() = feetContacts.isNotEmpty
+  val canJump: Boolean get() = feetContacts.isNotEmpty || isStuckInHold
+  val canMoveWest: Boolean get() = westArmContacts.isEmpty
+  val canMoveEast: Boolean get() = eastArmContacts.isEmpty
 
   fun canMove(dir: HorizontalDirection): Boolean =
     when (dir) {
@@ -60,8 +63,8 @@ class GroundedComponent :
     }
   }
 
-  override fun hudDebug(): String = "On Ground? $onGround, canMoveLeft? $canMoveLeft, canMoveRight? $canMoveRight"
-
+  override fun hudDebug(): String = "On Ground? $onGround, canJump? $canJump, canMoveWest? $canMoveWest, canMoveEast? $canMoveEast"
+  
   companion object : EntityLoadableMapper<GroundedComponent>() {
 
     var Entity.groundedComponent by propertyFor(mapper)

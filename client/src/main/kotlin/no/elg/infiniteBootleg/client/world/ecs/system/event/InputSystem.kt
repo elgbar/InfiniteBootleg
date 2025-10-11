@@ -11,7 +11,6 @@ import no.elg.infiniteBootleg.client.util.breakBlocks
 import no.elg.infiniteBootleg.client.util.inputMouseLocator
 import no.elg.infiniteBootleg.client.util.interpolate
 import no.elg.infiniteBootleg.client.util.isAltPressed
-import no.elg.infiniteBootleg.client.util.jump
 import no.elg.infiniteBootleg.client.util.placeBlocks
 import no.elg.infiniteBootleg.client.util.setVel
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
@@ -19,7 +18,9 @@ import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.core.net.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.core.net.serverBoundUpdateSelectedSlot
 import no.elg.infiniteBootleg.core.util.FLY_VEL
+import no.elg.infiniteBootleg.core.util.JUMP_VERTICAL_VEL
 import no.elg.infiniteBootleg.core.util.MAX_X_VEL
+import no.elg.infiniteBootleg.core.world.HorizontalDirection
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.box2d.extensions.mass
@@ -29,7 +30,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Compa
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.InputEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
-import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.HotbarSlot
@@ -39,7 +40,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.core.world.ecs.controlledEntityWithInputEventFamily
 import no.elg.infiniteBootleg.core.world.ecs.system.api.EventSystem
-import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.math.sign
 
@@ -164,7 +165,12 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
     setVel { oldX, oldY -> oldX + dx to oldY + dy }
   }
 
-  private fun WorldEntity.moveHorz(dir: Float) {
+  fun WorldEntity.jump() {
+    if (entity.groundedComponent.canJump && entity.velocityComponentOrNull?.isStill() ?: true) {
+      setVel { oldX, _ -> oldX to JUMP_VERTICAL_VEL }
+    }
+  }
+
   private fun WorldEntity.moveHorz(dir: HorizontalDirection) {
     world.postBox2dRunnable {
       val groundedComponent = entity.groundedComponent
