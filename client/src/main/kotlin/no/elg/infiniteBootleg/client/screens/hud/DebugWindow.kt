@@ -222,7 +222,11 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
         )
         toggleableDebugButton(
           "Render top block",
-          "Render top blocks in chunk columns. Solid = green, light = blue, both = cyan",
+          """Render top blocks in chunk columns. 
+            |Solid = green, 
+            |light = blue 
+            |both = cyan
+          """.trimMargin(),
           onAnyElementChanged = onAnyElementChanged,
           property = Settings::renderTopBlocks
         )

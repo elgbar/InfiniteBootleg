@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.client.screens.hud
 
+import com.badlogic.gdx.utils.Align
 import com.kotcrab.vis.ui.widget.VisLabel
 import com.kotcrab.vis.ui.widget.VisTextButton
 import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel
@@ -62,6 +63,7 @@ fun KTable.toggleableDebugButton(
     fun tooltipText() = description ?: "$name is ${isDisabled.toAbled()}"
     visTextTooltip(tooltipText()) {
       tooltipLabel = this.content as VisLabel
+      tooltipLabel.setAlignment(Align.left)
     }
 
     onClick {
