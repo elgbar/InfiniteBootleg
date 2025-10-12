@@ -228,7 +228,12 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
         )
         toggleableDebugButton(
           "Render grounded touching block",
-          "Render the blocks the player is touching",
+          """Render the blocks the player is touching
+            | Colors are combined when touching with multiple parts
+            |* Red = touching with arms
+            |* Blue = touching with feet
+            |* Green = touching with a hole detector
+          """.trimMargin(),
           onAnyElementChanged = onAnyElementChanged,
           property = Settings::renderGroundedTouchingBlocks
         )
