@@ -41,6 +41,7 @@ var b2BodyId.gravityScale: Float
   get() = Box2d.b2Body_GetGravityScale(this)
   set(value) {
     Box2d.b2Body_SetGravityScale(this, value)
+    isAwake = true
   }
 
 var b2BodyId.position: b2Vec2
