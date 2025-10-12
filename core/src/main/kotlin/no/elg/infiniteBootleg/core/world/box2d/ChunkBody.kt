@@ -93,7 +93,7 @@ class ChunkBody(val chunk: Chunk) :
    */
   override fun update() {
     ThreadType.PHYSICS.launchOrRun {
-      tryCreateChunkBodyNow()
+      tryCreateChunkBodyNow(addingBlock = false)
     }
   }
 
@@ -103,9 +103,9 @@ class ChunkBody(val chunk: Chunk) :
    * @throws no.elg.infiniteBootleg.core.exceptions.CalledFromWrongThreadTypeException If not called from the [ThreadType.PHYSICS] thread
    *
    */
-  private fun tryCreateChunkBodyNow(): b2BodyId? {
+  private fun tryCreateChunkBodyNow(addingBlock: Boolean): b2BodyId? {
     ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
-    return if (shouldCreateBody()) {
+    return if (shouldCreateBody(addingBlock)) {
       val bodyDef: b2BodyDef = Box2d.b2DefaultBodyDef().apply {
         position = makeB2Vec2(chunk.chunkX * CHUNK_SIZE_F + 0.5f, chunk.chunkY * CHUNK_SIZE_F + 0.5f)
         fixedRotation(true)
@@ -117,11 +117,11 @@ class ChunkBody(val chunk: Chunk) :
     }
   }
 
-  private fun shouldCreateBody(): Boolean {
+  private fun shouldCreateBody(addingBlock: Boolean): Boolean {
     if (isDisposed) {
       return false
     }
-    if (chunk.isAllAir) {
+    if (!addingBlock && chunk.isAllAir) {
       box2dBody = null
       return false
     }
@@ -175,7 +175,10 @@ class ChunkBody(val chunk: Chunk) :
 
   fun addBlocks(blocks: Sequence<Block>, box2dBody: b2BodyId? = null) =
     ThreadType.PHYSICS.launchOrRun {
-      val body = box2dBody ?: tryCreateChunkBodyNow() ?: return@launchOrRun
+      val body = box2dBody ?: tryCreateChunkBodyNow(addingBlock = true) ?: let {
+        logger.warn { "Failed to get the chunk body to add the blocks to!" }
+        return@launchOrRun
+      }
       for (block in blocks) {
         addBlockNow(block, body)
       }
