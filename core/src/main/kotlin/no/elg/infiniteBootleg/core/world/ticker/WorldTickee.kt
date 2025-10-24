@@ -22,7 +22,6 @@ internal class WorldTickee(private val world: World) : Ticking {
   private val worldTickedEvent = WorldTickedEvent(world)
   private val worldRareTickedEvent = WorldRareTickedEvent(world)
 
-  @Synchronized
   override fun tick() {
     val chunkUnloadTime = world.worldTicker.tps * CHUNK_UNLOAD_SECONDS
 
@@ -39,11 +38,13 @@ internal class WorldTickee(private val world: World) : Ticking {
         // clean up dead chunks
         if (chunk == null) {
           logger.warn { "Found null chunk when ticking world" }
+          chunkIterator.remove() // Assume this is how we handle it, not happened yet
         } else if (chunk.isDisposed) {
           logger.warn { "Found disposed chunk ${stringifyCompactLoc(chunk)} when ticking world" }
           launchOnAsyncSuspendable {
             world.unloadChunk(chunk, force = true)
           }
+          unloadQuota-- // force unloads also count against quota, ok to be negative
         } else if (unloadQuota > 0 && chunk.allowedToUnload && world.render.isOutOfView(chunk) && (chunk is ViewableChunk && tick - chunk.lastViewedTick > chunkUnloadTime)) {
           unloadQuota--
           launchOnAsyncSuspendable {

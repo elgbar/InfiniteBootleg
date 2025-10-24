@@ -53,6 +53,7 @@ sealed interface RingType<in R : RingRating?> :
 sealed interface RatelessRingType :
   Named,
   RingType<RingRating?>
+
 sealed interface RatedRingType :
   Named,
   RingType<RingRating>
@@ -123,7 +124,6 @@ data object SpellLightRing : RatedRingType {
   override val serializedName: String = "SpellLight"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
-    // fixme Drops torches sometimes
     state.entityModifications += { spell: Entity -> spell.safeWith { MaterialComponent(Material.Torch) } }
   }
 }

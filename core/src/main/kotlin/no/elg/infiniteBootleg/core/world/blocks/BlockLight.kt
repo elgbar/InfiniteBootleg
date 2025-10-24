@@ -98,8 +98,9 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
         val negSignum = -sign(distCubed)
         val intensity = 1 + (negSignum * distCubed)
 
-        if (firstTime || tmpLightMap[lightMapIndex(dx, dy)] < intensity) {
-          tmpLightMap[lightMapIndex(dx, dy)] = intensity.toFloat()
+        val lightMapIndex = lightMapIndex(dx, dy)
+        if (firstTime || tmpLightMap[lightMapIndex] < intensity) {
+          tmpLightMap[lightMapIndex] = intensity.toFloat()
         }
       }
     }
