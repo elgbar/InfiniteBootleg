@@ -73,7 +73,7 @@ class LeafDecayDebugRenderer(private val worldRender: ClientWorldRender) :
   }
 
   companion object {
-    val LEAF_DECAY_CHECK_SRC_COLOR: Color = Color.NAVY
-    val LEAF_DECAY_CHECK_SEEN_COLOR: Color = Color.ROYAL
+    val LEAF_DECAY_CHECK_SRC_COLOR: Color = Color.YELLOW
+    val LEAF_DECAY_CHECK_SEEN_COLOR: Color = Color.LIGHT_GRAY
   }
 }

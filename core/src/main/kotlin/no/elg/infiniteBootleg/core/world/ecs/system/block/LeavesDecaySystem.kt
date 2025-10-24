@@ -39,14 +39,11 @@ class LeavesDecaySystem :
     val world = entity.world
     val chunk = world.getChunk(srcLoc.worldToChunk(), load = false) ?: return
 
-    val event = if (Settings.debug && Settings.renderLeafDecay) LeafDecayCheckEvent(srcLoc, seen) else null
-
     try {
       stack.addFirst(srcLoc)
       while (stack.notEmpty()) {
         val loc = stack.removeLast()
         seen.add(loc)
-        event?.also(EventManager::dispatchEvent)
         for (dir in Direction.CARDINAL) {
           val nextLoc = relativeCompact(loc.decompactLocX(), loc.decompactLocY(), dir)
           if (!isWithin(srcLoc, nextLoc, DESPAWN_LEAVES_RADIUS)) {
@@ -74,6 +71,9 @@ class LeavesDecaySystem :
       // If no trunks were found, remove the leaf block
       chunk.removeBlock(srcLoc.decompactLocX().chunkOffset(), srcLoc.decompactLocY().chunkOffset())
     } finally {
+      if (Settings.debug && Settings.renderLeafDecay) {
+        EventManager.dispatchEvent(LeafDecayCheckEvent(srcLoc, seen))
+      }
       stack.clear()
       seen.clear()
     }
