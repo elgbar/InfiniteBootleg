@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
+import com.google.errorprone.annotations.concurrent.GuardedBy
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import ktx.graphics.copy
 import no.elg.infiniteBootleg.client.main.ClientMain
@@ -24,6 +26,8 @@ import no.elg.infiniteBootleg.core.util.withColor
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_TEXTURE_SIZE_F
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.ownedContainerOrNull
 import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 import kotlin.math.absoluteValue
 
 class ContainerChangeRenderer :
@@ -32,10 +36,16 @@ class ContainerChangeRenderer :
 
   private val screenRenderer: ScreenRenderer get() = ClientMain.inst().screenRenderer
 
-  private val knownContainers = ObjectOpenHashSet<Container>()
-  private val changeHandlers = ObjectOpenHashSet<EventDisplayData>()
-  private val changeHandlersHold = ObjectOpenHashSet<ChangeToBeProcessed>()
+  private val knownContainers = ObjectOpenHashSet<Container>() // always accessed from physics thread
+  private val changeHandlers = ObjectArrayList<EventDisplayData>()
+  private val changeHandlersToProcessed = ObjectArrayList<ChangeToBeProcessed>()
   private val layout = GlyphLayout()
+
+  /**
+   * Using one lock for both [changeHandlers] and [changeHandlersToProcessed] for simplicity
+   * Don't expect much contention here anyway
+   */
+  private val lock = ReentrantLock()
 
   /**
    * @return if the container is controlled by the currently controlled player
@@ -53,26 +63,29 @@ class ContainerChangeRenderer :
     }
   }
 
+  @GuardedBy("lock")
   private fun addForProcessing(maybeItem: Item?, remove: Boolean) {
     maybeItem?.let { item ->
       val toBeProcessed = ChangeToBeProcessed(item, remove)
-      synchronized(changeHandlersHold) {
-        changeHandlersHold += toBeProcessed
-      }
+      changeHandlersToProcessed += toBeProcessed
     }
   }
 
   private val onContentChanged = EventManager.registerListener { (container, _, type): ContainerEvent.ContentChanged ->
     if (type != null && (type.addedItem != null || type.removedItem != null) && isControlledContainer(container)) {
-      addForProcessing(type.addedItem, false)
-      addForProcessing(type.removedItem, true)
+
+      lock.withLock {
+        addForProcessing(type.addedItem, false)
+        addForProcessing(type.removedItem, true)
+      }
     }
   }
 
   private val onWorldTick = EventManager.registerListener { e: WorldTickedEvent ->
-    if (changeHandlersHold.isNotEmpty() && (changeHandlers.isEmpty() || e.tickId % (e.world.worldTicker.tps / LINES_PER_SECONDS) == 0L)) {
-      synchronized(changeHandlersHold) {
-        val data = changeHandlersHold.partitionMap { it -> it.item.element.displayName + it.item.stock }.mapNotNull { (_, items) ->
+    if (changeHandlersToProcessed.isNotEmpty() && (changeHandlers.isEmpty || e.tickId % (e.world.worldTicker.tps / LINES_PER_SECONDS) == 0L)) {
+      lock.withLock {
+        // note: the partition might be incorrect in the future! We must update this when there are more info to partition on
+        val data = changeHandlersToProcessed.partitionMap { it.item.element.displayName + it.item.maxStock }.mapNotNull { (_, items) ->
           val first = items.first()
           val sumOfStock = items.sumOf { (if (it.remove) -1 else 1) * it.item.stock.toInt() }
           if (sumOfStock != 0) {
@@ -82,11 +95,12 @@ class ContainerChangeRenderer :
             // Sum of stock is 0, so we don't need to display anything
             null
           }
-        }.sortedBy(Pair<*, Int>::second).mapIndexedNotNull { index, (item, sumOfStock) -> getData(item, sumOfStock < 0, index) }
+        }.sortedBy(Pair<*, Int>::second).mapIndexed { index, (item, sumOfStock) -> getData(item, sumOfStock < 0, index) }
 
         val progressHandler = ProgressHandler(DISPLAY_DURATION_SECONDS, Interpolation.sineOut, start = 1f)
+
         changeHandlers += EventDisplayData(data, progressHandler)
-        changeHandlersHold.clear()
+        changeHandlersToProcessed.clear()
       }
     }
   }
@@ -108,16 +122,18 @@ class ContainerChangeRenderer :
 
   override fun render() {
     if (changeHandlers.isEmpty()) return
-    val iterator = changeHandlers.iterator()
-    while (iterator.hasNext()) {
-      val (datas, progressHandler) = iterator.next()
-      if (progressHandler.update(Gdx.graphics.deltaTime)) {
-        iterator.remove()
-      } else {
-        val progress = progressHandler.progress
-        var lastX = 0f
-        for (data in datas) {
-          lastX = render(data, progress, lastX)
+    lock.withLock {
+      val iterator = changeHandlers.iterator()
+      while (iterator.hasNext()) {
+        val (datas, progressHandler) = iterator.next()
+        if (progressHandler.update(Gdx.graphics.deltaTime)) {
+          iterator.remove()
+        } else {
+          val progress = progressHandler.progress
+          var lastX = 0f
+          for (data in datas) {
+            lastX = render(data, progress, lastX)
+          }
         }
       }
     }
@@ -128,7 +144,7 @@ class ContainerChangeRenderer :
     onWorldTick.removeListener()
   }
 
-  fun getData(item: Item, remove: Boolean, xOffset: Int): ItemDisplayData? {
+  fun getData(item: Item, remove: Boolean, xOffset: Int): ItemDisplayData {
     val color = if (remove) Color.RED else Color.GREEN
     val text = "${if (remove) "-" else "+"}${item.stock} ${item.displayName}"
     return ItemDisplayData(text, color, item.element.textureRegion, xOffset)
@@ -147,7 +163,7 @@ class ContainerChangeRenderer :
     /**
      * How long to display a line
      */
-    const val DISPLAY_DURATION_SECONDS = 3f
+    const val DISPLAY_DURATION_SECONDS = 5f
 
     /**
      * How many lines to be created each second
