@@ -1097,8 +1097,8 @@ abstract class World(
   /**
    * @param worldX     Lower world X coordinate
    * @param worldY     Lower world Y coordinate
-   * @param offsetX    Offset from the world X coordinate
-   * @param offsetY    Offset from the world Y coordinate
+   * @param offsetX    Offset from the world X coordinate (inclusive)
+   * @param offsetY    Offset from the world Y coordinate (inclusive)
    * @param raw        If non-existing blocks (i.e., air) should be created to be included
    * @param loadChunk  Whether to load the chunks the blocks exist in. If false no blocks from
    * unloaded chunks will be included

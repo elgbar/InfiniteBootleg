@@ -33,7 +33,7 @@ object UpdateGridBlockSystem : IteratingSystem(standaloneGridOccupyingBlocksFami
     // Note: raw must be false to properly update the lights while lights are falling
     // Note 2: loadChunk must be false as the entity should then be handled as out of bounds
     val currentOccupations =
-      world.getBlocksAABB(pos.blockX.toFloat(), pos.blockY.toFloat(), halfBox2dWidth, halfBox2dHeight, raw = false, loadChunk = false, includeAir = true)
+      world.getBlocksAABB(pos.blockX.toFloat(), pos.blockY.toFloat(), box2d.box2dWidth - 1f, box2d.box2dHeight - 1f, raw = false, loadChunk = false, includeAir = true)
 
     // Remove markers that are no longer occupied
     val noLongerOccupied = entity.occupyingLocations.filter { it !in currentOccupations }
