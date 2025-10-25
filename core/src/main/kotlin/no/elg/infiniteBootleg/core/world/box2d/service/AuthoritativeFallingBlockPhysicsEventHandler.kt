@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.MaterialComponent.Compan
 import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.core.world.ecs.components.tags.GravityAffectedTag.Companion.gravityAffected
 import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem
 import no.elg.infiniteBootleg.protobuf.Packets
 import org.jetbrains.annotations.Async
@@ -19,8 +20,8 @@ object AuthoritativeFallingBlockPhysicsEventHandler : PhysicsSystem.PhysicsEvent
 
   private const val MAX_DELTA_UP = Chunk.CHUNK_SIZE
 
-  fun handleFallingBlockContactBeginsEvent(entity: Entity, event: PhysicsEvent.ContactBeginsEvent) {
-    if (entity.isBeingRemoved) {
+  fun handleFallingBlockContactBeginsEvent(entity: Entity) {
+    if (entity.isBeingRemoved || !entity.gravityAffected) {
       return
     }
     val material = entity.materialOrNull ?: return
@@ -28,7 +29,7 @@ object AuthoritativeFallingBlockPhysicsEventHandler : PhysicsSystem.PhysicsEvent
     val newX: Int = positionComp.blockX
     val newY: Int = positionComp.blockY - 1
     val world = entity.world
-
+  
     world.removeEntity(entity, Packets.DespawnEntity.DespawnReason.NATURAL)
 
     var deltaY = 0
@@ -49,7 +50,7 @@ object AuthoritativeFallingBlockPhysicsEventHandler : PhysicsSystem.PhysicsEvent
 
   override fun handleEvent(entity: Entity, @Async.Execute event: PhysicsEvent) {
     if (event is PhysicsEvent.ContactBeginsEvent) {
-      handleFallingBlockContactBeginsEvent(entity, event)
+      handleFallingBlockContactBeginsEvent(entity)
     }
   }
 }
