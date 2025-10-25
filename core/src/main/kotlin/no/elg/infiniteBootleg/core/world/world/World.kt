@@ -73,6 +73,7 @@ import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.remove
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight
+import no.elg.infiniteBootleg.core.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.core.world.box2d.WorldBody
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.invalid
@@ -762,22 +763,22 @@ abstract class World(
     if (entity.ignorePlaceableCheck) {
       return true
     }
-    if (canPlaceBlock(blockX, blockY, false)) {
+    if (canPlaceBlock(blockX, blockY)) {
       return true
     }
     for (direction in Direction.CARDINAL) {
-      if (canPlaceBlock(blockX + direction.dx, blockY + direction.dy, false)) {
+      if (canPlaceBlock(blockX + direction.dx, blockY + direction.dy)) {
         return true
       }
     }
     return false
   }
 
-  private fun canPlaceBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true): Boolean =
-    actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
+  private fun canPlaceBlock(worldX: WorldCoord, worldY: WorldCoord): Boolean =
+    actionOnBlock(worldX, worldY, false) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock false
-      val material = chunk.getRawBlock(localX, localY).materialOrAir()
-      material.isCollidable && !isAnyEntityAt(worldX, worldY)
+      val rawBlock = chunk.getRawBlock(localX, localY)
+      rawBlock !is EntityMarkerBlock && rawBlock.materialOrAir().isCollidable && !isAnyEntityAt(worldX, worldY)
     }
 
   fun <R> actionOnChunk(
