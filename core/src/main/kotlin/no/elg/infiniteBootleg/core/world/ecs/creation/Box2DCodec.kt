@@ -91,16 +91,16 @@ fun EngineEntity.createPlayerBodyComponent(
 
 fun EngineEntity.createDoorBodyComponent(world: World, worldX: WorldCoord, worldY: WorldCoord, whenReady: (Entity) -> Unit = {}) {
   createBody2DBodyComponent(
-    ProtoWorld.Entity.Box2D.BodyType.DOOR,
-    entity,
-    world,
-    worldX.toFloat() + DOOR_WIDTH / 2f,
-    worldY.toFloat() + DOOR_HEIGHT / 2f,
-    0f,
-    0f,
-    DOOR_WIDTH.toFloat(),
-    DOOR_HEIGHT.toFloat(),
-    arrayOf(
+    serializationType = ProtoWorld.Entity.Box2D.BodyType.DOOR,
+    entity = entity,
+    world = world,
+    worldX = worldX.toFloat() + DOOR_WIDTH / 2f,
+    worldY = worldY.toFloat() + DOOR_HEIGHT / 2f,
+    dx = 0f,
+    dy = 0f,
+    width = DOOR_WIDTH,
+    height = DOOR_HEIGHT,
+    wantedFamilies = arrayOf(
       drawableEntitiesFamily to "drawableEntitiesFamily",
       blockEntityFamily to "blockEntityFamily",
       doorEntityFamily to "doorEntityFamily",

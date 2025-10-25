@@ -38,7 +38,6 @@ object OnGroundPhysicsEventHandler : PhysicsSystem.PhysicsEventHandler {
       is PhysicsEvent.ContactBeginsEvent -> handleBodyEvents(entity, event, LongContactTracker::add)
       is PhysicsEvent.ContactEndsEvent -> handleBodyEvents(entity, event, LongContactTracker::remove)
       is PhysicsEvent.BlockRemovedEvent -> handleOnGroundBlockRemovedEvent(entity, event)
-      else -> Unit
     }
   }
 }

@@ -2,6 +2,8 @@ package no.elg.infiniteBootleg.core.world.chunks
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.box2d.structs.b2BodyId
+import no.elg.infiniteBootleg.core.util.BlockUnit
+import no.elg.infiniteBootleg.core.util.BlockUnitF
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
 import no.elg.infiniteBootleg.core.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.core.util.ChunkCoord
@@ -200,8 +202,8 @@ interface Chunk :
     /**
      * Chunks size in blocks
      */
-    const val CHUNK_SIZE: LocalCoord = 16
-    const val CHUNK_SIZE_F: Float = CHUNK_SIZE.toFloat()
+    const val CHUNK_SIZE: BlockUnit = 16
+    const val CHUNK_SIZE_F: BlockUnitF = CHUNK_SIZE.toFloat()
     const val CHUNK_TEXTURE_SIZE = CHUNK_SIZE * Block.BLOCK_TEXTURE_SIZE
     const val CHUNK_TEXTURE_SIZE_F = CHUNK_TEXTURE_SIZE.toFloat()
     const val CHUNK_TEXTURE_SIZE_HALF = CHUNK_TEXTURE_SIZE / 2

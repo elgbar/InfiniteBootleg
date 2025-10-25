@@ -10,7 +10,13 @@ import no.elg.infiniteBootleg.core.world.ecs.api.TagSavableComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType
 
+/**
+ * A tag to mark a block which will fall (spawn a [EntityType.FALLING_BLOCK])
+ *
+ * @see no.elg.infiniteBootleg.core.world.ecs.system.block.FallingBlockSystem
+ */
 class GravityAffectedTag :
   TagSavableComponent,
   AuthoritativeOnlyComponent {

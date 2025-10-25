@@ -16,7 +16,7 @@ class OccupyingBlocksComponent : EntitySavableComponent {
   /**
    * List of locations that this entity is occupying
    */
-  val occupying: GdxArray<EntityMarkerBlock> = GdxArray(false, 8)
+  val occupying: GdxArray<EntityMarkerBlock> = GdxArray(false, 1)
 
   override fun hudDebug(): String = "occupying ${occupying.map { it.hudDebug() }}"
 

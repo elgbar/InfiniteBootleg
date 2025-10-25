@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.core.world.box2d.service
 
 import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
+import no.elg.infiniteBootleg.core.util.BlockUnit
 import no.elg.infiniteBootleg.core.util.isBeingRemoved
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
@@ -19,7 +20,7 @@ private val logger = KotlinLogging.logger {}
 
 object AuthoritativeFallingBlockPhysicsEventHandler : PhysicsSystem.PhysicsEventHandler {
 
-  private const val MAX_DELTA_UP = Chunk.CHUNK_SIZE
+  private const val MAX_DELTA_UP: BlockUnit = Chunk.CHUNK_SIZE
 
   fun handleFallingBlockContactBeginsEvent(entity: Entity) {
     if (entity.isBeingRemoved || !entity.isType(EntityType.FALLING_BLOCK)) {

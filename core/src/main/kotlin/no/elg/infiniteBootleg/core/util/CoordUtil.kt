@@ -381,6 +381,12 @@ typealias LocalCoordFloat = Float
 typealias WorldCoordFloat = Float
 typealias ChunkCoordFloat = Float
 
+/** number of blocks **/
+typealias BlockUnitF = Float
+
+/** number of whole blocks **/
+typealias BlockUnit = Int
+
 typealias LocalCoordSquaredFloat = Float
 typealias WorldCoordSquaredFloat = Float
 typealias ChunkCoordSquaredFloat = Float
