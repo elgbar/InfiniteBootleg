@@ -4,13 +4,12 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import ktx.ashley.allOf
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
-import no.elg.infiniteBootleg.core.world.ecs.buildAlive
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
 
-object ValidateGroundContactSystem : IteratingSystem(allOf(GroundedComponent::class, PositionComponent::class).buildAlive(), UPDATE_PRIORITY_BEFORE_EVENTS) {
+object ValidateGroundContactSystem : IteratingSystem(allOf(GroundedComponent::class, PositionComponent::class).get(), UPDATE_PRIORITY_BEFORE_EVENTS) {
 
   const val CUTOFF_DISTANCE: Double = 3.5 // todo should be based on entity size
 

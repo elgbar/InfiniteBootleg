@@ -39,7 +39,6 @@ import no.elg.infiniteBootleg.core.world.ecs.components.tags.GravityAffectedTag
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.LeafDecayTag
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.SpellStateComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.ReactToEventTag
-import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.ToBeDestroyedTag
 import kotlin.reflect.KClass
 
 private val logger = KotlinLogging.logger {}
@@ -86,26 +85,23 @@ val PLAYERS_ENTITY_ARRAY = arrayOf(
 )
 val INVENTORY_COMPONENTS = arrayOf(ContainerComponent::class, HotbarComponent::class)
 
-/**
- * Build a family that excludes [no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.ToBeDestroyedTag]. This means that all entities in the family are not stale
- */
-fun Family.Builder.buildAlive(vararg additionalExcludes: KClass<out Component>): Family = exclude(*additionalExcludes, ToBeDestroyedTag::class).get()
-fun KClass<out Component>.toFamily(vararg additionalExcludes: KClass<out Component>): Family = allOf(this).buildAlive(*additionalExcludes)
+fun Family.Builder.getExcluding(vararg excluding: KClass<out Component>): Family = exclude(*excluding).get()
+fun KClass<out Component>.toFamily(): Family = allOf(this).get()
 
-val entityContainerFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, ContainerComponent::class).buildAlive()
-val blockContainerFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ContainerComponent::class).buildAlive()
+val entityContainerFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, ContainerComponent::class).get()
+val blockContainerFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ContainerComponent::class).get()
 
-val blockEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY).buildAlive()
-val doorEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY, DoorComponent::class).buildAlive()
+val blockEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY).get()
+val doorEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, DoorComponent::class).get()
 
-val gravityAffectedBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, GravityAffectedTag::class).buildAlive()
-val gravityAffectedBlockFamilyActive: Family = allOf(*BASIC_BLOCK_ENTITY, GravityAffectedTag::class, ReactToEventTag::class).buildAlive()
-val explosiveBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ExplosiveComponent::class).buildAlive()
-val leafBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, LeafDecayTag::class).buildAlive()
+val gravityAffectedBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, GravityAffectedTag::class).get()
+val gravityAffectedBlockFamilyActive: Family = allOf(*BASIC_BLOCK_ENTITY, GravityAffectedTag::class, ReactToEventTag::class).get()
+val explosiveBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ExplosiveComponent::class).get()
+val leafBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, LeafDecayTag::class).get()
 
-val standaloneGridOccupyingBlocksFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, OccupyingBlocksComponent::class, MaterialComponent::class).buildAlive()
+val standaloneGridOccupyingBlocksFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, OccupyingBlocksComponent::class, MaterialComponent::class).get()
 
-val playerFamily: Family = allOf(*PLAYERS_ENTITY_ARRAY).buildAlive()
+val playerFamily: Family = allOf(*PLAYERS_ENTITY_ARRAY).get()
 val localPlayerFamily: Family = allOf(
   *PLAYERS_ENTITY_ARRAY,
   *INVENTORY_COMPONENTS,
@@ -115,28 +111,26 @@ val localPlayerFamily: Family = allOf(
   TextureRegionNameComponent::class,
   InputEventQueueComponent::class,
   PhysicsEventQueueComponent::class
-).buildAlive()
+).get()
 
-val basicRequiredEntityFamily: Family = allOf(*REQUIRED_COMPONENTS).buildAlive()
-val basicRequiredEntityFamilyToSendToClient: Family = allOf(*REQUIRED_COMPONENTS).buildAlive(AuthoritativeOnlyTag::class)
-val basicStandaloneEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY).buildAlive()
-val drawableEntitiesFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, TextureRegionNameComponent::class).buildAlive()
-val selectedMaterialComponentFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, *INVENTORY_COMPONENTS).buildAlive()
-val basicDynamicEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY).buildAlive()
+val basicRequiredEntityFamily: Family = allOf(*REQUIRED_COMPONENTS).get()
+val basicRequiredEntityFamilyToSendToClient: Family = allOf(*REQUIRED_COMPONENTS).getExcluding(AuthoritativeOnlyTag::class)
+val basicStandaloneEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY).get()
+val drawableEntitiesFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, TextureRegionNameComponent::class).get()
+val selectedMaterialComponentFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, *INVENTORY_COMPONENTS).get()
+val basicDynamicEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY).get()
 
-val followEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, FollowedByCameraTag::class).buildAlive()
-val controlledEntityFamily: Family = allOf(*CONTROLLED_STANDALONE_ENTITY).buildAlive()
+val followEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, FollowedByCameraTag::class).get()
+val controlledEntityFamily: Family = allOf(*CONTROLLED_STANDALONE_ENTITY).get()
 
-val controlledEntityWithInputEventFamily: Family = allOf(*CONTROLLED_STANDALONE_ENTITY, InputEventQueueComponent::class).buildAlive()
+val controlledEntityWithInputEventFamily: Family = allOf(*CONTROLLED_STANDALONE_ENTITY, InputEventQueueComponent::class).get()
 val entityWithPhysicsEventFamily: Family = allOf(
   *BASIC_STANDALONE_ENTITY,
   PhysicsEventQueueComponent::class
-).buildAlive()
+).get()
 
-val staleEntityFamily: Family = allOf(ToBeDestroyedTag::class).get()
-
-val spellEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, TextureRegionNameComponent::class, SpellStateComponent::class).buildAlive()
-val namedEntitiesFamily: Family = allOf(*REQUIRED_COMPONENTS, NameComponent::class).buildAlive()
+val spellEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, TextureRegionNameComponent::class, SpellStateComponent::class).get()
+val namedEntitiesFamily: Family = allOf(*REQUIRED_COMPONENTS, NameComponent::class).get()
 
 // ////////////////////////////////////
 //  Common system update priorities  //
