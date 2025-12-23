@@ -60,10 +60,11 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   private val box2dDebugM4 = Matrix4()
   private val renderers: Array<Renderer> = arrayOf(
     CachedChunkRenderer(this),
-    AirBlockRenderer(this),
-    HoveringBlockRenderer(this),
-    TopBlockChunkColumnRenderer(this),
     EntityRenderer(this),
+    HoveringBlockRenderer(this),
+    //debug renderers goes after/above normal renderers
+    AirBlockRenderer(this),
+    TopBlockChunkColumnRenderer(this),
     DebugChunkRenderer(this),
     DebugChunkAddedToChunkRenderer(this),
     BlockLightDebugRenderer(this),
