@@ -565,6 +565,6 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     private inline fun blockMapIndex(localX: LocalCoord, localY: LocalCoord): Int = localX * Chunk.CHUNK_SIZE + localY
 
     @Contract(pure = true)
-    private fun areBothAirish(blockA: Block?, blockB: Block?): Boolean = blockA.isAir(markerIsAir = false) && blockB.isAir(markerIsAir = false)
+    private fun areBothAirish(blockA: Block?, blockB: Block?): Boolean = blockA.isAir() && blockB.isAir()
   }
 }

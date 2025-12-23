@@ -59,7 +59,7 @@ fun Engine.createFallingBlockStandaloneEntity(
     // This entity will handle input events
     with<PhysicsEventQueueComponent>()
     safeWith { MaterialComponent(material) }
-    with<OccupyingBlocksComponent>()
+    safeWith { OccupyingBlocksComponent(hardLink = false) }
     createFallingBlockBodyComponent(world, worldX, worldY, dx, dy) {
       if (!onReady(it)) {
         it.removeSelf()

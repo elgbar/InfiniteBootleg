@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.valid
 import no.elg.infiniteBootleg.core.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.core.world.ecs.components.MaterialComponent.Companion.material
+import no.elg.infiniteBootleg.core.world.ecs.components.tags.BrokenBlockTag.Companion.brokenBlock
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
 /**
@@ -20,7 +21,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
  * The block will be automatically removed if the entity is deleted or the entity is no longer in this world block
  * @see no.elg.infiniteBootleg.core.world.ecs.system.block.UpdateGridBlockSystem
  */
-class EntityMarkerBlock(override val chunk: Chunk, override val localX: LocalCoord, override val localY: LocalCoord, override val entity: Entity) : Block {
+class EntityMarkerBlock(override val chunk: Chunk, override val localX: LocalCoord, override val localY: LocalCoord, override val entity: Entity, val hardLink: Boolean) : Block {
 
   private var removeEntityListener: EntityListener? =
     EntityRemoveListener { if (it === entity) removeEntityMarker() }
@@ -30,7 +31,7 @@ class EntityMarkerBlock(override val chunk: Chunk, override val localX: LocalCoo
   }
 
   fun removeEntityMarker() {
-    remove(updateTexture = false, prioritize = false, sendUpdatePacket = false)
+    remove(updateTexture = false, sendUpdatePacket = false)
   }
 
   override val material: Material get() = entity.material
@@ -41,6 +42,9 @@ class EntityMarkerBlock(override val chunk: Chunk, override val localX: LocalCoo
         world.engine.removeEntityListener(it)
       }
       removeEntityListener = null
+    }
+    if (hardLink) {
+      entity.brokenBlock = true
     }
   }
 
@@ -76,10 +80,16 @@ class EntityMarkerBlock(override val chunk: Chunk, override val localX: LocalCoo
      *
      * @return the new block
      */
-    fun replaceBlock(chunk: Chunk, localX: LocalCoord, localY: LocalCoord, entity: Entity): EntityMarkerBlock? {
+    fun replaceBlock(
+      chunk: Chunk,
+      localX: LocalCoord,
+      localY: LocalCoord,
+      entity: Entity,
+      hardLink: Boolean
+    ): EntityMarkerBlock? {
       require(chunk.valid()) { "Block must be in a valid chunk" }
-      return EntityMarkerBlock(chunk, localX, localY, entity).let { emb ->
-        val replacedBlock = chunk.setBlock(localX, localY, emb, updateTexture = true, prioritize = false, sendUpdatePacket = false)
+      return EntityMarkerBlock(chunk, localX, localY, entity, hardLink).let { emb ->
+        val replacedBlock = chunk.setBlock(localX, localY, emb, sendUpdatePacket = false)
         replacedBlock as? EntityMarkerBlock?
       }
     }

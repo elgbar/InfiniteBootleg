@@ -84,12 +84,23 @@ fun Int.stringSize(): Int {
 
 inline fun Block?.isMaterial(material: Material): Boolean = this?.material == material
 
-inline fun Block?.isAir(markerIsAir: Boolean = true): Boolean {
+/**
+ * @param markerIsAir Override whether [EntityMarkerBlock] should be considered as air. Otherwise, it's up to [EntityMarkerBlock.hardLink]. A hard link will not be considered air.
+ */
+inline fun Block?.isAir(markerIsAir: Boolean = false): Boolean {
   contract { returns(false) implies (this@isAir != null) }
-  return this == null || (markerIsAir && this.isMarkerBlock()) || this.material == Material.Air
+  if (this == null) return true
+  return when {
+    isMaterial(Material.Air) -> true
+    isMarkerBlock() -> if (markerIsAir) true else !this.hardLink
+    else -> false
+  }
 }
 
-inline fun Block?.isNotAir(markerIsAir: Boolean = true): Boolean {
+/**
+ * @param markerIsAir Override whether [EntityMarkerBlock] should be considered as air. Otherwise, it's up to [EntityMarkerBlock.hardLink]. A hard link will not be considered air.
+ */
+inline fun Block?.isNotAir(markerIsAir: Boolean = false): Boolean {
   contract { returns(true) implies (this@isNotAir != null) }
   return !this.isAir(markerIsAir)
 }
@@ -98,6 +109,8 @@ inline fun Block?.isMarkerBlock(): Boolean {
   contract { returns(true) implies (this@isMarkerBlock is EntityMarkerBlock) }
   return this is EntityMarkerBlock
 }
+
+inline fun Block?.isMarkerBlockAir(): Boolean = this.isMarkerBlock() && this.hardLink && this.material != Material.Air
 
 /**
  * Do an action on a disposable respire then call [Disposable.dispose] on the resource.

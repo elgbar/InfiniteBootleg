@@ -712,7 +712,7 @@ abstract class World(
    * @param worldLoc The world location to check
    * @return If the block at the given location is air.
    */
-  fun isAirBlock(compactWorldLoc: Long, loadChunk: Boolean = true, markerIsAir: Boolean = true): Boolean =
+  fun isAirBlock(compactWorldLoc: Long, loadChunk: Boolean = true, markerIsAir: Boolean = false): Boolean =
     isAirBlock(compactWorldLoc.decompactLocX(), compactWorldLoc.decompactLocY(), loadChunk, markerIsAir)
 
   /**
@@ -730,7 +730,7 @@ abstract class World(
    * @param worldY The y coordinate from world view
    * @return If the block at the given location is air.
    */
-  fun isAirBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, markerIsAir: Boolean = true): Boolean =
+  fun isAirBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, markerIsAir: Boolean = false): Boolean =
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock false
       chunk.getRawBlock(localX, localY).isAir(markerIsAir)
@@ -750,7 +750,7 @@ abstract class World(
    * @param worldY The y coordinate from world view
    * @return If the block at the given location is not air.
    */
-  fun isNotAirBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, markerIsAir: Boolean = true): Boolean =
+  fun isNotAirBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, markerIsAir: Boolean = false): Boolean =
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock true
       chunk.getRawBlock(localX, localY).isNotAir(markerIsAir)
@@ -781,6 +781,17 @@ abstract class World(
       rawBlock !is EntityMarkerBlock && rawBlock.materialOrAir().isCollidable && !isAnyEntityAt(worldX, worldY)
     }
 
+  /**
+   * Perform an action on a chunk, loading it if necessary
+   *
+   * @param maybeChunk A chunk that might be the correct chunk, used for optimization only
+   * @param worldX     The world x coordinate to perform the action at
+   * @param worldY     The world y coordinate to perform the action at
+   * @param loadChunk  Whether to load the chunk if it is not already loaded
+   * @param action     The action to perform on the chunk
+   *
+   * @return The result of the action
+   */
   fun <R> actionOnChunk(
     maybeChunk: Chunk,
     worldX: WorldCoord,
@@ -1169,7 +1180,7 @@ abstract class World(
           y++
           continue
         }
-        if ((includeAir || block.isMarkerBlock() || block.isNotAir(markerIsAir = false)) && (filter === ACCEPT_EVERY_BLOCK || filter(block))) {
+        if ((includeAir || block.isMarkerBlock() || block.isNotAir()) && (filter === ACCEPT_EVERY_BLOCK || filter(block))) {
           val nnBlocks = blocks ?: GdxArray<Block>(false, 1).also { array -> blocks = array }
           nnBlocks.add(block)
         }

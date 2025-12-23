@@ -260,7 +260,7 @@ sealed interface Material : ContainerElement {
   fun createBlocks(world: World, locs: FastUtilLongIterator, prioritize: Boolean = true, allowOverwriteNonAir: Boolean = false) {
     val chunks = mutableSetOf<Chunk>()
     for ((worldX, worldY) in locs) {
-      if (allowOverwriteNonAir || world.isAirBlock(worldX, worldY, markerIsAir = false)) {
+      if (allowOverwriteNonAir || world.isAirBlock(worldX, worldY)) {
         val block = world.setBlock(worldX, worldY, this, false, prioritize)
         chunks += block?.chunk ?: continue
       }

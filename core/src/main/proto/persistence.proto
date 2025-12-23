@@ -227,7 +227,9 @@ message Entity {
     int64 chunkLoc = 1;
   }
 
-  message OccupyingBlocks {}
+  message OccupyingBlocks {
+    bool hardLink = 1;
+  }
   message Grounded {}
   message Door {}
   message InputEvent {}

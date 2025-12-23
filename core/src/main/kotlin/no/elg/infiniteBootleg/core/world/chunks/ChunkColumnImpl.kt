@@ -140,7 +140,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord
   // Extracting into an inlined function to allow usage of contract
   private inline fun isValidTopBlock(block: Block?, specialRule: (block: Block) -> Boolean): Boolean {
     contract { returns(true) implies (block != null) }
-    return block.isNotAir(markerIsAir = false) && specialRule(block)
+    return block.isNotAir() && specialRule(block)
   }
 
   private fun testChunk(

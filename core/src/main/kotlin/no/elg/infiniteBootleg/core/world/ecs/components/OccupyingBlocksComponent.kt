@@ -10,15 +10,25 @@ import no.elg.infiniteBootleg.core.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.core.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.core.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.protobuf.EntityKt
+import no.elg.infiniteBootleg.protobuf.EntityKt.occupyingBlocks
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
-class OccupyingBlocksComponent : EntitySavableComponent {
+/**
+ * @param hardLink If destroying a [EntityMarkerBlock] will also destroy the entity (and all other linked blocks & entities)
+ */
+class OccupyingBlocksComponent(val hardLink: Boolean) : EntitySavableComponent {
   /**
    * List of locations that this entity is occupying
    */
   val occupying: GdxArray<EntityMarkerBlock> = GdxArray(false, 1)
 
-  override fun hudDebug(): String = "occupying ${occupying.map { it.hudDebug() }}"
+  override fun hudDebug(): String = "Hard link? $hardLink occupying ${occupying.map { it.hudDebug() }}"
+
+  override fun EntityKt.Dsl.save() {
+    occupyingBlocks = occupyingBlocks {
+      hardLink = this@OccupyingBlocksComponent.hardLink
+    }
+  }
 
   companion object : EntityLoadableMapper<OccupyingBlocksComponent>() {
     val Entity.occupyingLocations get() = occupyingBlocksComponent.occupying
@@ -27,11 +37,6 @@ class OccupyingBlocksComponent : EntitySavableComponent {
     var Entity.occupyingBlocksComponentOrNull by optionalPropertyFor(mapper)
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasOccupyingBlocks()
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): OccupyingBlocksComponent? = safeWith { OccupyingBlocksComponent() }
-    val PROTO_OCCUPYING_BLOCKS: ProtoWorld.Entity.OccupyingBlocks = ProtoWorld.Entity.OccupyingBlocks.getDefaultInstance()
-  }
-
-  override fun EntityKt.Dsl.save() {
-    occupyingBlocks = PROTO_OCCUPYING_BLOCKS
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): OccupyingBlocksComponent? = safeWith { OccupyingBlocksComponent(protoEntity.occupyingBlocks.hardLink) }
   }
 }

@@ -39,7 +39,7 @@ fun Engine.createSpellEntity(
 
     // This entity will handle physics events
     with<PhysicsEventQueueComponent>()
-    with<OccupyingBlocksComponent>()
+    safeWith { OccupyingBlocksComponent(hardLink = false) }
     safeWith { SpellStateComponent(spellState, worldX, worldY, dx, dy) }
     createSpellBodyComponent(world, worldX, worldY, dx, dy) { entity ->
       spellState.entityModifications.forEach { modification -> entity.modification() }

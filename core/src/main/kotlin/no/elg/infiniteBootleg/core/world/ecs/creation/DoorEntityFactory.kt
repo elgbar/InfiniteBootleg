@@ -24,7 +24,7 @@ fun Engine.createDoorBlockEntity(world: World, worldX: WorldCoord, worldY: World
     // This entity will handle input events
     with<DoorComponent>()
     with<PhysicsEventQueueComponent>()
-    with<OccupyingBlocksComponent>()
+    safeWith { OccupyingBlocksComponent(hardLink = true) }
 
     createDoorBodyComponent(world, worldX, worldY)
   }

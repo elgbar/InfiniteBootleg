@@ -48,7 +48,7 @@ class FuturePositionRenderer(private val worldRender: ClientWorldRender) : Rende
             val time = step.toDouble()
             val futureWorldX = futurePoint(worldX, spawn.spawnDx.toDouble(), gravityX, time)
             val futureWorldY = futurePoint(worldY, spawn.spawnDy.toDouble(), gravityY, time)
-            if (collisionCheck && worldRender.world.getRawBlock(futureWorldX.toInt(), futureWorldY.toInt(), loadChunk = false).isNotAir(markerIsAir = false)) {
+            if (collisionCheck && worldRender.world.getRawBlock(futureWorldX.toInt(), futureWorldY.toInt(), loadChunk = false).isNotAir()) {
               break
             }
             worldRender.batch.draw(
