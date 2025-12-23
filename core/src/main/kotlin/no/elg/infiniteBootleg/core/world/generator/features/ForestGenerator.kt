@@ -24,7 +24,7 @@ class ForestGenerator(override val seed: Long, private val cutoff: Double) : Fea
   private fun createTree(world: World, worldX: WorldCoord, worldY: WorldCoord) {
     val treeHeight = shouldGenerateTreeNoise.getNoisePositive(worldX, worldY, 1, MAX_TREE_HEIGHT).coerceAtLeast(MIN_TREE_HEIGHT).roundToInt()
     val locs = World.getLocationsAABBFromCorner(worldX.toFloat(), worldY.toFloat() + treeHeight, 0.0, treeHeight.toDouble())
-    Material.BirchTrunk.createBlocks(world, locs, prioritize = false, allowOverwiteNonAir = true)
+    Material.BirchTrunk.createBlocks(world, locs, prioritize = false, allowOverwriteNonAir = true)
 
     val leavesRadius = shouldGenerateTreeNoise.getNoisePositive(worldX, worldY, 2, MAX_PRIMARY_LEAVES_RADIUS).coerceAtLeast(MIN_PRIMARY_LEAVES_RADIUS)
     generateLeavesBlob(world, worldX, worldY + treeHeight, leavesRadius)

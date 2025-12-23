@@ -251,16 +251,16 @@ sealed interface Material : ContainerElement {
     }
   }
 
-  fun createBlocks(world: World, locs: LongArray, prioritize: Boolean = true, allowOverwiteNonAir: Boolean = false) =
-    createBlocks(world, LongIterators.wrap(locs), prioritize, allowOverwiteNonAir)
+  fun createBlocks(world: World, locs: LongArray, prioritize: Boolean = true, allowOverwriteNonAir: Boolean = false) =
+    createBlocks(world, LongIterators.wrap(locs), prioritize, allowOverwriteNonAir)
 
-  fun createBlocks(world: World, locs: Iterable<Long>, prioritize: Boolean = true, allowOverwiteNonAir: Boolean = false) =
-    createBlocks(world, LongIterators.asLongIterator(locs.iterator()), prioritize, allowOverwiteNonAir)
+  fun createBlocks(world: World, locs: Iterable<Long>, prioritize: Boolean = true, allowOverwriteNonAir: Boolean = false) =
+    createBlocks(world, LongIterators.asLongIterator(locs.iterator()), prioritize, allowOverwriteNonAir)
 
-  fun createBlocks(world: World, locs: FastUtilLongIterator, prioritize: Boolean = true, allowOverwiteNonAir: Boolean = false) {
+  fun createBlocks(world: World, locs: FastUtilLongIterator, prioritize: Boolean = true, allowOverwriteNonAir: Boolean = false) {
     val chunks = mutableSetOf<Chunk>()
     for ((worldX, worldY) in locs) {
-      if (allowOverwiteNonAir || world.isAirBlock(worldX, worldY, markerIsAir = false)) {
+      if (allowOverwriteNonAir || world.isAirBlock(worldX, worldY, markerIsAir = false)) {
         val block = world.setBlock(worldX, worldY, this, false, prioritize)
         chunks += block?.chunk ?: continue
       }

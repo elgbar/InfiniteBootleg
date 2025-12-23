@@ -11,8 +11,8 @@ private val logger = KotlinLogging.logger {}
 fun createEventLoopGroup(): EventLoopGroup {
   val ioHandlerFactory = try {
     EpollIoHandler.newFactory()
-  } catch (e: Throwable) {
-    logger.trace(e) { "Failed to use EpollIoHandler (not on linux?), falling back to NioIoHandler" }
+  } catch (_: Throwable) {
+    logger.trace { "Failed to use EpollIoHandler (not on linux?), falling back to NioIoHandler" }
     NioIoHandler.newFactory()
   }
   return MultiThreadIoEventLoopGroup(ioHandlerFactory)

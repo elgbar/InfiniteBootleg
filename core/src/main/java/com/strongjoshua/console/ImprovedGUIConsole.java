@@ -42,7 +42,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragScrollListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.SnapshotArray;
-import com.badlogic.gdx.utils.StringBuilder;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
