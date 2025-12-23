@@ -1032,7 +1032,7 @@ abstract class World(
   }
 
   /**
-   * Remove and disposes the given entity directly.
+   * Remove and disposes the given entity directly. 
    *
    * Will not handle block entities correctly, set the tag [no.elg.infiniteBootleg.core.world.ecs.components.tags.BrokenBlockTag] to properly remove blocks.
    *
