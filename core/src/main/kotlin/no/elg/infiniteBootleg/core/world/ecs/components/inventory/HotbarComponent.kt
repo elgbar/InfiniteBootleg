@@ -95,7 +95,8 @@ data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: Object2Int
       SIX,
       SEVEN,
       EIGHT,
-      NINE;
+      NINE,
+      TEN;
 
       companion object {
         fun fromOrdinal(ordinal: Int): HotbarSlot = entries[ordinal]

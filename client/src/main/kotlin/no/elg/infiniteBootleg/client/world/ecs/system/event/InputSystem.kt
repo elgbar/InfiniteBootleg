@@ -148,6 +148,7 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
       Input.Keys.NUM_7, Input.Keys.NUMPAD_7 -> HotbarSlot.SEVEN
       Input.Keys.NUM_8, Input.Keys.NUMPAD_8 -> HotbarSlot.EIGHT
       Input.Keys.NUM_9, Input.Keys.NUMPAD_9 -> HotbarSlot.NINE
+      Input.Keys.NUM_0, Input.Keys.NUMPAD_0 -> HotbarSlot.TEN
       else -> return false
     }
     updateSelectedItem(hotbarComponent, hotbarSlot)
