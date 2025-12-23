@@ -104,6 +104,7 @@ import no.elg.infiniteBootleg.core.world.ecs.system.OutOfBoundsSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.ReadBox2DStateSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.ValidateGroundContactSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.WriteBox2DStateSystem
+import no.elg.infiniteBootleg.core.world.ecs.system.block.BrokenBlockCleanupSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.ExplosiveBlockSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.FallingBlockSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.LeavesDecaySystem
@@ -297,6 +298,7 @@ abstract class World(
     engine.addSystem(NoGravityInUnloadedChunksSystem)
     engine.addSystem(SpellRemovalSystem)
     engine.addSystem(ValidateGroundContactSystem)
+    engine.addSystem(BrokenBlockCleanupSystem)
     additionalSystems().forEach(engine::addSystem)
 
     engine.systems.forEach(::configureSystem)
@@ -1019,7 +1021,9 @@ abstract class World(
   }
 
   /**
-   * Remove and disposes the given entity.
+   * Remove and disposes the given entity directly.
+   *
+   * Will not handle block entities correctly, set the tag [no.elg.infiniteBootleg.core.world.ecs.components.tags.BrokenBlockTag] to properly remove blocks.
    *
    * Even if the given entity is not a part of this world, it will be disposed
    *
@@ -1028,7 +1032,7 @@ abstract class World(
    */
   @JvmOverloads
   open fun removeEntity(entity: Entity, reason: DespawnReason = DespawnReason.UNKNOWN_REASON) {
-    worldBody.removeEntity(entity)
+    engine.removeEntity(entity)
   }
 
   fun getPlayer(entityId: String): Entity? {

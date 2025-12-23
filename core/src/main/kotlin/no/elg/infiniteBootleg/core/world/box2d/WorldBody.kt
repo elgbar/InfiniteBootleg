@@ -12,13 +12,10 @@ import no.elg.infiniteBootleg.core.api.Ticking
 import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
 import no.elg.infiniteBootleg.core.util.Compacted2Float
-import no.elg.infiniteBootleg.core.util.EntityFlags.INVALID_FLAG
-import no.elg.infiniteBootleg.core.util.EntityFlags.enableFlag
 import no.elg.infiniteBootleg.core.util.FailureWatchdog
 import no.elg.infiniteBootleg.core.util.IllegalAction
 import no.elg.infiniteBootleg.core.util.MAX_WORLD_VEL
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
-import no.elg.infiniteBootleg.core.util.isBeingRemoved
 import no.elg.infiniteBootleg.core.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.core.world.box2d.extensions.body
 import no.elg.infiniteBootleg.core.world.box2d.extensions.compactToFloat
@@ -91,19 +88,6 @@ open class WorldBody(private val world: World) :
    * @see [com.badlogic.gdx.Application.postRunnable]
    */
   fun postBox2dRunnable(runnable: () -> Unit) = postRunnable.postRunnable(runnable)
-
-  /**
-   * Thread safe and fastest way to remove an entity from the world
-   */
-  internal fun removeEntity(entity: Entity) {
-    if (entity.isBeingRemoved) {
-      return
-    }
-    entity.enableFlag(INVALID_FLAG)
-    ThreadType.PHYSICS.launchOrRun {
-      world.engine.removeEntity(entity)
-    }
-  }
 
   /**
    * Create a new body in this world, this method can be called from any thread

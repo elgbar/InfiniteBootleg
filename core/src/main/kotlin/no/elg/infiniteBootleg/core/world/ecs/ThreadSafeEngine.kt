@@ -13,6 +13,9 @@ import com.badlogic.gdx.utils.ObjectMap
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.main.Main
+import no.elg.infiniteBootleg.core.util.EntityFlags.INVALID_FLAG
+import no.elg.infiniteBootleg.core.util.EntityFlags.enableFlag
+import no.elg.infiniteBootleg.core.util.isBeingRemoved
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.system.AuthoritativeSystem
 import no.elg.infiniteBootleg.core.world.ecs.components.events.ECSEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.system.api.AuthorizedEntitiesIteratingSystem
@@ -54,10 +57,15 @@ class ThreadSafeEngine :
       super.addEntity(entity)
     }
 
-  override fun removeEntity(entity: Entity): Unit =
+  override fun removeEntity(entity: Entity) {
+    if (entity.isBeingRemoved) {
+      return
+    }
+    entity.enableFlag(INVALID_FLAG)
     synchronized(engineLock) {
       super.removeEntity(entity)
     }
+  }
 
   override fun removeAllEntities(family: Family): Unit =
     synchronized(engineLock) {

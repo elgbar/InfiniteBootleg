@@ -34,6 +34,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Com
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.AuthoritativeOnlyTag
+import no.elg.infiniteBootleg.core.world.ecs.components.tags.BrokenBlockTag
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FollowedByCameraTag
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.GravityAffectedTag
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.LeafDecayTag
@@ -92,6 +93,7 @@ val entityContainerFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, ContainerC
 val blockContainerFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ContainerComponent::class).get()
 
 val blockEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY).get()
+val brokenBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, BrokenBlockTag::class).get()
 val doorEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, DoorComponent::class).get()
 
 val gravityAffectedBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, GravityAffectedTag::class).get()

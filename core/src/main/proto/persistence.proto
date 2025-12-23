@@ -172,6 +172,7 @@ message Entity {
     optional bool canBeOutOfBounds = 6;
     optional bool transient = 7;
     optional bool authoritativeOnly = 8;
+    optional bool brokenBlock = 9;
   }
 
   message Killable {
