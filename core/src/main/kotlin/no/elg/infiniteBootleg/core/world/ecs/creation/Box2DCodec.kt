@@ -116,7 +116,7 @@ fun EngineEntity.createDoorBodyComponent(world: World, worldX: WorldCoord, world
     val shapeDef = Box2d.b2DefaultShapeDef().also { def ->
       def.isSensor(true)
       def.enableSensorEvents(true)
-      def.filter = Filters.EN__GROUND_FILTER
+      def.filter = Filters.EN__ENTITY_FILTER
     }
 
     createPolygonShape(shapeDef, polygon, entity)

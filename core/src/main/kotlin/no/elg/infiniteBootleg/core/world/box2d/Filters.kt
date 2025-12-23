@@ -13,8 +13,8 @@ object Filters {
     maskBits(0)
   }
 
-  val EN__GROUND_FILTER: b2Filter = Box2d.b2DefaultFilter().apply {
-    categoryBits(GROUND_CATEGORY)
+  val EN__ENTITY_FILTER: b2Filter = Box2d.b2DefaultFilter().apply {
+    categoryBits(ENTITY_CATEGORY)
     maskBits(ENTITY_CATEGORY)
   }
   val GR_FB__GROUND_FILTER: b2Filter = Box2d.b2DefaultFilter().apply {
