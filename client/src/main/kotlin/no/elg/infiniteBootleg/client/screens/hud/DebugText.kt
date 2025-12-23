@@ -86,7 +86,7 @@ object DebugText {
     val format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) local (% 5d,% 5d) exists? %-5s%s"
     sb.append(String.format(format, material.displayName, rawX, rawY, mouseBlockX, mouseBlockY, localX, localY, exists, blockDebug))
 
-    val blockEntity = block?.entity?.let(::ent) ?: "N/A"
+    val blockEntity = block?.entity?.let { ent(it, world) } ?: "N/A"
     sb.appendLine().append("Block entity: $blockEntity")
   }
 
@@ -216,9 +216,12 @@ object DebugText {
   fun ents(sb: StringBuilder, world: ClientWorld, mouseWorldX: WorldCoord, mouseWorldY: WorldCoord) {
     sb.append("E = \n")
     for (entity in world.getEntities(mouseWorldX, mouseWorldY)) {
-      sb.append(ent(entity)).appendLine()
+      sb.append(ent(entity, world)).appendLine()
     }
   }
 
-  private fun ent(entity: Entity): String = "${entity.id}: ${entity.toComponentsString()}"
+  private fun ent(entity: Entity, world: ClientWorld): String {
+    val entityId = entity.id
+    return "id $entityId, exists in world? ${world.containsEntity(entityId)}, comps ${entity.toComponentsString()}"
+  }
 }
