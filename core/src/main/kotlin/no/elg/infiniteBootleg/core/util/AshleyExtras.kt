@@ -7,6 +7,7 @@ import ktx.math.component2
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.util.EntityFlags.INVALID_FLAG
 import no.elg.infiniteBootleg.core.util.EntityFlags.hasFlag
+import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
@@ -50,9 +51,17 @@ fun Entity.breakableLocs(
   interactionRadius: Float
 ): Sequence<WorldCompactLoc> = interactableBlocks(world, centerBlockX, centerBlockY, radius, interactionRadius).filterNot { world.isAirBlock(it, false) }
 
-fun Entity.placeableBlocks(world: World, centerBlockX: WorldCoord, centerBlockY: WorldCoord, interactionRadius: Float): Sequence<Long> =
+fun Entity.placeableBlocks(
+  world: World,
+  centerBlockX: WorldCoord,
+  centerBlockY: WorldCoord,
+  interactionRadius: Float,
+  material: Material
+): Sequence<WorldCompactLoc> =
   interactableBlocks(world, centerBlockX, centerBlockY, 1f, interactionRadius)
-    .filter { world.isAirBlock(it) }
+    .filter { (worldX: WorldCoord, worldY: WorldCoord) ->
+      world.isAirBlock(worldX, worldY, loadChunk = false) && material.canBeCreated(world, worldX, worldY, material)
+    }
     .let { seq ->
       if (seq.any { (worldX, worldY) -> world.canEntityPlaceBlock(worldX, worldY, this) }) {
         seq

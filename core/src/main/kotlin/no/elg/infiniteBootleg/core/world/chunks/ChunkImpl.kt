@@ -155,7 +155,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     prioritize: Boolean,
     sendUpdatePacket: Boolean
   ): Block? {
-    val block = material?.createBlock(world, this, localX, localY)
+    val block = material?.createBlock(world, this, localX, localY) ?: return null
     return setBlock(
       localX = localX,
       localY = localY,

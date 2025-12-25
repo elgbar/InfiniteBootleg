@@ -1032,7 +1032,7 @@ abstract class World(
   }
 
   /**
-   * Remove and disposes the given entity directly. 
+   * Remove and disposes the given entity directly.
    *
    * Will not handle block entities correctly, set the tag [no.elg.infiniteBootleg.core.world.ecs.components.tags.BrokenBlockTag] to properly remove blocks.
    *
@@ -1087,6 +1087,7 @@ abstract class World(
    * @param height       How far to go on either side of the y-axis.
    * @param raw          If non-existing blocks (i.e., air) should be created to be included
    * @param loadChunk    Whether to load the chunks the blocks exist in. If false no blocks from
+   * @param cancel    Allows for early termination of this method, argument are current blocks found
    * unloaded chunks will be included
    * @return An Axis-Aligned Bounding Box of blocks
    */
@@ -1098,7 +1099,7 @@ abstract class World(
     raw: Boolean,
     loadChunk: Boolean,
     includeAir: Boolean,
-    cancel: () -> Boolean = NEVER_CANCEL,
+    cancel: (GdxArray<Block>?) -> Boolean = NEVER_CANCEL,
     filter: (Block) -> Boolean = ACCEPT_EVERY_BLOCK
   ): GdxArray<Block> {
     require(width >= 0) { "Width must be >= 0, was $width" }
@@ -1117,7 +1118,7 @@ abstract class World(
    * @param loadChunk  Whether to load the chunks the blocks exist in. If false no blocks from
    * unloaded chunks will be included
    * @param includeAir Whether air should be included
-   * @param cancel     Allows for early termination of this method
+   * @param cancel     Allows for early termination of this method, argument are current blocks found
    * @return An Axis-Aligned Bounding Box of blocks
    */
   fun getBlocksAABB(
@@ -1128,7 +1129,7 @@ abstract class World(
     raw: Boolean,
     loadChunk: Boolean,
     includeAir: Boolean,
-    cancel: () -> Boolean = NEVER_CANCEL,
+    cancel: (GdxArray<Block>?) -> Boolean = NEVER_CANCEL,
     filter: (Block) -> Boolean = ACCEPT_EVERY_BLOCK
   ): GdxArray<Block> {
     val effectiveRaw: Boolean = if (!raw && !includeAir) {
@@ -1148,7 +1149,7 @@ abstract class World(
     while (x <= maxX) {
       var y = startY
       while (y <= maxY) {
-        if (cancel !== NEVER_CANCEL && cancel()) {
+        if (cancel !== NEVER_CANCEL && cancel(blocks)) {
           return blocks ?: EMPTY_BLOCKS_ARRAY
         }
         val chunkPos = compactInt(x.worldToChunk(), y.worldToChunk())
@@ -1272,7 +1273,7 @@ abstract class World(
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW = LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
     const val TRY_LOCK_CHUNKS_DURATION_MS = 20L
 
-    val NEVER_CANCEL: () -> Boolean = { false }
+    val NEVER_CANCEL: (GdxArray<Block>?) -> Boolean = { false }
     val ACCEPT_EVERY_BLOCK: (Block) -> Boolean = { true }
 
     val CHUNK_THREAD_LOCAL = AtomicInteger(0)

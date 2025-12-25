@@ -22,6 +22,7 @@ sealed class Biome(val topBlocks: Array<Material>, val filler: Material, val bio
     val blocks = chunk.blocks[localX]
     for (dy in 0 until localY) {
       val mat = materialAt(seed, height, chunk.worldX + localX, chunk.worldY + dy)
+      // will be filled with air if creating block fails
       blocks[dy] = mat.createBlock(chunk.world, chunk, localX, dy, tryRevalidateChunk = false)
     }
   }

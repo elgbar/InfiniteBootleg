@@ -71,7 +71,7 @@ fun placeBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean =
     if (element is Material) {
       val world = entity.world
       val locallyControlledComponent = entity.locallyControlledComponent
-      val placeableBlock = entity.placeableBlocks(world, blockX, blockY, locallyControlledComponent.interactRadius).toSet()
+      val placeableBlock = entity.placeableBlocks(world, blockX, blockY, locallyControlledComponent.interactRadius, element).toSet()
       val usages = placeableBlock.size.toUInt()
       val container = entity.containerOrNull ?: return false
       val notRemoved = container.remove(element, usages)
@@ -79,7 +79,8 @@ fun placeBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean =
         // Make sure we don't use more items than in the inventory
         placeableBlock.drop(notRemoved.toInt())
       }
-      element.createBlocks(world, placeableBlock)
+      val notAdded = element.createBlocks(world, placeableBlock)
+      container.add(element, notAdded)
     }
     return true
   }

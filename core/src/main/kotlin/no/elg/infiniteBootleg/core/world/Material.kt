@@ -7,10 +7,12 @@ import no.elg.infiniteBootleg.core.items.ItemType
 import no.elg.infiniteBootleg.core.items.MaterialItem
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.util.LocalCoord
+import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.safeWith
+import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.stringifyCompactLocWithChunk
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.BlockImpl
@@ -18,6 +20,8 @@ import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.ecs.api.ProtoConverter
 import no.elg.infiniteBootleg.core.world.ecs.components.ExplosiveComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.EntityTypeComponent.Companion.entityTypeComponent
+import no.elg.infiniteBootleg.core.world.ecs.creation.DOOR_HEIGHT
+import no.elg.infiniteBootleg.core.world.ecs.creation.DOOR_WIDTH
 import no.elg.infiniteBootleg.core.world.ecs.creation.createBlockEntity
 import no.elg.infiniteBootleg.core.world.ecs.creation.createContainerEntity
 import no.elg.infiniteBootleg.core.world.ecs.creation.createDoorBlockEntity
@@ -72,9 +76,19 @@ sealed interface Material : ContainerElement {
   val canBeHandled: Boolean get() = true
 
   /**
+   * Remember to set [canBeCreated] accordingly if you set this!
+   *
    * @return The entity to attach to this block
    */
-  val createNew: ((World, WorldCoord, WorldCoord, Material) -> CompletableFuture<Entity>)? get() = null
+  val createNew: ((world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material) -> CompletableFuture<Entity>)? get() = null
+
+  /**
+   * Whether a new block can be loaded or created of this material at a given location.
+   * Useful to check bounds or other conditions.
+   *
+   * Must be called before loading or creating a block.
+   */
+  val canBeCreated: ((world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material) -> Boolean) get() = CAN_ALWAYS_BE_CREATED
 
   override val itemType: ItemType get() = ItemType.BLOCK
   override fun toItem(maxStock: UInt, stock: UInt): MaterialItem = MaterialItem(this, maxStock, stock)
@@ -157,6 +171,20 @@ sealed interface Material : ContainerElement {
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createDoorBlockEntity(world, worldX, worldY, material)
     }
+    override val canBeCreated = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+      val blocks =
+        world.getBlocksAABB(
+          worldX.toFloat(),
+          worldY.toFloat(),
+          DOOR_WIDTH - 1,
+          DOOR_HEIGHT - 1,
+          raw = true,
+          loadChunk = false,
+          includeAir = false,
+          cancel = { blocks -> blocks != null }
+        )
+      blocks.size == 0
+    }
   }
 
   object BirchTrunk : Material, TexturedContainerElement {
@@ -226,51 +254,82 @@ sealed interface Material : ContainerElement {
     localY: LocalCoord,
     protoEntity: ProtoWorld.Entity? = null,
     tryRevalidateChunk: Boolean = true
-  ): Block {
+  ): Block? {
     val validChunk = if (chunk.isDisposed && tryRevalidateChunk) world.getChunk(chunk.compactLocation) else chunk
     requireNotNull(validChunk) { "No valid chunk found" }
     require(validChunk.isNotDisposed) { "Chunk has been disposed" }
-    return BlockImpl(validChunk, localX, localY, this).also { block ->
-      if (Main.isAuthoritative) {
-        // Blocks client side should not have any entity in them
-        val futureEntity = protoEntity?.let { world.load(it, validChunk) } ?: createNew?.invoke(world, validChunk.worldX + localX, validChunk.worldY + localY, this)
-        futureEntity?.thenApply { entity: Entity ->
-          if (block.isDisposed || validChunk.isDisposed) {
-            world.removeEntity(entity)
-            // This will fire when generating features in the world (i.e., trees next to other trees)
-            logger.debug {
-              "Block@${stringifyCompactLocWithChunk(block)} was disposed" +
-                " before entity (type ${entity.entityTypeComponent.hudDebug()}) was fully created. " +
-                "Is the chunk disposed? ${validChunk.isDisposed}, block disposed? ${block.isDisposed}"
+    val worldX: WorldCoord = validChunk.worldX + localX
+    val worldY: WorldCoord = validChunk.worldY + localY
+    if (canBeCreated(world, worldX, worldY, this)) {
+      return BlockImpl(validChunk, localX, localY, this).also { block ->
+        if (Main.isAuthoritative) {
+          // Blocks client side should not have any entity in them
+          val futureEntity = protoEntity?.let { world.load(it, validChunk) } ?: createNew?.invoke(world, worldX, worldY, this)
+          futureEntity?.thenApply { entity: Entity ->
+            if (block.isDisposed || validChunk.isDisposed) {
+              world.removeEntity(entity)
+              // This will fire when generating features in the world (i.e., trees next to other trees)
+              logger.debug {
+                "Block@${stringifyCompactLocWithChunk(block)} was disposed" + " before entity (type ${entity.entityTypeComponent.hudDebug()}) was fully created. " +
+                  "Is the chunk disposed? ${validChunk.isDisposed}, block disposed? ${block.isDisposed}"
+              }
+            } else {
+              block.entity = entity
             }
-          } else {
-            block.entity = entity
           }
         }
       }
+    } else {
+      logger.warn { "Tried to create block of material $this at ${stringifyCompactLoc(worldX, worldY)} where it is not allowed" }
+      return null
     }
   }
 
-  fun createBlocks(world: World, locs: LongArray, prioritize: Boolean = true, allowOverwriteNonAir: Boolean = false) =
+  /**
+   * Create blocks of this material at the given locations
+   *
+   * @return number of blocks that were not created
+   */
+  fun createBlocks(world: World, locs: LongArray, prioritize: Boolean = true, allowOverwriteNonAir: Boolean = false): UInt =
     createBlocks(world, LongIterators.wrap(locs), prioritize, allowOverwriteNonAir)
 
-  fun createBlocks(world: World, locs: Iterable<Long>, prioritize: Boolean = true, allowOverwriteNonAir: Boolean = false) =
+  /**
+   * Create blocks of this material at the given locations
+   *
+   * @return number of blocks that were not created
+   */
+  fun createBlocks(world: World, locs: Iterable<WorldCompactLoc>, prioritize: Boolean = true, allowOverwriteNonAir: Boolean = false): UInt =
     createBlocks(world, LongIterators.asLongIterator(locs.iterator()), prioritize, allowOverwriteNonAir)
 
-  fun createBlocks(world: World, locs: FastUtilLongIterator, prioritize: Boolean = true, allowOverwriteNonAir: Boolean = false) {
+  /**
+   * Create blocks of this material at the given locations
+   *
+   * @return number of blocks that were not created
+   */
+  fun createBlocks(world: World, locs: FastUtilLongIterator, prioritize: Boolean = true, allowOverwriteNonAir: Boolean = false): UInt {
     val chunks = mutableSetOf<Chunk>()
+    var notCreated = 0
     for ((worldX, worldY) in locs) {
       if (allowOverwriteNonAir || world.isAirBlock(worldX, worldY)) {
         val block = world.setBlock(worldX, worldY, this, false, prioritize)
-        chunks += block?.chunk ?: continue
+        chunks += block?.chunk ?: let {
+          notCreated++
+          continue
+        }
       }
     }
     for (chunk in chunks) {
       chunk.dirty(prioritize)
     }
+    return notCreated.toUInt()
   }
 
   companion object : ProtoConverter<Material, ProtoWorld.Material> {
+
+    /**
+     * Mark a block as always able to be created.
+     */
+    private val CAN_ALWAYS_BE_CREATED: ((World, WorldCoord, WorldCoord, Material) -> Boolean) = { _, _, _, _ -> true }
 
     val materials: List<Material> = Material::class.sealedSubclasses.map { it.objectInstance ?: error("Material ${it.simpleName} is not an object") }
 
@@ -279,8 +338,7 @@ sealed interface Material : ContainerElement {
      */
     val normalMaterials: List<Material> = materials.filter(Material::canBeHandled)
 
-    private val nameToMaterial: Map<String, Material> =
-      materials.associateBy { it.javaClass.simpleName.lowercase() } + mapOf("" to Air)
+    private val nameToMaterial: Map<String, Material> = materials.associateBy { it.javaClass.simpleName.lowercase() } + mapOf("" to Air)
 
     private val materialToName: Map<Material, String> = materials.associateWith { it.javaClass.simpleName.lowercase() }
 
