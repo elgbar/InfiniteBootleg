@@ -30,6 +30,24 @@ open class ContainerImpl(override val name: String, final override val size: Int
 
   override fun indexOfFirst(filter: (Item?) -> Boolean): Int = content.indexOfFirst(filter)
 
+  @Suppress("UNCHECKED_CAST")
+  private fun filterElementType(element: ContainerElement): Sequence<Item> =
+    // "it" Can not be null because the input element can't be null
+    content.asSequence().filter { it?.element == element } as Sequence<Item>
+
+  override fun exists(element: ContainerElement, amount: UInt): Boolean {
+    var amountNeeded = amount
+    filterElementType(element).forEach { item ->
+      amountNeeded -= item.stock
+      if (amountNeeded <= 0u) {
+        return true
+      }
+    }
+    return false
+  }
+
+  override fun count(element: ContainerElement): UInt = filterElementType(element).sumOf(Item::stock)
+
   override fun add(element: ContainerElement, amount: UInt): UInt {
     if (amount == 0u) return 0u
     var amountNotAdded = amount

@@ -115,6 +115,16 @@ interface Container : Iterable<IndexedItem> {
     return notAdded
   }
 
+  /**
+   * Check if there exists at least `amount` of the given element type in the container
+   */
+  fun exists(element: ContainerElement, amount: UInt): Boolean
+
+  /**
+   * Count how many of the given element type is in the container
+   */
+  fun count(element: ContainerElement): UInt
+
   /** Remove all element stacks with the given element type  */
   fun removeAll(element: ContainerElement)
 
@@ -140,7 +150,6 @@ interface Container : Iterable<IndexedItem> {
    * Remove element stacks in the container that match the given element
    *
    * @param Item The item to remove
-   * @throws IllegalArgumentException if one of the `Item`s is `null`
    */
   fun remove(item: Item)
 

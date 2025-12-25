@@ -73,6 +73,7 @@ fun Entity.placeableBlocks(
 fun Entity.toComponentsString() = "${components.filterNotNull().map { it.javaClass.simpleName.removeSuffix("Component") }.sorted()}"
 
 val Entity.isBeingRemoved: Boolean get() = isRemoving || isScheduledForRemoval || hasFlag(INVALID_FLAG)
+val Entity.isValid: Boolean get() = !isBeingRemoved
 
 fun Entity.removeSelf(reason: DespawnReason = DespawnReason.UNKNOWN_REASON) = this.world.removeEntity(this, reason)
 

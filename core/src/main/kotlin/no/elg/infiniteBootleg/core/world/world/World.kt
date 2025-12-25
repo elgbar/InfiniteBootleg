@@ -839,32 +839,42 @@ abstract class World(
   fun getBlocks(locs: Iterable<WorldCompactLoc>, loadChunk: Boolean = true): Iterable<Block> =
     locs.mapNotNullTo(mutableSetOf()) { (blockX, blockY) -> getBlock(blockX, blockY, loadChunk) }
 
-  fun removeBlocks(blocks: Iterable<Block>, prioritize: Boolean = false) {
+  fun removeBlocks(blocks: Iterable<Block>, prioritize: Boolean = false): Set<Block> {
     val blockChunks = ObjectOpenHashSet<Chunk>()
+    val removed = ObjectOpenHashSet<Block>()
     for (block in blocks) {
       val chunk = block.remove() ?: continue
-      blockChunks.add(chunk)
+      removed += block
+      blockChunks += chunk
     }
     for (chunk in blockChunks) {
       chunk.dirty(prioritize)
     }
+    return removed
   }
 
+  /**
+   * @return The blocks actually removed
+   */
   @JvmName("removeLocs")
   fun removeBlocks(blocks: Iterable<WorldCompactLoc>, giveTo: Entity? = null, prioritize: Boolean = false): Set<Block> {
-    val removed = ObjectOpenHashSet<Block>()
-    val blockChunks = actionOnBlocks(blocks) { localX, localY, nullableChunk ->
+    val toRemove = ObjectOpenHashSet<Block>()
+    actionOnBlocks(blocks) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlocks
-      chunk.getRawBlock(localX, localY)?.also { oldBlock ->
-        removed += oldBlock
-        chunk.removeBlock(localX, localY, updateTexture = false)
-      }
+      chunk.getRawBlock(localX, localY)?.also { oldBlock -> toRemove += oldBlock }
     }
-    for (chunk in blockChunks) {
-      chunk.dirty(prioritize)
+
+    // Make sure we only remove references to each entity once (i.e. for multi-block entities)
+    val seenEntity = ObjectOpenHashSet<String>()
+    toRemove.removeIf {
+      val entity = it.entity
+      entity != null && !seenEntity.add(entity.id)
     }
-    giveBlocks(removed, giveTo)
-    return removed
+
+    removeBlocks(toRemove, prioritize)
+
+    giveBlocks(toRemove, giveTo)
+    return toRemove
   }
 
   private fun giveBlocks(blocks: Collection<Block>, giveTo: Entity?) {
