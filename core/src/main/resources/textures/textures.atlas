@@ -1,152 +1,156 @@
 textures.png
-	size: 122, 518
+	size: 468, 136
 	repeat: xy
 birch_leaves-air-north-air-east-birch_leaves-south-birch_leaves-west
-	bounds: 35, 119, 32, 32
+	bounds: 205, 37, 32, 32
 birch_leaves-air-north-air-west-birch_leaves-south-birch_leaves-east
-	bounds: 67, 419, 32, 32
+	bounds: 333, 103, 32, 32
 birch_leaves-air-south-air-east-birch_leaves-north-birch_leaves-west
-	bounds: 35, 51, 32, 32
+	bounds: 273, 37, 32, 32
 birch_leaves-air-south-air-west-birch_leaves-north-birch_leaves-east
-	bounds: 35, 85, 32, 32
+	bounds: 239, 37, 32, 32
 birch_leaves_rotatable
-	bounds: 69, 215, 32, 32
+	bounds: 396, 35, 32, 32
 birch_trunk
-	bounds: 69, 109, 16, 16
+	bounds: 73, 19, 16, 16
 birch_trunk-birch_leaves-east
-	bounds: 35, 221, 32, 32
+	bounds: 103, 37, 32, 32
 birch_trunk-birch_leaves-east-birch_leaves-west
-	bounds: 1, 155, 32, 32
+	bounds: 401, 103, 32, 32
 birch_trunk-birch_leaves-east-birch_leaves-west-birch_leaves-north
-	bounds: 1, 121, 32, 32
+	bounds: 333, 69, 32, 32
 birch_trunk-birch_leaves-east-birch_trunk-west
-	bounds: 67, 385, 32, 32
+	bounds: 435, 103, 32, 32
 birch_trunk-birch_leaves-west
-	bounds: 35, 187, 32, 32
+	bounds: 137, 37, 32, 32
 birch_trunk-birch_leaves-west-birch_trunk-east
-	bounds: 67, 317, 32, 32
+	bounds: 435, 69, 32, 32
 birch_trunk-birch_trunk-east
-	bounds: 69, 249, 32, 32
+	bounds: 362, 35, 32, 32
 birch_trunk-birch_trunk-east-birch_leaves-north-birch_leaves-west
-	bounds: 1, 53, 32, 32
+	bounds: 1, 37, 32, 32
 birch_trunk-birch_trunk-east-birch_trunk-west
-	bounds: 1, 87, 32, 32
+	bounds: 401, 69, 32, 32
 birch_trunk-birch_trunk-west
-	bounds: 69, 181, 32, 32
+	bounds: 430, 35, 32, 32
 birch_trunk-birch_trunk-west-birch_leaves-north-birch_leaves-east
-	bounds: 35, 17, 32, 32
+	bounds: 328, 35, 32, 32
 break
 	index: 9
-	bounds: 69, 163, 16, 16
+	bounds: 19, 19, 16, 16
 break
 	index: 1
-	bounds: 69, 145, 16, 16
+	bounds: 37, 19, 16, 16
 break
 	index: 6
-	bounds: 69, 37, 16, 16
+	bounds: 145, 19, 16, 16
 break
 	index: 3
-	bounds: 87, 127, 16, 16
+	bounds: 217, 19, 16, 16
 break
 	index: 8
-	bounds: 87, 109, 16, 16
+	bounds: 235, 19, 16, 16
 break
 	index: 5
-	bounds: 103, 278, 16, 16
+	bounds: 37, 1, 16, 16
 break
 	index: 2
-	bounds: 105, 152, 16, 16
+	bounds: 163, 1, 16, 16
 break
 	index: 7
-	bounds: 105, 98, 16, 16
+	bounds: 217, 1, 16, 16
 break
 	index: 4
-	bounds: 105, 44, 16, 16
+	bounds: 271, 1, 16, 16
 breaking_block
-	bounds: 105, 62, 16, 16
+	bounds: 253, 1, 16, 16
 brick
-	bounds: 87, 37, 16, 16
-coal_ore_rotatable
-	bounds: 103, 206, 16, 16
-container
-	bounds: 67, 351, 32, 32
-copper
-	bounds: 1, 19, 32, 32
-copper_ore_rotatable
-	bounds: 105, 134, 16, 16
-dirt_rotatable
 	bounds: 1, 1, 16, 16
+coal_ore_rotatable
+	bounds: 109, 1, 16, 16
+container
+	bounds: 367, 69, 32, 32
+copper
+	bounds: 69, 37, 32, 32
+copper_ore_rotatable
+	bounds: 181, 1, 16, 16
+cross
+	bounds: 328, 1, 32, 32
+cross_inverted
+	bounds: 367, 103, 32, 32
+dirt_rotatable
+	bounds: 1, 19, 16, 16
 door
-	bounds: 87, 91, 16, 16
+	bounds: 253, 19, 16, 16
 door_closed
-	bounds: 1, 189, 32, 64
+	bounds: 299, 71, 32, 64
 door_open
-	bounds: 67, 453, 32, 64
+	bounds: 265, 71, 32, 64
 glass
-	bounds: 87, 145, 16, 16
+	bounds: 199, 19, 16, 16
 gold_ore_rotatable
-	bounds: 103, 242, 16, 16
+	bounds: 73, 1, 16, 16
 grass-dirt-east
-	bounds: 103, 188, 16, 16
+	bounds: 127, 1, 16, 16
 grass-dirt-south
-	bounds: 103, 260, 16, 16
+	bounds: 55, 1, 16, 16
 grass-dirt-south-dirt-east
-	bounds: 103, 224, 16, 16
+	bounds: 91, 1, 16, 16
 grass-dirt-south-dirt-west
-	bounds: 105, 170, 16, 16
+	bounds: 145, 1, 16, 16
 grass-dirt-south-dirt-west-dirt-east
-	bounds: 69, 55, 16, 16
+	bounds: 127, 19, 16, 16
 grass-dirt-south-dirt-west-dirt-east-dirt-north
-	bounds: 87, 55, 16, 16
+	bounds: 289, 19, 16, 16
 grass-dirt-west
-	bounds: 105, 116, 16, 16
+	bounds: 199, 1, 16, 16
 grass_rotatable
-	bounds: 87, 73, 16, 16
+	bounds: 271, 19, 16, 16
 hand
-	bounds: 1, 453, 64, 64
+	bounds: 1, 71, 64, 64
 iron_ore_rotatable
-	bounds: 69, 19, 16, 16
+	bounds: 163, 19, 16, 16
 papp
-	bounds: 67, 283, 32, 32
+	bounds: 35, 37, 32, 32
 pickaxe
-	bounds: 1, 255, 64, 64
+	bounds: 199, 71, 64, 64
 player
-	bounds: 101, 455, 18, 30
+	bounds: 362, 3, 18, 30
 player_idle
 	index: 1
-	bounds: 101, 455, 18, 30
+	bounds: 362, 3, 18, 30
 player_idle
 	index: 3
-	bounds: 101, 359, 18, 30
+	bounds: 422, 3, 18, 30
 player_idle
 	index: 2
-	bounds: 101, 327, 18, 30
+	bounds: 442, 3, 18, 30
 player_old
-	bounds: 101, 391, 18, 30
+	bounds: 402, 3, 18, 30
 player_walking
 	index: 2
-	bounds: 101, 487, 19, 30
-player_walking
-	index: 1
-	bounds: 101, 423, 18, 30
+	bounds: 307, 39, 19, 30
 player_walking
 	index: 0
-	bounds: 101, 296, 19, 29
+	bounds: 307, 8, 19, 29
+player_walking
+	index: 1
+	bounds: 382, 3, 18, 30
 sand_rotatable
-	bounds: 87, 19, 16, 16
+	bounds: 19, 1, 16, 16
 sandstone_rotatable
-	bounds: 105, 80, 16, 16
+	bounds: 235, 1, 16, 16
 spell
-	bounds: 1, 387, 64, 64
+	bounds: 67, 71, 64, 64
 stick
-	bounds: 1, 321, 64, 64
+	bounds: 133, 71, 64, 64
 stone_rotatable
-	bounds: 87, 163, 16, 16
+	bounds: 181, 19, 16, 16
 tnt
-	bounds: 69, 91, 16, 16
+	bounds: 91, 19, 16, 16
 torch
-	bounds: 69, 127, 16, 16
+	bounds: 55, 19, 16, 16
 trapiche
-	bounds: 35, 153, 32, 32
+	bounds: 171, 37, 32, 32
 visible_air
-	bounds: 69, 73, 16, 16
+	bounds: 109, 19, 16, 16

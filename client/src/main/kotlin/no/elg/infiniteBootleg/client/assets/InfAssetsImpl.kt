@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.collections.plusAssign
@@ -40,6 +41,8 @@ class InfAssetsImpl : InfAssets {
   override lateinit var skylightDebugTexture: RotatableTextureRegion
   override lateinit var luminanceDebugTexture: RotatableTextureRegion
   override lateinit var visibleAirTexture: RotatableTextureRegion
+  override lateinit var canNotPlaceTexture: TextureRegion
+  override lateinit var canNotBreakTexture: TextureRegion
 
   override lateinit var breakingBlockTextures: Array<RotatableTextureRegion>
   override lateinit var playerIdleTextures: Animation<RotatableTextureRegion>
@@ -100,6 +103,8 @@ class InfAssetsImpl : InfAssets {
     doorOpenTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.DOOR_OPEN_TEXTURE, false)
     doorClosedTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.DOOR_CLOSED_TEXTURE, false)
     visibleAirTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.VISIBLE_AIR_TEXTURE, false)
+    canNotPlaceTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.CROSS_TEXTURE, false).textureRegion
+    canNotBreakTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.CROSS_INVERTED_TEXTURE, false).textureRegion
     pickaxeTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.PICKAXE_TEXTURE, false)
     staffTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.STICK_TEXTURE, false)
     spellTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.SPELL_TEXTURE, false)

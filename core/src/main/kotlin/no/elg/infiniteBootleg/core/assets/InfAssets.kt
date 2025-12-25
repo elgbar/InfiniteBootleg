@@ -34,6 +34,9 @@ interface InfAssets {
   val luminanceDebugTexture: RotatableTextureRegion
   val visibleAirTexture: RotatableTextureRegion
 
+  val canNotPlaceTexture: TextureRegion
+  val canNotBreakTexture: TextureRegion
+
   val breakingBlockTextures: Array<RotatableTextureRegion>
   val playerIdleTextures: Animation<RotatableTextureRegion>
   val playerWalkingTextures: Animation<RotatableTextureRegion>
@@ -59,6 +62,9 @@ interface InfAssets {
     const val DOOR_OPEN_TEXTURE = "door_open"
     const val DOOR_CLOSED_TEXTURE = "door_closed"
     const val VISIBLE_AIR_TEXTURE = "visible_air"
+    const val PAPP_TEXTURE = "papp"
+    const val CROSS_TEXTURE = "cross"
+    const val CROSS_INVERTED_TEXTURE = "cross_inverted"
     const val PICKAXE_TEXTURE = "pickaxe"
     const val STICK_TEXTURE = "stick"
     const val SPELL_TEXTURE = "spell"
