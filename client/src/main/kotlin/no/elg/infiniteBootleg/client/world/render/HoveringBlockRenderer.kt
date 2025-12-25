@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.placeableBlocks
 import no.elg.infiniteBootleg.core.util.withColor
+import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
@@ -50,29 +51,37 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
 
       if (element.itemType == ItemType.TOOL) {
         val breakableBlocks = entity.breakableLocs(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
-        breakableBlocks.forEach { blockWorldLoc ->
-          if (isBreaking) {
-            val rawProgress: Progress = breakingComponent?.breaking?.get(blockWorldLoc)?.progressHandler?.progress ?: run { 0f }
-            if (Main.isServerClient) {
-              ClientMain.inst().serverClient?.let {
-                val serverProgress = it.breakingBlockCache.getIfPresent(blockWorldLoc)
-                if (serverProgress != null && serverProgress > rawProgress) {
-                  // If the server progress is greater than the local progress, do not render the local progress
-                  return@forEach
+        if (breakableBlocks.none()) {
+          renderPlaceableBlock(world, ClientMain.inst().assets.canNotBreakTexture, mouseLocator.mouseBlockCompactLoc)
+        } else {
+          breakableBlocks.forEach { blockWorldLoc ->
+            if (isBreaking) {
+              val rawProgress: Progress = breakingComponent?.breaking?.get(blockWorldLoc)?.progressHandler?.progress ?: run { 0f }
+              if (Main.isServerClient) {
+                ClientMain.inst().serverClient?.let {
+                  val serverProgress = it.breakingBlockCache.getIfPresent(blockWorldLoc)
+                  if (serverProgress != null && serverProgress > rawProgress) {
+                    // If the server progress is greater than the local progress, do not render the local progress
+                    return@forEach
+                  }
                 }
               }
+              renderBreakingOverlay(world, blockWorldLoc, rawProgress)
+            } else {
+              renderPlaceableBlock(world, ClientMain.inst().assets.breakableBlockTexture.textureRegion, blockWorldLoc)
             }
-            renderBreakingOverlay(world, blockWorldLoc, rawProgress)
-          } else {
-            renderPlaceableBlock(world, ClientMain.inst().assets.breakableBlockTexture.textureRegion, blockWorldLoc)
           }
         }
-      } else if (element.itemType == ItemType.BLOCK && !isBreaking) {
+      } else if (element is Material && !isBreaking) {
         val texture = element.textureRegion?.textureRegionOrNull ?: continue
-        entity.placeableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.interactRadius)
-          .forEach { blockWorldLoc ->
+        val placeableBlocks = entity.placeableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.interactRadius, element)
+        if (placeableBlocks.none()) {
+          renderPlaceableBlock(world, ClientMain.inst().assets.canNotPlaceTexture, mouseLocator.mouseBlockCompactLoc)
+        } else {
+          placeableBlocks.forEach { blockWorldLoc ->
             renderPlaceableBlock(world, texture, blockWorldLoc)
           }
+        }
       }
     }
   }
@@ -109,15 +118,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
       it.draw(
         texture,
         // Draw the block aligned to the block grid
-        mouseScreenX - diffFromBlockSizeX,
-        mouseScreenY - diffFromBlockSizeY,
-        0f,
-        0f,
-        Block.BLOCK_TEXTURE_SIZE_F,
-        Block.BLOCK_TEXTURE_SIZE_F,
-        1f,
-        1f,
-        0f
+        mouseScreenX - diffFromBlockSizeX, mouseScreenY - diffFromBlockSizeY, 0f, 0f, Block.BLOCK_TEXTURE_SIZE_F, Block.BLOCK_TEXTURE_SIZE_F, 1f, 1f, 0f
       )
     }
   }
