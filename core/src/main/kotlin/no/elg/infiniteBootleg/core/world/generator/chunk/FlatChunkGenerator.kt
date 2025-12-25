@@ -19,7 +19,7 @@ class FlatChunkGenerator : ChunkGenerator {
         for (localX in 0 until Chunk.CHUNK_SIZE) {
           for (localY in 0 until Chunk.CHUNK_SIZE) {
             val block = Material.Stone.createBlock(world, chunk, localX, localY, tryRevalidateChunk = false)
-            chunk.setBlock(localX, localY, block, updateTexture = false, prioritize = false, sendUpdatePacket = false)
+            chunk.setBlock(localX, localY, block, updateTexture = false, sendUpdatePacket = false)
           }
         }
       }

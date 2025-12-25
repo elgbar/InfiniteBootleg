@@ -62,7 +62,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     CachedChunkRenderer(this),
     EntityRenderer(this),
     HoveringBlockRenderer(this),
-    //debug renderers goes after/above normal renderers
+    // debug renderers goes after/above normal renderers
     AirBlockRenderer(this),
     TopBlockChunkColumnRenderer(this),
     DebugChunkRenderer(this),

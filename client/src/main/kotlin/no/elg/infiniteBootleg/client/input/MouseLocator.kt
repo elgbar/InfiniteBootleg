@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
+import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.WorldCoordFloat
 import no.elg.infiniteBootleg.core.util.compactInt
@@ -31,7 +32,7 @@ class MouseLocator {
   private val mouseWorldInput = Vector2()
   private val screenInputVec = Vector3()
 
-  val mouseBlockCompactLoc: Long get() = compactInt(mouseBlockX, mouseBlockY)
+  val mouseBlockCompactLoc: WorldCompactLoc get() = compactInt(mouseBlockX, mouseBlockY)
 
   /**
    * If the block the mouse is over has changed since the last update

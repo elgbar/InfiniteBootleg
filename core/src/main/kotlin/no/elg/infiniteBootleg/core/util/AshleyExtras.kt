@@ -29,7 +29,7 @@ fun Entity.interactableBlocks(
   centerBlockY: WorldCoord,
   radius: Float,
   interactionRadius: Float
-): Sequence<Long> {
+): Sequence<WorldCompactLoc> {
   val (worldX, worldY) = this.position
   return World.getLocationsWithin(centerBlockX, centerBlockY, radius).asSequence()
     .filter { worldLoc: WorldCompactLoc -> world.isChunkLoaded(worldLoc.worldToChunk()) }
@@ -48,7 +48,7 @@ fun Entity.breakableLocs(
   centerBlockY: WorldCoord,
   radius: Float,
   interactionRadius: Float
-): Sequence<Long> = interactableBlocks(world, centerBlockX, centerBlockY, radius, interactionRadius).filterNot { world.isAirBlock(it, false) }
+): Sequence<WorldCompactLoc> = interactableBlocks(world, centerBlockX, centerBlockY, radius, interactionRadius).filterNot { world.isAirBlock(it, false) }
 
 fun Entity.placeableBlocks(world: World, centerBlockX: WorldCoord, centerBlockY: WorldCoord, interactionRadius: Float): Sequence<Long> =
   interactableBlocks(world, centerBlockX, centerBlockY, 1f, interactionRadius)
