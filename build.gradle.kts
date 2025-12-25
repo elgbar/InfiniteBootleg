@@ -62,7 +62,7 @@ allprojects {
         mapOf(
           "ktlint_function_signature_rule_force_multiline_when_parameter_count_greater_or_equal_than" to "5",
           "ktlint_function_signature_body_expression_wrapping" to "multiline",
-          "ktlint_standard_no-empty-file" to "disabled", //TMP, TODO REMOVE
+          "ktlint_standard_no-empty-file" to "disabled", // TMP, TODO REMOVE
           "ktlint_standard_comment-wrapping" to "disabled"
         )
       )
@@ -117,9 +117,9 @@ subprojects {
       freeCompilerArgs.add("-Xnested-type-aliases")
       // https://kotlinlang.org/docs/whatsnew22.html#new-defaulting-rules-for-use-site-annotation-targets (experimental in 2.2)
       freeCompilerArgs.add("-Xannotation-default-target=param-property")
-      //kotlinlang.org/docs/whatsnew2220.html#support-for-reified-types-in-catch-clauses (experimental in 2.2.20)
+      // kotlinlang.org/docs/whatsnew2220.html#support-for-reified-types-in-catch-clauses (experimental in 2.2.20)
       freeCompilerArgs.add("-Xallow-reified-type-in-catch")
-      //kotlinlang.org/docs/whatsnew2220.html#data-flow-based-exhaustiveness-checks-for-when-expressions (experimental in 2.2.20)
+      // kotlinlang.org/docs/whatsnew2220.html#data-flow-based-exhaustiveness-checks-for-when-expressions (experimental in 2.2.20)
       freeCompilerArgs.add("-Xdata-flow-based-exhaustiveness")
     }
   }
