@@ -93,10 +93,10 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
 
       section {
         toggleableDebugButton(
-          "Render existing air",
-          "Render air blocks, which are normally indistinguishable from non-existing blocks, as cute little clouds",
+          "Render invisible blocks",
+          "Render invisible blocks (e.g., air and doors) as cute little clouds",
           onAnyElementChanged = onAnyElementChanged,
-          property = Settings::renderAirBlocks
+          property = Settings::renderInvisibleBlocks
         )
         toggleableDebugButton(
           "Validate families",

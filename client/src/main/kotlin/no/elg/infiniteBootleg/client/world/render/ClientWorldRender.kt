@@ -19,13 +19,13 @@ import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.screens.StageScreen
 import no.elg.infiniteBootleg.client.util.IBVisWindow
 import no.elg.infiniteBootleg.client.world.managers.interfaces.InterfaceManager
-import no.elg.infiniteBootleg.client.world.render.debug.AirBlockRenderer
 import no.elg.infiniteBootleg.client.world.render.debug.BlockLightDebugRenderer
 import no.elg.infiniteBootleg.client.world.render.debug.ClosestBlockToChunkDebugRenderer
 import no.elg.infiniteBootleg.client.world.render.debug.DebugChunkAddedToChunkRenderer
 import no.elg.infiniteBootleg.client.world.render.debug.DebugChunkRenderer
 import no.elg.infiniteBootleg.client.world.render.debug.EntityMarkerBlockRenderer
 import no.elg.infiniteBootleg.client.world.render.debug.GroundedTouchingArea
+import no.elg.infiniteBootleg.client.world.render.debug.InvisibleBlockRenderer
 import no.elg.infiniteBootleg.client.world.render.debug.LeafDecayDebugRenderer
 import no.elg.infiniteBootleg.client.world.render.debug.TopBlockChangeRenderer
 import no.elg.infiniteBootleg.client.world.render.debug.TopBlockChunkColumnRenderer
@@ -63,7 +63,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     EntityRenderer(this),
     HoveringBlockRenderer(this),
     // debug renderers goes after/above normal renderers
-    AirBlockRenderer(this),
+    InvisibleBlockRenderer(this),
     TopBlockChunkColumnRenderer(this),
     DebugChunkRenderer(this),
     DebugChunkAddedToChunkRenderer(this),

@@ -64,7 +64,7 @@ object Settings {
 
   var renderLeafDecay = false
 
-  var renderAirBlocks = false
+  var renderInvisibleBlocks = false
 
   var renderTopBlockChanges = false
 
