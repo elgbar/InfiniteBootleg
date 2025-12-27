@@ -9,11 +9,14 @@ import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.Transien
 import no.elg.infiniteBootleg.core.world.ecs.creation.createNewPlayer
 import no.elg.infiniteBootleg.core.world.ecs.load
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkGenerator
+import no.elg.infiniteBootleg.core.world.loader.chunk.ChunkLoader
+import no.elg.infiniteBootleg.core.world.loader.chunk.FullChunkLoader
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
 private val logger = KotlinLogging.logger {}
 
 class SinglePlayerWorld(generator: ChunkGenerator, seed: Long, worldName: String, forceTransient: Boolean = false) : ClientWorld(generator, seed, worldName, forceTransient) {
+  override val chunkLoader: ChunkLoader = FullChunkLoader(this, generator)
 
   /**
    * Load singleplayer player from the given [protoWorld] or create a new player if none is found

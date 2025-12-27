@@ -15,6 +15,8 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.EntityTypeCompo
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.core.world.loader.WorldLoader
+import no.elg.infiniteBootleg.core.world.loader.chunk.ChunkLoader
+import no.elg.infiniteBootleg.core.world.loader.chunk.FullChunkLoader
 import no.elg.infiniteBootleg.core.world.ticker.WorldTicker
 import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.Packets
@@ -41,6 +43,7 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
 
   override val render = HeadlessWorldRenderer(this)
   override val worldTicker: WorldTicker = ServerWorldTicker(this, tick = false)
+  override val chunkLoader: ChunkLoader = FullChunkLoader(this, generator)
 
   override fun initialize() {
     super.initialize()

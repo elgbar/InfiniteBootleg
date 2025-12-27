@@ -173,14 +173,25 @@ abstract class World(
     forceTransient
   )
 
-  var chunkReads = AtomicInteger(0)
-  var chunkWrites = AtomicInteger(0)
-
   protected val metadata: WorldMetadata = WorldMetadata(
     name = name,
     seed = seed,
     spawn = compactInt(0, generator.getHeight(0)),
-    isTransient = forceTransient || !Settings.loadWorldFromDisk || Main.isServerClient
+    isTransient = forceTransient || !Settings.loadWorldFromDisk || Main.isServerClient,
+    box2dCoroutineDispatcher = object : CoroutineDispatcher() {
+      override fun dispatch(context: CoroutineContext, block: Runnable) {
+        postBox2dRunnable(block::run)
+      }
+
+      override fun isDispatchNeeded(context: CoroutineContext): Boolean = ThreadType.PHYSICS.isDifferentThreadType()
+    },
+    worldTickCoroutineDispatcher = object : CoroutineDispatcher() {
+      override fun dispatch(context: CoroutineContext, block: Runnable) {
+        postWorldTickerRunnable(block::run)
+      }
+
+      override fun isDispatchNeeded(context: CoroutineContext): Boolean = ThreadType.TICKER.isDifferentThreadType()
+    }
   )
 
   /**
@@ -204,7 +215,7 @@ abstract class World(
 
   open val worldTicker: WorldTicker = CommonWorldTicker(this, false)
   open val worldContainerManager: WorldContainerManager = AuthoritativeWorldContainerManager(engine)
-  open val chunkLoader: ChunkLoader = FullChunkLoader(this, generator)
+  abstract val chunkLoader: ChunkLoader
 
   val chunkColumnsManager: ChunkColumnsManager = ChunkColumnsManager(this)
 
@@ -234,6 +245,16 @@ abstract class World(
   val name: String get() = metadata.name
   val seed: Long get() = metadata.seed
   val worldFolder: FileHandle? get() = metadata.worldFolder
+  val chunkReads get() = metadata.chunkReads
+  val chunkWrites get() = metadata.chunkWrites
+  val box2dCoroutineDispatcher: CoroutineDispatcher get() = metadata.box2dCoroutineDispatcher
+  val worldTickCoroutineDispatcher: CoroutineDispatcher get() = metadata.worldTickCoroutineDispatcher
+
+  final override var isDisposed: Boolean
+    get() = metadata.isDisposed
+    private set(value) {
+      metadata.isDisposed = value
+    }
 
   val tick get() = worldTicker.tickId
 
@@ -1221,22 +1242,6 @@ abstract class World(
   @Suppress("NOTHING_TO_INLINE")
   inline fun postWorldTickerRunnable(noinline runnable: () -> Unit) = worldTicker.postRunnable(runnable)
 
-  val box2dCoroutineDispatcher: CoroutineDispatcher = object : CoroutineDispatcher() {
-    override fun dispatch(context: CoroutineContext, block: Runnable) {
-      postBox2dRunnable(block::run)
-    }
-
-    override fun isDispatchNeeded(context: CoroutineContext): Boolean = ThreadType.PHYSICS.isDifferentThreadType()
-  }
-
-  val worldTickCoroutineDispatcher: CoroutineDispatcher = object : CoroutineDispatcher() {
-    override fun dispatch(context: CoroutineContext, block: Runnable) {
-      postWorldTickerRunnable(block::run)
-    }
-
-    override fun isDispatchNeeded(context: CoroutineContext): Boolean = ThreadType.TICKER.isDifferentThreadType()
-  }
-
   abstract val render: WorldRender
 
   override fun hashCode(): Int = uuid.hashCode()
@@ -1257,8 +1262,8 @@ abstract class World(
   override fun toString(): String = "World $name ($uuid)"
 
   override fun dispose() {
-    logger.info { "Disposing $this" }
-    EventManager.clear()
+    logger.info { "Disposing world $this" }
+    isDisposed = true
 
     val saveTasks = writeChunks { writableChunks ->
       writableChunks.values().map { chunk ->
@@ -1283,6 +1288,7 @@ abstract class World(
       chunkColumnsManager.dispose()
       chunkLoader.dispose()
       worldBody.dispose()
+      EventManager.clear()
       logger.debug { "$this have been fully disposed" }
     }
   }
