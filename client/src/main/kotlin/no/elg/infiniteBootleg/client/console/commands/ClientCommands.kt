@@ -505,7 +505,7 @@ class ClientCommands : CommonCommands() {
     for (entity in entities) {
       val locallyControlledComponent = entity.locallyControlledComponent
       locallyControlledComponent.instantBreak = !locallyControlledComponent.instantBreak
-      logger.info { "Instant break for ${entity.nameOrNull} is now ${(!locallyControlledComponent.instantBreak).toAbled()}" }
+      logger.info { "Instant break for ${entity.nameOrNull} is now ${locallyControlledComponent.instantBreak.toAbled()}" }
     }
   }
 
