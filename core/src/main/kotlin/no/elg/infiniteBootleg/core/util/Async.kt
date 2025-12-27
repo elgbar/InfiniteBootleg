@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.core.world.world.World
 
 const val ASYNC_THREAD_NAME = "async"
 const val EVENTS_THREAD_NAME = "events"
+const val SERVER_THREAD_PREFIX = "netty-server-"
 val singleThreadAsyncDispatcher: AsyncExecutorDispatcher = newSingleThreadAsyncContext(ASYNC_THREAD_NAME)
 val singleThreadEventDispatcher: AsyncExecutorDispatcher = newSingleThreadAsyncContext(EVENTS_THREAD_NAME)
 

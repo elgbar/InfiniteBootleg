@@ -12,8 +12,10 @@ fun createEventLoopGroup(): EventLoopGroup {
   val ioHandlerFactory = try {
     EpollIoHandler.newFactory()
   } catch (_: Throwable) {
+    // Do not log the exception stacktrace, as it will always fail on non-linux systems, its distracting
     logger.trace { "Failed to use EpollIoHandler (not on linux?), falling back to NioIoHandler" }
     NioIoHandler.newFactory()
   }
-  return MultiThreadIoEventLoopGroup(ioHandlerFactory)
+  val ofPlatform = Thread.ofPlatform().name(SERVER_THREAD_PREFIX, 0).daemon().factory()
+  return MultiThreadIoEventLoopGroup(0, ofPlatform, ioHandlerFactory)
 }

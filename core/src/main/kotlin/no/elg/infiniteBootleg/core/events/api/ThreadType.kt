@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.exceptions.CalledFromWrongThreadTypeException
 import no.elg.infiniteBootleg.core.util.ASYNC_THREAD_NAME
 import no.elg.infiniteBootleg.core.util.EVENTS_THREAD_NAME
+import no.elg.infiniteBootleg.core.util.SERVER_THREAD_PREFIX
 import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnBox2d
 import no.elg.infiniteBootleg.core.util.launchOnBox2dSuspendable
@@ -41,7 +42,7 @@ sealed interface ThreadType {
     /**
      * Run the task on this thread if is the render thread, otherwise launch it on the main render thread
      *
-     * @implementationNote There is no thread check here because the main dispatcher already does that internally
+     * @implSpec There is no thread check here because the main dispatcher already does that internally
      **/
     fun launchOrRunSuspended(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend () -> Unit) = launchOnMainSuspendable(start, block = { block() })
   }
@@ -65,7 +66,7 @@ sealed interface ThreadType {
      *
      * @param world The world reference to the physics (box2d) thread
      *
-     * @implementationNote There is no thread check here because the [World.box2dCoroutineDispatcher] already does that internally
+     * @implSpec There is no thread check here because the [World.box2dCoroutineDispatcher] already does that internally
      *
      * @see no.elg.infiniteBootleg.core.world.box2d.WorldBody
      */
@@ -91,7 +92,7 @@ sealed interface ThreadType {
      *
      * @param world The world whose ticker to launch the task on
      *
-     * @implementationNote There is no thread check here because the [World.worldTickCoroutineDispatcher] already does that internally
+     * @implSpec There is no thread check here because the [World.worldTickCoroutineDispatcher] already does that internally
      *
      * @see WorldTicker
      */
@@ -139,6 +140,14 @@ sealed interface ThreadType {
   }
 
   /**
+   * The event was distracted from a server thread. These threads are usually created by Netty for handling network events.
+   * There is no way to launch tasks on this thread type, use [ASYNC] instead.
+   *
+   * Tasks on this thread type should be offloaded to [ASYNC] as quickly as po ssible to not block network events.
+   */
+  data object SERVER : ThreadType
+
+  /**
    * Failed to detect what kind of thread the event was dispatched from.
    *
    * Cannot launch any types of tasks.
@@ -169,6 +178,10 @@ sealed interface ThreadType {
       }
     }
 
+    private fun isThreadNameServer(threadName: String): Boolean =
+      threadName.startsWith(SERVER_THREAD_PREFIX, false) ||
+        threadName.startsWith("multiThreadIoEventLoopGroup", false)
+
     private fun isThreadNameAsync(threadName: String): Boolean =
       ASYNC_THREAD_NAME == threadName ||
         EVENTS_THREAD_NAME == threadName ||
@@ -179,17 +192,17 @@ sealed interface ThreadType {
     fun currentThreadType(): ThreadType {
       val currentThread = Thread.currentThread()
       val threadName = currentThread.name
-      if (currentThread === MainDispatcher.mainThread) {
-        return RENDER
-      } else if (threadName.startsWith(WorldBox2DTicker.BOX2D_TICKER_TAG_PREFIX, false)) {
-        return PHYSICS
-      } else if (threadName.startsWith(WorldTicker.WORLD_TICKER_TAG_PREFIX, false)) {
-        return TICKER
-      } else if (isThreadNameAsync(threadName)) {
-        return ASYNC
+      return when {
+        currentThread === MainDispatcher.mainThread -> RENDER
+        threadName.startsWith(WorldBox2DTicker.BOX2D_TICKER_TAG_PREFIX, false) -> PHYSICS
+        threadName.startsWith(WorldTicker.WORLD_TICKER_TAG_PREFIX, false) -> TICKER
+        isThreadNameAsync(threadName) -> ASYNC
+        isThreadNameServer(threadName) -> SERVER
+        else -> {
+          logger.error { "Dispatched event from unknown thread: $threadName" }
+          UNKNOWN
+        }
       }
-      logger.error { "Dispatched event from unknown thread: $threadName" }
-      return UNKNOWN
     }
   }
 }
