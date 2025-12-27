@@ -23,9 +23,9 @@ interface ChunksInView {
   val size: Int
     get() = horizontalLength * verticalLength
 
-  fun isOutOfView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = chunkX < horizontalStart || chunkX >= horizontalEnd || chunkY < verticalStart || chunkY >= verticalEnd
+  fun isOutOfView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = !isInView(chunkX, chunkY)
 
-  fun isInView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = (chunkX in horizontalStart until horizontalEnd) && (chunkY in verticalStart until verticalEnd)
+  fun isInView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = (chunkX in horizontalStart..<horizontalEnd) && (chunkY in verticalStart..<verticalEnd)
 
   companion object {
     /**
