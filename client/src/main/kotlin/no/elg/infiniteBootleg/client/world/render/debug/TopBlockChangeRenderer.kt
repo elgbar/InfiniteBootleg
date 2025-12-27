@@ -44,7 +44,33 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) :
     val worldOldY: Float,
     val flagSetting: FlagSetting,
     val diff: LongArray
-  )
+  ) {
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (other !is ChunkColumnUpdate) return false
+
+      if (index != other.index) return false
+      if (worldX != other.worldX) return false
+      if (worldNewY != other.worldNewY) return false
+      if (worldOldY != other.worldOldY) return false
+      if (progress != other.progress) return false
+      if (flagSetting != other.flagSetting) return false
+      if (!diff.contentEquals(other.diff)) return false
+
+      return true
+    }
+
+    override fun hashCode(): Int {
+      var result = index.hashCode()
+      result = 31 * result + worldX.hashCode()
+      result = 31 * result + worldNewY.hashCode()
+      result = 31 * result + worldOldY.hashCode()
+      result = 31 * result + progress.hashCode()
+      result = 31 * result + flagSetting.hashCode()
+      result = 31 * result + diff.contentHashCode()
+      return result
+    }
+  }
 
   data class FlagSetting(
     val newColor: Color,
