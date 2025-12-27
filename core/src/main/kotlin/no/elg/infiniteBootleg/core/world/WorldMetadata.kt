@@ -18,7 +18,10 @@ data class WorldMetadata(
   var spawn: Long,
   var isTransient: Boolean,
   var isLoaded: Boolean = false,
-  var isDisposed: Boolean = false,
+  /**
+   * 0 = not disposed, 1 = disposing, 2 = disposed
+   */
+  var worldDisposeState: Int = 0,
   val box2dCoroutineDispatcher: CoroutineDispatcher,
   val worldTickCoroutineDispatcher: CoroutineDispatcher
 ) : Disposable {

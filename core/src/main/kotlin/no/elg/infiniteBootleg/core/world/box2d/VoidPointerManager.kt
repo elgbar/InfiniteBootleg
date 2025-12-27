@@ -77,14 +77,16 @@ class VoidPointerManager {
     return addrToObj.get(id)
   }
 
-  fun clean() {
+  fun clear(checkMemLeak: Boolean = true) {
     synchronized(BOX2D_LOCK) {
-      if (addrToObj.isNotEmpty() || objToAddr.isNotEmpty()) {
-        logger.warn { "Memory leak: still referencing objects" }
-        logger.info { "Memory leak (${addrToObj.size}): Objects: $addrToObj" }
-        logger.info { "Memory leak (${objToAddr.size}): Addresses: $objToAddr" }
-      } else {
-        logger.debug { "No memory leak!" }
+      if (checkMemLeak) {
+        if (addrToObj.isNotEmpty() || objToAddr.isNotEmpty()) {
+          logger.warn { "Memory leak: still referencing objects" }
+          logger.info { "Memory leak (${addrToObj.size}): Objects: $addrToObj" }
+          logger.info { "Memory leak (${objToAddr.size}): Addresses: $objToAddr" }
+        } else {
+          logger.debug { "No memory leak!" }
+        }
       }
       addrToObj.clear()
       objToAddr.clear()

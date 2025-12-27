@@ -23,15 +23,17 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
  */
 class EntityMarkerBlock(override val chunk: Chunk, override val localX: LocalCoord, override val localY: LocalCoord, override val entity: Entity, val hardLink: Boolean) : Block {
 
-  private var removeEntityListener: EntityListener? =
-    EntityRemoveListener { if (it === entity) removeEntityMarker() }
+  private var removeEntityListener: EntityListener? = EntityRemoveListener { if (it === entity) removeEntityMarker() }
 
   init {
     removeEntityListener?.also { world.engine.addEntityListener(it) }
   }
 
   fun removeEntityMarker() {
-    remove(updateTexture = false, sendUpdatePacket = false)
+    // No point in removing EMS when we're disposing the world
+    if (world.isValid) {
+      remove(updateTexture = false, sendUpdatePacket = false)
+    }
   }
 
   override val material: Material get() = entity.material

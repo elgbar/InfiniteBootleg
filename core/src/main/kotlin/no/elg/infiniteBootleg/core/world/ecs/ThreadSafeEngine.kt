@@ -17,7 +17,6 @@ import no.elg.infiniteBootleg.core.util.EntityFlags.INVALID_FLAG
 import no.elg.infiniteBootleg.core.util.EntityFlags.enableFlag
 import no.elg.infiniteBootleg.core.util.isBeingRemoved
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.system.AuthoritativeSystem
-import no.elg.infiniteBootleg.core.world.ecs.components.events.ECSEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.system.api.AuthorizedEntitiesIteratingSystem
 import kotlin.contracts.contract
 
@@ -199,8 +198,5 @@ class ThreadSafeEngine :
 
   override fun dispose() {
     isDisposed = true
-    removeAllEntities()
-    removeAllSystems()
-    ECSEventQueueComponent.entitiesCache.clear()
   }
 }

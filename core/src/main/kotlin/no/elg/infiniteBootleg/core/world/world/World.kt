@@ -19,6 +19,7 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import ktx.async.interval
 import ktx.collections.GdxArray
 import ktx.collections.GdxLongArray
@@ -75,6 +76,7 @@ import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight
 import no.elg.infiniteBootleg.core.world.blocks.EntityMarkerBlock
+import no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager
 import no.elg.infiniteBootleg.core.world.box2d.WorldBody
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.invalid
@@ -141,7 +143,7 @@ private val logger = KotlinLogging.logger {}
 /**
  * Different kind of views
  *
- *  * Chunk view: One unit in chunk view is [no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE] times larger than a unit in
+ *  * Chunk view: One unit in chunk view is [Chunk.Companion.CHUNK_SIZE] times larger than a unit in
  * world view
  *  * World view: One unit in world view is [Block.Companion.BLOCK_TEXTURE_SIZE] times larger than a unit in
  * Box2D view
@@ -161,7 +163,8 @@ abstract class World(
    */
   name: String,
   forceTransient: Boolean = false
-) : CheckableDisposable, Resizable {
+) : CheckableDisposable,
+  Resizable {
 
   constructor(protoWorld: ProtoWorld.World, forceTransient: Boolean = false) : this(
     WorldLoader.generatorFromProto(
@@ -207,7 +210,7 @@ abstract class World(
   /**
    * The entity engine of this world
    *
-   * Adding and removing entities to the engine must be used on [no.elg.infiniteBootleg.core.events.api.ThreadType.PHYSICS] thread. Either within a System or within the [postBox2dRunnable] method.
+   * Adding and removing entities to the engine must be used on [ThreadType.PHYSICS] thread. Either within a System or within the [postBox2dRunnable] method.
    */
   val engine: ThreadSafeEngine = initializeEngine()
 
@@ -226,9 +229,7 @@ abstract class World(
   var spawn: WorldCompactLoc
     get() = metadata.spawn
     set(value) {
-      if (isDisposed) {
-        error("World is disposed")
-      }
+      assertNotDisposed()
       val old = metadata.spawn
       if (value != old) {
         EventManager.dispatchEvent(WorldSpawnUpdatedEvent(this, old, value))
@@ -254,11 +255,10 @@ abstract class World(
   val box2dCoroutineDispatcher: CoroutineDispatcher get() = metadata.box2dCoroutineDispatcher
   val worldTickCoroutineDispatcher: CoroutineDispatcher get() = metadata.worldTickCoroutineDispatcher
 
-  final override var isDisposed: Boolean
-    get() = metadata.isDisposed
-    private set(value) {
-      metadata.isDisposed = value
-    }
+  val hasDisposeBegun: Boolean get() = metadata.worldDisposeState > 0
+  val isValid: Boolean get() = metadata.worldDisposeState == 0 && isLoaded
+  final override val isDisposed: Boolean
+    get() = metadata.worldDisposeState > 1
 
   val tick get() = worldTicker.tickId
 
@@ -332,9 +332,7 @@ abstract class World(
   }
 
   open fun initialize() {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     val worldFolder = worldFolder
     if (!isTransient && worldFolder != null && worldFolder.isDirectory && !WorldLoader.canWriteToWorld(uuid)) {
       if (!Settings.ignoreWorldLock) {
@@ -387,11 +385,9 @@ abstract class World(
 
   fun <R> readChunks(onFailure: () -> R, action: (readableChunks: LongMap<Chunk>) -> R): R {
     contract { callsInPlace(action, InvocationKind.AT_MOST_ONCE) }
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     chunkReads.incrementAndGet()
-    val stamp = chunksLock.tryReadLock(1, TimeUnit.SECONDS)
+    val stamp = chunksLock.tryReadLock(LONG_WAIT_DURATION_CHUNK_LOCK_MS, TimeUnit.MILLISECONDS)
     return if (stamp != 0L) {
       try {
         action(chunks)
@@ -406,9 +402,7 @@ abstract class World(
 
   private fun <R> writeChunks(onFailure: (() -> R?)? = null, action: (writableChunks: LongMap<Chunk>) -> R): R? {
     contract { callsInPlace(action, InvocationKind.AT_MOST_ONCE) }
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     chunkWrites.incrementAndGet()
     val stamp = chunksLock.tryWriteLock(1, TimeUnit.SECONDS)
     return if (stamp != 0L) {
@@ -425,12 +419,10 @@ abstract class World(
 
   fun <R> readChunks(timeoutMillis: Long, onFailure: (() -> R?)? = null, onSuccess: (readableChunks: LongMap<Chunk>) -> R?): R? {
     contract { callsInPlace(onSuccess, InvocationKind.AT_MOST_ONCE) }
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     chunkReads.incrementAndGet()
     // This is a long lock, it must appear to be an atomic operation though
-    var result: R? = null
+    var result: R?
     var acquiredLock = 0L
     val acquireTime = measureTimeMillis {
       acquiredLock = chunksLock.tryReadLock(timeoutMillis, TimeUnit.MILLISECONDS)
@@ -438,12 +430,9 @@ abstract class World(
     if (acquiredLock != 0L) {
       try {
         result = onSuccess(chunks)
-      } catch (_: InterruptedException) {
       } finally {
         chunksLock.unlock(acquiredLock)
       }
-    }
-    if (acquiredLock != 0L) {
       if (acquireTime >= timeoutMillis) {
         logger.debug { "Acquired read lock in $acquireTime ms. Max lock time is $timeoutMillis ms" }
       } else if (acquireTime > timeoutMillis / 2L) {
@@ -477,9 +466,7 @@ abstract class World(
    * @see loadNewWorld
    */
   open fun loadFromProtoWorld(protoWorld: ProtoWorld.World): Boolean {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     if (Settings.debug && Settings.logPersistence) {
       logger.debug { singleLinePrinter.printToString(protoWorld) }
     }
@@ -492,9 +479,7 @@ abstract class World(
   }
 
   open fun save() {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     if (isTransient) {
       return
     }
@@ -535,9 +520,7 @@ abstract class World(
     }
 
   fun getChunkColumn(chunkX: ChunkCoord): ChunkColumn {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     return chunkColumnsManager.getChunkColumn(chunkX)
   }
 
@@ -570,9 +553,7 @@ abstract class World(
    * @return The currently active chunk, might be different from the argument [chunk]
    */
   fun updateChunk(chunk: Chunk, expectedChunk: Chunk? = null, newlyGenerated: Boolean): Chunk {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     require(chunk.isValid) { "Chunk must be valid to be updated" }
     var chunkToDispose: Chunk? = null
     val toReturn: Chunk? = writeChunks { writableChunks ->
@@ -618,9 +599,7 @@ abstract class World(
    * @return A valid chunk
    */
   fun getChunk(chunkLoc: Long, load: Boolean = true): Chunk? {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     val localChunks = threadLocalChunksView.get()
     val localChunk: Chunk? = localChunks.get(chunkLoc)?.get()
     if (localChunk != null) {
@@ -630,8 +609,10 @@ abstract class World(
         localChunks.remove(chunkLoc)
       }
     }
+    // Give a larger timeout when disposing as it might take longer to acquire the lock as all chunks are being saved
+    val timeoutMillis = if (hasDisposeBegun) LONG_WAIT_DURATION_CHUNK_LOCK_MS else TRY_LOCK_CHUNKS_DURATION_MS
     // This is a long lock, it must appear to be an atomic operation though
-    val readChunk = readChunks(TRY_LOCK_CHUNKS_DURATION_MS) { readableChunks -> readableChunks[chunkLoc] }
+    val readChunk = readChunks(timeoutMillis) { readableChunks -> readableChunks[chunkLoc] }
     val finalChunk = if (readChunk == null || readChunk.isDisposed) {
       if (!load) {
         null
@@ -670,9 +651,7 @@ abstract class World(
    * @return The loaded chunk
    */
   protected fun loadChunk(chunkLoc: ChunkCompactLoc): Chunk? {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     if (worldTicker.isPaused) {
       return null
     }
@@ -858,9 +837,7 @@ abstract class World(
     loadChunk: Boolean = true,
     action: (actionChunk: Chunk?) -> R
   ): R {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     val chunkX: ChunkCoord = worldX.worldToChunk()
     val chunkY: ChunkCoord = worldY.worldToChunk()
     val chunk: Chunk? = if (maybeChunk.isValid && compactInt(chunkX, chunkY) == maybeChunk.compactLocation) {
@@ -873,9 +850,7 @@ abstract class World(
   }
 
   inline fun <R> actionOnBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, action: (localX: LocalCoord, localY: LocalCoord, chunk: Chunk?) -> R): R {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     val chunkX: ChunkCoord = worldX.worldToChunk()
     val chunkY: ChunkCoord = worldY.worldToChunk()
     val chunk: Chunk? = getChunk(chunkX, chunkY, loadChunk)
@@ -890,9 +865,7 @@ abstract class World(
     loadChunk: Boolean = true,
     action: (localX: LocalCoord, localY: LocalCoord, chunk: Chunk?) -> Unit
   ): Iterable<Chunk> {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     val chunks = LongMap<Chunk>()
     for ((worldX, worldY) in locations) {
       val chunkLoc = worldXYtoChunkCompactLoc(worldX, worldY)
@@ -908,9 +881,7 @@ abstract class World(
     locs.mapNotNullTo(mutableSetOf()) { (blockX, blockY) -> getBlock(blockX, blockY, loadChunk) }
 
   fun removeBlocks(blocks: Iterable<Block>, prioritize: Boolean = false): Set<Block> {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     val blockChunks = ObjectOpenHashSet<Chunk>()
     val removed = ObjectOpenHashSet<Block>()
     for (block in blocks) {
@@ -929,9 +900,7 @@ abstract class World(
    */
   @JvmName("removeLocs")
   fun removeBlocks(blocks: Iterable<WorldCompactLoc>, giveTo: Entity? = null, prioritize: Boolean = false): Set<Block> {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     val toRemove = ObjectOpenHashSet<Block>()
     actionOnBlocks(blocks) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlocks
@@ -952,9 +921,7 @@ abstract class World(
   }
 
   private fun giveBlocks(blocks: Collection<Block>, giveTo: Entity?) {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     if (blocks.isNotEmpty()) {
       val container = giveTo?.containerOrNull
       if (container != null) {
@@ -971,9 +938,7 @@ abstract class World(
   }
 
   fun getEntities(worldX: WorldCoord, worldY: WorldCoord): GdxArray<Entity> {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     val foundEntities = GdxArray<Entity>(false, 0)
     for (entity in standaloneEntities) {
       val (x, y) = entity.getComponent(PositionComponent::class.java)
@@ -988,9 +953,7 @@ abstract class World(
   }
 
   fun isAnyEntityAt(worldX: WorldCoord, worldY: WorldCoord): Boolean {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     for (entity in standaloneEntities) {
       val (x, y) = entity.positionComponent
       val size = entity.box2d
@@ -1119,9 +1082,7 @@ abstract class World(
   fun containsEntity(entityId: String): Boolean = getEntity(entityId) != null
 
   fun getEntity(entityId: String): Entity? {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     for (entity in validEntities) {
       if (entity.id == entityId) {
         return entity
@@ -1142,16 +1103,12 @@ abstract class World(
    */
   @JvmOverloads
   open fun removeEntity(entity: Entity, reason: DespawnReason = DespawnReason.UNKNOWN_REASON) {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     engine.removeEntity(entity)
   }
 
   fun getPlayer(entityId: String): Entity? {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     for (entity in playersEntities) {
       if (entity.id == entityId) {
         return entity
@@ -1237,9 +1194,7 @@ abstract class World(
     cancel: (GdxArray<Block>?) -> Boolean = NEVER_CANCEL,
     filter: (Block) -> Boolean = ACCEPT_EVERY_BLOCK
   ): GdxArray<Block> {
-    if (isDisposed) {
-      error("World is disposed")
-    }
+    assertNotDisposed()
     val effectiveRaw: Boolean = if (!raw && !includeAir) {
       logger.warn { "Will not include air AND air blocks will be created! (raw: false, includeAir: false)" }
       true
@@ -1312,19 +1267,14 @@ abstract class World(
    * Alias to `WorldBody#postBox2dRunnable`
    */
   fun postBox2dRunnable(runnable: () -> Unit) {
-    if (isDisposed) {
-      return
-    }
+    assertNotDisposed()
     worldBody.postBox2dRunnable(runnable)
   }
 
   fun postWorldTickerRunnable(runnable: () -> Unit) {
-    if (isDisposed) {
-      return
-    }
+    assertNotDisposed()
     worldTicker.postRunnable(runnable)
   }
-
 
   override fun hashCode(): Int = uuid.hashCode()
 
@@ -1343,39 +1293,47 @@ abstract class World(
 
   override fun toString(): String = "World $name ($uuid)"
 
+  fun assertNotDisposed() {
+    check(!isDisposed) { "World $this is disposed" }
+  }
+
   override fun dispose() {
-    if (isDisposed) {
+    if (hasDisposeBegun) {
       return
     }
-    logger.info { "Disposing world $this" }
-    isDisposed = true
+    metadata.worldDisposeState++
 
-    val saveTasks = writeChunks { writableChunks ->
-      writableChunks.values().map { chunk ->
-        chunk.save().thenRun { chunk.dispose() }
-      }.also { writableChunks.clear() }
-    } ?: emptyList()
-    logger.debug { "Waiting for ${saveTasks.size} chunks in $this to be saved" }
-    CompletableFuture.allOf(*saveTasks.toTypedArray()).thenApply { }.orTimeout(1, TimeUnit.MINUTES).exceptionally {
-      logger.error(it) { "Failed to save chunks in $this" }
-    }.get()
-
-    if (!isTransient) {
-      WorldLoader.deleteLockFile(uuid)
-    }
-    metadata.dispose()
     logger.debug { "Switching thread for disposal of $this to physics thread" }
-    ThreadType.PHYSICS.launchOrRun(this) {
-      logger.debug { "Continuing disposal of $this" }
+    val job = ThreadType.PHYSICS.launchOrRunSuspended(this) {
+      val saveTasks = writeChunks { writableChunks ->
+        writableChunks.values().map { chunk ->
+          chunk.save().thenRun { chunk.dispose() }
+        }.also { writableChunks.clear() }
+      } ?: emptyList()
+      logger.debug { "Waiting for ${saveTasks.size} chunks in $this to be saved" }
+      CompletableFuture.allOf(*saveTasks.toTypedArray()).thenApply { }.orTimeout(1, TimeUnit.MINUTES).exceptionally {
+        logger.error(it) { "Failed to save chunks in $this" }
+      }.get()
+
+      logger.debug { "Done saving world before disposal of $this" }
+
+      if (!isTransient) {
+        WorldLoader.deleteLockFile(uuid)
+      }
+      metadata.dispose()
+      VoidPointerManager.globalVPM.clear(checkMemLeak = false)
+      EventManager.clear()
       // Some of these (e.g., engine) must be done from the physics thread
       engine.dispose()
       worldTicker.dispose()
       chunkColumnsManager.dispose()
       chunkLoader.dispose()
       worldBody.dispose()
-      EventManager.clear()
+      metadata.worldDisposeState++
       logger.debug { "$this have been fully disposed" }
     }
+    // Make sure we are fully disposed before returning!
+    runBlocking { job.join() }
   }
 
   companion object {
@@ -1391,6 +1349,7 @@ abstract class World(
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_F: Float = LIGHT_SOURCE_LOOK_BLOCKS + 2f
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW = LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
     const val TRY_LOCK_CHUNKS_DURATION_MS = 20L
+    const val LONG_WAIT_DURATION_CHUNK_LOCK_MS = 1000L
 
     val NEVER_CANCEL: (GdxArray<Block>?) -> Boolean = { false }
     val ACCEPT_EVERY_BLOCK: (Block) -> Boolean = { true }

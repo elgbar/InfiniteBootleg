@@ -157,7 +157,7 @@ open class WorldBody(private val world: World) :
         contactEventManager.postBox2dStepEvents()
       }
 
-      ashleyWatchdog.watch(world.engine) {
+      ashleyWatchdog.watch(world) {
         world.engine.update(BOX2D_TIME_STEP)
       }
 

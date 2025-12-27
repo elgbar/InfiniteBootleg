@@ -24,6 +24,7 @@ import no.elg.infiniteBootleg.core.Settings.handleInvalidBox2dRef
 import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.exceptions.CalledFromWrongThreadTypeException
 import no.elg.infiniteBootleg.core.world.box2d.ALLOW_ALL_QUERY_FILTER
+import no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager
 import no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager.Companion.deferenceVoidPointer
 import no.elg.infiniteBootleg.core.world.box2d.genericSetUserData
 import no.elg.infiniteBootleg.core.world.box2d.use
@@ -128,5 +129,5 @@ fun b2WorldId.overlapAABB(aabb: b2AABB, filter: b2QueryFilter = ALLOW_ALL_QUERY_
 fun b2WorldId.dispose() {
   userData = null
   Box2d.b2DestroyWorld(this)
-  no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager.globalVPM.clean()
+  VoidPointerManager.globalVPM.clear()
 }
