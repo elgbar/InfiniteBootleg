@@ -28,6 +28,7 @@ import no.elg.infiniteBootleg.core.util.Util
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.generateUUIDFromString
 import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
+import no.elg.infiniteBootleg.core.util.launchOnBox2d
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.toCompact
@@ -443,7 +444,7 @@ private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
   val player = ctx.getCurrentPlayer() ?: return
   val staff = player.selectedItem?.element as? Staff ?: return
   val inputEventQueue = player.inputEventQueueOrNull ?: return
-  inputEventQueue.enqueueAsync(InputEvent.SpellCastEvent(staff))
+  ServerMain.inst().serverWorld.launchOnBox2d { inputEventQueue.enqueue(InputEvent.SpellCastEvent(staff)) }
 }
 
 private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, owner: ContainerOwner) {

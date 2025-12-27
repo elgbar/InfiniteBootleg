@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.core.world.ecs.components
 
-import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
@@ -9,6 +8,7 @@ import no.elg.infiniteBootleg.core.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.events.ECSEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.events.InputEvent
+import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
@@ -22,7 +22,7 @@ class InputEventQueueComponent :
 
   companion object : EntityLoadableMapper<InputEventQueueComponent>() {
     var Entity.inputEventQueueOrNull by optionalPropertyFor(mapper)
-    fun Engine.queueInputEventAsync(event: InputEvent, filter: (Entity) -> Boolean = ALLOW_ALL_FILTER) {
+    fun World.queueInputEventAsync(event: InputEvent, filter: (Entity) -> Boolean = ALLOW_ALL_FILTER) {
       queueEventAsync(mapper, event, filter)
     }
 

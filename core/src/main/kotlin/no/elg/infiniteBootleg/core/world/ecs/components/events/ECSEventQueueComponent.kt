@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.util.launchOnBox2d
 import no.elg.infiniteBootleg.core.world.ecs.BASIC_STANDALONE_ENTITY
 import no.elg.infiniteBootleg.core.world.ecs.api.EntitySavableComponent
+import no.elg.infiniteBootleg.core.world.world.World
 import kotlin.reflect.KClass
 
 /**
@@ -36,13 +37,6 @@ abstract class ECSEventQueueComponent<T : ECSEvent> : EntitySavableComponent {
     events.add(event)
   }
 
-  /**
-   * Enqueue an event from any other thread
-   */
-  fun enqueueAsync(event: T) {
-    launchOnBox2d { enqueue(event) }
-  }
-
   fun processEvents(entity: Entity, processEvent: (entity: Entity, event: T) -> Unit) {
     requireCorrectThreadType(ThreadType.PHYSICS) { "Event queue must be accessed on the ${ThreadType.PHYSICS} thread" }
     for (event: T in events) {
@@ -60,12 +54,12 @@ abstract class ECSEventQueueComponent<T : ECSEvent> : EntitySavableComponent {
 
     val entitiesCache = Object2ObjectOpenHashMap<KClass<out ECSEventQueueComponent<out ECSEvent>>, ImmutableArray<Entity>>()
 
-    inline fun <T : ECSEvent, reified Q : ECSEventQueueComponent<T>> Engine.queueEventAsync(
+    inline fun <T : ECSEvent, reified Q : ECSEventQueueComponent<T>> World.queueEventAsync(
       queueMapper: ComponentMapper<out Q>,
       event: T,
       noinline filter: (Entity) -> Boolean = ALLOW_ALL_FILTER
     ) {
-      launchOnBox2d { queueEvent(queueMapper, event, filter) }
+      launchOnBox2d { engine.queueEvent(queueMapper, event, filter) }
     }
 
     inline fun <T : ECSEvent, reified Q : ECSEventQueueComponent<T>> Engine.queueEvent(

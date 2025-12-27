@@ -13,7 +13,7 @@ class ECSInputListener(val world: World) :
   Disposable {
 
   fun handleEvent(inputEvent: InputEvent): Boolean {
-    world.engine.queueInputEventAsync(inputEvent) {
+    world.queueInputEventAsync(inputEvent) {
       ClientMain.inst().shouldNotIgnoreWorldInput()
     }
     return false
