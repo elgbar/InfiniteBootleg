@@ -3,8 +3,6 @@ package no.elg.infiniteBootleg.client.main
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
-import com.badlogic.gdx.Screen
-import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.GL20
 import com.kotcrab.vis.ui.VisUI
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -16,6 +14,7 @@ import no.elg.infiniteBootleg.client.input.MouseLocator
 import no.elg.infiniteBootleg.client.net.ClientPacketSender
 import no.elg.infiniteBootleg.client.screens.AbstractScreen
 import no.elg.infiniteBootleg.client.screens.MainMenuScreen
+import no.elg.infiniteBootleg.client.screens.NoopScreen
 import no.elg.infiniteBootleg.client.screens.ScreenRenderer
 import no.elg.infiniteBootleg.client.screens.WorldScreen
 import no.elg.infiniteBootleg.client.world.chunks.TexturedChunkImpl
@@ -49,7 +48,7 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<InGameC
 
   override val exec: ClientCommands get() = console.exec
 
-  var screen: Screen = ScreenAdapter() // Dummy value
+  var screen: AbstractScreen = NoopScreen() // Dummy value
     set(value) {
       field.hide()
       field = value
