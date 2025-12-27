@@ -61,7 +61,7 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<InGameC
       updateStatus(world)
       console.isVisible = false
 
-      (value as? AbstractScreen)?.tryCreate()
+      value.tryCreate()
       value.show()
       value.resize(Gdx.graphics.width, Gdx.graphics.height)
     }

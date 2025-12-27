@@ -232,7 +232,7 @@ private fun handleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: Pack
   val isFalling = velocity.y < NEG_Y_VEL_TO_BE_FALLING
   val maxMovement = if (isFalling) MAX_BLOCKS_PER_SECOND_FALLING_SQUARED else MAX_BLOCKS_PER_SECOND_SQUARED
   logger.debug {
-    "Player ${player.nameOrNull} moved $deltaPos blocks in $elapsedSeconds seconds (falling straight down? $isFalling). " +
+    "Player ${player.nameOrNull} moved $deltaPos blocks in $elapsedSeconds seconds (falling? $isFalling). " +
       "Max allowed for this timeframe is ${elapsedSeconds * maxMovement})"
   }
 

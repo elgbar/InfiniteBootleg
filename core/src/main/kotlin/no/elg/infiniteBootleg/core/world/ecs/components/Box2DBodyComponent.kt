@@ -89,7 +89,7 @@ class Box2DBodyComponent(body: b2BodyId, val type: ProtoWorld.Entity.Box2D.BodyT
       disposed = true
       val currentBody = internalBody ?: return
       this.internalBody = null
-      val entity = currentBody.userData as Entity // todo userdata
+      val entity = currentBody.userData as Entity
       entity.world.worldBody.destroyBody(currentBody)
     }
   }
