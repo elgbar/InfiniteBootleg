@@ -22,6 +22,7 @@ import no.elg.infiniteBootleg.core.net.serverBoundClientSecretResponse
 import no.elg.infiniteBootleg.core.net.serverBoundEntityRequest
 import no.elg.infiniteBootleg.core.net.serverBoundHeartbeat
 import no.elg.infiniteBootleg.core.net.serverBoundPacketBuilder
+import no.elg.infiniteBootleg.core.util.chunkOffset
 import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.safeWith
@@ -30,6 +31,7 @@ import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.util.worldXYtoChunkCompactLoc
 import no.elg.infiniteBootleg.core.world.ContainerElement.Companion.fromProto
 import no.elg.infiniteBootleg.core.world.Direction
+import no.elg.infiniteBootleg.core.world.blocks.BlockImpl
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
@@ -295,14 +297,23 @@ private fun ServerClient.asyncHandleSpawnEntity(spawnEntity: Packets.SpawnEntity
   when (protoEntity.entityType) {
     PLAYER -> world.load(protoEntity)
     FALLING_BLOCK -> world.engine.createFallingBlockStandaloneEntity(world, protoEntity)
-//    BLOCK -> {
-//      val material = protoEntity.materialOrNull?.fromProto() ?: return
-//      val localPosX = position.x.toInt().chunkOffset()
-//      val localPosY = position.y.toInt().chunkOffset()
-//      material.createBlock(world, chunk, localPosX, localPosY, protoEntity)
-//    }
+    BLOCK -> {
+      val localPosX = position.x.toInt().chunkOffset()
+      val localPosY = position.y.toInt().chunkOffset()
+      world.load(protoEntity, chunk).thenApply { entity ->
+        val block = chunk.getBlock(localPosX, localPosY, false) ?: let {
+          logger.error { "Failed to get a block to place entity at!" }
+          return@thenApply
+        }
+        if (block is BlockImpl) {
+          block.entity = entity
+        } else {
+          logger.error { "Block at position is not a BlockImpl, cannot set entity! Is a ${block.javaClass.simpleName}" }
+        }
+      }
+    }
 
-    else -> logger.error { "Cannot spawn a ${protoEntity.entityType} yet" }
+    else -> logger.error { "Missing implementation! Don't know how to spawn a ${protoEntity.entityType} yet" }
   }
 }
 
