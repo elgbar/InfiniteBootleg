@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.core.world.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.box2d.structs.b2BodyId
+import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.world.box2d.extensions.isAwake
 import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2Vec2
 import no.elg.infiniteBootleg.core.world.box2d.extensions.position
@@ -51,6 +52,7 @@ object WriteBox2DStateSystem : AuthorizedEntitiesIteratingSystem(basicDynamicEnt
    * MUST BE CALLED ON BOX2D THREAD!
    */
   fun updateVelocity(body: b2BodyId, dx: Float, dy: Float) {
+    ThreadType.PHYSICS.requireCorrectThreadType()
     body.velocity = makeB2Vec2(dx, dy)
   }
 
@@ -60,6 +62,7 @@ object WriteBox2DStateSystem : AuthorizedEntitiesIteratingSystem(basicDynamicEnt
    * MUST BE CALLED ON BOX2D THREAD!
    */
   fun updatePosition(body: b2BodyId, x: Float, y: Float) {
+    ThreadType.PHYSICS.requireCorrectThreadType()
     body.position = makeB2Vec2(x, y)
     body.isAwake = true
   }

@@ -147,6 +147,7 @@ sealed interface ThreadType {
 
   fun isCurrentThreadType() = currentThreadType() == this
   fun isDifferentThreadType() = currentThreadType() != this
+  fun requireCorrectThreadType(message: (() -> String)? = null) = requireCorrectThreadType(this, message)
 
   companion object {
 
