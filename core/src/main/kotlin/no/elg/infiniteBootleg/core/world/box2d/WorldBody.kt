@@ -49,12 +49,19 @@ open class WorldBody(private val world: World) :
   Ticking,
   CheckableDisposable {
 
+  private val postRunnable: PostRunnableHandler = PostRunnableHandler()
+
   init {
     synchronized(BOX2D_LOCK) {
       val worldDef = Box2d.b2DefaultWorldDef()
       worldDef.gravity = makeB2Vec2(X_WORLD_GRAVITY, Y_WORLD_GRAVITY)
       worldDef.maximumLinearSpeed(MAX_WORLD_VEL)
       box2dWorld = Box2d.b2CreateWorld(worldDef.asPointer())
+
+      // call directly, we are not setup correctly yet.
+      postRunnable.postRunnable {
+        box2dWorld.userData = world
+      }
 
       if (!box2dWorld.isValid) {
         throw IllegalStateException("Box2D world is not valid")
@@ -76,8 +83,6 @@ open class WorldBody(private val world: World) :
 
   @field:Volatile
   private var disposed = false
-
-  private val postRunnable = PostRunnableHandler()
 
   private val contactEventManager = ContactManager(box2dWorld, world.engine)
 
