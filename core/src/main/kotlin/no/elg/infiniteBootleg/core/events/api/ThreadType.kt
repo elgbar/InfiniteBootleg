@@ -1,8 +1,10 @@
 package no.elg.infiniteBootleg.core.events.api
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
 import ktx.async.MainDispatcher
-import ktx.log.error
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.exceptions.CalledFromWrongThreadTypeException
 import no.elg.infiniteBootleg.core.util.ASYNC_THREAD_NAME
@@ -12,84 +14,141 @@ import no.elg.infiniteBootleg.core.util.launchOnBox2d
 import no.elg.infiniteBootleg.core.util.launchOnBox2dSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnMain
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
+import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnWorldTicker
 import no.elg.infiniteBootleg.core.util.launchOnWorldTickerSuspendable
 import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker
 import no.elg.infiniteBootleg.core.world.ticker.WorldTicker
+import no.elg.infiniteBootleg.core.world.world.World
 
 private val logger = KotlinLogging.logger {}
 
 /**
  * What kind of thread an event originated from.
  */
-enum class ThreadType {
+sealed interface ThreadType {
+
   /**
    * The event was distracted on the render thread
    */
-  RENDER,
+  data object RENDER : ThreadType {
+
+    /**
+     * Run the task on this thread if is the render thread, otherwise launch it on the main render thread
+     */
+    fun launchOrRun(block: () -> Unit) = if (isCurrentThreadType()) block() else launchOnMain(block)
+
+    /**
+     * Run the task on this thread if is the render thread, otherwise launch it on the main render thread
+     *
+     * @implementationNote There is no thread check here because the main dispatcher already does that internally
+     **/
+    fun launchOrRunSuspended(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend () -> Unit) = launchOnMainSuspendable(start, block = { block() })
+  }
 
   /**
    * The event was distracted from the Box2D physics thread and ashley engine
    */
-  PHYSICS,
+  data object PHYSICS : ThreadType {
+
+    /**
+     * Run the task directly if already on the world's physics (box2d) thread, otherwise launch on the world physics thread.
+     *
+     * @param world The world reference to the physics (box2d) thread
+     *
+     * @see no.elg.infiniteBootleg.core.world.box2d.WorldBody
+     */
+    fun launchOrRun(world: World, block: () -> Unit) = if (isCurrentThreadType()) block() else world.launchOnBox2d(block)
+
+    /**
+     * Run the task directly if already on the world's physics (box2d) thread, otherwise launch on the world physics thread.
+     *
+     * @param world The world reference to the physics (box2d) thread
+     *
+     * @implementationNote There is no thread check here because the [World.box2dCoroutineDispatcher] already does that internally
+     *
+     * @see no.elg.infiniteBootleg.core.world.box2d.WorldBody
+     */
+    fun launchOrRunSuspended(world: World, start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend () -> Unit) = world.launchOnBox2dSuspendable(start, block = { block() })
+  }
 
   /**
    * The event was dispatched from a world thread, exactly which world is unknown. These kind of events are triggered by the world ticking
    */
-  TICKER,
+  data object TICKER : ThreadType {
+
+    /**
+     * Run the task directly if already on the world's ticker thread, otherwise launch on the world ticker thread.
+     *
+     * @param world The world whose ticker to launch the task on
+     *
+     * @see WorldTicker
+     */
+    fun launchOrRun(world: World, block: () -> Unit) = if (isCurrentThreadType()) block() else world.launchOnWorldTicker(block)
+
+    /**
+     * Run the task directly if already on the world's ticker thread, otherwise launch on the world ticker thread.
+     *
+     * @param world The world whose ticker to launch the task on
+     *
+     * @implementationNote There is no thread check here because the [World.worldTickCoroutineDispatcher] already does that internally
+     *
+     * @see WorldTicker
+     */
+    fun launchOrRunSuspended(world: World, start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend () -> Unit) =
+      world.launchOnWorldTickerSuspendable(start, block = { block() })
+  }
 
   /**
    * The event was distracted from the async thread, this is the only event which can be considered truly async
    */
-  ASYNC,
+  data object ASYNC : ThreadType {
+
+    /**
+     * Launch a new task on the single async thread, even if already on the async thread
+     * This will make tasks run in sequence as there is only a single async thread with this dispatcher.
+     */
+    fun launch(block: () -> Unit) = launchOnAsyncSuspendable { block() }
+
+    /**
+     * Launch a new task on default single async thread, even if already on the async thread.
+     * This will make tasks run in parallel.
+     *
+     * This option does not have a `launchOrRun` variant as it defeats the purpose of running on multiple threads at once.
+     *
+     * @see Dispatchers.Default
+     */
+    fun launchMultithreaded(block: () -> Unit) = launchOnMultithreadedAsyncSuspendable { block() }
+
+    /**
+     * Launch a new task on the single async thread, even if already on the async thread
+     * This will make tasks run in sequence as there is only a single async thread with this dispatcher.
+     */
+    fun launchSuspended(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) = launchOnAsyncSuspendable(start, block)
+
+    /**
+     * Run the task directly if already on the single async thread, otherwise launch on the single async thread.
+     */
+    fun launchOrRun(block: () -> Unit) = if (isCurrentThreadType()) block() else launch(block)
+
+    /**
+     * Run the task directly if already on the single async thread, otherwise launch on the single async thread.
+     */
+    suspend fun launchOrRunSuspended(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend () -> Unit) =
+      if (isCurrentThreadType()) block() else launchSuspended(start, block = { block() })
+  }
 
   /**
-   * Failed to detect what kind of thread the event was dispatched from
+   * Failed to detect what kind of thread the event was dispatched from.
+   *
+   * Cannot launch any types of tasks.
    */
-  UNKNOWN;
+  data object UNKNOWN : ThreadType
 
-  /**
-   * Run the given [block] on this thread type, if already on the correct thread type the block will be run immediately
-   */
-  fun launchOrRun(block: () -> Unit) = launchOnThreadType(this, block)
-
-  /**
-   * Run the given [block] on this thread type, if already on the correct thread type the block will be run immediately
-   */
-  suspend fun launchSuspendedOrRun(block: suspend () -> Unit) = launchOnThreadType(this, block)
+  fun isCurrentThreadType() = currentThreadType() == this
+  fun isDifferentThreadType() = currentThreadType() != this
 
   companion object {
-
-    suspend fun launchOnThreadType(expected: ThreadType, block: suspend () -> Unit) {
-      if (isCurrentThreadType(expected)) {
-        block()
-      } else {
-        when (expected) {
-          ASYNC -> launchOnAsyncSuspendable(block = { block() })
-          PHYSICS -> launchOnBox2dSuspendable(block = { block() })
-          RENDER -> launchOnMainSuspendable(block = { block() })
-          TICKER -> launchOnWorldTickerSuspendable(block = { block() })
-          UNKNOWN -> error { "Don't know how to do a task on $expected thread type" }
-        }
-      }
-    }
-
-    fun launchOnThreadType(expected: ThreadType, block: () -> Unit) {
-//      contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-      if (isCurrentThreadType(expected)) {
-        block()
-      } else {
-        when (expected) {
-          ASYNC -> launchOnAsyncSuspendable { block() }
-          PHYSICS -> launchOnBox2d(block)
-          RENDER -> launchOnMain(block)
-          TICKER -> launchOnWorldTicker(block)
-          UNKNOWN -> error { "Don't know how to do a task on $expected thread type" }
-        }
-      }
-    }
-
-    fun isCurrentThreadType(expected: ThreadType): Boolean = currentThreadType() == expected
 
     /**
      * Makes sure this code is called from the [expected] thread type.

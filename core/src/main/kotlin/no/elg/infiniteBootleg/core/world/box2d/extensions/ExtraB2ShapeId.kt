@@ -23,6 +23,8 @@ import com.badlogic.gdx.box2d.structs.b2Vec2
 import com.badlogic.gdx.box2d.structs.b2WorldId
 import com.badlogic.gdx.jnigen.runtime.pointer.VoidPointer
 import no.elg.infiniteBootleg.core.Settings.handleInvalidBox2dRef
+import no.elg.infiniteBootleg.core.events.api.ThreadType
+import no.elg.infiniteBootleg.core.exceptions.CalledFromWrongThreadTypeException
 import no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager
 import no.elg.infiniteBootleg.core.world.box2d.genericSetUserData
 
@@ -155,6 +157,11 @@ private var b2ShapeId.userDataPointer: VoidPointer
     }
   }
 
+/**
+ * Get or set the user data associated with this shape.
+ *
+ * @throws CalledFromWrongThreadTypeException if the thread is not [ThreadType.PHYSICS]
+ */
 var b2ShapeId.userData: Any?
   get() = VoidPointerManager.deferenceVoidPointer(userDataPointer)
   set(value) {

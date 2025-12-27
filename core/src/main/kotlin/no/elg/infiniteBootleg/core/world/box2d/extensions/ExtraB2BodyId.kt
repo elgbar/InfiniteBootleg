@@ -20,6 +20,8 @@ import com.badlogic.gdx.box2d.structs.b2Vec2
 import com.badlogic.gdx.box2d.structs.b2WorldId
 import com.badlogic.gdx.jnigen.runtime.pointer.VoidPointer
 import no.elg.infiniteBootleg.core.Settings.handleInvalidBox2dRef
+import no.elg.infiniteBootleg.core.events.api.ThreadType
+import no.elg.infiniteBootleg.core.exceptions.CalledFromWrongThreadTypeException
 
 // ////////////////////
 // Simple properties //
@@ -118,6 +120,11 @@ var b2BodyId.userDataPointer: VoidPointer
     }
   }
 
+/**
+ * Get or set the user data associated with this body.
+ *
+ * @throws CalledFromWrongThreadTypeException if the thread is not [ThreadType.PHYSICS]
+ */
 var b2BodyId.userData: Any?
   get() = no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager.deferenceVoidPointer(userDataPointer)
   set(value) {

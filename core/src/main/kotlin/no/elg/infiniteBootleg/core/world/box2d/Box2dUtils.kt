@@ -7,6 +7,7 @@ import com.badlogic.gdx.jnigen.runtime.closure.Closure
 import com.badlogic.gdx.jnigen.runtime.closure.ClosureObject
 import com.badlogic.gdx.jnigen.runtime.pointer.VoidPointer
 import no.elg.infiniteBootleg.core.events.api.ThreadType
+import no.elg.infiniteBootleg.core.exceptions.CalledFromWrongThreadTypeException
 import no.elg.infiniteBootleg.core.util.Degrees
 import no.elg.infiniteBootleg.core.util.Radians
 import no.elg.infiniteBootleg.core.util.toDegrees
@@ -48,16 +49,17 @@ val VoidPointer.isValid: Boolean get() = !isInvalid
 
 /**
  * Correctly set the user data pointer of a shape. Handles `null` values by removing the pointer from the [VoidPointerManager].
+ *
+ * @throws CalledFromWrongThreadTypeException if the thread is not [ThreadType.PHYSICS]
  */
 internal fun genericSetUserData(value: Any?, property: KMutableProperty0<VoidPointer>) {
-  ThreadType.PHYSICS.launchOrRun {
-    if (value == null) {
-      val pointer = property.get()
-      VoidPointerManager.removePointer(pointer)
-      property.set(VoidPointer.NULL)
-    } else {
-      property.set(VoidPointerManager.createVoidPointer(value))
-    }
+  ThreadType.requireCorrectThreadType(ThreadType.PHYSICS) { "User data pointer must be set on the ${ThreadType.PHYSICS} thread" }
+  if (value == null) {
+    val pointer = property.get()
+    VoidPointerManager.removePointer(pointer)
+    property.set(VoidPointer.NULL)
+  } else {
+    property.set(VoidPointerManager.createVoidPointer(value))
   }
 }
 

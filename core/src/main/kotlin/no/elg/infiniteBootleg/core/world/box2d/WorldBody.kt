@@ -41,7 +41,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 private val logger = KotlinLogging.logger {}
 
 /**
- * Wrapper for [com.badlogic.gdx.physics.box2d.World] for asynchronous reasons
+ * Wrapper for [b2WorldId] for asynchronous reasons
  *
  * @author Elg
  */
@@ -97,7 +97,7 @@ open class WorldBody(private val world: World) :
    * @param def The definition of the body to create
    */
   fun createBody(def: b2BodyDef, callback: (b2BodyId) -> Unit) {
-    ThreadType.PHYSICS.launchOrRun {
+    ThreadType.PHYSICS.launchOrRun(world) {
       createBodyNow(def, callback)
     }
   }
@@ -120,7 +120,7 @@ open class WorldBody(private val world: World) :
    * @param body The body to destroy
    */
   fun destroyBody(body: b2BodyId) {
-    ThreadType.PHYSICS.launchOrRun {
+    ThreadType.PHYSICS.launchOrRun(world) {
       require(body.isValid) { "Cannot destroy body that is not valid" }
       if (!body.isEnabled) {
         logger.error { "Trying to destroy an disabled body, the program will probably crash, userData: ${body.userData}" }
@@ -179,7 +179,7 @@ open class WorldBody(private val world: World) :
     afterAllCallback: (Set<Entity>) -> Unit = {},
     callback: ((b2BodyId, Entity) -> Unit)
   ) {
-    ThreadType.PHYSICS.launchOrRun {
+    ThreadType.PHYSICS.launchOrRun(world) {
       val seenEntities: MutableSet<Entity> = mutableSetOf()
       val aabb = makeAABBDirect(lowerX, lowerY, upperX, upperY)
       box2dWorld.overlapAABB(aabb) { shapeId, _ ->
@@ -205,8 +205,8 @@ open class WorldBody(private val world: World) :
    * @param callback a user implemented callback class.
    * @param lowerX the x coordinate of the lower left corner
    * @param lowerY the y coordinate of the lower left corner
-   * @param upperX the x coordinate of the upper right corner
-   * @param upperY the y coordinate of the upper right corner
+   * @param offsetX How much to offset the AABB in the x direction
+   * @param offsetY How much to offset the AABB in the y direction
    * @param callback Called for each entity found in the query AABB
    */
   fun overlapAABB(
@@ -216,7 +216,7 @@ open class WorldBody(private val world: World) :
     offsetY: Float,
     callback: (b2ShapeId) -> Unit
   ) {
-    ThreadType.PHYSICS.launchOrRun {
+    ThreadType.PHYSICS.launchOrRun(world) {
       val aabb = makeAABBOffset(lowerX, lowerY, offsetX, offsetY)
       box2dWorld.overlapAABB(aabb) { shapeId, _ ->
         callback(shapeId)

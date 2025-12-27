@@ -92,7 +92,7 @@ class ChunkBody(val chunk: Chunk) :
    * Update the box2d fixture of this chunk
    */
   override fun update() {
-    ThreadType.PHYSICS.launchOrRun {
+    ThreadType.PHYSICS.launchOrRun(chunk.world) {
       tryCreateChunkBodyNow(addingBlock = false)
     }
   }
@@ -151,7 +151,7 @@ class ChunkBody(val chunk: Chunk) :
 
   fun removeBlock(block: Block) {
     require(block.chunk.chunkBody === this) { "Block $block does not belong to this chunk body, $this. it belongs to chunk ${block.chunk.chunkBody}" }
-    ThreadType.PHYSICS.launchOrRun {
+    ThreadType.PHYSICS.launchOrRun(chunk.world) {
       updateShape(block, null)
     }
   }
@@ -174,7 +174,7 @@ class ChunkBody(val chunk: Chunk) :
   }
 
   fun addBlocks(blocks: Sequence<Block>, box2dBody: b2BodyId? = null) =
-    ThreadType.PHYSICS.launchOrRun {
+    ThreadType.PHYSICS.launchOrRun(chunk.world) {
       val body = box2dBody ?: tryCreateChunkBodyNow(addingBlock = true) ?: let {
         logger.warn { "Failed to get the chunk body to add the blocks to!" }
         return@launchOrRun
@@ -189,7 +189,7 @@ class ChunkBody(val chunk: Chunk) :
   override fun dispose() {
     if (isDisposed) return
     disposed = true
-    ThreadType.PHYSICS.launchOrRun {
+    ThreadType.PHYSICS.launchOrRun(chunk.world) {
       box2dBody = null
     }
   }

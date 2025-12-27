@@ -18,6 +18,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import ktx.async.interval
 import ktx.collections.GdxArray
@@ -130,6 +131,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.StampedLock
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.system.measureTimeMillis
@@ -1219,6 +1221,22 @@ abstract class World(
   @Suppress("NOTHING_TO_INLINE")
   inline fun postWorldTickerRunnable(noinline runnable: () -> Unit) = worldTicker.postRunnable(runnable)
 
+  val box2dCoroutineDispatcher: CoroutineDispatcher = object : CoroutineDispatcher() {
+    override fun dispatch(context: CoroutineContext, block: Runnable) {
+      postBox2dRunnable(block::run)
+    }
+
+    override fun isDispatchNeeded(context: CoroutineContext): Boolean = ThreadType.PHYSICS.isDifferentThreadType()
+  }
+
+  val worldTickCoroutineDispatcher: CoroutineDispatcher = object : CoroutineDispatcher() {
+    override fun dispatch(context: CoroutineContext, block: Runnable) {
+      postWorldTickerRunnable(block::run)
+    }
+
+    override fun isDispatchNeeded(context: CoroutineContext): Boolean = ThreadType.TICKER.isDifferentThreadType()
+  }
+
   abstract val render: WorldRender
 
   override fun hashCode(): Int = uuid.hashCode()
@@ -1257,7 +1275,7 @@ abstract class World(
     }
     metadata.dispose()
     logger.debug { "Switching thread for disposal of $this to physics thread" }
-    ThreadType.PHYSICS.launchOrRun {
+    ThreadType.PHYSICS.launchOrRun(this) {
       logger.debug { "Continuing disposal of $this" }
       // Some of these (e.g., engine) must be done from the physics thread
       engine.dispose()

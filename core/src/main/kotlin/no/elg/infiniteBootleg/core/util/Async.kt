@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.core.util
 
 import com.badlogic.gdx.Gdx
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -10,8 +9,7 @@ import ktx.async.AsyncExecutorDispatcher
 import ktx.async.KtxAsync
 import ktx.async.MainDispatcher
 import ktx.async.newSingleThreadAsyncContext
-import no.elg.infiniteBootleg.core.main.Main
-import kotlin.coroutines.CoroutineContext
+import no.elg.infiniteBootleg.core.world.world.World
 
 const val ASYNC_THREAD_NAME = "async"
 const val EVENTS_THREAD_NAME = "events"
@@ -41,24 +39,11 @@ fun launchOnEventsSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, bl
 fun launchOnMultithreadedAsyncSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(Dispatchers.Default, start = start, block = block)
 
-fun launchOnWorldTickerSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
-  KtxAsync.launch(WorldTickCoroutineDispatcher, start = start, block = block)
+fun World.launchOnWorldTicker(block: () -> Unit) = launchOnWorldTickerSuspendable(block = { block() })
+fun World.launchOnWorldTickerSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
+  KtxAsync.launch(worldTickCoroutineDispatcher, start = start, block = block)
 
-fun launchOnWorldTicker(block: () -> Unit) = Main.inst().world?.postWorldTickerRunnable(block)
+fun World.launchOnBox2dSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
+  KtxAsync.launch(box2dCoroutineDispatcher, start = start, block = block)
 
-fun launchOnBox2dSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
-  KtxAsync.launch(Box2DTickCoroutineDispatcher, start = start, block = block)
-
-fun launchOnBox2d(block: () -> Unit) = Main.inst().world?.postBox2dRunnable(block) ?: error("No world is currently active, cannot post Box2D runnable.")
-
-object WorldTickCoroutineDispatcher : CoroutineDispatcher() {
-  override fun dispatch(context: CoroutineContext, block: Runnable) {
-    launchOnWorldTicker(block::run)
-  }
-}
-
-object Box2DTickCoroutineDispatcher : CoroutineDispatcher() {
-  override fun dispatch(context: CoroutineContext, block: Runnable) {
-    launchOnBox2d(block::run)
-  }
-}
+fun World.launchOnBox2d(block: () -> Unit) = postBox2dRunnable(block)

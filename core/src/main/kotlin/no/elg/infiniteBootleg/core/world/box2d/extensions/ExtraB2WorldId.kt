@@ -21,10 +21,13 @@ import com.badlogic.gdx.box2d.structs.b2WorldId
 import com.badlogic.gdx.jnigen.runtime.closure.ClosureObject
 import com.badlogic.gdx.jnigen.runtime.pointer.VoidPointer
 import no.elg.infiniteBootleg.core.Settings.handleInvalidBox2dRef
+import no.elg.infiniteBootleg.core.events.api.ThreadType
+import no.elg.infiniteBootleg.core.exceptions.CalledFromWrongThreadTypeException
 import no.elg.infiniteBootleg.core.world.box2d.ALLOW_ALL_QUERY_FILTER
 import no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager.Companion.deferenceVoidPointer
 import no.elg.infiniteBootleg.core.world.box2d.genericSetUserData
 import no.elg.infiniteBootleg.core.world.box2d.use
+import no.elg.infiniteBootleg.core.world.world.World
 
 var b2WorldId.sleepingEnabled: Boolean
   get() = Box2d.b2World_IsSleepingEnabled(this)
@@ -81,8 +84,13 @@ var b2WorldId.userDataPointer: VoidPointer
     }
   }
 
-var b2WorldId.userData: Any?
-  get() = deferenceVoidPointer(userDataPointer)
+/**
+ * The world associated with this box2d world
+ *
+ * @throws CalledFromWrongThreadTypeException if the thread is not [ThreadType.PHYSICS]
+ */
+var b2WorldId.userData: World?
+  get() = deferenceVoidPointer(userDataPointer) as World
   set(value) {
     genericSetUserData(value, this::userDataPointer)
   }

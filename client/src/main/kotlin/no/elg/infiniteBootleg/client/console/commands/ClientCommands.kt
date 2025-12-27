@@ -664,7 +664,7 @@ class ClientCommands : CommonCommands() {
       return entityName ?: chunkBody ?: block ?: userdata?.toString() ?: "null"
     }
 
-    ThreadType.PHYSICS.launchOrRun {
+    ThreadType.PHYSICS.launchOrRun(world) {
       world.worldBody.overlapAABB(worldX - 0.5f, worldY - 0.5f, 1f, 1f) { shapeId ->
         if (shapeId.isValid) {
           logger.info { stringifyCompactLoc(shapeId.body.position) }
