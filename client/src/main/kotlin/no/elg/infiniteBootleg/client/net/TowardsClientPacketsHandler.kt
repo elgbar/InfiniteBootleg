@@ -175,7 +175,6 @@ private fun ServerClient.handleSecretExchange(secretExchange: SecretExchange) {
   val id = secretExchange.ref.id
   if (id.isEmpty() || secretExchange.secret.isEmpty()) {
     ctx.fatal("Entity id nor secret can be empty")
-    return
   }
   val sharedInformation = SharedInformation(id, secretExchange.secret)
   this.sharedInformation = sharedInformation
@@ -187,12 +186,10 @@ private fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus) {
   when (loginStatus.status) {
     ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN -> {
       ctx.fatal("You are already logged in!")
-      return
     }
 
     ServerLoginStatus.ServerStatus.FULL_SERVER -> {
       ctx.fatal("Server is full")
-      return
     }
 
     ServerLoginStatus.ServerStatus.PROCEED_LOGIN -> {
@@ -204,25 +201,19 @@ private fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus) {
 
     ServerLoginStatus.ServerStatus.UNRECOGNIZED, null -> {
       ctx.fatal("Unrecognized server status")
-      return
     }
   }
 }
 
 private fun ServerClient.handleLoginSuccess() {
   val world = clientWorld
-  val protoPlayerEntity = protoEntity
-  if (protoPlayerEntity == null) {
-    ctx.fatal("Invalid player client side: Did not a receive an entity to control")
-    return
-  }
+  val protoPlayerEntity = protoEntity ?: ctx.fatal("Invalid player client side: Did not a receive an entity to control")
   val futurePlayer: CompletableFuture<Entity> = world.load(protoPlayerEntity).orTimeout(5, TimeUnit.SECONDS)
   ConnectingScreen.info = "Login successful! Waiting for player to be spawned..."
 
   futurePlayer.whenCompleteAsync { player, e ->
     if (e != null) {
       ctx.fatal("Invalid player client side ${e::class.simpleName}: ${e.message}")
-      return@whenCompleteAsync
     } else {
       player.box2d.enableGravity()
       logger.debug { "Server sent the entity to control" }
@@ -276,7 +267,7 @@ private fun ServerClient.asyncHandleBlockUpdate(blockUpdate: UpdateBlock) {
   val worldY = blockUpdate.pos.y
   if (world.isChunkLoaded(worldXYtoChunkCompactLoc(worldX, worldY))) {
     val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
-    world.setBlock(worldX, worldY, protoBlock, updateTexture = true, prioritize = false, sendUpdatePacket = false)
+    world.setBlock(worldX, worldY, protoBlock, sendUpdatePacket = false)
   } else {
     logger.warn { "Sever sent block update to unloaded client chunk" }
     sendServerBoundPacket(serverBoundChunkRequestPacket(blockUpdate.pos))
@@ -341,11 +332,7 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
     return
   }
 
-  val id = moveEntity.ref.id
-  if (id == null) {
-    ctx.fatal("Entity ref cannot be parsed")
-    return
-  }
+  val id = moveEntity.ref.id ?: ctx.fatal("Entity ref cannot be parsed")
   val entity = world.getEntity(id)
   if (entity == null) {
     logger.warn { "Cannot move unknown entity '$id'" }
@@ -367,6 +354,8 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
   } else {
     entity.teleport(serverPos)
     entity.setVelocity(moveEntity.velocity)
+
+    // post directly, we'll never be on the physics thread here
     world.postBox2dRunnable {
       val body = entity.box2dBody
       WriteBox2DStateSystem.updatePosition(body, serverPos.x, serverPos.y)
