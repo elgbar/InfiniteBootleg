@@ -140,7 +140,7 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<InGameC
     Gdx.gl.glClearColor(CLEAR_COLOR_R, CLEAR_COLOR_G, CLEAR_COLOR_B, CLEAR_COLOR_A)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
     world?.let(mouseLocator::update)
-    watchdog.watch {
+    watchdog.watch(screen) {
       screen.render(Gdx.graphics.deltaTime)
     }
   }

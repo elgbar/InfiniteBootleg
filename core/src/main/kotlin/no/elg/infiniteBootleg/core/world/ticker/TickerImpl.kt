@@ -8,10 +8,10 @@ import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.util.FailureWatchdog
 
 /**
- * A helper class that calls a [Ticking]'s [Ticking.tick] and [Ticking.tickRare] method periodically. By default it will call it every [msDelayBetweenTicks].
+ * A helper class that calls a [Ticking]'s [Ticking.tick] and [Ticking.tickRare] method periodically. By default, it will call it every [msDelayBetweenTicks].
  *
  *
- * The ticker will not update the if [Graphics.getFrameId] is the same as it was last
+ * The ticker will not update the if [com.badlogic.gdx.Graphics.getFrameId] is the same as it was last
  * tick (as can be caused by fps lag), and will warn when too many ticks have been skipped.
  *
  * @param ticking The ticker to tick
@@ -93,7 +93,7 @@ class TickerImpl(private val ticking: Ticking, name: String, start: Boolean, tps
 
   override fun run() {
     val start = TimeUtils.nanoTime()
-    watchdog.watch {
+    watchdog.watch(this) {
       ticking.tick()
       if (tickId % tickRareRate == 0L) {
         ticking.tickRare()
