@@ -85,11 +85,12 @@ class EntityMarkerBlock(override val chunk: Chunk, override val localX: LocalCoo
       localX: LocalCoord,
       localY: LocalCoord,
       entity: Entity,
-      hardLink: Boolean
+      hardLink: Boolean,
+      sendUpdatePacket: Boolean
     ): EntityMarkerBlock? {
       require(chunk.valid()) { "Block must be in a valid chunk" }
       return EntityMarkerBlock(chunk, localX, localY, entity, hardLink).let { emb ->
-        val replacedBlock = chunk.setBlock(localX, localY, emb, sendUpdatePacket = false)
+        val replacedBlock = chunk.setBlock(localX, localY, emb, sendUpdatePacket = sendUpdatePacket)
         replacedBlock as? EntityMarkerBlock?
       }
     }

@@ -53,10 +53,11 @@ object UpdateGridBlockSystem : IteratingSystem(standaloneGridOccupyingBlocksFami
         continue
       }
       if ((newOccupation !is EntityMarkerBlock || newOccupation.entity != entity) && newOccupation.material == Material.Air) {
-        val occupiedBlock = EntityMarkerBlock.replaceBlock(validChunk, newOccupation.localX, newOccupation.localY, entity, occupyingBlocksComponent.hardLink) ?: run {
-          logger.error { "Failed to replace marker block ${stringifyCompactLocWithChunk(newOccupation)}" }
-          continue
-        }
+        val occupiedBlock =
+          EntityMarkerBlock.replaceBlock(validChunk, newOccupation.localX, newOccupation.localY, entity, occupyingBlocksComponent.hardLink, sendUpdatePacket = false) ?: run {
+            logger.error { "Failed to replace marker block ${stringifyCompactLocWithChunk(newOccupation)}" }
+            continue
+          }
         occupyingBlocksComponent.occupying += occupiedBlock
       }
     }

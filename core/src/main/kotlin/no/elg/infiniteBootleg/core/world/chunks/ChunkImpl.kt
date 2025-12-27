@@ -29,7 +29,6 @@ import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.dst2
 import no.elg.infiniteBootleg.core.util.isAir
 import no.elg.infiniteBootleg.core.util.isInsideChunk
-import no.elg.infiniteBootleg.core.util.isMarkerBlock
 import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.singleLinePrinter
@@ -98,6 +97,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
    * If the chunk is still being initialized, meaning not all blocks are in [blocks]
    */
   protected var initializing: Boolean = true
+  protected val initialized: Boolean get() = !initializing
 
   override var isAllAir: Boolean = false
     get() {
@@ -202,6 +202,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
       require(block.localY == localY) { "The local coordinate of the block does not match the given localY. Block localY: ${block.localY} != localY $localY" }
       require(block.chunk === this) { "The chunk of the block is not this chunk. block chunk: ${block.chunk}, this: $this" }
     }
+    // Are both blocks null or air?
     val bothAirish: Boolean
     val currBlock = synchronized(blocks) {
       val currBlock = getRawBlock(localX, localY)
@@ -234,23 +235,26 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
       launchOnAsyncSuspendable { chunkColumn.updateTopBlock(localX, chunkY.chunkToWorld(localY)) }
     }
 
-    if (!initializing && !bothAirish) {
+    if (initialized && !bothAirish) {
+      // Only dispatch events when there is a real change and the chunk is initialized
       EventManager.dispatchEventAsync(BlockChangedEvent(currBlock, block))
-    }
-    if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
-      if (Settings.renderLight) {
-        EventManager.dispatchEventAsync(ChunkLightChangedEvent(compactLocation, localX, localY))
+
+      if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
+        if (Settings.renderLight) {
+          EventManager.dispatchEventAsync(ChunkLightChangedEvent(compactLocation, localX, localY))
+        }
+      }
+
+      if (sendUpdatePacket && Main.isMultiplayer) {
+        val worldX = chunkX.chunkToWorld(localX)
+        val worldY = chunkY.chunkToWorld(localY)
+        Main.inst().packetSender.sendDuplexPacketInView(
+          ifIsServer = { clientBoundBlockUpdate(worldX, worldY, block) to compactLocation },
+          ifIsClient = { serverBoundBlockUpdate(worldX, worldY, block) }
+        )
       }
     }
     currBlock?.dispose()
-    if (Main.isMultiplayer && sendUpdatePacket && isValid && !bothAirish && !block.isMarkerBlock()) {
-      val worldX = chunkX.chunkToWorld(localX)
-      val worldY = chunkY.chunkToWorld(localY)
-      Main.inst().packetSender.sendDuplexPacketInView(
-        ifIsServer = { clientBoundBlockUpdate(worldX, worldY, block) to compactLocation },
-        ifIsClient = { serverBoundBlockUpdate(worldX, worldY, block) }
-      )
-    }
     return block
   }
 
@@ -323,7 +327,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
   override val isNotDisposed: Boolean
     get() = !disposed
   override val isValid: Boolean
-    get() = !disposed && !initializing
+    get() = !disposed && initialized
   override val isInvalid: Boolean
     get() = disposed || initializing
 
@@ -421,7 +425,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
    */
   @Synchronized
   fun finishLoading() {
-    if (!initializing) {
+    if (initialized) {
       return
     }
     initializing = false

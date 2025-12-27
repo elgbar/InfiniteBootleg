@@ -100,7 +100,7 @@ class FallingBlockSystem :
           entity.reactToEventTag = true // If we failed to fall, we want it to fall in the future
           return@createFallingBlockStandaloneEntity false
         }
-        val replacedBlock = EntityMarkerBlock.replaceBlock(validChunk, block.localX, block.localY, fallingEntity, false) ?: run {
+        val replacedBlock = EntityMarkerBlock.replaceBlock(validChunk, block.localX, block.localY, fallingEntity, false, sendUpdatePacket = true) ?: run {
           logger.error { "Failed to get replace block ${stringifyCompactLocWithChunk(block)} with EMB" }
           entity.reactToEventTag = true
           return@createFallingBlockStandaloneEntity false
