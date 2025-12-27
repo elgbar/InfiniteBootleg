@@ -1,6 +1,10 @@
 package no.elg.infiniteBootleg.core.world.ticker
 
-interface Ticker : PostRunnable {
+import no.elg.infiniteBootleg.core.util.CheckableDisposable
+
+interface Ticker :
+  PostRunnable,
+  CheckableDisposable {
   /** The ticks per seconds this ticker is using. Defaults to [TickerImpl.DEFAULT_TICKS_PER_SECOND]  */
   val tps: Long
   val secondsDelayBetweenTicks: Float
@@ -34,9 +38,6 @@ interface Ticker : PostRunnable {
   val isStarted: Boolean
 
   fun start()
-
-  /** Stop this ticker, the tickers thread will not be called anymore  */
-  fun stop()
 
   /**
    * Temporarily stops this ticker, can be resumed with [resume]

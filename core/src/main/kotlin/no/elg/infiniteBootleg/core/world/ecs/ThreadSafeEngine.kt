@@ -8,11 +8,11 @@ import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.core.NonPooledComponentOperationHandler
 import com.badlogic.ashley.utils.ImmutableArray
-import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.ObjectMap
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.main.Main
+import no.elg.infiniteBootleg.core.util.CheckableDisposable
 import no.elg.infiniteBootleg.core.util.EntityFlags.INVALID_FLAG
 import no.elg.infiniteBootleg.core.util.EntityFlags.enableFlag
 import no.elg.infiniteBootleg.core.util.isBeingRemoved
@@ -25,7 +25,7 @@ private val logger = KotlinLogging.logger {}
 
 class ThreadSafeEngine :
   Engine(),
-  Disposable {
+  CheckableDisposable {
 
   private val declaredField = Engine::class.java.getDeclaredField("updating").also { it.isAccessible = true }
   val isUpdating: Boolean get() = declaredField.getBoolean(this)
@@ -194,7 +194,11 @@ class ThreadSafeEngine :
     return synchronized(engineLock, block)
   }
 
+  override var isDisposed: Boolean = false
+    private set
+
   override fun dispose() {
+    isDisposed = true
     removeAllEntities()
     removeAllSystems()
     ECSEventQueueComponent.entitiesCache.clear()

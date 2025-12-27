@@ -24,8 +24,7 @@ import no.elg.infiniteBootleg.core.util.FailureWatchdog
  */
 class TickerImpl(private val ticking: Ticking, name: String, start: Boolean, tps: Long, nagDelay: Double) :
   Ticker,
-  Runnable,
-  PostRunnable {
+  Runnable {
   /**
    * How many ticks between each rare update. Currently, each rare tick is the same as one second
    */
@@ -137,11 +136,6 @@ class TickerImpl(private val ticking: Ticking, name: String, start: Boolean, tps
     tickerThread.start()
   }
 
-  /** Stop this ticker, the tickers thread will not be called anymore  */
-  override fun stop() {
-    tickerThread.stopThread()
-  }
-
   /**
    * Temporarily stops this ticker, can be resumed with [resume]
    *
@@ -164,6 +158,13 @@ class TickerImpl(private val ticking: Ticking, name: String, start: Boolean, tps
 
   override val isPaused: Boolean
     get() = isStarted && tickerThread.isPaused
+  override var isDisposed: Boolean = false
+    private set
+
+  override fun dispose() {
+    isDisposed = true
+    tickerThread.stopThread()
+  }
 
   companion object {
     const val DEFAULT_TICKS_PER_SECOND = 30L

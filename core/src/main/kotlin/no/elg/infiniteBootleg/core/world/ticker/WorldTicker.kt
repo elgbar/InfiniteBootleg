@@ -62,9 +62,9 @@ class CommonWorldTicker(world: World, tick: Boolean) : WorldTicker {
 
   override fun postRunnable(runnable: () -> Unit) = ticker.postRunnable(runnable)
 
-  override fun stop() {
-    ticker.stop()
-    box2DTicker.ticker.stop()
+  override fun dispose() {
+    ticker.dispose()
+    box2DTicker.ticker.dispose()
   }
 
   override val tps: Long get() = ticker.tps
@@ -74,4 +74,5 @@ class CommonWorldTicker(world: World, tick: Boolean) : WorldTicker {
   override val tpsDelta: Long get() = ticker.tpsDelta
   override val isPaused: Boolean get() = ticker.isPaused
   override val isStarted: Boolean get() = ticker.isStarted
+  override val isDisposed: Boolean get() = ticker.isDisposed
 }

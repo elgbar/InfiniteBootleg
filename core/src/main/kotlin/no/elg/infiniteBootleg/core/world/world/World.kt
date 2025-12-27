@@ -1279,7 +1279,7 @@ abstract class World(
       logger.debug { "Continuing disposal of $this" }
       // Some of these (e.g., engine) must be done from the physics thread
       engine.dispose()
-      worldTicker.stop()
+      worldTicker.dispose()
       chunkColumnsManager.dispose()
       chunkLoader.dispose()
       worldBody.dispose()

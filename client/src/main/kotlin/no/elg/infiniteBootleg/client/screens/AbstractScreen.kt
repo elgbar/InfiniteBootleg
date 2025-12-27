@@ -5,14 +5,18 @@ import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import no.elg.infiniteBootleg.core.util.CheckableDisposable
 
 /** @author Elg */
-abstract class AbstractScreen(private val yDown: Boolean = true) : ScreenAdapter() {
+abstract class AbstractScreen(private val yDown: Boolean = true) :
+  ScreenAdapter(),
+  CheckableDisposable {
 
   val batch: SpriteBatch by lazy { SpriteBatch() }
   private val lineRenderer: ShapeRenderer by lazy { ShapeRenderer() }
 
-  private var isDisposed = false
+  override var isDisposed = false
+    protected set
   private var hasBeenShown = false
 
   val camera: OrthographicCamera by lazy {
