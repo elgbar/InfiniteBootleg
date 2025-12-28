@@ -275,22 +275,19 @@ abstract class World(
     val world: World = this
 
     EventManager.oneShotListener<InitialChunksOfWorldLoadedEvent> {
-      if (Main.isAuthoritative) {
-        // Add a delay to make sure the light is calculated
-        launchOnAsyncSuspendable {
-          delay(200L)
-          EventManager.dispatchEvent(WorldLoadedEvent(world))
-        }
-      }
-    }
-
-    EventManager.oneShotListener<WorldLoadedEvent> {
       launchOnMainSuspendable {
         logger.debug { "Handling InitialChunksOfWorldLoadedEvent, adding systems to the engine" }
         addSystems()
         metadata.isLoaded = true
         readChunks { readableChunks ->
           readableChunks.values().forEach(Chunk::updateAllBlockLights)
+        }
+        if (Main.isAuthoritative) {
+          // Add a delay to make sure the light is calculated
+          launchOnAsyncSuspendable {
+            delay(200L)
+            EventManager.dispatchEvent(WorldLoadedEvent(world))
+          }
         }
       }
     }
