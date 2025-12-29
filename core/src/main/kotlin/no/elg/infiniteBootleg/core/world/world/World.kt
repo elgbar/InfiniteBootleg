@@ -597,8 +597,9 @@ abstract class World(
    */
   fun getChunk(chunkLoc: Long, load: Boolean = true): Chunk? {
     assertNotDisposed()
-    val localChunks = threadLocalChunksView.get()
-    val localChunk: Chunk? = localChunks.get(chunkLoc)?.get()
+    // Disallow async threads from using thread local cache
+    val localChunks: Long2ObjectMap<WeakReference<Chunk>>? = if (ThreadType.ASYNC.isCurrentThreadType()) null else threadLocalChunksView.get()
+    val localChunk: Chunk? = localChunks?.get(chunkLoc)?.get()
     if (localChunk != null) {
       if (localChunk.isValid) {
         return localChunk
@@ -621,7 +622,7 @@ abstract class World(
     }
     return if (finalChunk.valid()) {
       CHUNK_ADDED_THREAD_LOCAL.incrementAndGet()
-      localChunks.put(chunkLoc, WeakReference(finalChunk))
+      localChunks?.put(chunkLoc, WeakReference(finalChunk))
       finalChunk
     } else {
       null
