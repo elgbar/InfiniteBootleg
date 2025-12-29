@@ -186,6 +186,15 @@ class ChunkBody(val chunk: Chunk) :
 
   fun addBlock(block: Block, box2dBody: b2BodyId? = null) = addBlocks(sequenceOf(block), box2dBody)
 
+  fun replaceBlock(oldBlock: Block?, newBlock: Block?) {
+    if (oldBlock != null || newBlock != null) {
+      ThreadType.PHYSICS.launchOrRun(chunk.world) {
+        oldBlock?.let(::removeBlock)
+        newBlock?.let(::addBlock)
+      }
+    }
+  }
+
   override fun dispose() {
     if (isDisposed) return
     disposed = true

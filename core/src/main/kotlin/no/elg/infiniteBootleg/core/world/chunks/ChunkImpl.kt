@@ -202,17 +202,16 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
       require(block.localY == localY) { "The local coordinate of the block does not match the given localY. Block localY: ${block.localY} != localY $localY" }
       require(block.chunk === this) { "The chunk of the block is not this chunk. block chunk: ${block.chunk}, this: $this" }
     }
-    // Are both blocks null or air?
-    val bothAirish: Boolean
+    // Should we notify the rest of the system about this change
+    val isRealChange: Boolean
     val currBlock = synchronized(blocks) {
       val currBlock = getRawBlock(localX, localY)
       if (currBlock == block) {
         block?.dispose()
         return currBlock
       }
-      // accounts for both being null also ofc
-      bothAirish = areBothAirish(currBlock, block)
-      if (bothAirish && currBlock != null && (block == null || block::class == currBlock::class)) {
+      isRealChange = !areBothAirish(currBlock, block)
+      if (!isRealChange && currBlock != null && (block == null || block::class == currBlock::class)) {
         // Ok to return here, an air block exists here and the new block is also air (or null)
         block?.dispose()
         return currBlock
@@ -220,38 +219,34 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
       blocks[localX][localY] = block
       currBlock
     }
-    modified = true
-    if (updateTexture) {
-      dirty(prioritize)
-    }
-    if (!bothAirish) {
+    if (isRealChange) {
+      modified = true
+      if (updateTexture) {
+        dirty(prioritize)
+      }
       // Note chunkBody must be called after the body is inserted into the chunk
-      if (currBlock != null) {
-        chunkBody.removeBlock(currBlock)
-      }
-      if (block != null) {
-        chunkBody.addBlock(block)
-      }
-      launchOnAsyncSuspendable { chunkColumn.updateTopBlock(localX, chunkY.chunkToWorld(localY)) }
-    }
+      chunkBody.replaceBlock(currBlock, block)
 
-    if (initialized && !bothAirish) {
-      // Only dispatch events when there is a real change and the chunk is initialized
-      EventManager.dispatchEventAsync(BlockChangedEvent(currBlock, block))
+      if (initialized) {
+        launchOnAsyncSuspendable { chunkColumn.updateTopBlock(localX, chunkY.chunkToWorld(localY)) }
 
-      if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
-        if (Settings.renderLight) {
-          EventManager.dispatchEventAsync(ChunkLightChangedEvent(compactLocation, localX, localY))
+        // Only dispatch events when there is a real change and the chunk is initialized
+        EventManager.dispatchEventAsync(BlockChangedEvent(currBlock, block))
+
+        if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
+          if (Settings.renderLight) {
+            EventManager.dispatchEventAsync(ChunkLightChangedEvent(compactLocation, localX, localY))
+          }
         }
-      }
 
-      if (sendUpdatePacket && Main.isMultiplayer) {
-        val worldX = chunkX.chunkToWorld(localX)
-        val worldY = chunkY.chunkToWorld(localY)
-        Main.inst().packetSender.sendDuplexPacketInView(
-          ifIsServer = { clientBoundBlockUpdate(worldX, worldY, block) to compactLocation },
-          ifIsClient = { serverBoundBlockUpdate(worldX, worldY, block) }
-        )
+        if (sendUpdatePacket && Main.isMultiplayer) {
+          val worldX = chunkX.chunkToWorld(localX)
+          val worldY = chunkY.chunkToWorld(localY)
+          Main.inst().packetSender.sendDuplexPacketInView(
+            ifIsServer = { clientBoundBlockUpdate(worldX, worldY, block) to compactLocation },
+            ifIsClient = { serverBoundBlockUpdate(worldX, worldY, block) }
+          )
+        }
       }
     }
     currBlock?.dispose()
