@@ -159,8 +159,8 @@ class ChunkBody(val chunk: Chunk) :
   private fun addBlockNow(block: Block, bodyId: b2BodyId) {
     val filter = when {
       block.isMarkerBlock() -> Filters.NON_INTERACTIVE__GROUND_FILTER
-      block.material.isCollidable -> Filters.GR_FB_EN__GROUND_FILTER
-      else -> Filters.GR_FB__GROUND_FILTER
+      block.material.isCollidable -> Filters.GR_FB_EN_BE__GROUND_FILTER
+      else -> Filters.GR_FB_BE__GROUND_FILTER
     }
 
     val shapeDef = Box2d.b2DefaultShapeDef().also { def ->
