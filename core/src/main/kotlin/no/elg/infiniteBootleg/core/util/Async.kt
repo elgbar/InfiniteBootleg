@@ -35,7 +35,7 @@ fun launchOnEventsSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, bl
   KtxAsync.launch(singleThreadEventDispatcher, start = start, block = block)
 
 /**
- * Run tasks which
+ * Run tasks using the default kotlin dispatcher
  */
 fun launchOnMultithreadedAsyncSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(Dispatchers.Default, start = start, block = block)

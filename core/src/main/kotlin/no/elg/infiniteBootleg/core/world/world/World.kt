@@ -593,6 +593,8 @@ abstract class World(
   /**
    * Find a valid chunk and optionally load it if it is not valid/not loaded
    *
+   * @implSpec This method is heavily performance optimize. Check for performance regressions when modifying with 'sandtest'
+   *
    * @return A valid chunk
    */
   fun getChunk(chunkLoc: Long, load: Boolean = true): Chunk? {
