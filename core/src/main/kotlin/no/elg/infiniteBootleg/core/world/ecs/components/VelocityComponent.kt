@@ -36,6 +36,8 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
 
   fun isHorizontalStill(): Boolean = dx.absoluteValue < MathUtils.FLOAT_ROUNDING_ERROR
   fun isVerticalStill(): Boolean = dy.absoluteValue < MathUtils.FLOAT_ROUNDING_ERROR
+  fun isStill(): Boolean = isHorizontalStill() && isVerticalStill()
+  fun isMoving(): Boolean = !isHorizontalStill() || !isVerticalStill()
 
   init {
     require(maxDx > 0) { "Max dx velocity must be strictly positive" }
@@ -63,7 +65,7 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
     const val EFFECTIVE_ZERO = 0.01f
 
     val Entity.velocityOrNull: Vector2? get() = velocityComponentOrNull?.toVector2()
-    val Entity.velocityOrZero: Vector2 get() = velocityComponentOrNull?.toVector2() ?: Vector2.Zero
+    val Entity.velocityOrZero: Vector2 get() = velocityOrNull ?: Vector2.Zero
 
     var Entity.velocityComponent by propertyFor(mapper)
     var Entity.velocityComponentOrNull by optionalPropertyFor(mapper)
