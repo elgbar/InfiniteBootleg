@@ -76,23 +76,14 @@ class InfAssetsImpl : InfAssets {
   override val font16pt: BitmapFont by lazy { createFont(16) }
   override val font10pt: BitmapFont by lazy { createFont(10) }
 
-  override fun findTextureOrNull(name: String, rotationAllowed: Boolean): RotatableTextureRegion? {
-    if (safeTextureAtlas.existsRegion(name)) {
-      return safeTextureAtlas.findRotationAwareRegion(name, rotationAllowed)
-    }
-    return null
-  }
+  override fun findTextureOrNull(name: String, rotationAllowed: Boolean): RotatableTextureRegion? = safeTextureAtlas.findRotationAwareRegionOrNull(name, rotationAllowed)
 
   override fun findTexture(name: String, rotationAllowed: Boolean): RotatableTextureRegion = safeTextureAtlas.findRotationAwareRegion(name, rotationAllowed)
 
   override fun findTexture(name: String): RotatableTextureRegion =
-    if (safeTextureAtlas.existsRegion(name)) {
-      safeTextureAtlas.findRotationAwareRegion(name, false)
-    } else if (safeTextureAtlas.existsRegion(rotatableTextureName(name))) {
-      safeTextureAtlas.findRotationAwareRegion(rotatableTextureName(name), true)
-    } else {
-      throw IllegalArgumentException("No texture found with name $name or ${rotatableTextureName(name)}")
-    }
+    safeTextureAtlas.findRotationAwareRegionOrNull(name, false)
+      ?: safeTextureAtlas.findRotationAwareRegionOrNull(rotatableTextureName(name), true)
+      ?: throw IllegalArgumentException("No texture found with name $name or ${rotatableTextureName(name)}")
 
   override fun loadAssets() {
     safeTextureAtlas = SafeTextureAtlas(InfAssets.TEXTURES_BLOCK_FILE)

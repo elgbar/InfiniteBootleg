@@ -28,17 +28,12 @@ class SafeTextureAtlas(textFileName: String) {
 
   fun findRegion(name: String, index: Int? = null): TextureAtlas.AtlasRegion? = index?.let { textureAtlas?.findRegion(name, it) } ?: textureAtlas?.findRegion(name)
 
-  fun findRotationAwareRegion(name: String, rotationAllowed: Boolean, index: Int? = null): RotatableTextureRegion {
-    val index1 = index ?: -1
-    if (!existsRegion(name, index1)) {
-      throw IllegalArgumentException("Could not find region with name $name and index $index")
+  fun findRotationAwareRegion(name: String, rotationAllowed: Boolean, maybeIndex: Int? = null): RotatableTextureRegion =
+    findRotationAwareRegionOrNull(name, rotationAllowed, maybeIndex) ?: throw IllegalArgumentException("Could not find region with name $name and index $maybeIndex")
+
+  fun findRotationAwareRegionOrNull(name: String, rotationAllowed: Boolean, maybeIndex: Int? = null): RotatableTextureRegion? =
+    cache.getOrPut(name + rotationAllowed + maybeIndex) {
+      val textureRegion = findRegion(name, maybeIndex) ?: return null
+      RotatableTextureRegion(textureRegion, rotationAllowed, name)
     }
-    return cache.getOrPut(name + rotationAllowed + index1) {
-      RotatableTextureRegion(
-        findRegion(name, index),
-        rotationAllowed,
-        name
-      )
-    }
-  }
 }
