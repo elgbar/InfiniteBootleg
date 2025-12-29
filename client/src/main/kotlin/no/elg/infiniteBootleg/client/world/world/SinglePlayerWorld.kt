@@ -44,7 +44,7 @@ class SinglePlayerWorld(generator: ChunkGenerator, seed: Long, worldName: String
         player.box2d.disableGravity()
         player.setVelocity(0f, 0f)
       }
-      player.isTransientEntity = true
+      player.isTransientEntity = false
       logger.debug { "Singleplayer player created" }
     }
 
