@@ -16,7 +16,7 @@ fastutil = "8.5.18"
 netty = "4.2.9.Final"
 kotlinCoroutines = "1.10.2"
 
-stacktracedecoroutinator = "2.6.0"
+stacktracedecoroutinator = "2.6.1"
 spotless = "8.1.0"
 versionsPlugin = "0.53.0"
 protobufPlugin = "0.9.6"
