@@ -20,7 +20,7 @@ import no.elg.infiniteBootleg.core.world.ecs.api.LoadableMapper
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityOrZero
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
-import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.flying
+import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.ensureFlyingStatus
 import no.elg.infiniteBootleg.core.world.ecs.creation.NON_CONTROLLED_PLAYER_FAMILIES
 import no.elg.infiniteBootleg.core.world.ecs.creation.createDoorBodyComponent
 import no.elg.infiniteBootleg.core.world.ecs.creation.createFallingBlockBodyComponent
@@ -108,9 +108,7 @@ class Box2DBodyComponent(body: b2BodyId, val type: ProtoWorld.Entity.Box2D.BodyT
       val (velX, velY) = entity.velocityOrZero
       when (protoEntity.box2D.bodyType) {
         PLAYER -> createPlayerBodyComponent(world, worldX, worldY, velX, velY, NON_CONTROLLED_PLAYER_FAMILIES) { entity ->
-          if (entity.flying) {
-            entity.box2d.disableGravity()
-          }
+          entity.ensureFlyingStatus()
           state(entity)
         }
 

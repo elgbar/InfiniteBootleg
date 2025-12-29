@@ -33,6 +33,7 @@ import no.elg.infiniteBootleg.core.util.asWorldSeed
 import no.elg.infiniteBootleg.core.util.chunkToWorld
 import no.elg.infiniteBootleg.core.util.getStaticField
 import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
+import no.elg.infiniteBootleg.core.util.launchOnMain
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.stringifyCompactLocWithChunk
@@ -48,8 +49,6 @@ import no.elg.infiniteBootleg.core.world.box2d.extensions.isValid
 import no.elg.infiniteBootleg.core.world.box2d.extensions.position
 import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE
-import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent
@@ -57,6 +56,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerCompo
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.ownedContainerOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.teleport
+import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.ensureFlyingStatus
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.core.world.render.WorldRender.Companion.MAX_ZOOM
@@ -202,12 +202,7 @@ class ClientCommands : CommonCommands() {
     for (entity in entities) {
       val wasFlying: Boolean = entity.flying
       entity.flying = !wasFlying
-      val box2DBodyComponent: Box2DBodyComponent = entity.box2d
-      if (wasFlying) {
-        box2DBodyComponent.enableGravity()
-      } else {
-        box2DBodyComponent.disableGravity()
-      }
+      entity.ensureFlyingStatus()
       logger.info { "Player is now ${if (wasFlying) "not " else ""}flying" }
     }
   }
@@ -371,7 +366,7 @@ class ClientCommands : CommonCommands() {
   @ConsoleDoc(description = "Teleport to given world coordinate", paramDescriptions = ["World x coordinate", "World y coordinate"])
   fun tp(worldX: Float, worldY: Float) {
     val clientWorld = clientWorld ?: return
-    launchOnAsyncSuspendable {
+    ThreadType.PHYSICS.launchOrRun(clientWorld) {
       val entities = clientWorld.controlledPlayerEntities
       if (entities.size() > 0) {
         world?.loadChunk(worldX.worldToChunk(), worldY.worldToChunk())
@@ -392,7 +387,7 @@ class ClientCommands : CommonCommands() {
   @ConsoleDoc(description = "Teleport the camera to given world coordinate", paramDescriptions = ["World x coordinate", "World y coordinate"])
   fun lookAt(worldX: Float, worldY: Float) {
     val clientWorld = clientWorld ?: return
-    launchOnAsyncSuspendable {
+    launchOnMain {
       clientWorld.render.lookAt(worldX, worldY)
       logger.info { "Teleported camera to ${stringifyCompactLoc(worldX, worldY)}" }
     }

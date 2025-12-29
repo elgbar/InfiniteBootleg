@@ -5,6 +5,7 @@ import com.badlogic.gdx.box2d.structs.b2Vec2
 import com.badlogic.gdx.math.Vector2
 import ktx.ashley.EngineEntity
 import ktx.ashley.propertyFor
+import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.WorldCoordFloat
 import no.elg.infiniteBootleg.core.util.WorldCoordNumber
@@ -94,6 +95,7 @@ data class PositionComponent(var x: WorldCoordFloat, var y: WorldCoordFloat) : E
      * @param killVelocity If the velocity of the entity should be set to zero
      */
     fun Entity.teleport(worldX: WorldCoordNumber, worldY: WorldCoordNumber, killVelocity: Boolean = false) {
+      ThreadType.PHYSICS.requireCorrectThreadType { "Teleporting can only be done on the physics thread" }
       val position = positionComponent
       position.x = worldX.toFloat()
       position.y = worldY.toFloat()
