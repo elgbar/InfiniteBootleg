@@ -30,6 +30,9 @@ internal class WorldTickee(private val world: World) : Ticking {
 
     var unloadQuota = ALLOWED_NORMAL_CHUNK_UNLOADS_PER_SECOND / world.worldTicker.tps
 
+    fun shouldUnloadChunk(chunk: Chunk): Boolean =
+      !chunk.isDisposed && chunk.allowedToUnload && world.render.isOutOfView(chunk) && (chunk is ViewableChunk && tick - chunk.lastViewedTick > chunkUnloadTime)
+
     world.readChunks {
       chunkIterator.reset()
       while (chunkIterator.hasNext()) {
@@ -45,10 +48,14 @@ internal class WorldTickee(private val world: World) : Ticking {
             world.unloadChunk(chunk, force = true)
           }
           unloadQuota-- // force unloads also count against quota, ok to be negative
-        } else if (unloadQuota > 0 && chunk.allowedToUnload && world.render.isOutOfView(chunk) && (chunk is ViewableChunk && tick - chunk.lastViewedTick > chunkUnloadTime)) {
+        } else if (unloadQuota > 0 && shouldUnloadChunk(chunk)) {
           unloadQuota--
           launchOnAsyncSuspendable {
-            world.unloadChunk(chunk)
+            // Make sure we don't double unload the chunk.
+            // If the async thread is slow we might have to wait and the ticker then might have scheduled it multiple times
+            if (shouldUnloadChunk(chunk)) {
+              world.unloadChunk(chunk)
+            }
           }
         }
       }
