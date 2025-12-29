@@ -748,7 +748,7 @@ abstract class World(
    * @param worldLoc The world location to check
    * @return If the block at the given location is air.
    */
-  fun isAirBlock(compactWorldLoc: Long, loadChunk: Boolean = true, markerIsAir: Boolean = false): Boolean =
+  fun isAirBlock(compactWorldLoc: Long, loadChunk: Boolean = true, markerIsAir: Boolean? = null): Boolean =
     isAirBlock(compactWorldLoc.decompactLocX(), compactWorldLoc.decompactLocY(), loadChunk, markerIsAir)
 
   /**
@@ -766,7 +766,7 @@ abstract class World(
    * @param worldY The y coordinate from world view
    * @return If the block at the given location is air.
    */
-  fun isAirBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, markerIsAir: Boolean = false): Boolean =
+  fun isAirBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, markerIsAir: Boolean? = null): Boolean =
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock false
       chunk.getRawBlock(localX, localY).isAir(markerIsAir)
@@ -786,7 +786,7 @@ abstract class World(
    * @param worldY The y coordinate from world view
    * @return If the block at the given location is not air.
    */
-  fun isNotAirBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, markerIsAir: Boolean = false): Boolean =
+  fun isNotAirBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, markerIsAir: Boolean? = null): Boolean =
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock true
       chunk.getRawBlock(localX, localY).isNotAir(markerIsAir)

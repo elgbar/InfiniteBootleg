@@ -87,12 +87,12 @@ inline fun Block?.isMaterial(material: Material): Boolean = this?.material == ma
 /**
  * @param markerIsAir Override whether [EntityMarkerBlock] should be considered as air. Otherwise, it's up to [EntityMarkerBlock.hardLink]. A hard link will not be considered air.
  */
-inline fun Block?.isAir(markerIsAir: Boolean = false): Boolean {
+inline fun Block?.isAir(markerIsAir: Boolean? = null): Boolean {
   contract { returns(false) implies (this@isAir != null) }
   if (this == null) return true
   return when {
     isMaterial(Material.Air) -> true
-    isMarkerBlock() -> if (markerIsAir) true else !this.hardLink
+    isMarkerBlock() -> markerIsAir ?: !this.hardLink
     else -> false
   }
 }
@@ -100,7 +100,7 @@ inline fun Block?.isAir(markerIsAir: Boolean = false): Boolean {
 /**
  * @param markerIsAir Override whether [EntityMarkerBlock] should be considered as air. Otherwise, it's up to [EntityMarkerBlock.hardLink]. A hard link will not be considered air.
  */
-inline fun Block?.isNotAir(markerIsAir: Boolean = false): Boolean {
+inline fun Block?.isNotAir(markerIsAir: Boolean? = null): Boolean {
   contract { returns(true) implies (this@isNotAir != null) }
   return !this.isAir(markerIsAir)
 }
