@@ -8,6 +8,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.client.input.MouseLocator
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.Settings
+import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.util.breakableLocs
 import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.dstd
@@ -98,10 +99,12 @@ fun canNotInteract(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean 
   }
 
 fun WorldEntity.setVel(modify: (oldX: Float, oldY: Float) -> (Pair<Float, Float>)) {
-  val body = entity.box2dBody
-  val vel = body.velocity
-  val (nx, ny) = modify(vel.x(), vel.y())
-  entity.setVelocity(nx, ny)
+  ThreadType.PHYSICS.launchOrRun(world) {
+    val body = entity.box2dBody
+    val vel = body.velocity
+    val (nx, ny) = modify(vel.x(), vel.y())
+    entity.setVelocity(nx, ny)
+  }
 }
 
 /**

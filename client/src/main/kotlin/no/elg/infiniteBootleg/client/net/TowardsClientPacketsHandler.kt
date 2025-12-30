@@ -34,7 +34,6 @@ import no.elg.infiniteBootleg.core.world.ContainerElement.Companion.fromProto
 import no.elg.infiniteBootleg.core.world.Direction
 import no.elg.infiniteBootleg.core.world.blocks.BlockImpl
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.position
@@ -43,7 +42,6 @@ import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityH
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityHoldingElement.Companion.remoteEntityHoldingElementComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.creation.createFallingBlockStandaloneEntity
 import no.elg.infiniteBootleg.core.world.ecs.load
-import no.elg.infiniteBootleg.core.world.ecs.system.WriteBox2DStateSystem
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.ContainerUpdate
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
@@ -105,7 +103,7 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
   when (packet.type) {
     // Gameplay related packets
     DX_HEARTBEAT -> if (packet.hasHeartbeat()) handleHeartbeat()
-    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { launchOnAsyncSuspendable { asyncHandleMoveEntity(it) } }
+    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { world.postBox2dRunnable { physicsHandleMoveEntity(it) } }
     DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { launchOnAsyncSuspendable { asyncHandleBlockUpdate(it) } }
     CB_SPAWN_ENTITY -> packet.spawnEntityOrNull?.let { launchOnAsyncSuspendable { asyncHandleSpawnEntity(it) } }
     CB_UPDATE_CHUNK -> packet.updateChunkOrNull?.let { launchOnAsyncSuspendable { asyncHandleUpdateChunk(it) } }
@@ -334,7 +332,7 @@ private fun ServerClient.asyncHandleUpdateChunk(updateChunk: UpdateChunk) {
 private const val CLIENT_SERVER_DIFF_SQUARED_TO_UPDATE_CONTROLLING_ENTITY = 0.5f * 0.5f
 
 // Must be sync to reuse the same vector
-private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
+private fun ServerClient.physicsHandleMoveEntity(moveEntity: MoveEntity) {
   if (!started) {
     return
   }
@@ -358,7 +356,6 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
     val deltaPos = clientPos.dst2(serverPos.x, serverPos.y)
     if (deltaPos > CLIENT_SERVER_DIFF_SQUARED_TO_UPDATE_CONTROLLING_ENTITY) {
       logger.warn { "Teleporting controlled entity, we're too far away. $deltaPos > $CLIENT_SERVER_DIFF_SQUARED_TO_UPDATE_CONTROLLING_ENTITY" }
-
       entity.teleport(serverPos)
       entity.setVelocity(moveEntity.velocity)
     } else {
@@ -367,16 +364,9 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
   } else {
     entity.teleport(serverPos)
     entity.setVelocity(moveEntity.velocity)
-
-    // post directly, we'll never be on the physics thread here
-    world.postBox2dRunnable {
-      val body = entity.box2dBody
-      WriteBox2DStateSystem.updatePosition(body, serverPos.x, serverPos.y)
-      WriteBox2DStateSystem.updateVelocity(body, moveEntity.velocity.x, moveEntity.velocity.y)
-    }
-    // Only set look direction if it exists on the entity from before
-    moveEntity.lookDirectionOrNull?.let { entity.lookDirectionComponentOrNull?.direction = Direction.valueOf(it) }
   }
+  // Only set look direction if it exists on the entity from before
+  moveEntity.lookDirectionOrNull?.let { entity.lookDirectionComponentOrNull?.direction = Direction.valueOf(it) }
 }
 
 /**
