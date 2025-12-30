@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.core.console.CmdArgNames
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.events.api.EventStatistics
 import no.elg.infiniteBootleg.core.events.api.EventsTracker
+import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.net.clientBoundWorldSettings
 import no.elg.infiniteBootleg.core.net.serverBoundWorldSettings
@@ -21,6 +22,7 @@ import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.toAbled
 import no.elg.infiniteBootleg.core.util.toTitleCase
+import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.WorldTime
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.ClientComponent
@@ -29,6 +31,7 @@ import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.TagCompon
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.name
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
+import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.core.world.ticker.Ticker
 import no.elg.infiniteBootleg.core.world.world.World
 import java.util.Locale
@@ -74,6 +77,22 @@ open class CommonCommands : CommandExecutor() {
   // ///////////////////////////////
 
   @AuthoritativeOnly
+  @CmdArgNames("entity", "x", "y")
+  @ConsoleDoc(description = "Teleport entity to given world coordinate", paramDescriptions = ["Entity to teleport", "World x coordinate", "World y coordinate"])
+  fun tp(entity: String, worldX: Float, worldY: Float) {
+    val world = this@CommonCommands.world ?: return
+    ThreadType.PHYSICS.launchOrRun(world) {
+      val entity = findEntity(entity) ?: return@launchOrRun
+      this@CommonCommands.world?.loadChunk(worldX.worldToChunk(), worldY.worldToChunk()) ?: let {
+        logger.error { "Failed to teleport entity ${entityNameId(entity)} to ${stringifyCompactLoc(worldX, worldY)}, chunk could not be loaded" }
+        return@launchOrRun
+      }
+      entity.teleport(worldX, worldY, killVelocity = true)
+      logger.info { "Teleported entity ${entityNameId(entity)} to ${stringifyCompactLoc(worldX, worldY)}" }
+    }
+  }
+
+  @AuthoritativeOnly
   @ConsoleDoc(description = "Save the world if possible")
   fun save() {
     val world = world ?: return
@@ -115,9 +134,9 @@ open class CommonCommands : CommandExecutor() {
     }
   }
 
-  // /////////////////
-  // OPEN COMMANDS //
-  // /////////////////
+// /////////////////
+// OPEN COMMANDS //
+// /////////////////
 
   @ConsoleDoc(description = "Run command delayed")
   @CmdArgNames("delayMs", "command")
