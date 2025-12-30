@@ -64,6 +64,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
   }
 
   private val tmpColor = Color()
+  private val tmpVel = Vector2()
 
   private val batch: Batch
     get() = worldRender.batch
@@ -72,7 +73,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
   private fun Entity.currentTexture(): TextureRegion {
     val lookDirectionOrNull = lookDirectionComponentOrNull
-    val velocityOrNull = velocityOrNull
+    val velocityOrNull = velocityOrNull(tmpVel)
     val rotatableTextureRegion: RotatableTextureRegion = if (box2d.type == ProtoWorld.Entity.Box2D.BodyType.PLAYER && velocityOrNull != null) {
       if (velocityOrNull.isZero(EFFECTIVE_ZERO)) {
         ClientMain.inst().assets.playerIdleTextures.getKeyFrame(globalAnimationTimer)

@@ -32,8 +32,8 @@ class PositionComponent(x: WorldCoordFloat, y: WorldCoordFloat) : EntitySavableC
   var y: WorldCoordFloat = y
     private set
 
-  operator fun component1(): Float = x
-  operator fun component2(): Float = y
+  operator fun component1(): WorldCoordFloat = x
+  operator fun component2(): WorldCoordFloat = y
 
   private val pos by lazy { Vector2(x, y) }
 

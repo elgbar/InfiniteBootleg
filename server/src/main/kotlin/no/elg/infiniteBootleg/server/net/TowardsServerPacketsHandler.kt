@@ -222,7 +222,7 @@ private fun handleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: Pack
     return
   }
 
-  val velocity = player.velocityOrZero
+  val velocity = player.velocityOrZero()
   val position = player.position
   val nextX = moveEntity.position.x
   val nextY = moveEntity.position.y

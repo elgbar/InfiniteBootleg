@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.core.world.ecs.components
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
@@ -38,10 +37,10 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
       y = this@VelocityComponent.dy
     }
 
-  fun isHorizontalStill(): Boolean = dx.absoluteValue < MathUtils.FLOAT_ROUNDING_ERROR
-  fun isVerticalStill(): Boolean = dy.absoluteValue < MathUtils.FLOAT_ROUNDING_ERROR
-  fun isStill(): Boolean = isHorizontalStill() && isVerticalStill()
-  fun isMoving(): Boolean = !isHorizontalStill() || !isVerticalStill()
+  fun isHorizontalStill(): Boolean = dx.absoluteValue < EFFECTIVE_ZERO
+  fun isVerticalStill(): Boolean = dy.absoluteValue < EFFECTIVE_ZERO
+  fun isStill(): Boolean = dx * dx + dy * dy < EFFECTIVE_ZERO * EFFECTIVE_ZERO
+  fun isMoving(): Boolean = !isStill()
 
   init {
     require(maxDx > 0) { "Max dx velocity must be strictly positive" }
@@ -66,10 +65,14 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
 
   companion object : EntityLoadableMapper<VelocityComponent>() {
 
+    /**
+     * Visually effective zero velocity threshold
+     */
     const val EFFECTIVE_ZERO = 0.01f
 
-    val Entity.velocityOrNull: Vector2? get() = velocityComponentOrNull?.toVector2()
-    val Entity.velocityOrZero: Vector2 get() = velocityOrNull ?: Vector2.Zero
+    fun Entity.velocityOrNull(target: Vector2? = null): Vector2? = velocityComponentOrNull?.toVector2(target ?: Vector2())
+    fun Entity.velocityOrZero(): Vector2 = velocityComponentOrNull?.toVector2(Vector2()) ?: Vector2.Zero
+    fun Entity.velocityOrZero(target: Vector2 = Vector2()): Vector2 = velocityComponentOrNull?.toVector2(target) ?: target.set(0f, 0f)
 
     var Entity.velocityComponent by propertyFor(mapper)
     var Entity.velocityComponentOrNull by optionalPropertyFor(mapper)
@@ -80,7 +83,7 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
       ThreadType.PHYSICS.requireCorrectThreadType { "Setting entity velocity can only be done on the physics thread" }
       velocityComponentOrNull?.also {
         it.setAshleyVelocity(dx, dy)
-        this.updateBox2DVelocity = true
+        updateBox2DVelocity = true
       }
     }
 

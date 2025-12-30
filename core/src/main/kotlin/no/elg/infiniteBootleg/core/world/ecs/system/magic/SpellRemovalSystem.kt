@@ -9,7 +9,7 @@ import no.elg.infiniteBootleg.core.world.box2d.extensions.gravityScale
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.system.AuthoritativeSystem
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
-import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityOrZero
+import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.SpellStateComponent
@@ -25,7 +25,7 @@ object SpellRemovalSystem : IteratingSystem(spellEntityFamily, UPDATE_PRIORITY_D
     val currentPos = entity.position
 
     val distanceTravelled = Vector2.dst2(spellStateComponent.spawnX.toFloat(), spellStateComponent.spawnY.toFloat(), currentPos.x, currentPos.y)
-    fun willRemainStationary(): Boolean = entity.velocityOrZero.isZero(1f) && entity.box2dBody.gravityScale < Constants.DEFAULT_GRAVITY_SCALE / 2f
+    fun willRemainStationary(): Boolean = entity.velocityComponent.isStill() && entity.box2dBody.gravityScale < Constants.DEFAULT_GRAVITY_SCALE / 2f
     val haveTravelledMaxDistance = distanceTravelled > maxTravelDistance * maxTravelDistance
     if (haveTravelledMaxDistance || willRemainStationary()) {
       entity.world.removeEntity(entity, Packets.DespawnEntity.DespawnReason.NATURAL)

@@ -26,7 +26,8 @@ import kotlin.time.TimeSource
 
 object MagicSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFAULT) {
 
-  private val vector = Vector2()
+  private val posVector = Vector2()
+  private val velVector = Vector2()
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     if (ClientMain.inst().shouldIgnoreWorldInput()) {
@@ -43,10 +44,10 @@ object MagicSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFAULT)
       val position = entity.position
       val newSpellState = heldStaff.createSpellState(entity)
       entity.add(LastSpellCastComponent(newSpellState))
-      val velocityOrZero = entity.velocityOrZero
+      val velocityOrZero = entity.velocityOrZero(velVector)
 
       inputMouseLocator.update(world)
-      vector
+      posVector
         .set(inputMouseLocator.mouseWorldX, inputMouseLocator.mouseWorldY)
         .sub(position.x, position.y)
         .nor()
@@ -56,8 +57,8 @@ object MagicSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFAULT)
         world,
         position.x,
         position.y,
-        vector.x * newSpellState.spellVelocity.toFloat() + velocityOrZero.x,
-        vector.y * newSpellState.spellVelocity.toFloat() + velocityOrZero.y,
+        posVector.x * newSpellState.spellVelocity.toFloat() + velocityOrZero.x,
+        posVector.y * newSpellState.spellVelocity.toFloat() + velocityOrZero.y,
         newSpellState
       ) {
         newSpellState.castMark = TimeSource.Monotonic.markNow() + newSpellState.castDelay
