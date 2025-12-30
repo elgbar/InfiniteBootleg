@@ -77,6 +77,7 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
     inline fun Entity.setVelocity(velocity: ProtoWorld.Vector2f) = setVelocity(velocity.x, velocity.y)
     inline fun Entity.setVelocity(velocity: Vector2) = setVelocity(velocity.x, velocity.y)
     fun Entity.setVelocity(dx: Float, dy: Float) {
+      ThreadType.PHYSICS.requireCorrectThreadType { "Setting entity velocity can only be done on the physics thread" }
       velocityComponentOrNull?.also {
         it.setAshleyVelocity(dx, dy)
         this.updateBox2DVelocity = true
