@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.core.world.box2d.extensions.isAwake
 import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2Vec2
 import no.elg.infiniteBootleg.core.world.box2d.extensions.position
 import no.elg.infiniteBootleg.core.world.box2d.extensions.velocity
+import no.elg.infiniteBootleg.core.world.ecs.BEFORE
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
@@ -29,7 +30,7 @@ import kotlin.math.abs
  * We do not read or update entities without the [no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent], as they should never be moved once placed.
  * They may also a difference in box2d and ashley position.
  */
-object UpdateBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_BEFORE_EVENTS) {
+object UpdateBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, BEFORE + UPDATE_PRIORITY_BEFORE_EVENTS) {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val body = entity.box2dBody
