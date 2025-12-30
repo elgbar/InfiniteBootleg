@@ -25,6 +25,7 @@ abstract class ECSEventQueueComponent<T : ECSEvent> : EntitySavableComponent {
    * Must only be accessed on the box2d thread!
    */
   private val events = ObjectOpenHashSet<T>(0, DEFAULT_LOAD_FACTOR)
+  private val workingEvents = ObjectOpenHashSet<T>(0, DEFAULT_LOAD_FACTOR)
 
   override fun hudDebug(): String = "Event queue size: ${events.size}"
 
@@ -38,10 +39,16 @@ abstract class ECSEventQueueComponent<T : ECSEvent> : EntitySavableComponent {
 
   fun processEvents(entity: Entity, processEvent: (entity: Entity, event: T) -> Unit) {
     ThreadType.PHYSICS.requireCorrectThreadType { "Event queue must be accessed on the ${ThreadType.PHYSICS} thread" }
-    for (event: T in events) {
+
+    if (events.isEmpty()) return
+
+    workingEvents.clear()
+    workingEvents.addAll(events)
+    events.clear()
+
+    for (event: T in workingEvents) {
       processEvent(entity, event)
     }
-    events.clear()
   }
 
   companion object {
