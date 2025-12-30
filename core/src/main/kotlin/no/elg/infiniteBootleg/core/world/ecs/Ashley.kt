@@ -138,7 +138,7 @@ val namedEntitiesFamily: Family = allOf(*REQUIRED_COMPONENTS, NameComponent::cla
 //  Common system update priorities  //
 // ////////////////////////////////////
 
-const val UPDATE_PRIORITY_ID_CHECK = Int.MIN_VALUE
+const val UPDATE_PRIORITY_ASSERTIONS = Int.MIN_VALUE
 const val UPDATE_PRIORITY_BEFORE_EVENTS = -2_000
 const val UPDATE_PRIORITY_EVENT_HANDLING = -1_500
 const val UPDATE_PRIORITY_EARLY = -1_000
@@ -154,7 +154,7 @@ fun ensureUniquenessListener(engine: Engine) {
     val knownIds = ObjectOpenHashSet<String>()
     val idFamily = IdComponent::class.toFamily()
 
-    engine.onEntityAdded(idFamily, UPDATE_PRIORITY_ID_CHECK) { newlyAddedEntity ->
+    engine.onEntityAdded(idFamily, UPDATE_PRIORITY_ASSERTIONS) { newlyAddedEntity ->
       val newId = newlyAddedEntity.id
       if (newId in knownIds) {
         logger.warn {
@@ -167,7 +167,7 @@ fun ensureUniquenessListener(engine: Engine) {
       }
     }
 
-    engine.onEntityRemoved(idFamily, UPDATE_PRIORITY_ID_CHECK) { entity ->
+    engine.onEntityRemoved(idFamily, UPDATE_PRIORITY_ASSERTIONS) { entity ->
       knownIds -= entity.id
     }
   }
@@ -175,7 +175,7 @@ fun ensureUniquenessListener(engine: Engine) {
 
 fun disposeBox2dOnRemoval(engine: Engine) {
   val family = Box2DBodyComponent::class.toFamily()
-  engine.onEntityRemoved(family, UPDATE_PRIORITY_ID_CHECK) { entity ->
+  engine.onEntityRemoved(family, UPDATE_PRIORITY_ASSERTIONS) { entity ->
     entity.box2d.dispose()
   }
 }
