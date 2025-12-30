@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
+import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.util.MAX_X_VEL
 import no.elg.infiniteBootleg.core.util.MAX_Y_VEL
 import no.elg.infiniteBootleg.core.util.safeWith
@@ -24,6 +25,9 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
     private set
   var dy: Float = dy
     private set
+
+  operator fun component1(): Float = dx
+  operator fun component2(): Float = dy
 
   val maxDx: Float = MAX_X_VEL
   val maxDy: Float = MAX_Y_VEL

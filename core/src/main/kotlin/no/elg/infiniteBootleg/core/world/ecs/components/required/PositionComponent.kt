@@ -25,7 +25,15 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f as ProtoVector2f
 
-data class PositionComponent(var x: WorldCoordFloat, var y: WorldCoordFloat) : EntitySavableComponent {
+class PositionComponent(x: WorldCoordFloat, y: WorldCoordFloat) : EntitySavableComponent {
+
+  var x: WorldCoordFloat = x
+    private set
+  var y: WorldCoordFloat = y
+    private set
+
+  operator fun component1(): Float = x
+  operator fun component2(): Float = y
 
   private val pos by lazy { Vector2(x, y) }
 

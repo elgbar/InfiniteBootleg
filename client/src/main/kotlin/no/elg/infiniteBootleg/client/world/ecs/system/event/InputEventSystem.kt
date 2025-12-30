@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.client.util.isAltPressed
 import no.elg.infiniteBootleg.client.util.placeBlocks
 import no.elg.infiniteBootleg.client.util.setVel
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
+import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.core.net.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.core.net.serverBoundUpdateSelectedSlot
@@ -156,11 +157,11 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
   }
 
   private fun WorldEntity.updateSelectedItem(hotbarComponent: HotbarComponent, slot: HotbarSlot) {
-    hotbarComponent.selected = slot
-    ClientMain.inst().serverClient.sendServerBoundPacket { serverBoundUpdateSelectedSlot(slot) }
+    ThreadType.PHYSICS.launchOrRun(world) {
+      hotbarComponent.selected = slot
+      ClientMain.inst().serverClient.sendServerBoundPacket { serverBoundUpdateSelectedSlot(slot) }
+    }
   }
-
-  private val tmpVec = b2Vec2()
 
   private fun WorldEntity.fly(dx: Float = 0f, dy: Float = 0f) {
     setVel { oldX, oldY -> oldX + dx to oldY + dy }
@@ -172,8 +173,9 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
     }
   }
 
+  private val tmpVec = b2Vec2()
   private fun WorldEntity.moveHorz(dir: HorizontalDirection) {
-    world.postBox2dRunnable {
+    ThreadType.PHYSICS.launchOrRun(world) {
       val groundedComponent = entity.groundedComponent
       if (groundedComponent.canMove(dir)) {
         val bodyId = entity.box2dBody

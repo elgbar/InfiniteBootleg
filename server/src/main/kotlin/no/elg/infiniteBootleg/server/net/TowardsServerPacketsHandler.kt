@@ -5,6 +5,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.console.logPacket
 import no.elg.infiniteBootleg.core.console.serverSideServerBoundMarker
 import no.elg.infiniteBootleg.core.console.temporallyFilterPacket
+import no.elg.infiniteBootleg.core.events.api.ThreadType.PHYSICS
 import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner.Companion.fromProto
 import no.elg.infiniteBootleg.core.inventory.container.OwnedContainer.Companion.fromProto
@@ -87,7 +88,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
   logPacket(serverSideServerBoundMarker, packet)
   when (packet.type) {
     Packets.Packet.Type.DX_HEARTBEAT -> handleHeartbeat(ctx)
-    Packets.Packet.Type.DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { launchOnMainSuspendable { handleMovePlayer(ctx, it) } }
+    Packets.Packet.Type.DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { handleMovePlayer(ctx, it) } }
     Packets.Packet.Type.DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let {
       launchOnAsyncSuspendable {
         asyncHandleBlockUpdate(

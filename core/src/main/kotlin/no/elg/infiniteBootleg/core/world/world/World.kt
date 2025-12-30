@@ -104,9 +104,8 @@ import no.elg.infiniteBootleg.core.world.ecs.save
 import no.elg.infiniteBootleg.core.world.ecs.system.MaxVelocitySystem
 import no.elg.infiniteBootleg.core.world.ecs.system.NoMovementInUnlockedChunksSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.OutOfBoundsSystem
-import no.elg.infiniteBootleg.core.world.ecs.system.ReadBox2DStateSystem
+import no.elg.infiniteBootleg.core.world.ecs.system.UpdateBox2DStateSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.ValidateGroundContactSystem
-import no.elg.infiniteBootleg.core.world.ecs.system.WriteBox2DStateSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.BrokenBlockCleanupSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.ExplosiveBlockSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.FallingBlockSystem
@@ -311,8 +310,7 @@ abstract class World(
 
   private fun addSystems() {
     engine.addSystem(MaxVelocitySystem)
-    engine.addSystem(ReadBox2DStateSystem)
-    engine.addSystem(WriteBox2DStateSystem)
+    engine.addSystem(UpdateBox2DStateSystem)
     engine.addSystem(PhysicsSystem())
     engine.addSystem(UpdateGridBlockSystem)
     engine.addSystem(OutOfBoundsSystem)

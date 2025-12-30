@@ -152,6 +152,8 @@ open class WorldBody(private val world: World) :
       return
     }
     synchronized(BOX2D_LOCK) {
+      postRunnable.executeRunnables()
+
       box2dWatchdog.watch(this) {
         box2dWorld.step(BOX2D_TIME_STEP, BOX2D_SUB_STEP_COUNT)
         contactEventManager.postBox2dStepEvents()
@@ -160,8 +162,6 @@ open class WorldBody(private val world: World) :
       ashleyWatchdog.watch(world) {
         world.engine.update(BOX2D_TIME_STEP)
       }
-
-      postRunnable.executeRunnables()
     }
   }
 

@@ -7,6 +7,8 @@ import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.world.Direction
 import no.elg.infiniteBootleg.core.world.box2d.extensions.component1
 import no.elg.infiniteBootleg.core.world.box2d.extensions.component2
+import no.elg.infiniteBootleg.core.world.box2d.extensions.isAwake
+import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2Vec2
 import no.elg.infiniteBootleg.core.world.box2d.extensions.position
 import no.elg.infiniteBootleg.core.world.box2d.extensions.velocity
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
@@ -15,29 +17,49 @@ import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Compa
 import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
+import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
 import kotlin.math.abs
 
 /**
- * Read the position of the entity from **dynamic** the box2D entity
+ * synchronize box2d and ashley entity positions.
+ *
+ * We either read the position/velocity from box2d to ashley, or write the position/velocity from ashley to box2d depending on whether the relevant tags are set.
  *
  * We do not read or update entities without the [no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent], as they should never be moved once placed.
  * They may also a difference in box2d and ashley position.
  */
-object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_BEFORE_EVENTS) {
+object UpdateBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_BEFORE_EVENTS) {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val body = entity.box2dBody
-
-    readPosition(entity, body)
-    readVelocity(entity, body)
+    processPosition(entity, body)
+    processVelocity(entity, body)
   }
 
-  private fun readPosition(entity: Entity, body: b2BodyId) {
-    val newPosition = body.position
-    entity.positionComponent.setPosition(newPosition)
+  private fun processPosition(entity: Entity, body: b2BodyId) {
+    if (entity.updateBox2DPosition) {
+      entity.updateBox2DPosition = false
+      val (x, y) = entity.positionComponent
+      body.position = makeB2Vec2(x, y)
+      body.isAwake = true
+    } else {
+      val newPosition = body.position
+      entity.positionComponent.setPosition(newPosition)
+    }
   }
 
-  private fun readVelocity(entity: Entity, body: b2BodyId) {
+  private fun processVelocity(entity: Entity, body: b2BodyId) {
+    if (entity.updateBox2DVelocity) {
+      entity.updateBox2DVelocity = false
+      val (dx, dy) = entity.velocityComponent
+      body.velocity = makeB2Vec2(dx, dy)
+    } else {
+      readVelocityFromBox2d(entity, body)
+    }
+  }
+
+  private fun readVelocityFromBox2d(entity: Entity, body: b2BodyId) {
     val (newDx, newDy) = body.velocity
     entity.velocityComponent.setAshleyVelocity(newDx, newDy)
 
