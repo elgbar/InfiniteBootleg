@@ -18,7 +18,7 @@ import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnWorldTicker
 import no.elg.infiniteBootleg.core.util.launchOnWorldTickerSuspendable
-import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker
+import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker.Companion.BOX2D_TICKER_TAG_PREFIX
 import no.elg.infiniteBootleg.core.world.ticker.WorldTicker
 import no.elg.infiniteBootleg.core.world.world.World
 
@@ -45,6 +45,8 @@ sealed interface ThreadType {
      * @implSpec There is no thread check here because the main dispatcher already does that internally
      **/
     fun launchOrRunSuspended(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend () -> Unit) = launchOnMainSuspendable(start, block = { block() })
+
+    override fun isThreadType(thread: Thread): Boolean = thread === MainDispatcher.mainThread
   }
 
   /**
@@ -71,6 +73,8 @@ sealed interface ThreadType {
      * @see no.elg.infiniteBootleg.core.world.box2d.WorldBody
      */
     fun launchOrRunSuspended(world: World, start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend () -> Unit) = world.launchOnBox2dSuspendable(start, block = { block() })
+
+    override fun isThreadType(thread: Thread): Boolean = thread.name.startsWith(BOX2D_TICKER_TAG_PREFIX, false)
   }
 
   /**
@@ -98,6 +102,8 @@ sealed interface ThreadType {
      */
     fun launchOrRunSuspended(world: World, start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend () -> Unit) =
       world.launchOnWorldTickerSuspendable(start, block = { block() })
+
+    override fun isThreadType(thread: Thread): Boolean = thread.name.startsWith(WorldTicker.WORLD_TICKER_TAG_PREFIX, false)
   }
 
   /**
@@ -137,6 +143,12 @@ sealed interface ThreadType {
      */
     suspend fun launchOrRunSuspended(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend () -> Unit) =
       if (isCurrentThreadType()) block() else launchSuspended(start, block = { block() })
+
+
+    override fun isThreadType(thread: Thread): Boolean {
+      val threadName = thread.name
+      return threadName.startsWith(SERVER_THREAD_PREFIX, false) || threadName.startsWith("multiThreadIoEventLoopGroup", false)
+    }
   }
 
   /**
@@ -145,20 +157,47 @@ sealed interface ThreadType {
    *
    * Tasks on this thread type should be offloaded to [ASYNC] as quickly as po ssible to not block network events.
    */
-  data object SERVER : ThreadType
+  data object SERVER : ThreadType {
+    override fun isThreadType(thread: Thread): Boolean {
+      val threadName = thread.name
+      return ASYNC_THREAD_NAME == threadName || EVENTS_THREAD_NAME == threadName || threadName.startsWith("DefaultDispatcher", false) || threadName.startsWith(
+        ASYNC_THREAD_NAME,
+        false
+      ) || threadName.startsWith(EVENTS_THREAD_NAME, false)
+    }
+  }
 
   /**
    * Failed to detect what kind of thread the event was dispatched from.
    *
    * Cannot launch any types of tasks.
    */
-  data object UNKNOWN : ThreadType
+  data object UNKNOWN : ThreadType {
+    override fun isThreadType(thread: Thread): Boolean = false
+  }
 
   fun isCurrentThreadType() = currentThreadType() == this
   fun isDifferentThreadType() = currentThreadType() != this
+
+  /**
+   * Makes sure this code is called from this thread type.
+   *
+   * May be disabled in [Settings.assertThreadType]
+   *
+   * @throws CalledFromWrongThreadTypeException If this is called from another thread type than this
+   */
   fun requireCorrectThreadType(message: (() -> String)? = null) = requireCorrectThreadType(this, message)
 
+  /**
+   * Checks if the given [thread] is of this thread type
+   *
+   * @param thread The thread to check, usually [Thread.currentThread]
+   */
+  fun isThreadType(thread: Thread = Thread.currentThread()): Boolean
+
   companion object {
+
+    val types: List<ThreadType> = ThreadType::class.sealedSubclasses.map { it.objectInstance ?: error("No object instance for ${it.simpleName}") }
 
     /**
      * Makes sure this code is called from the [expected] thread type.
@@ -167,10 +206,11 @@ sealed interface ThreadType {
      *
      * @throws CalledFromWrongThreadTypeException If this is called from another thread type than the [expected]
      */
+    @Deprecated("Use the instance method requireCorrectThreadType on ThreadType instead", ReplaceWith("expected.requireCorrectThreadType(message)"))
     fun requireCorrectThreadType(expected: ThreadType, message: (() -> String)? = null) {
       if (Settings.assertThreadType) {
-        val current = currentThreadType()
-        if (current != expected) {
+        if (expected.isThreadType()) {
+          val current = currentThreadType()
           val string = "Expected event to be dispatched from $expected but was dispatched from $current"
           val message = message?.invoke() ?: ""
           throw CalledFromWrongThreadTypeException("$message $string")
@@ -178,30 +218,11 @@ sealed interface ThreadType {
       }
     }
 
-    private fun isThreadNameServer(threadName: String): Boolean =
-      threadName.startsWith(SERVER_THREAD_PREFIX, false) ||
-        threadName.startsWith("multiThreadIoEventLoopGroup", false)
-
-    private fun isThreadNameAsync(threadName: String): Boolean =
-      ASYNC_THREAD_NAME == threadName ||
-        EVENTS_THREAD_NAME == threadName ||
-        threadName.startsWith("DefaultDispatcher", false) ||
-        threadName.startsWith(ASYNC_THREAD_NAME, false) ||
-        threadName.startsWith(EVENTS_THREAD_NAME, false)
-
     fun currentThreadType(): ThreadType {
       val currentThread = Thread.currentThread()
-      val threadName = currentThread.name
-      return when {
-        currentThread === MainDispatcher.mainThread -> RENDER
-        threadName.startsWith(WorldBox2DTicker.BOX2D_TICKER_TAG_PREFIX, false) -> PHYSICS
-        threadName.startsWith(WorldTicker.WORLD_TICKER_TAG_PREFIX, false) -> TICKER
-        isThreadNameAsync(threadName) -> ASYNC
-        isThreadNameServer(threadName) -> SERVER
-        else -> {
-          logger.error { "Dispatched event from unknown thread: $threadName" }
-          UNKNOWN
-        }
+      return types.firstOrNull { it.isThreadType(currentThread) } ?: let {
+        logger.error { "Dispatched event from unknown thread: $currentThread" }
+        UNKNOWN
       }
     }
   }
