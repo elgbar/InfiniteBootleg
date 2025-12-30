@@ -66,15 +66,15 @@ class Box2DBodyComponent(body: b2BodyId, val type: ProtoWorld.Entity.Box2D.BodyT
 
   override val isDisposed get() = disposed
 
-  val body: b2BodyId = (
-    if (disposed) {
-      null
-    } else if (internalBody?.isValid == true) {
-      internalBody
-    } else {
-      null
+  val body: b2BodyId
+    get() {
+      val bodyId = if (disposed) {
+        error("Tried to access a disposed body!")
+      } else {
+        internalBody
+      }
+      return bodyId ?: error("Tried to access an invalid or null body!")
     }
-    ) ?: error("Tried to access a disposed body!")
 
   fun disableGravity() {
     body.gravityScale = 0f
