@@ -109,7 +109,7 @@ open class WorldBody(private val world: World) :
 
   @GuardedBy("BOX2D_LOCK")
   fun createBodyNow(def: b2BodyDef, callback: (b2BodyId) -> Unit): b2BodyId {
-    ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
+    ThreadType.PHYSICS.requireCorrectThreadType()
     return box2dWorld.createBody(def).also { body ->
       callback(body)
       val userData = body.userData

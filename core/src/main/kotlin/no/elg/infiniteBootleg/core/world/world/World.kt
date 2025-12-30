@@ -185,14 +185,14 @@ abstract class World(
         postBox2dRunnable(block::run)
       }
 
-      override fun isDispatchNeeded(context: CoroutineContext): Boolean = ThreadType.PHYSICS.isDifferentThreadType()
+      override fun isDispatchNeeded(context: CoroutineContext): Boolean = !ThreadType.PHYSICS.isThreadType()
     },
     worldTickCoroutineDispatcher = object : CoroutineDispatcher() {
       override fun dispatch(context: CoroutineContext, block: Runnable) {
         postWorldTickerRunnable(block::run)
       }
 
-      override fun isDispatchNeeded(context: CoroutineContext): Boolean = ThreadType.TICKER.isDifferentThreadType()
+      override fun isDispatchNeeded(context: CoroutineContext): Boolean = !ThreadType.TICKER.isThreadType()
     }
   )
 

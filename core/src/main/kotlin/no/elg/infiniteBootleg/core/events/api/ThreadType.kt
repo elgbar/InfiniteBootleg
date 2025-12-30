@@ -37,7 +37,7 @@ sealed interface ThreadType {
     /**
      * Run the task on this thread if is the render thread, otherwise launch it on the main render thread
      */
-    fun launchOrRun(block: () -> Unit) = if (isCurrentThreadType()) block() else launchOnMain(block)
+    fun launchOrRun(block: () -> Unit) = if (isThreadType()) block() else launchOnMain(block)
 
     /**
      * Run the task on this thread if is the render thread, otherwise launch it on the main render thread
@@ -61,7 +61,7 @@ sealed interface ThreadType {
      *
      * @see no.elg.infiniteBootleg.core.world.box2d.WorldBody
      */
-    fun launchOrRun(world: World, block: () -> Unit) = if (isCurrentThreadType()) block() else world.launchOnBox2d(block)
+    fun launchOrRun(world: World, block: () -> Unit) = if (isThreadType()) block() else world.launchOnBox2d(block)
 
     /**
      * Run the task directly if already on the world's physics (box2d) thread, otherwise launch on the world physics thread.
@@ -89,7 +89,7 @@ sealed interface ThreadType {
      *
      * @see WorldTicker
      */
-    fun launchOrRun(world: World, block: () -> Unit) = if (isCurrentThreadType()) block() else world.launchOnWorldTicker(block)
+    fun launchOrRun(world: World, block: () -> Unit) = if (isThreadType()) block() else world.launchOnWorldTicker(block)
 
     /**
      * Run the task directly if already on the world's ticker thread, otherwise launch on the world ticker thread.
@@ -136,14 +136,13 @@ sealed interface ThreadType {
     /**
      * Run the task directly if already on the single async thread, otherwise launch on the single async thread.
      */
-    fun launchOrRun(block: () -> Unit) = if (isCurrentThreadType()) block() else launch(block)
+    fun launchOrRun(block: () -> Unit) = if (isThreadType()) block() else launch(block)
 
     /**
      * Run the task directly if already on the single async thread, otherwise launch on the single async thread.
      */
     suspend fun launchOrRunSuspended(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend () -> Unit) =
-      if (isCurrentThreadType()) block() else launchSuspended(start, block = { block() })
-
+      if (isThreadType()) block() else launchSuspended(start, block = { block() })
 
     override fun isThreadType(thread: Thread): Boolean {
       val threadName = thread.name
@@ -176,9 +175,6 @@ sealed interface ThreadType {
     override fun isThreadType(thread: Thread): Boolean = false
   }
 
-  fun isCurrentThreadType() = currentThreadType() == this
-  fun isDifferentThreadType() = currentThreadType() != this
-
   /**
    * Makes sure this code is called from this thread type.
    *
@@ -186,7 +182,16 @@ sealed interface ThreadType {
    *
    * @throws CalledFromWrongThreadTypeException If this is called from another thread type than this
    */
-  fun requireCorrectThreadType(message: (() -> String)? = null) = requireCorrectThreadType(this, message)
+  fun requireCorrectThreadType(message: (() -> String)? = null) {
+    if (Settings.assertThreadType) {
+      if (!isThreadType()) {
+        val current = currentThreadType()
+        val string = "Expected event to be dispatched from $this but was dispatched from $current"
+        val message = message?.invoke() ?: ""
+        throw CalledFromWrongThreadTypeException("$message $string")
+      }
+    }
+  }
 
   /**
    * Checks if the given [thread] is of this thread type
@@ -197,30 +202,12 @@ sealed interface ThreadType {
 
   companion object {
 
-    val types: List<ThreadType> = ThreadType::class.sealedSubclasses.map { it.objectInstance ?: error("No object instance for ${it.simpleName}") }
-
-    /**
-     * Makes sure this code is called from the [expected] thread type.
-     *
-     * May be disabled in [Settings.assertThreadType]
-     *
-     * @throws CalledFromWrongThreadTypeException If this is called from another thread type than the [expected]
-     */
-    @Deprecated("Use the instance method requireCorrectThreadType on ThreadType instead", ReplaceWith("expected.requireCorrectThreadType(message)"))
-    fun requireCorrectThreadType(expected: ThreadType, message: (() -> String)? = null) {
-      if (Settings.assertThreadType) {
-        if (expected.isThreadType()) {
-          val current = currentThreadType()
-          val string = "Expected event to be dispatched from $expected but was dispatched from $current"
-          val message = message?.invoke() ?: ""
-          throw CalledFromWrongThreadTypeException("$message $string")
-        }
-      }
-    }
+    /** All thread types instances */
+    val threadTypes: List<ThreadType> by lazy { ThreadType::class.sealedSubclasses.map { it.objectInstance ?: error("No object instance for ${it.simpleName}") } }
 
     fun currentThreadType(): ThreadType {
       val currentThread = Thread.currentThread()
-      return types.firstOrNull { it.isThreadType(currentThread) } ?: let {
+      return threadTypes.firstOrNull { it.isThreadType(currentThread) } ?: let {
         logger.error { "Dispatched event from unknown thread: $currentThread" }
         UNKNOWN
       }

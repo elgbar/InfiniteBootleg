@@ -65,7 +65,7 @@ class ChunkBody(val chunk: Chunk) :
    */
   private var box2dBody: b2BodyId? = null
     set(value) {
-      ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
+      ThreadType.PHYSICS.requireCorrectThreadType()
       val oldBody = field
       field = value
       if (::chunkShapes.isLazyInitialized()) {
@@ -78,7 +78,7 @@ class ChunkBody(val chunk: Chunk) :
       }
     }
     get() {
-      ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
+      ThreadType.PHYSICS.requireCorrectThreadType()
       return field
     }
 
@@ -104,7 +104,7 @@ class ChunkBody(val chunk: Chunk) :
    *
    */
   private fun tryCreateChunkBodyNow(addingBlock: Boolean): b2BodyId? {
-    ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
+    ThreadType.PHYSICS.requireCorrectThreadType()
     return if (shouldCreateBody(addingBlock)) {
       val bodyDef: b2BodyDef = Box2d.b2DefaultBodyDef().apply {
         position = makeB2Vec2(chunk.chunkX * CHUNK_SIZE_F + 0.5f, chunk.chunkY * CHUNK_SIZE_F + 0.5f)

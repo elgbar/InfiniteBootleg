@@ -10,7 +10,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import ktx.ashley.allOf
 import no.elg.infiniteBootleg.core.events.api.ThreadType
-import no.elg.infiniteBootleg.core.events.api.ThreadType.Companion.requireCorrectThreadType
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.util.launchOnBox2d
 import no.elg.infiniteBootleg.core.world.ecs.BASIC_STANDALONE_ENTITY
@@ -33,12 +32,12 @@ abstract class ECSEventQueueComponent<T : ECSEvent> : EntitySavableComponent {
    * Enqueue an event from the physics thread
    */
   fun enqueue(event: T) {
-    requireCorrectThreadType(ThreadType.PHYSICS) { "Event queue must be accessed on the ${ThreadType.PHYSICS} thread" }
+    ThreadType.PHYSICS.requireCorrectThreadType { "Event queue must be accessed on the ${ThreadType.PHYSICS} thread" }
     events.add(event)
   }
 
   fun processEvents(entity: Entity, processEvent: (entity: Entity, event: T) -> Unit) {
-    requireCorrectThreadType(ThreadType.PHYSICS) { "Event queue must be accessed on the ${ThreadType.PHYSICS} thread" }
+    ThreadType.PHYSICS.requireCorrectThreadType { "Event queue must be accessed on the ${ThreadType.PHYSICS} thread" }
     for (event: T in events) {
       processEvent(entity, event)
     }

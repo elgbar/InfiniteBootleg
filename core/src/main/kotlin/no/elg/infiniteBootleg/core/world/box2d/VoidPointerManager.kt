@@ -25,7 +25,7 @@ class VoidPointerManager {
    * If the object is null, a null pointer will be returned
    */
   fun createPointer(obj: Any?): VoidPointer {
-    ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
+    ThreadType.PHYSICS.requireCorrectThreadType()
     if (obj == null) {
       return VoidPointer.NULL
     }
@@ -42,7 +42,7 @@ class VoidPointerManager {
   }
 
   private fun removePointer(pointer: VoidPointer): Boolean {
-    ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
+    ThreadType.PHYSICS.requireCorrectThreadType()
     if (pointer.isInvalid) {
       return false
     }
@@ -53,7 +53,7 @@ class VoidPointerManager {
   }
 
   private fun removeObject(obj: Any): Boolean {
-    ThreadType.requireCorrectThreadType(ThreadType.PHYSICS)
+    ThreadType.PHYSICS.requireCorrectThreadType()
     val addr = objToAddr.removeLong(obj)
     return if (addr != NOT_IN_MANAGER) {
       addrToObj.remove(addr) != null

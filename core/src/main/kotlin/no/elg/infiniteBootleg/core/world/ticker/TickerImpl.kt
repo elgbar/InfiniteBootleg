@@ -129,9 +129,7 @@ class TickerImpl(private val ticking: Ticking, name: String, start: Boolean, tps
 
   override fun start() {
     check(!isStarted) { "Ticker thread has already been started" }
-    ThreadType.requireCorrectThreadType(ThreadType.RENDER) {
-      "Tickers can only be started from the render thread, it was called from ${ThreadType.currentThreadType()}"
-    }
+    ThreadType.RENDER.requireCorrectThreadType { "Tickers can only be started from the render thread" }
     isStarted = true
     tickerThread.start()
   }
