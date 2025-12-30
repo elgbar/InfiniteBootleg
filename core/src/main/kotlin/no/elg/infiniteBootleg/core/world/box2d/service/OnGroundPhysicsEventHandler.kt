@@ -5,10 +5,10 @@ import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.core.world.box2d.LongContactTracker
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
-import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem
+import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsEventSystem
 import org.jetbrains.annotations.Async
 
-object OnGroundPhysicsEventHandler : PhysicsSystem.PhysicsEventHandler {
+object OnGroundPhysicsEventHandler : PhysicsEventSystem.PhysicsEventHandler {
 
   private fun handleTouchEvent(entity: Entity, event: PhysicsEvent, contacts: LongContactTracker, handle: LongContactTracker.(loc: Long) -> Unit) {
     if (contacts.filter(event.getThisUserDataForShape(entity))) {

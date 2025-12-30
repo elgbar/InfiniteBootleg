@@ -311,7 +311,7 @@ abstract class World(
   private fun addSystems() {
     engine.addSystem(MaxVelocitySystem)
     engine.addSystem(UpdateBox2DStateSystem)
-    engine.addSystem(PhysicsSystem())
+    engine.addSystem(PhysicsEventSystem())
     engine.addSystem(UpdateGridBlockSystem)
     engine.addSystem(OutOfBoundsSystem)
     engine.addSystem(FallingBlockSystem())

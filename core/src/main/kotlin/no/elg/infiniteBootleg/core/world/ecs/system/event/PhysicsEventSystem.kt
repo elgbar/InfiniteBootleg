@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.core.world.ecs.entityWithPhysicsEventFamily
 import no.elg.infiniteBootleg.core.world.ecs.system.api.EventSystem
 
-class PhysicsSystem :
+class PhysicsEventSystem :
   EventSystem<PhysicsEvent, PhysicsEventQueueComponent>(
     family = entityWithPhysicsEventFamily,
     eventType = PhysicsEvent::class,

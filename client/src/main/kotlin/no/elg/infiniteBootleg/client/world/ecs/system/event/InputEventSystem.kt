@@ -45,7 +45,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.math.sign
 
-object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
+object InputEventSystem : EventSystem<InputEvent, InputEventQueueComponent>(
   controlledEntityWithInputEventFamily,
   InputEvent::class,
   InputEventQueueComponent.mapper

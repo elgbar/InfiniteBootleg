@@ -7,11 +7,11 @@ import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.SpellStateComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.SpellStateComponent.Companion.spellStateOrNull
-import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem
+import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsEventSystem
 import no.elg.infiniteBootleg.protobuf.Packets
 import org.jetbrains.annotations.Async
 
-object SpellContactPhysicsEventHandler : PhysicsSystem.PhysicsEventHandler {
+object SpellContactPhysicsEventHandler : PhysicsEventSystem.PhysicsEventHandler {
 
   fun handleSpellContactBeginsEvent(entity: Entity, event: PhysicsEvent.ContactBeginsEvent) {
     if (Main.isAuthoritative) {

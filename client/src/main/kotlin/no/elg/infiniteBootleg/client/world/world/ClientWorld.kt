@@ -11,9 +11,9 @@ import no.elg.infiniteBootleg.client.world.ecs.system.FollowEntitySystem
 import no.elg.infiniteBootleg.client.world.ecs.system.MagicSystem
 import no.elg.infiniteBootleg.client.world.ecs.system.MineBlockSystem
 import no.elg.infiniteBootleg.client.world.ecs.system.event.ContinuousInputSystem
-import no.elg.infiniteBootleg.client.world.ecs.system.event.InputSystem
+import no.elg.infiniteBootleg.client.world.ecs.system.event.InputEventSystem
 import no.elg.infiniteBootleg.client.world.render.ClientWorldRender
-import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem
+import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsEventSystem
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -45,12 +45,12 @@ abstract class ClientWorld : World {
       ContinuousInputSystem(ECSInputListener(this)),
       MineBlockSystem,
       FollowEntitySystem,
-      InputSystem,
+      InputEventSystem,
       MagicSystem
     )
 
   override fun configureSystem(system: EntitySystem) {
-    if (system is PhysicsSystem) {
+    if (system is PhysicsEventSystem) {
       system.handlers += DoorService
     }
   }

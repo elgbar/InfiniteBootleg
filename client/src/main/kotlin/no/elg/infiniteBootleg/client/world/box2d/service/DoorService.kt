@@ -6,10 +6,10 @@ import no.elg.infiniteBootleg.core.assets.InfAssets
 import no.elg.infiniteBootleg.core.world.box2d.ObjectContactTracker
 import no.elg.infiniteBootleg.core.world.ecs.components.DoorComponent.Companion.doorComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
-import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem
+import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsEventSystem
 import org.jetbrains.annotations.Async
 
-object DoorService : PhysicsSystem.PhysicsEventHandler {
+object DoorService : PhysicsEventSystem.PhysicsEventHandler {
 
   private fun handleDoorContactEvent(doorEntity: Entity, event: PhysicsEvent, handle: ObjectContactTracker<Entity>.(otherEntity: Entity) -> Unit) {
     val otherEntity = event.getOtherEventEntity(doorEntity) ?: return

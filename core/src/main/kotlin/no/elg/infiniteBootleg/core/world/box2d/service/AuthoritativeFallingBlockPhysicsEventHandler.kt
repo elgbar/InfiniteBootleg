@@ -11,14 +11,14 @@ import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.EntityTypeComponent.Companion.isType
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
-import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem
+import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsEventSystem
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType
 import org.jetbrains.annotations.Async
 
 private val logger = KotlinLogging.logger {}
 
-object AuthoritativeFallingBlockPhysicsEventHandler : PhysicsSystem.PhysicsEventHandler {
+object AuthoritativeFallingBlockPhysicsEventHandler : PhysicsEventSystem.PhysicsEventHandler {
 
   private const val MAX_DELTA_UP: BlockUnit = Chunk.CHUNK_SIZE
 
