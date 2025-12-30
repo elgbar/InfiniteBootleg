@@ -122,7 +122,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
 
   fun assertValid() {
     if (Settings.debug && chunk.isInvalid) {
-      IllegalAction.LOG.handle { "Chunk must be valid, listened to events when this chunk is disposed" }
+      IllegalAction.LOG.handle { "Chunk must be valid, listened to events when this chunk is disposed. Chunk $chunk" }
       dispose()
     }
   }

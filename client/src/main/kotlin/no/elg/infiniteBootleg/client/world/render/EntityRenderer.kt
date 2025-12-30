@@ -203,6 +203,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       val activeScreenX: Float
       val activeScreenY: Float
       if (entity.materialComponentOrNull != null) {
+        // Render blocks from their corner, not their center
         val position = box2d.body.position
         activeScreenX = (position.x - box2d.halfBox2dWidth).worldToScreen()
         activeScreenY = (position.y - box2d.halfBox2dHeight).worldToScreen()

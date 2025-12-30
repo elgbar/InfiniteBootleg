@@ -8,7 +8,7 @@ import no.elg.infiniteBootleg.core.world.ecs.AFTER
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_EVENT_HANDLING
 import no.elg.infiniteBootleg.core.world.ecs.components.events.InputEvent
 
-class ContinuousInputSystem(private val ecsInput: ECSInputListener) : EntitySystem(UPDATE_PRIORITY_EVENT_HANDLING + AFTER) {
+class ContinuousInputSystem(private val ecsInput: ECSInputListener) : EntitySystem(AFTER + UPDATE_PRIORITY_EVENT_HANDLING) {
 
   override fun update(deltaTime: Float) {
     for (keycode in ecsInput.keysDown) {
