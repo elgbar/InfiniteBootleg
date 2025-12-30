@@ -53,7 +53,7 @@ val VoidPointer.isValid: Boolean get() = !isInvalid
  * @throws CalledFromWrongThreadTypeException if the thread is not [ThreadType.PHYSICS]
  */
 internal fun genericSetUserData(value: Any?, property: KMutableProperty0<VoidPointer>) {
-  ThreadType.requireCorrectThreadType(ThreadType.PHYSICS) { "User data pointer must be set on the ${ThreadType.PHYSICS} thread" }
+  ThreadType.PHYSICS.requireCorrectThreadType { "User data pointer must be set on the ${ThreadType.PHYSICS} thread" }
   if (value == null) {
     val pointer = property.get()
     VoidPointerManager.removePointer(pointer)
