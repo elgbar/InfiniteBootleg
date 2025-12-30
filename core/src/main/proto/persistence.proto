@@ -44,6 +44,8 @@ message Block {
 
 message Chunk {
   Vector2i position = 1;
+  // blocks are stored in a flat array, size = CHUNK_SIZE * CHUNK_SIZE
+  // if size is 0 => empty chunk
   repeated Block blocks = 2;
   repeated Entity entities = 3;
 }

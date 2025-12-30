@@ -482,7 +482,10 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
         x = chunkX
         y = chunkY
       }
-      blocks += this@ChunkImpl.map { it?.save() ?: AIR_BLOCK_PROTO }
+      if (!isAllAir) {
+        // If we're all air, we save no blocks
+        blocks += this@ChunkImpl.map { it?.save() ?: AIR_BLOCK_PROTO }
+      }
     }
 
   override fun load(protoChunk: ProtoWorld.Chunk): Boolean {
@@ -498,20 +501,22 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
         )
       }"
     }
-    checkChunkCorrupt(protoChunk, protoChunk.blocksCount == Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE) {
-      "Invalid number of blocks. Expected ${Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE}, but got ${protoChunk.blocksCount}"
-    }
-
-    var index = 0
-    val protoBlocks = protoChunk.blocksList
-    synchronized(blocks) {
-      for (localY in 0 until Chunk.CHUNK_SIZE) {
-        for (localX in 0 until Chunk.CHUNK_SIZE) {
-          checkChunkCorrupt(protoChunk, blocks[localX][localY] == null) {
-            "Double assemble of ${stringifyCompactLoc(localX, localY)} in chunk ${stringifyCompactLoc(chunkPosition)}"
+    // Load blocks, no blocks means all air
+    if (protoChunk.blocksCount > 0) {
+      checkChunkCorrupt(protoChunk, protoChunk.blocksCount == Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE) {
+        "Invalid number of blocks. Expected ${Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE}, but got ${protoChunk.blocksCount}"
+      }
+      var index = 0
+      val protoBlocks: List<ProtoWorld.Block> = protoChunk.blocksList
+      synchronized(blocks) {
+        for (localY in 0 until Chunk.CHUNK_SIZE) {
+          for (localX in 0 until Chunk.CHUNK_SIZE) {
+            checkChunkCorrupt(protoChunk, blocks[localX][localY] == null) {
+              "Double assemble of ${stringifyCompactLoc(localX, localY)} in chunk ${stringifyCompactLoc(chunkPosition)}"
+            }
+            val protoBlock = protoBlocks[index++]
+            blocks[localX][localY] = Block.fromProto(world, this, localX, localY, protoBlock)
           }
-          val protoBlock = protoBlocks[index++]
-          blocks[localX][localY] = Block.fromProto(world, this, localX, localY, protoBlock)
         }
       }
     }
