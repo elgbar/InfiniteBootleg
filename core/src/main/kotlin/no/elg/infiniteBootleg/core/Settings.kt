@@ -72,7 +72,7 @@ object Settings {
 
   var renderClosestBlockToPlayerChunk = false
 
-  var renderBox2dEntityDifference = false
+  var renderEntityPosDifference = false
 
   var renderGroundedTouchingBlocks = false
 

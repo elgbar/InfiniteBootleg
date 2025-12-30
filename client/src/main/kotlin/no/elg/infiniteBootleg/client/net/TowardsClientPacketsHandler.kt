@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.client.console.clientSideClientBoundMarker
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.screens.ConnectingScreen
 import no.elg.infiniteBootleg.client.screens.WorldScreen
+import no.elg.infiniteBootleg.client.world.ecs.components.transients.LastServerPositionComponent.Companion.setLastServerPosition
 import no.elg.infiniteBootleg.client.world.managers.container.ServerClientWorldContainerManager
 import no.elg.infiniteBootleg.client.world.world.ServerClientWorld
 import no.elg.infiniteBootleg.core.console.logPacket
@@ -351,6 +352,7 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
     return
   }
   val serverPos = moveEntity.position
+  entity.setLastServerPosition(serverPos)
   if (Main.inst().isAuthorizedToChange(entity)) {
     val clientPos = entity.position
     val deltaPos = clientPos.dst2(serverPos.x, serverPos.y)
