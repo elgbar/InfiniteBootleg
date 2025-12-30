@@ -14,7 +14,9 @@ import no.elg.infiniteBootleg.core.world.Constants
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.box2d.extensions.gravityScale
 import no.elg.infiniteBootleg.core.world.box2d.extensions.isValid
+import no.elg.infiniteBootleg.core.world.box2d.extensions.position
 import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
+import no.elg.infiniteBootleg.core.world.box2d.extensions.velocity
 import no.elg.infiniteBootleg.core.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.LoadableMapper
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityOrZero
@@ -94,8 +96,13 @@ class Box2DBodyComponent(body: b2BodyId, val type: ProtoWorld.Entity.Box2D.BodyT
     }
   }
 
-  override fun hudDebug(): String =
-    "type: $type, gravity ${body.gravityScale}, size ${stringifyCompactLoc(box2dWidth, box2dHeight)}, disposed? $disposed, userdata ${internalBody?.userData}"
+  override fun hudDebug(): String {
+    val box2dBody = body
+    val size = stringifyCompactLoc(box2dWidth, box2dHeight)
+    val pos = stringifyCompactLoc(box2dBody.position)
+    val vel = stringifyCompactLoc(box2dBody.velocity)
+    return "type: $type, gravity ${box2dBody.gravityScale}, size $size, pos $pos, vel $vel, disposed? $disposed, userdata ${box2dBody.userData}"
+  }
 
   companion object : LoadableMapper<Box2DBodyComponent, ProtoWorld.Entity, (Entity) -> Unit>() {
     val Entity.box2dBody get() = box2d.body
