@@ -243,9 +243,19 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
         )
       }
 
-//      section {
-      // Room for one four buttons
-//      }
+      section {
+        toggleableDebugButton(
+          "Render pos difference",
+          """Render the difference between ashley, server, and box2d position
+            |* Red = ashley position
+            |* Green = last sent server position
+            |* Blue = box2d position
+          """.trimMargin(),
+          onAnyElementChanged = onAnyElementChanged,
+          property = Settings::renderEntityPosDifference
+        )
+//       Room for three more buttons
+      }
 
       sep()
       // Future positions renderers
