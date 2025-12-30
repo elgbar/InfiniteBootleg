@@ -2,13 +2,11 @@ package no.elg.infiniteBootleg.core.util
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntityListener
-import ktx.math.component1
-import ktx.math.component2
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.util.EntityFlags.INVALID_FLAG
 import no.elg.infiniteBootleg.core.util.EntityFlags.hasFlag
 import no.elg.infiniteBootleg.core.world.Material
-import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.core.world.world.World
@@ -31,7 +29,7 @@ fun Entity.interactableBlocks(
   radius: Float,
   interactionRadius: Float
 ): Sequence<WorldCompactLoc> {
-  val (worldX, worldY) = this.position
+  val (worldX, worldY) = positionComponent
   return World.getLocationsWithin(centerBlockX, centerBlockY, radius).asSequence()
     .filter { worldLoc: WorldCompactLoc -> world.isChunkLoaded(worldLoc.worldToChunk()) }
     .filter { (targetX, targetY) ->

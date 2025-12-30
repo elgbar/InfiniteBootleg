@@ -15,7 +15,7 @@ import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityOrZero
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
-import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.LastSpellCastComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.LastSpellCastComponent.Companion.lastSpellCastOrNull
@@ -26,6 +26,7 @@ import kotlin.time.TimeSource
 
 object MagicSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFAULT) {
 
+  private val diffVector = Vector2()
   private val posVector = Vector2()
   private val velVector = Vector2()
 
@@ -41,24 +42,24 @@ object MagicSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFAULT)
     if (existingSpellState.canCastAgain() && doCastNow) {
       // TODO Increase (distance/speed) by holding right click?
 
-      val position = entity.position
+      val (worldX, worldY) = entity.positionComponent
       val newSpellState = heldStaff.createSpellState(entity)
       entity.add(LastSpellCastComponent(newSpellState))
       val velocityOrZero = entity.velocityOrZero(velVector)
 
       inputMouseLocator.update(world)
-      posVector
+      diffVector
         .set(inputMouseLocator.mouseWorldX, inputMouseLocator.mouseWorldY)
-        .sub(position.x, position.y)
+        .sub(worldX, worldY)
         .nor()
 
       entity.containerOrNull?.remove(selectedItem, 1u)
       world.engine.createSpellEntity(
         world,
-        position.x,
-        position.y,
-        posVector.x * newSpellState.spellVelocity.toFloat() + velocityOrZero.x,
-        posVector.y * newSpellState.spellVelocity.toFloat() + velocityOrZero.y,
+        worldX,
+        worldY,
+        diffVector.x * newSpellState.spellVelocity.toFloat() + velocityOrZero.x,
+        diffVector.y * newSpellState.spellVelocity.toFloat() + velocityOrZero.y,
         newSpellState
       ) {
         newSpellState.castMark = TimeSource.Monotonic.markNow() + newSpellState.castDelay

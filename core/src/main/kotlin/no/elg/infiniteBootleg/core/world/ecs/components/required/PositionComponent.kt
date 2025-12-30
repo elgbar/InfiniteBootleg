@@ -35,8 +35,6 @@ class PositionComponent(x: WorldCoordFloat, y: WorldCoordFloat) : EntitySavableC
   operator fun component1(): WorldCoordFloat = x
   operator fun component2(): WorldCoordFloat = y
 
-  private val pos by lazy { Vector2(x, y) }
-
   val blockX: WorldCoord get() = x.worldToBlock()
   val blockY: WorldCoord get() = y.worldToBlock()
 
@@ -60,9 +58,10 @@ class PositionComponent(x: WorldCoordFloat, y: WorldCoordFloat) : EntitySavableC
     }
 
   /**
-   * Returns the same vector each time
+   * @param vec vector to set the position into
+   * @return the input [vec]
    */
-  fun toVector2(): Vector2 = pos.set(x, y)
+  fun toVector2(vec: Vector2): Vector2 = vec.set(x, y)
 
   override fun EntityKt.Dsl.save() {
     position = vector2f {
@@ -74,7 +73,8 @@ class PositionComponent(x: WorldCoordFloat, y: WorldCoordFloat) : EntitySavableC
   override fun hudDebug(): String = stringifyCompactLoc(x, y)
 
   companion object : EntityLoadableMapper<PositionComponent>() {
-    val Entity.position: Vector2 get() = positionComponent.toVector2()
+    fun Entity.position(vec: Vector2 = Vector2()): Vector2 = positionComponent.toVector2(vec)
+
     val Entity.compactBlockLoc: Long get() = positionComponent.run { compactInt(blockX, blockY) }
     val Entity.compactChunkLoc: Long get() = positionComponent.run { compactInt(chunkX, chunkY) }
     val Entity.positionComponent by propertyFor(mapper)

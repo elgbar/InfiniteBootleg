@@ -50,6 +50,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponen
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
 import no.elg.infiniteBootleg.core.world.render.ChunksInView
@@ -223,7 +224,7 @@ private fun handleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: Pack
   }
 
   val velocity = player.velocityOrZero()
-  val position = player.position
+  val position = player.position()
   val nextX = moveEntity.position.x
   val nextY = moveEntity.position.y
 
@@ -380,8 +381,8 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
   val validEntitiesToSendToClient = world.validEntitiesToSendToClient
     .filterNot { it.id == shared.entityId } // don't send the player to themselves
     .filter {
-      val pos = it.position
-      isLocInView(ctx, pos.x.toInt(), pos.y.toInt())
+      val (worldX, worldY) = it.positionComponent
+      isLocInView(ctx, worldX.toInt(), worldY.toInt())
     }
   if (validEntitiesToSendToClient.isNotEmpty()) {
     for (entity in validEntitiesToSendToClient) {
@@ -417,8 +418,8 @@ private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entityId
     ctx.writeAndFlushPacket(clientBoundDespawnEntity(entityId, Packets.DespawnEntity.DespawnReason.UNKNOWN_ENTITY))
     return
   }
-  val position = entity.position
-  if (entity.shouldSendToClients && isLocInView(ctx, position.x.toInt(), position.y.toInt())) {
+  val (worldX, worldY) = entity.positionComponent
+  if (entity.shouldSendToClients && isLocInView(ctx, worldX.toInt(), worldY.toInt())) {
     ctx.writeAndFlushPacket(clientBoundSpawnEntity(entity))
   }
 }

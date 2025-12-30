@@ -87,12 +87,10 @@ import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEngine
 import no.elg.infiniteBootleg.core.world.ecs.basicRequiredEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.basicRequiredEntityFamilyToSendToClient
 import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
-import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrToString
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
-import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.core.world.ecs.disposeBox2dOnRemoval
@@ -938,8 +936,8 @@ abstract class World(
     assertNotDisposed()
     val foundEntities = GdxArray<Entity>(false, 0)
     for (entity in standaloneEntities) {
-      val (x, y) = entity.getComponent(PositionComponent::class.java)
-      val size = entity.getComponent(Box2DBodyComponent::class.java)
+      val (x, y) = entity.positionComponent
+      val size = entity.box2d
       if (worldX in MathUtils.floor(x - size.halfBox2dWidth) until MathUtils.ceil(x + size.halfBox2dWidth) &&
         worldY in MathUtils.floor(y - size.halfBox2dHeight) until MathUtils.ceil(y + size.halfBox2dHeight)
       ) {
@@ -953,9 +951,9 @@ abstract class World(
     assertNotDisposed()
     for (entity in standaloneEntities) {
       val (x, y) = entity.positionComponent
-      val size = entity.box2d
-      if (worldX in MathUtils.floor(x - size.halfBox2dWidth) until MathUtils.ceil(x + size.halfBox2dWidth) &&
-        worldY in MathUtils.floor(y - size.halfBox2dHeight) until MathUtils.ceil(y + size.halfBox2dHeight)
+      val box2d = entity.box2d
+      if (worldX in MathUtils.floor(x - box2d.halfBox2dWidth) until MathUtils.ceil(x + box2d.halfBox2dWidth) &&
+        worldY in MathUtils.floor(y - box2d.halfBox2dHeight) until MathUtils.ceil(y + box2d.halfBox2dHeight)
       ) {
         return true
       }

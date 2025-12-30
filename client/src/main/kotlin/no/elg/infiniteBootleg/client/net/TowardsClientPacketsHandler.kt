@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.client.net
 
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.math.Vector2
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.client.console.clientSideClientBoundMarker
 import no.elg.infiniteBootleg.client.main.ClientMain
@@ -36,7 +37,7 @@ import no.elg.infiniteBootleg.core.world.blocks.BlockImpl
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.setVelocity
-import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityHoldingElement
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityHoldingElement.Companion.remoteEntityHoldingElementComponentOrNull
@@ -352,8 +353,8 @@ private fun ServerClient.physicsHandleMoveEntity(moveEntity: MoveEntity) {
   val serverPos = moveEntity.position
   entity.setLastServerPosition(serverPos)
   if (Main.inst().isAuthorizedToChange(entity)) {
-    val clientPos = entity.position
-    val deltaPos = clientPos.dst2(serverPos.x, serverPos.y)
+    val (clientX, clientY) = entity.positionComponent
+    val deltaPos = Vector2.dst2(clientX, clientY, serverPos.x, serverPos.y)
     if (deltaPos > CLIENT_SERVER_DIFF_SQUARED_TO_UPDATE_CONTROLLING_ENTITY) {
       logger.warn { "Teleporting controlled entity, we're too far away. $deltaPos > $CLIENT_SERVER_DIFF_SQUARED_TO_UPDATE_CONTROLLING_ENTITY" }
       entity.teleport(serverPos)

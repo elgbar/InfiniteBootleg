@@ -57,6 +57,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
   private val nameLayout = GlyphLayout()
   private val lightVector: Vector2 = Vector2()
+  private val posVector: Vector2 = Vector2()
 
   private val shapeRenderer: ShapeRenderer = ShapeRenderer().also {
     it.color = Color.GREEN
@@ -196,7 +197,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
         batch.projectionMatrix = worldRender.camera.combined
         FollowEntitySystem.processedPosition
       } else {
-        entity.position
+        entity.position(posVector)
       }
 
       val texture = entity.currentTexture()
