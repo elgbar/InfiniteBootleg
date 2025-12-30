@@ -146,7 +146,11 @@ sealed interface ThreadType {
 
     override fun isThreadType(thread: Thread): Boolean {
       val threadName = thread.name
-      return threadName.startsWith(SERVER_THREAD_PREFIX, false) || threadName.startsWith("multiThreadIoEventLoopGroup", false)
+      return ASYNC_THREAD_NAME == threadName || //
+        EVENTS_THREAD_NAME == threadName || //
+        threadName.startsWith("DefaultDispatcher", false) || //
+        threadName.startsWith(ASYNC_THREAD_NAME, false) || //
+        threadName.startsWith(EVENTS_THREAD_NAME, false)
     }
   }
 
@@ -159,10 +163,7 @@ sealed interface ThreadType {
   data object SERVER : ThreadType {
     override fun isThreadType(thread: Thread): Boolean {
       val threadName = thread.name
-      return ASYNC_THREAD_NAME == threadName || EVENTS_THREAD_NAME == threadName || threadName.startsWith("DefaultDispatcher", false) || threadName.startsWith(
-        ASYNC_THREAD_NAME,
-        false
-      ) || threadName.startsWith(EVENTS_THREAD_NAME, false)
+      return threadName.startsWith(SERVER_THREAD_PREFIX, false) || threadName.startsWith("multiThreadIoEventLoopGroup", false)
     }
   }
 
