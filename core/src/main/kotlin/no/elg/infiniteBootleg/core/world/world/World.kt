@@ -273,9 +273,6 @@ abstract class World(
 
     EventManager.oneShotListener<InitialChunksOfWorldLoadedEvent> {
       launchOnMainSuspendable {
-        logger.debug { "Handling InitialChunksOfWorldLoadedEvent, adding systems to the engine" }
-        addSystems()
-        metadata.isLoaded = true
         readChunks { readableChunks ->
           readableChunks.values().forEach(Chunk::updateAllBlockLights)
         }
@@ -287,6 +284,11 @@ abstract class World(
           }
         }
       }
+    }
+    EventManager.oneShotListener<WorldLoadedEvent> {
+      logger.debug { "Handling WorldLoadedEvent, adding systems to the engine" }
+      addSystems()
+      metadata.isLoaded = true
     }
   }
 
