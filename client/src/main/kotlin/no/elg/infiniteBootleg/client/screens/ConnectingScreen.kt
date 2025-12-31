@@ -47,7 +47,8 @@ object ConnectingScreen : StageScreen() {
         logger.error { "Liveliness test is too early, connection not yet established" }
       } else if (ClientMain.inst().screen is ConnectingScreen && connectAttempt == attempt) {
         // We are still trying to connect after 5 seconds
-        ClientMain.inst().serverClient?.ctx?.fatal("Failed to connect, server stopped responding")
+        val msg = "Failed to connect, server stopped responding"
+        ClientMain.inst().serverClient?.ctx?.fatal(msg) ?: also { info = msg }
       }
       livelinessTest = null
     }
