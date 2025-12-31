@@ -49,6 +49,8 @@ abstract class CommonMain<CONSOLE : GameConsoleHandler>(private val progArgs: Pr
   override fun create() {
     AnsiConsole.systemInstall()
     KtxAsync.initiate()
+    Thread.currentThread().priority = Thread.MAX_PRIORITY
+
     Box2d.initialize()
     renderThreadName = Thread.currentThread().name
     console = createConsole().apply {
