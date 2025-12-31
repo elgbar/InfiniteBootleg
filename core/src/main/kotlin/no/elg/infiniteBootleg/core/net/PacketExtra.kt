@@ -75,11 +75,13 @@ import java.time.Instant
 // util functions //
 // //////////////////
 
-fun ServerClient.serverBoundPacketBuilder(type: Type): Packet.Builder =
-  Packet.newBuilder()
+fun ServerClient.serverBoundPacketBuilder(type: Type): Packet.Builder {
+  val secret = sharedInformation?.secret ?: error("No shared information available")
+  return Packet.newBuilder()
     .setDirection(SERVER)
-    .setSecret(sharedInformation!!.secret) // FIXME
+    .setSecret(secret)
     .setType(type)
+}
 
 fun clientBoundPacketBuilder(type: Type): Packet.Builder =
   Packet.newBuilder()
