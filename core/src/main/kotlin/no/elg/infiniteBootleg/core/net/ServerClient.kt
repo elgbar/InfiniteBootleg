@@ -6,6 +6,7 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import io.netty.channel.ChannelFuture
 import no.elg.infiniteBootleg.core.events.ContainerEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
+import no.elg.infiniteBootleg.core.events.api.RegisteredEventListener
 import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner.EntityOwner
 import no.elg.infiniteBootleg.core.util.Progress
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
@@ -22,7 +23,8 @@ import java.time.Duration
  */
 class ServerClient(val name: String, var worldOrNull: World? = null, var protoEntity: ProtoWorld.Entity? = null) : Disposable {
 
-  lateinit var ctx: ChannelHandlerContextWrapper
+  private var _ctx: ChannelHandlerContextWrapper? = null
+  val ctx: ChannelHandlerContextWrapper get() = _ctx!!
   var sharedInformation: SharedInformation? = null
 
   /**
@@ -40,6 +42,21 @@ class ServerClient(val name: String, var worldOrNull: World? = null, var protoEn
   val entityId: String get() = sharedInformation?.entityId ?: error("Cannot access uuid of entity before it is given by the server")
 
   /**
+   * Make sure the server is updated with the latest container changes
+   */
+  private var containerContentChangedEventListener: RegisteredEventListener? = null
+
+  fun channelActive(ctx: ChannelHandlerContextWrapper) {
+    require(_ctx == null) { "ServerClient $name has already been initialized" }
+    this._ctx = ctx
+    containerContentChangedEventListener = EventManager.registerListener<ContainerEvent.ContentChanged> { event: ContainerEvent.ContentChanged ->
+      if (event.owner is EntityOwner && event.owner.entityId == entityId) {
+        sendServerBoundPacket { serverBoundContainerUpdate(event.owner, event.container) }
+      }
+    }
+  }
+
+  /**
    * Sends a packet from the client to the server
    *
    * This method is to make the api of sending packets more uniform
@@ -47,19 +64,18 @@ class ServerClient(val name: String, var worldOrNull: World? = null, var protoEn
   @Suppress("NOTHING_TO_INLINE")
   inline fun sendServerBoundPacket(packet: Packets.Packet): ChannelFuture = ctx.writeAndFlushPacket(packet)
 
-  /**
-   * Make sure the server is updated with the latest container changes
-   */
-  private val containerContentChangedEventListener = EventManager.registerListener<ContainerEvent.ContentChanged> { event: ContainerEvent.ContentChanged ->
-    if (event.owner is EntityOwner && event.owner.entityId == entityId) {
-      sendServerBoundPacket { serverBoundContainerUpdate(event.owner, event.container) }
-    }
-  }
-
   override fun dispose() {
-    sendServerBoundPacket { serverBoundClientDisconnectPacket("Server client disposed") }
-    containerContentChangedEventListener.removeListener()
-    ctx.disconnect()
+    if (sharedInformation != null) {
+      // We might have disposed before getting the shared information
+      sendServerBoundPacket { serverBoundClientDisconnectPacket("Server client disposed") }
+    }
+    containerContentChangedEventListener?.removeListener()
+    _ctx?.disconnect()
+    // Fix recursive dispose calls
+    worldOrNull?.also { world ->
+      worldOrNull = null
+      world.dispose()
+    }
   }
 
   companion object {

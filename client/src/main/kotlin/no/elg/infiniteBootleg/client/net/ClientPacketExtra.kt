@@ -26,6 +26,7 @@ internal fun ChannelHandlerContextWrapper.fatal(msg: String): Nothing {
     if (serverClient?.sharedInformation != null) {
       this@fatal.writeAndFlushPacket(serverClient.serverBoundClientDisconnectPacket(msg))
     }
+    serverClient?.dispose()
   }
   error(msg)
 }

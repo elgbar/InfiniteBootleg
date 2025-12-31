@@ -60,6 +60,7 @@ class ClientChannel(val client: ServerClient) {
         channel.closeFuture().sync()
       }
     } finally {
+      client.dispose()
       workerGroup.shutdownGracefully()
     }
   }

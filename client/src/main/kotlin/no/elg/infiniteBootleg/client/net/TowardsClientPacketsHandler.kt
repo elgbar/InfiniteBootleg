@@ -104,7 +104,7 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
   when (packet.type) {
     // Gameplay related packets
     DX_HEARTBEAT -> if (packet.hasHeartbeat()) handleHeartbeat()
-    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { world.postBox2dRunnable { physicsHandleMoveEntity(it) } }
+    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { worldOrNull?.postBox2dRunnable { physicsHandleMoveEntity(it) } }
     DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { launchOnAsyncSuspendable { asyncHandleBlockUpdate(it) } }
     CB_SPAWN_ENTITY -> packet.spawnEntityOrNull?.let { launchOnAsyncSuspendable { asyncHandleSpawnEntity(it) } }
     CB_UPDATE_CHUNK -> packet.updateChunkOrNull?.let { launchOnAsyncSuspendable { asyncHandleUpdateChunk(it) } }
