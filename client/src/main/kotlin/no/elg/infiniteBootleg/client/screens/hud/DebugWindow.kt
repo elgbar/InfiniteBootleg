@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.client.util.ibVisWindowClosed
 import no.elg.infiniteBootleg.client.util.setIBDefaults
 import no.elg.infiniteBootleg.client.world.render.FuturePositionRenderer
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
+import no.elg.infiniteBootleg.client.world.world.ClientWorld.Companion.recalculateLights
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.events.api.EventsTracker
@@ -162,9 +163,7 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           onAnyElementChanged,
           { false },
           {
-            world.readChunks { readableChunks ->
-              readableChunks.values().forEach(Chunk::updateAllBlockLights)
-            }
+            world.recalculateLights()
           }
         )
         toggleableDebugButton(

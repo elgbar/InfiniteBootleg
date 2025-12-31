@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.client.world.world
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.gdx.Gdx
+import ktx.assets.dispose
 import no.elg.infiniteBootleg.client.input.ECSInputListener
 import no.elg.infiniteBootleg.client.input.WorldInputHandler
 import no.elg.infiniteBootleg.client.main.ClientMain
@@ -13,6 +14,7 @@ import no.elg.infiniteBootleg.client.world.ecs.system.MineBlockSystem
 import no.elg.infiniteBootleg.client.world.ecs.system.event.ContinuousInputSystem
 import no.elg.infiniteBootleg.client.world.ecs.system.event.InputEventSystem
 import no.elg.infiniteBootleg.client.world.render.ClientWorldRender
+import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsEventSystem
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.core.world.world.World
@@ -59,6 +61,14 @@ abstract class ClientWorld : World {
     super.dispose()
     input.dispose()
     // Must be done on GL thread
-    Gdx.app.postRunnable { render.dispose() }
+    Gdx.app.postRunnable { render.dispose { it.printStackTrace() } }
+  }
+
+  companion object {
+    fun ClientWorld.recalculateLights() {
+      readChunks { readableChunks ->
+        readableChunks.values().forEach(Chunk::updateAllBlockLights)
+      }
+    }
   }
 }

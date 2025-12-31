@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.client.screens.hud.addDebugOverlay
 import no.elg.infiniteBootleg.client.screens.hud.addStaffCreatorOverlay
 import no.elg.infiniteBootleg.client.util.IBVisWindow
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
+import no.elg.infiniteBootleg.client.world.world.ClientWorld.Companion.recalculateLights
 import no.elg.infiniteBootleg.core.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.main.Main
@@ -54,6 +55,7 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     val showed = System.currentTimeMillis()
     EventManager.oneShotListener { event: WorldLoadedEvent ->
       if (event.world === world) {
+        world.recalculateLights()
         worldFinishedLoading = true
         logger.info { "Finished loading $world in ${System.currentTimeMillis() - showed}ms" }
       }
