@@ -41,6 +41,7 @@ class SinglePlayerWorld(generator: ChunkGenerator, seed: Long, worldName: String
     var worldLoaded = false
     futurePlayer.thenApply { player ->
       if (!worldLoaded) {
+        // make sure we dont disable gravity after the world has loaded
         player.box2d.disableGravity()
         player.setVelocity(0f, 0f)
       }

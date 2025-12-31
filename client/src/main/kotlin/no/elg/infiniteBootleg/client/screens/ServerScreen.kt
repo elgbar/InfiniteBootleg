@@ -63,21 +63,26 @@ object ServerScreen : StageScreen() {
             val username = nameField.text
             val serverClient = ServerClient(username)
             val clientChannel = ClientChannel(serverClient)
-            val thread = Thread({
-              try {
-                logger.info { "Trying to log into the server '${hostField.text}:${portSpinner.value}' with username '$username'" }
-                clientChannel.connect(hostField.text, portSpinner.value) {
-                  val channel = clientChannel.channel
-                  ConnectingScreen.channel = channel
-                  channel.writeAndFlush(serverBoundLoginPacket(username))
-                }
-              } catch (e: InterruptedException) {
-                logger.info(e) { "Server interruption received" }
-                Gdx.app.exit()
+            Thread.ofPlatform()
+              .name("Server connector")
+              .uncaughtExceptionHandler { thread, ex ->
+                logger.error(ex) { "Uncaught exception in thread '${thread.name}'" }
+                ConnectingScreen.info = "Connection failed: ${ex.message}"
               }
-            }, "Server")
-            thread.isDaemon = true
-            thread.start()
+              .start {
+                try {
+                  logger.info { "Trying to log into the server '${hostField.text}:${portSpinner.value}' with username '$username'" }
+                  clientChannel.connect(hostField.text, portSpinner.value) {
+                    val channel = clientChannel.channel
+                    ConnectingScreen.channel = channel
+                    channel.writeAndFlush(serverBoundLoginPacket(username))
+                  }
+                } catch (e: InterruptedException) {
+                  Thread.interrupted()
+                  logger.info(e) { "Server interruption received" }
+                  Gdx.app.exit()
+                }
+              }
           }
         }
         row()
