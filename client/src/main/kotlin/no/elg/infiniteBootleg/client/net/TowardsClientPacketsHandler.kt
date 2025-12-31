@@ -210,7 +210,7 @@ private fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus) {
 private fun ServerClient.handleLoginSuccess() {
   val world = clientWorld
   val protoPlayerEntity = protoEntity ?: ctx.fatal("Invalid player client side: Did not a receive an entity to control")
-  val futurePlayer: CompletableFuture<Entity> = world.load(protoPlayerEntity).orTimeout(5, TimeUnit.SECONDS)
+  val futurePlayer: CompletableFuture<Entity> = world.load(protoPlayerEntity).orTimeout(10, TimeUnit.SECONDS)
   ConnectingScreen.info = "Login successful! Waiting for player to be spawned..."
 
   futurePlayer.whenCompleteAsync { player, e ->
@@ -237,6 +237,7 @@ private fun ServerClient.handleStartGame(startGame: StartGame) {
     if (startGame.controlling.entityType != PLAYER) {
       ctx.fatal("Can only control a player, got ${startGame.controlling.entityType}")
     }
+
     this@handleStartGame.protoEntity = startGame.controlling
     val protoWorld = startGame.world
     this@handleStartGame.worldOrNull = ServerClientWorld(protoWorld, this@handleStartGame).apply {

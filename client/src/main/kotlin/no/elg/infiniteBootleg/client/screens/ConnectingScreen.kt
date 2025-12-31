@@ -42,7 +42,7 @@ object ConnectingScreen : StageScreen() {
   fun startLivelinessTest() {
     val attempt = connectAttempt
     // note the delay must be more than 50ms
-    livelinessTest = schedule(5f) {
+    livelinessTest = schedule(10f) {
       if (channel == null) {
         logger.error { "Liveliness test is too early, connection not yet established" }
       } else if (ClientMain.inst().screen is ConnectingScreen && connectAttempt == attempt) {

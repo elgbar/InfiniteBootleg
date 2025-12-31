@@ -44,10 +44,10 @@ inline fun <reified T : Component> EngineEntity.safeWith(component: () -> T): T?
  */
 inline fun Engine.futureEntity(configure: EngineEntity.(whenReady: CompletableFuture<Unit>) -> Unit = {}): CompletableFuture<Entity> {
   val entity: Entity = createEntity()
-  val configurationFuture = CompletableFuture<Unit>().orTimeout(1, TimeUnit.SECONDS).exceptionally {
+  val configurationFuture = CompletableFuture<Unit>().orTimeout(5, TimeUnit.SECONDS).exceptionally {
     throw IllegalStateException("Failed to complete future entity init", it)
   }
-  val addedToEngineFuture = CompletableFuture<Entity>().orTimeout(2, TimeUnit.SECONDS).exceptionally {
+  val addedToEngineFuture = CompletableFuture<Entity>().orTimeout(10, TimeUnit.SECONDS).exceptionally {
     throw IllegalStateException("Failed to add entity to engine", it)
   }
 
