@@ -16,13 +16,12 @@ import no.elg.infiniteBootleg.core.util.FailureWatchdog
  *
  * @param ticking The ticker to tick
  * @param name Name of the ticker thread
- * @param start If the thread should start at once
  * @param tps Ticks per seconds, must be a strictly positive number
  * @param nagDelay Minimum seconds between each nag message, If less than or equal to zero there will be no delay (note that this will be a lot of spam!)
  *
  * @author Elg
  */
-class TickerImpl(private val ticking: Ticking, name: String, start: Boolean, tps: Long, nagDelay: Double) :
+class TickerImpl(private val ticking: Ticking, name: String, tps: Long, nagDelay: Double) :
   Ticker,
   Runnable {
   /**
@@ -79,10 +78,6 @@ class TickerImpl(private val ticking: Ticking, name: String, start: Boolean, tps
     tickerThread = PauseableThread(this)
     tickerThread.name = tag
     tickerThread.isDaemon = true
-    if (start) {
-      // Do not begin ticking until the render thread is initialized
-      start()
-    }
   }
 
   private val postRunnableHandler: PostRunnableHandler = PostRunnableHandler()

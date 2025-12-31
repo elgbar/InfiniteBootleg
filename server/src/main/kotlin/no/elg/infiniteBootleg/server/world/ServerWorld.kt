@@ -42,7 +42,7 @@ private val logger = KotlinLogging.logger {}
 class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : World(generator, seed, worldName) {
 
   override val render = HeadlessWorldRenderer(this)
-  override val worldTicker: WorldTicker = ServerWorldTicker(this, tick = false)
+  override val worldTicker: WorldTicker = ServerWorldTicker(this)
   override val chunkLoader: ChunkLoader = FullChunkLoader(this, generator)
 
   override fun initialize() {

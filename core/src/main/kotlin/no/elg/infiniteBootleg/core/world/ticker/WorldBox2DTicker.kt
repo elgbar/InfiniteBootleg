@@ -3,9 +3,9 @@ package no.elg.infiniteBootleg.core.world.ticker
 import no.elg.infiniteBootleg.core.api.Ticking
 import no.elg.infiniteBootleg.core.world.world.World
 
-class WorldBox2DTicker(private val world: World, tick: Boolean) : Ticking {
+class WorldBox2DTicker(private val world: World) : Ticking {
 
-  val ticker: Ticker = TickerImpl(this, BOX2D_TICKER_TAG_PREFIX + world.name, tick, BOX2D_TPS, Double.MAX_VALUE)
+  val ticker: Ticker = TickerImpl(this, BOX2D_TICKER_TAG_PREFIX + world.name, BOX2D_TPS, Double.MAX_VALUE)
 
   override fun tick() {
     // tick all box2d elements

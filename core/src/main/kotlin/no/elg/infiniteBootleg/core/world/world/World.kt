@@ -214,7 +214,7 @@ abstract class World(
   val worldBody: WorldBody = WorldBody(this)
   val worldTime: WorldTime = WorldTime(this)
 
-  open val worldTicker: WorldTicker = CommonWorldTicker(this, false)
+  open val worldTicker: WorldTicker = CommonWorldTicker(this)
   open val worldContainerManager: WorldContainerManager = AuthoritativeWorldContainerManager(engine)
   abstract val chunkLoader: ChunkLoader
 

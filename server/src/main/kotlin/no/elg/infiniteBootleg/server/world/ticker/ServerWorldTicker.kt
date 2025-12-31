@@ -15,10 +15,10 @@ import no.elg.infiniteBootleg.server.world.ServerWorld
  *
  * Multiple tickers are needed due to some ticks will happen less frequently.
  */
-class ServerWorldTicker(world: ServerWorld, tick: Boolean) : WorldTicker {
+class ServerWorldTicker(world: ServerWorld) : WorldTicker {
 
-  private val ticker = CommonWorldTicker(world, tick)
-  private val serverRendererTicker: ServerRendererTicker = ServerRendererTicker(world, tick)
+  private val ticker = CommonWorldTicker(world)
+  private val serverRendererTicker: ServerRendererTicker = ServerRendererTicker(world)
 
   private val logger = KotlinLogging.logger(WORLD_TICKER_TAG_PREFIX + world.name)
   override val box2DTicker: WorldBox2DTicker get() = ticker.box2DTicker
