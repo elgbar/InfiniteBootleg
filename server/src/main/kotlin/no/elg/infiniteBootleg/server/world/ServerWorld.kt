@@ -106,9 +106,9 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
     super.removeEntity(entity, reason)
   }
 
-  override fun save() {
+  override fun save(overrideDispose: Boolean) {
     playersEntities.forEach(ServerWorldLoader::saveServerPlayer)
-    super.save()
+    super.save(overrideDispose)
   }
 
   fun getPlayer(channel: Channel): Entity? {

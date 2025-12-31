@@ -76,7 +76,6 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
   }
 
   override fun dispose() {
-    world.save()
     super.dispose()
     ClientMain.inst().updateStatus(null)
     world.dispose { it.printStackTrace() }

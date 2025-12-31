@@ -124,7 +124,6 @@ import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.world
 import java.lang.ref.WeakReference
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.StampedLock
@@ -473,9 +472,13 @@ abstract class World(
     return false
   }
 
-  open fun save() {
-    assertNotDisposed()
-    if (isTransient) {
+  fun save() = save(false)
+
+  /**
+   * Allow for saving when disposeing
+   */
+  protected open fun save(overrideDispose: Boolean) {
+    if ((!overrideDispose && hasDisposeBegun) || isTransient) {
       return
     }
     val worldFolder = worldFolder ?: return
@@ -1299,20 +1302,14 @@ abstract class World(
       return
     }
     metadata.worldDisposeState++
+    save(overrideDispose = true)
 
     logger.debug { "Switching thread for disposal of $this to physics thread" }
     val job = ThreadType.PHYSICS.launchOrRunSuspended(this) {
-      val saveTasks = writeChunks { writableChunks ->
-        writableChunks.values().map { chunk ->
-          chunk.save().thenRun { chunk.dispose() }
-        }.also { writableChunks.clear() }
-      } ?: emptyList()
-      logger.debug { "Waiting for ${saveTasks.size} chunks in $this to be saved" }
-      CompletableFuture.allOf(*saveTasks.toTypedArray()).thenApply { }.orTimeout(1, TimeUnit.MINUTES).exceptionally {
-        logger.error(it) { "Failed to save chunks in $this" }
-      }.get()
-
-      logger.debug { "Done saving world before disposal of $this" }
+      writeChunks { writableChunks ->
+        writableChunks.values().forEach(Chunk::dispose)
+        writableChunks.clear()
+      }
 
       if (!isTransient) {
         WorldLoader.deleteLockFile(uuid)
