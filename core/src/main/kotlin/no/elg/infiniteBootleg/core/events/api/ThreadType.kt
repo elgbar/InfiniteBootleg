@@ -18,6 +18,7 @@ import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnWorldTicker
 import no.elg.infiniteBootleg.core.util.launchOnWorldTickerSuspendable
+import no.elg.infiniteBootleg.core.util.sealedSubclassObjectInstances
 import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker.Companion.BOX2D_TICKER_TAG_PREFIX
 import no.elg.infiniteBootleg.core.world.ticker.WorldTicker
 import no.elg.infiniteBootleg.core.world.world.World
@@ -204,7 +205,7 @@ sealed interface ThreadType {
   companion object {
 
     /** All thread types instances */
-    val threadTypes: List<ThreadType> by lazy { ThreadType::class.sealedSubclasses.map { it.objectInstance ?: error("No object instance for ${it.simpleName}") } }
+    val threadTypes: List<ThreadType> by lazy { sealedSubclassObjectInstances<ThreadType>() }
 
     fun currentThreadType(): ThreadType {
       val currentThread = Thread.currentThread()

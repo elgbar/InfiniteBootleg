@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.safeWith
+import no.elg.infiniteBootleg.core.util.sealedSubclassObjectInstances
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.stringifyCompactLocWithChunk
 import no.elg.infiniteBootleg.core.world.blocks.Block
@@ -331,7 +332,7 @@ sealed interface Material : ContainerElement {
      */
     private val CAN_ALWAYS_BE_CREATED: ((World, WorldCoord, WorldCoord, Material) -> Boolean) = { _, _, _, _ -> true }
 
-    val materials: List<Material> = Material::class.sealedSubclasses.map { it.objectInstance ?: error("Material ${it.simpleName} is not an object") }
+    val materials: List<Material> = sealedSubclassObjectInstances<Material>()
 
     /**
      * All materials that can be interacted in a normal fashion by the player

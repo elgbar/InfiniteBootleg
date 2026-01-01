@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.core.world
 
 import no.elg.infiniteBootleg.core.items.ItemType
 import no.elg.infiniteBootleg.core.items.ToolItem
+import no.elg.infiniteBootleg.core.util.sealedSubclassObjectInstances
 
 @Suppress("unused")
 sealed interface Tool : TexturedContainerElement {
@@ -13,7 +14,7 @@ sealed interface Tool : TexturedContainerElement {
   }
 
   companion object {
-    val tools: List<Tool> = Tool::class.sealedSubclasses.map { it.objectInstance ?: error("Tool ${it.simpleName} is not an object") }
+    val tools: List<Tool> = sealedSubclassObjectInstances<Tool>()
 
     private val nameToTool: Map<String, Tool> = tools.associateBy { it.javaClass.simpleName.lowercase() }
     private val toolToName: Map<Tool, String> = tools.associateWith { it.javaClass.simpleName.lowercase() }
