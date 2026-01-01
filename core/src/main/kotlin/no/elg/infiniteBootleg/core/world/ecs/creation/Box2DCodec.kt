@@ -203,7 +203,7 @@ fun EngineEntity.createSpellBodyComponent(
     val shapeDef = Box2d.b2DefaultShapeDef().also { def ->
       def.isSensor(true)
       def.enableSensorEvents(true)
-      def.filter = Filters.GR_FB_BE__FALLING_BLOCK_FILTER
+      def.filter = Filters.GR_FB_BE__ENTITY_FILTER
     }
     createCircleShape(shapeDef, circle, entity)
   }

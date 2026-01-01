@@ -34,6 +34,10 @@ object Filters {
     categoryBits(ENTITY_CATEGORY)
     maskBits(GROUND_CATEGORY or ENTITY_CATEGORY or BLOCK_ENTITY_CATEGORY)
   }
+  val GR_FB_BE__ENTITY_FILTER: b2Filter = Box2d.b2DefaultFilter().apply {
+    categoryBits(ENTITY_CATEGORY)
+    maskBits(GROUND_CATEGORY or FALLING_BLOCK_CATEGORY or BLOCK_ENTITY_CATEGORY)
+  }
   val GR_FB_BE__FALLING_BLOCK_FILTER: b2Filter = Box2d.b2DefaultFilter().apply {
     categoryBits(FALLING_BLOCK_CATEGORY)
     maskBits(GROUND_CATEGORY or FALLING_BLOCK_CATEGORY or BLOCK_ENTITY_CATEGORY)
