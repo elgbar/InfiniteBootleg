@@ -40,8 +40,8 @@ data class ExplosiveComponent(var fuse: Float = FUSE_DURATION_SECONDS, val stren
     const val RESISTANCE = 8
     const val FUSE_DURATION_SECONDS = 3f
 
-    /** Maximum explosion radius  */
-    const val EXPLOSION_STRENGTH = 40
+    /** Default explosion radius  */
+    const val EXPLOSION_STRENGTH = 20
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = safeWith { ExplosiveComponent(protoEntity.explosive.fuse, protoEntity.explosive.strength) }
 
