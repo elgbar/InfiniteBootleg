@@ -55,15 +55,15 @@ Each gem will produce a different spell. The power of the spell is determined by
 
 ### Types of gems
 
-| Gem type   | Power meaning                                     | Effect when power at 100% | cast delay at 100% power | Description                                                                                                                                           |
-|------------|---------------------------------------------------|---------------------------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Diamond    | Greater break radius, i.e,. more blocks at a time | 10 block radius           | 0.1s                     | Allows to break blocks, slow and a small radius, but will always give blocks to the player                                                            |
-| Quartz     | Greater build radius, i.e,. more blocks at a time | 10 block radius           | 0.1s                     | will create blocks in a radius (radius is customizable during use of the staff)                                                                       |
-| Trapiche   | Greater teleport radius.                          | 10000 block radius        |                          | Teleports the player to the location of the staff, The staff must be placed there by a player. Needs a "twin" staff tuned to the same tag to teleport |
-| Sky gem    | More damage per thunderbolt                       | 100% of players health    |                          | Summons a thunderbolt to the location of the staff, can be used to create a defensive barrier                                                         |
-| Blast opal | Greater explosion                                 | 100 blocks                |                          | Destroys blocks in a radius, a low % will be mined, the rest will be destroyed                                                                        |
-| Dartle Gem | Dart further                                      | 10 blocks                 |                          | Allow player to teleport short distances (i.e., dart)                                                                                                 |
-| Obsidian   | More damage pr projectile                         | 100% of players health    |                          | Destroys blocks in a radius, a low % will be mined, the rest will be destroyed                                                                        |
+| Gem type   | Power meaning                                     | Effect when power at 100% | Description                                                                                                                                           |
+|------------|---------------------------------------------------|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Diamond    | Greater break radius, i.e,. more blocks at a time | 10 block radius           | Allows to break blocks, slow and a small radius, but will always give blocks to the player                                                            |
+| Quartz     | Greater build radius, i.e,. more blocks at a time | 10 block radius           | will create blocks in a radius (radius is customizable during use of the staff)                                                                       |
+| Trapiche   | Greater teleport radius.                          | 10000 block radius        | Teleports the player to the location of the staff, The staff must be placed there by a player. Needs a "twin" staff tuned to the same tag to teleport |
+| Sky gem    | More damage per thunderbolt                       | 100% of players health    | Summons a thunderbolt to the location of the staff, can be used to create a defensive barrier                                                         |
+| Blast opal | Greater explosion                                 | 100 blocks                | Destroys blocks in a radius, a low % will be mined, the rest will be destroyed                                                                        |
+| Dartle Gem | Dart further                                      | 10 blocks                 | Allow player to teleport short distances (i.e., dart)                                                                                                 |
+| Obsidian   | More damage pr projectile                         | 100% of players health    | Destroys blocks in a radius, a low % will be mined, the rest will be destroyed                                                                        |
 
 ### Flaw ratings - more flawed decrease the power of the gem
 
