@@ -112,8 +112,7 @@ class TickerImpl(private val ticking: Ticking, name: String, tps: Long, nagDelay
       try {
         Thread.sleep(ms)
       } catch (e: InterruptedException) {
-        Thread.interrupted()
-        logger.error(e) { "Ticker interrupted" }
+        logger.debug(e) { "$tag interrupted, disposed? $isDisposed, paused? $isPaused" }
       }
     } else if (tickId - lastTickNagged >= nagDelayTicks && tpsWarnThreshold >= realTPS) {
       lastTickNagged = tickId

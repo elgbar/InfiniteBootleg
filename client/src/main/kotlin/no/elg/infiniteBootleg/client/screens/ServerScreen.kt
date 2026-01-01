@@ -78,8 +78,7 @@ object ServerScreen : StageScreen() {
                     channel.writeAndFlush(serverBoundLoginPacket(username))
                   }
                 } catch (e: InterruptedException) {
-                  Thread.interrupted()
-                  logger.info(e) { "Server interruption received" }
+                  logger.info(e) { "Client connector interruption received" }
                   Gdx.app.exit()
                 }
               }
