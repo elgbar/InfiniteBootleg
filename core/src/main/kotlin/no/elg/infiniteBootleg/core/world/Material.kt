@@ -197,7 +197,7 @@ sealed interface Material : ContainerElement {
   }
 
   object BirchLeaves : Material, TexturedContainerElement {
-    override val hardness = 0.1f
+    override val hardness = 0.5f
     override val textureName: String get() = "birch_leaves"
     override val hasTransparentTexture = true
     override val isCollidable = false
