@@ -119,11 +119,18 @@ data object SpellSpeedRing : RatedRingType {
 //  }
 // }
 //
-data object SpellLightRing : RatedRingType {
+
+data object SpellLightRing : RatelessRingType {
   override val displayName: String = "Phosphorus Ring"
   override val serializedName: String = "SpellLight"
+  override val description: String
+    get() = "Causes the spell to emit light like a torch."
 
-  override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
-    state.entityModifications += { spell: Entity -> spell.safeWith { MaterialComponent(Material.Torch) } }
+  override fun onSpellCreate(state: MutableSpellState, rating: RingRating?) {
+    state.entityModifications += { spell: Entity ->
+      spell.safeWith { MaterialComponent(Material.Torch) }
+      // Must be occupying blocks to emit light
+      spell.safeWith { OccupyingBlocksComponent(hardLink = false) }
+    }
   }
 }
