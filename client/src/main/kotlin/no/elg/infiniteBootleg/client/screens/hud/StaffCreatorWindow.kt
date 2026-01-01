@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.client.screens.hud
 
+import com.kotcrab.vis.ui.widget.VisLabel
 import com.kotcrab.vis.ui.widget.VisSelectBox
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.actors.onChange
@@ -8,6 +9,7 @@ import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actor
 import ktx.scene2d.vis.KVisTable
 import ktx.scene2d.vis.visCheckBox
+import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.infiniteBootleg.client.util.IBVisWindow
@@ -102,13 +104,31 @@ fun addStaffCreatorOverlay(world: ClientWorld): IBVisWindow {
     fun KVisTable.addWoodSelector(): () -> Wood {
       var type: WoodType = Birch
       var rating: WoodRating = WoodRating.FRESHLY_CUT
-      visTable {
+      visTable { tableCell ->
         setIBDefaults()
-        sealedSelector<WoodType>(onAnyElementChanged, type) {
-          type = it
+        tableCell.grow()
+        var descLabel: VisLabel? = null
+        fun VisLabel.descWood(woodType: WoodType) {
+          val text =
+            "${woodType.description}\n" +
+              "Gem Slots: ${woodType.gemSlots}, Ring Slots: ${woodType.ringSlots}, Drying Rate: ${woodType.dryingRate}x, Cast Delay: ${woodType.castDelay.inWholeMilliseconds} ms"
+          setText(text)
+          this@ibVisWindowClosed.pack()
+        }
+        sealedSelector<WoodType>(onAnyElementChanged, type) { woodType ->
+          type = woodType
           containerTable.addGemsAndRings(type)
+          descLabel?.descWood(type)
         }
         enumSelector<WoodRating>(onAnyElementChanged, rating) { rating = it }
+        row()
+        descLabel = visLabel("") { cell ->
+          wrap = true
+          cell.colspan(2)
+          cell.growX()
+
+          descWood(type)
+        }
       }
       return { Wood(type, rating) }
     }
