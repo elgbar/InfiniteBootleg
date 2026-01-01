@@ -279,6 +279,8 @@ abstract class World(
           // Add a delay to make sure the light is calculated
           launchOnAsyncSuspendable {
             delay(200L)
+            // World must be set to loaded before dispatching WorldLoadedEvent
+            metadata.isLoaded = true
             EventManager.dispatchEvent(WorldLoadedEvent(world))
           }
         }
@@ -287,7 +289,6 @@ abstract class World(
     EventManager.oneShotListener<WorldLoadedEvent> {
       logger.debug { "Handling WorldLoadedEvent, adding systems to the engine" }
       addSystems()
-      metadata.isLoaded = true
     }
   }
 
