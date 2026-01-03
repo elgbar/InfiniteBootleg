@@ -1,11 +1,15 @@
 package no.elg.infiniteBootleg.core.world.magic
 
 import com.badlogic.ashley.core.Entity
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.world.Staff
 import kotlin.contracts.contract
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
+
+private val logger = KotlinLogging.logger {}
 
 interface SpellState {
   /**
@@ -48,6 +52,8 @@ interface SpellState {
   val castMark: TimeMark
 
   companion object {
+    val MIN_CAST_DELAY: Duration = 150.milliseconds
+
     fun SpellState?.canCastAgain(): Boolean {
       contract { returns(false) implies (this@canCastAgain != null) }
       return this == null || castMark.hasPassedNow()
@@ -70,8 +76,21 @@ data class MutableSpellState(
   override val staff: Staff,
   override var spellRange: Double,
   override var spellVelocity: Double,
-  override var castDelay: Duration,
+  // Fixed part of the cast delay that does not change with modifications
+  val fixedCastDelay: Duration,
+  // Variable part of the cast delay that can be modified with rings etc.
+  var variableCastDelay: Duration,
   override var gemPower: Double,
   override val entityModifications: MutableList<(Entity) -> Unit>,
   override var castMark: TimeMark = TimeSource.Monotonic.markNow() + Duration.INFINITE
-) : SpellState
+) : SpellState {
+  override val castDelay: Duration
+    get() {
+      val delay = fixedCastDelay + variableCastDelay
+      return if (delay < SpellState.MIN_CAST_DELAY) {
+        logger.warn { "Spell made which is less than the min cast delay! $this" }
+        SpellState.MIN_CAST_DELAY
+      } else
+        delay
+    }
+}

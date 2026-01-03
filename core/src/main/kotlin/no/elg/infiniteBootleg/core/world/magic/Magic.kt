@@ -36,6 +36,8 @@ data class Wood(val type: WoodType, val rating: WoodRating) :
 
   companion object {
     fun fromProto(proto: ProtoElement.Staff.Wood): Wood = Wood(WoodType.valueOf(proto.type), WoodRating.valueOf(proto.rating))
+    const val FIXED_DELAY_PERCENTAGE: Double = 0.4
+    const val VARIABLE_DELAY_PERCENTAGE: Double = 1.0 - FIXED_DELAY_PERCENTAGE
   }
 }
 

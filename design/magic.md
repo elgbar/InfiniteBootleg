@@ -23,6 +23,14 @@ Staff determines how powerful a spell can be combined into.
 All staff are made from wood, but can be made from different kind of wood.
 
 Cast delay will be affected by wood rating's absolute power.
+
+The cast delay is calculated is split into two components, to try and prevent "machine-gunning".
+They are called the fixed and the variable components.
+The fixed delay is 40% of the base delay, and the variable delay is 60% of the base delay.
+Only the variable delay can be affected by rings
+
+**Note:** There is a hard minimum cast delay of 150ms to prevent "machine-gunning" (game-breaking speeds.)
+
 | Wood type   | Gem slots | Ring slots | drying rate | Cast delay at 100% | Special modifier                                                                  | Description                                                                                   |
 |-------------|-----------|------------|-------------|--------------------|-----------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
 | Birch       | 1         | 0          | 100%        | 1000 ms            | N/A                                                                               | A weakly magical, but common, wood type known for its light color.                            |

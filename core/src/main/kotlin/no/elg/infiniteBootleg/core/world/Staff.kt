@@ -12,6 +12,8 @@ import no.elg.infiniteBootleg.core.world.magic.MutableSpellState
 import no.elg.infiniteBootleg.core.world.magic.Ring
 import no.elg.infiniteBootleg.core.world.magic.SpellState
 import no.elg.infiniteBootleg.core.world.magic.Wood
+import no.elg.infiniteBootleg.core.world.magic.Wood.Companion.FIXED_DELAY_PERCENTAGE
+import no.elg.infiniteBootleg.core.world.magic.Wood.Companion.VARIABLE_DELAY_PERCENTAGE
 import no.elg.infiniteBootleg.protobuf.ElementKt.staff
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Element as ProtoElement
 
@@ -37,7 +39,8 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
       staff = this,
       // FIXME placeholder
       spellRange = 32.0,
-      castDelay = wood.castDelay,
+      fixedCastDelay = wood.type.castDelay * FIXED_DELAY_PERCENTAGE,
+      variableCastDelay = wood.type.castDelay * VARIABLE_DELAY_PERCENTAGE,
       gemPower = wood.rating.powerPercent,
       // FIXME placeholder
       spellVelocity = 10.0,

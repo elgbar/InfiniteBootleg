@@ -101,7 +101,7 @@ data object IncarnationSpeedRing : RatedRingType {
     get() = "Decreases the casting time of the spell"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
-    state.castDelay /= rating.effectPercent
+    state.variableCastDelay /= rating.effectPercent
   }
 }
 
