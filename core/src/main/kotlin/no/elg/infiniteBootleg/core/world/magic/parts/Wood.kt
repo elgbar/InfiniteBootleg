@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package no.elg.infiniteBootleg.core.world.magic.parts
 
 import no.elg.infiniteBootleg.core.util.sealedSubclassObjectInstances
@@ -10,11 +12,11 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 
 enum class WoodRating(val powerPercent: Double, timeToNext: Duration) : Named {
-  FRESHLY_CUT(0.3, 1.hours),
-  DRIED(0.5, 2.hours),
-  AGED(0.7, 5.hours),
-  ANCIENT(0.9, 10.hours),
-  PETRIFIED(1.0, Duration.INFINITE);
+  FRESHLY_CUT(1.0, 1.hours),
+  DRIED(1.2, 2.hours),
+  AGED(1.4, 5.hours),
+  ANCIENT(1.6, 4.hours),
+  PETRIFIED(1.7, Duration.INFINITE);
 
   override val displayName: String = name.toTitleCase()
 }
