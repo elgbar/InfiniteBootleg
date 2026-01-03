@@ -22,15 +22,16 @@ Staff determines how powerful a spell can be combined into.
 
 All staff are made from wood, but can be made from different kind of wood.
 
+Cast delay will be affected by wood rating's absolute power.
 | Wood type   | Gem slots | Ring slots | drying rate | Cast delay at 100% | Special modifier                                                                  | Description                                                                                   |
 |-------------|-----------|------------|-------------|--------------------|-----------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
-| Birch       | 1         | 0          | 100%        | 333 ms             | N/A                                                                               | A weakly magical, but common, wood type known for its light color.                            |
-| Birch       | 1         | 1          | 100%        | 333 ms             | N/A                                                                               | A slightly more magical wood to the common birch                                              |
-| Aerowode    | 1         | 1          | 100%        | 250 ms             | Player gravity is lowered by up to 20% from normal. Imcompatible with `Lead` ring | A rare and lightweight wood that seems to almost float in the air                             |
-| Red wood    | 1         | 0          | 200%        | 150 ms             | Will start fires, at random                                                       | The wood crackles and smokes, making it dry very quickly                                      |
-| driftwood   | 1         | 3          | 25%         | 300 ms             | Works while under water                                                           | Even when dried, drops of water forms around its base                                         |
-| Wisted wood | 2         | 1          | 100%        | 100 ms             | N/A                                                                               | A magical twisted and gnarled wood, known for its ring capacity and speed                     |
-| Trekant     | 3         | 2          | 100%        | 100 ms             | N/A                                                                               | A legendary triangular cross-section wood, prized for its unique shape and magical properties |
+| Birch       | 1         | 0          | 100%        | 1000 ms            | N/A                                                                               | A weakly magical, but common, wood type known for its light color.                            |
+| Birch       | 1         | 1          | 100%        | 1000 ms            | N/A                                                                               | A slightly more magical wood to the common birch                                              |
+| Aerowode    | 1         | 1          | 100%        | 750 ms             | Player gravity is lowered by up to 20% from normal. Imcompatible with `Lead` ring | A rare and lightweight wood that seems to almost float in the air                             |
+| Red wood    | 2         | 2          | 200%        | 500 ms             | Will start fires, at random, where the spell lands                                | The wood crackles and smokes, making it dry very quickly                                      |
+| driftwood   | 1         | 1          | 25%         | 900 ms             | Works while under water                                                           | Even when dried, drops of water forms around its base                                         |
+| Wisted wood | 2         | 1          | 100%        | 300 ms             | N/A                                                                               | A magical twisted and gnarled wood, known for its ring capacity and speed                     |
+| Trekant     | 3         | 2          | 100%        | 300 ms             | N/A                                                                               | A legendary triangular cross-section wood, prized for its unique shape and magical properties |
 
 ### Wood rating
 

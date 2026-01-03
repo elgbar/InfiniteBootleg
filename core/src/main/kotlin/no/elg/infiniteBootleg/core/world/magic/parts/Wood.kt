@@ -34,41 +34,41 @@ sealed class WoodType(val gemSlots: UInt, val ringSlots: UInt, val dryingRate: D
   }
 }
 
-data object Birch : WoodType(1u, 0u, 1.0, 333.milliseconds) {
+data object Birch : WoodType(1u, 0u, 1.0, 1000.milliseconds) {
   override val description: String get() = "A weakly magical, but common, wood type known for its light color."
   override val displayName: String get() = "Birch"
 }
 
-data object HangingBirch : WoodType(1u, 1u, 1.0, 333.milliseconds) {
+data object HangingBirch : WoodType(1u, 1u, 1.0, 1000.milliseconds) {
   override val description: String get() = "A slightly more magical wood to the common birch"
   override val displayName: String get() = "Hanging Birch"
 }
 
-//TODO on equip: player's gravity is reduced by 20% * rating.powerPercent
-//TODO Imcompatible with `Lead` ring
-data object Aerowode : WoodType(1u, 0u, 1.0, 250.milliseconds) {
+// TODO on equip: player's gravity is reduced by 20% * rating.powerPercent
+// TODO Imcompatible with `Lead` ring
+data object Aerowode : WoodType(1u, 0u, 1.0, 750.milliseconds) {
   override val description: String get() = "A rare and lightweight wood that seems to almost float in the air"
   override val displayName: String get() = "Aerowode"
 }
 
-// TODO make it start random fires
-data object RedWood : WoodType(1u, 0u, 2.0, 150.milliseconds) {
+// TODO make it start random fires on spell land
+data object RedWood : WoodType(1u, 0u, 2.0, 500.milliseconds) {
   override val description: String get() = "The wood crackles and smokes, making it dry very quickly"
   override val displayName: String get() = "Redwood"
 }
 
 // todo make it work under water
-data object Driftwood : WoodType(1u, 3u, 0.25, 300.milliseconds) {
+data object Driftwood : WoodType(1u, 3u, 0.25, 900.milliseconds) {
   override val description: String get() = "Even when dried, drops of water forms around its base"
   override val displayName: String get() = "Driftwood"
 }
 
-data object WistedWood : WoodType(2u, 1u, 1.0, 100.milliseconds) {
+data object WistedWood : WoodType(2u, 1u, 1.0, 300.milliseconds) {
   override val description: String get() = "A magical twisted and gnarled wood, known for its ring capacity and speed"
   override val displayName: String get() = "Wistedwood"
 }
 
-data object Trekant : WoodType(3u, 2u, 1.0, 50.milliseconds) {
+data object Trekant : WoodType(3u, 2u, 1.0, 300.milliseconds) {
   override val description: String get() = "A legendary triangular cross-section wood, prized for its unique shape and magical properties."
   override val displayName: String get() = "Trekant"
 }
