@@ -77,7 +77,7 @@ fun addStaffCreatorOverlay(world: ClientWorld): IBVisWindow {
 
     @Scene2dDsl
     fun KVisTable.addRingSelector(): () -> Ring? =
-      addSelector<RingType<RingRating?>, RingRating, Ring>(GravityRing, RingRating.FLAWLESS, onAnyElementChanged) { type, rating -> Ring(type, rating) }
+      addSelector<RingType<RingRating?>, RingRating, Ring>(GravityRing, RingRating.PERFECT, onAnyElementChanged) { type, rating -> Ring(type, rating) }
 
     @Scene2dDsl
     fun KVisTable.addGemsAndRings(type: WoodType) {

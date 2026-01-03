@@ -112,6 +112,7 @@ Note that the flaw rating will only affect the power of the gem, not the whole s
 ---
 
 Rings can be used to modify the spell-entity and/or the holder of the staff.
+
 Each ring will have a different effect on the spell.
 Rings are named after elements of the periodic table, and should somewhat relate to what they are used for in the real world.
 
@@ -137,12 +138,17 @@ To give some meat here is the boring list of all the "normal" rings
 | Tin       | Increases spell speed (Speed of spell-entity)                   |                       |
 | Titanium  | Increases player movement speed                                 | Lightweight material  |
 
-| Flaw rating    | +Effect% | Relative increase | Description                                                     |
-|----------------|----------|-------------------|-----------------------------------------------------------------|
-| Flawless       | 160%     | 10%               | I didn't know this perfection of existed anymore!               |
-| Minor scratch  | 150%     | 5%                | A small few surface scratches shouldn't be too much of an issue |
-| Major scratch  | 145%     | 5%                | A large few surface scratches, might be an issue                |
-| Minor chip     | 140%     | 5%                | Someone got a matching small piece of this                      |
+Each normal ring have a flaw rating which indicate how much they linearly increase the gem effect.
+Even a ring of the lowest quality is still better than no ring at all.
+If a ring had a negative effect, then no player would have equipped it.
+
+| Ring flaw rating | +Gem Effect% | Relative increase | Description                                                     |
+|------------------|--------------|-------------------|-----------------------------------------------------------------|
+| Perfect          | 175%         | 15%               | I didn't know this perfection of existed!                       |
+| Nearly Perfect   | 160%         | 10%               | Too bad someone dropped it, it should've been perfect           |
+| Minor scratch    | 150%         | 5%                | A small few surface scratches shouldn't be too much of an issue |
+| Major scratch    | 145%         | 5%                | A large few surface scratches, might be an issue                |
+| Minor chip       | 140%         | 5%                | Someone got a matching small piece of this                      |
 | Major chip     | 135%     | 10%               | Someone got a matching big piece of this                        |
 | Large fragment | 125%     | 10%               | Almost whole, just missing most of it                           |
 | Small fragment | 115%     | 5%                | More than the pieces                                            |

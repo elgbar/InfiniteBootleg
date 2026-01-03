@@ -1,11 +1,15 @@
+@file:Suppress("unused")
+
 package no.elg.infiniteBootleg.core.world.magic.parts
 
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.core.util.safeWith
+import no.elg.infiniteBootleg.core.util.sealedSubclassObjectInstances
 import no.elg.infiniteBootleg.core.util.toTitleCase
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.MaterialComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.core.world.magic.Description
 import no.elg.infiniteBootleg.core.world.magic.Equippable
 import no.elg.infiniteBootleg.core.world.magic.MagicEffectsWithRating
@@ -13,7 +17,8 @@ import no.elg.infiniteBootleg.core.world.magic.MutableSpellState
 import no.elg.infiniteBootleg.core.world.magic.Named
 
 enum class RingRating(val effectPercent: Double) : Named {
-  FLAWLESS(1.6),
+  PERFECT(1.75),
+  NEARLY_PERFECT(1.6),
   MINORLY_SCRATCHED(1.5),
   MAJORLY_SCRATCHED(1.45),
   MINORLY_CHIPPED(1.40),
@@ -34,21 +39,12 @@ sealed interface RingType<in R : RingRating?> :
   Description {
   companion object {
 
-    fun valueOf(serializedName: String): RingType<RingRating?>? {
-      @Suppress("UNCHECKED_CAST")
-      return when (serializedName) {
-        GravityRing.serializedName -> GravityRing
-        PowerRing.serializedName -> PowerRing
-        SpellRangeRing.serializedName -> SpellRangeRing
-        IncarnationSpeedRing.serializedName -> IncarnationSpeedRing
-        SpellSpeedRing.serializedName -> SpellSpeedRing
-        SpellLightRing.serializedName -> SpellLightRing
-        else -> {
-          logger.error { "Failed to parse ring type '$serializedName', it will be absent" }
-          null
-        }
-      } as RingType<RingRating?>?
-    }
+    val ringRatings: List<RingType<RingRating?>> by lazy { sealedSubclassObjectInstances<RingType<RingRating?>>() }
+
+    fun valueOf(serializedName: String): RingType<RingRating?> =
+      requireNotNull(ringRatings.find { it.serializedName == serializedName }) {
+        "Unknown ring type $serializedName"
+      }
   }
 }
 
