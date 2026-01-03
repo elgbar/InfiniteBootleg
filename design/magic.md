@@ -7,7 +7,7 @@ Each staff is created by combining a type of wood and a gem. The wood will deter
 spell.
 Each staff has 1+ slots and 0+ ring slots. The slots types are determined by the wood type.
 
-Each staff can be "forged" with a different spell. The wood used will determine how powerful the spell is.
+Each staff can be "forged" with a different spell. The wood used will determine how powerful the spell is with the number of slots available.
 The spells are not "learned" by the player, but are "forged" into the staff. The player can only use the staff to cast spells.
 
 The power of a staff is specific to each spell. Some attributes can be increased by rings for all staffs, such as casting speed
@@ -17,6 +17,24 @@ The power of a staff is specific to each spell. Some attributes can be increased
 ---
 
 Staff determines how powerful a spell can be combined into.
+
+### Removing gems and rings (not implemented)
+
+#### Rings
+
+Rings can be removed at any time without any cost or degradation.
+
+#### Gems
+
+There are two ways to remove gems from a staff.
+
+1. Dragging gems out
+
+* The wood is recovered intact, but the gem will be scratched and its gem rating will be decreased.
+
+2. Destroy the wood
+
+* The gem can be recovered intact, but the wood will be destroyed in the process.
 
 ### Wood types
 
