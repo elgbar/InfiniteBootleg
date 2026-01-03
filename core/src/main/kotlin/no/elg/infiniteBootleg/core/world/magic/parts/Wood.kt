@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.core.world.magic.parts
 
 import no.elg.infiniteBootleg.core.util.sealedSubclassObjectInstances
+import no.elg.infiniteBootleg.core.util.toTitleCase
 import no.elg.infiniteBootleg.core.world.magic.Description
 import no.elg.infiniteBootleg.core.world.magic.MagicEffectsWithRating
 import no.elg.infiniteBootleg.core.world.magic.Named
@@ -8,12 +9,14 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 
-enum class WoodRating(val powerPercent: Double, timeToNext: Duration) {
+enum class WoodRating(val powerPercent: Double, timeToNext: Duration) : Named {
   FRESHLY_CUT(0.3, 1.hours),
   DRIED(0.5, 2.hours),
   AGED(0.7, 5.hours),
   ANCIENT(0.9, 10.hours),
-  PETRIFIED(1.0, Duration.INFINITE)
+  PETRIFIED(1.0, Duration.INFINITE);
+
+  override val displayName: String = name.toTitleCase()
 }
 
 sealed class WoodType(val gemSlots: UInt, val ringSlots: UInt, val dryingRate: Double, val castDelay: Duration) :

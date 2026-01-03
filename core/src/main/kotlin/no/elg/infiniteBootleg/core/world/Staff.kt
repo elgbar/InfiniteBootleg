@@ -5,6 +5,7 @@ import no.elg.infiniteBootleg.core.items.Item
 import no.elg.infiniteBootleg.core.items.ItemType
 import no.elg.infiniteBootleg.core.items.StaffItem
 import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
+import no.elg.infiniteBootleg.core.world.magic.Description
 import no.elg.infiniteBootleg.core.world.magic.Equippable
 import no.elg.infiniteBootleg.core.world.magic.Gem
 import no.elg.infiniteBootleg.core.world.magic.MutableSpellState
@@ -16,11 +17,19 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Element as ProtoElement
 
 data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
   Equippable,
-  ContainerElement {
+  ContainerElement,
+  Description {
 
   init {
     check(gems.isNotEmpty()) { "A staff must have at least one gem" }
   }
+
+  override val displayName: String
+    get() = wood.displayName
+
+  override val description: String = wood.type.description +
+    gems.joinToString(separator = "\n", prefix = "\n") { "${it.displayName} ${it.type.description}" } +
+    rings.joinToString(separator = "\n", prefix = if (rings.isNotEmpty()) "\n" else "") { "${it.displayName} ${it.type.description}" }
 
   fun createSpellState(entity: Entity): MutableSpellState {
     val state = MutableSpellState(

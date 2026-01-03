@@ -3,25 +3,30 @@ package no.elg.infiniteBootleg.core.world.magic.parts
 import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.util.breakableLocs
+import no.elg.infiniteBootleg.core.util.toTitleCase
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.core.world.magic.Description
 import no.elg.infiniteBootleg.core.world.magic.MagicEffectsWithRating
 import no.elg.infiniteBootleg.core.world.magic.Named
 import no.elg.infiniteBootleg.core.world.magic.SpellState
 
 private val logger = KotlinLogging.logger {}
 
-enum class GemRating(val powerPercent: Double) {
+enum class GemRating(val powerPercent: Double) : Named {
   FLAWLESS(1.0),
   SCRATCHED(0.85),
   CHIPPED(0.7),
   CRACKED(0.5),
   FRACTURED(0.25),
-  RUINED(0.0)
+  RUINED(0.0);
+
+  override val displayName: String = name.toTitleCase()
 }
 
 sealed interface GemType :
   Named,
+  Description,
   MagicEffectsWithRating<GemRating> {
 
   val maxPower: Double
@@ -43,6 +48,9 @@ data object Diamond : GemType {
   override val displayName: String = "Diamond"
 
   override val maxPower: Double = 5.0 // blocks radius
+
+  override val description: String
+    get() = "Destructive mining spell that breaks blocks in an area upon landing."
 
   override fun onSpellLand(state: SpellState, spellEntity: Entity, rating: GemRating) {
     val breakRadius = (maxPower * state.gemPower * rating.powerPercent).coerceAtLeast(1.0)

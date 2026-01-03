@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.core.util
 
 val CAMELCASE_REGEX = "([A-Z][a-z]|[A-Z]+(?![a-z]))".toRegex()
 
+fun String.toTitleCase(): String = (lowercase() as CharSequence).toTitleCase()
 fun CharSequence.toTitleCase(): String {
   val title = CAMELCASE_REGEX.replace(this) { " ${it.value}" }
   val first = title.first()

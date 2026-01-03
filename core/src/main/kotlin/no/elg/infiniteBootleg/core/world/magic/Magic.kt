@@ -14,9 +14,15 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Element as ProtoElement
 
 data class Wood(val type: WoodType, val rating: WoodRating) :
   MagicEffects,
-  Equippable {
+  Equippable,
+  Named,
+  Description {
 
-  val castDelay by lazy { type.castDelay / rating.powerPercent }
+  override val displayName: String
+    get() = "${rating.displayName} ${type.displayName}"
+
+  override val description: String
+    get() = type.description
 
   override fun onSpellCreate(state: MutableSpellState) = type.onSpellCreate(state, rating)
   override fun onSpellCast(state: SpellState, spellEntity: Entity) = type.onSpellCast(state, spellEntity, rating)
@@ -35,9 +41,15 @@ data class Wood(val type: WoodType, val rating: WoodRating) :
 
 data class Gem(val type: GemType, val rating: GemRating) :
   MagicEffects,
-  Equippable {
+  Equippable,
+  Named,
+  Description {
 
-  val power = rating.powerPercent
+  override val displayName: String
+    get() = "${rating.displayName} ${type.displayName}"
+
+  override val description: String
+    get() = type.description
 
   override fun onSpellCreate(state: MutableSpellState) = type.onSpellCreate(state, rating)
   override fun onSpellCast(state: SpellState, spellEntity: Entity) = type.onSpellCast(state, spellEntity, rating)
@@ -56,7 +68,14 @@ data class Gem(val type: GemType, val rating: GemRating) :
 
 data class Ring(val type: RingType<RingRating?>, val rating: RingRating?) :
   MagicEffects,
+  Named,
   Equippable {
+
+  override val displayName: String = if (rating != null) {
+    "${rating.displayName} ${type.displayName}"
+  } else {
+    type.displayName
+  }
 
   override fun onSpellCreate(state: MutableSpellState) = type.onSpellCreate(state, rating)
   override fun onSpellCast(state: SpellState, spellEntity: Entity) = type.onSpellCast(state, spellEntity, rating)

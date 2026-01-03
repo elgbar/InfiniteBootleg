@@ -31,10 +31,11 @@ import no.elg.infiniteBootleg.core.events.api.EventManager.registerListener
 import no.elg.infiniteBootleg.core.events.api.RegisteredEventListener
 import no.elg.infiniteBootleg.core.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.core.items.Item
-import no.elg.infiniteBootleg.core.items.Item.Companion.displayName
+import no.elg.infiniteBootleg.core.items.Item.Companion.fullName
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.safeUse
 import no.elg.infiniteBootleg.core.util.withColor
+import no.elg.infiniteBootleg.core.world.magic.Description
 
 @Scene2dDsl
 fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop: DragAndDrop, batch: Batch): IBVisWindow {
@@ -82,7 +83,7 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
     )
 
     for (containerSlot in container) {
-      visImageButton {
+      visImageButton { it ->
         val tooltip = visTextTooltip("")
 
         var fbo: FrameBuffer? = null
@@ -99,7 +100,8 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
             fbo = null
             defaultDrawable
           }
-          tooltip.setText(item.displayName)
+          val description = (item as? Description)?.run { "\n $description" } ?: ""
+          tooltip.setText(item.fullName + description)
         }
 
         it.pad(2f).space(2f)
