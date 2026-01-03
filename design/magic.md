@@ -80,21 +80,23 @@ The drying rate is also affected by the wood type. Some wood types will dry fast
 
 ---
 
-Each gem will produce a different spell. The power of the spell is determined by the quality of the gem (flaw rating). Gems have names after precious stones
+Each gem will produce a different spell.
+The power of the spell is determined by the quality of the gem (flaw rating).
+Gems have names after precious stones
 
 ### Types of gems
 
 | Gem type   | Power meaning                                     | Effect when power at 100% | Description                                                                                                                                           |
 |------------|---------------------------------------------------|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Diamond    | Greater break radius, i.e,. more blocks at a time | 10 block radius           | Allows to break blocks, slow and a small radius, but will always give blocks to the player                                                            |
-| Quartz     | Greater build radius, i.e,. more blocks at a time | 10 block radius           | will create blocks in a radius (radius is customizable during use of the staff)                                                                       |
+| Diamond    | Greater break radius, i.e,. more blocks at a time | 5 block radius            | Allows to break blocks, slow and a small radius, but will always give blocks to the player                                                            |
+| Quartz     | Greater build radius, i.e,. more blocks at a time | 5 block radius            | will create blocks in a radius (radius is customizable during use of the staff)                                                                       |
 | Trapiche   | Greater teleport radius.                          | 10000 block radius        | Teleports the player to the location of the staff, The staff must be placed there by a player. Needs a "twin" staff tuned to the same tag to teleport |
-| Sky gem    | More damage per thunderbolt                       | 100% of players health    | Summons a thunderbolt to the location of the staff, can be used to create a defensive barrier                                                         |
-| Blast opal | Greater explosion                                 | 100 blocks                | Destroys blocks in a radius, a low % will be mined, the rest will be destroyed                                                                        |
+| Sky gem    | More damage per thunderbolt                       | 75% of players health     | Summons a thunderbolt to the location of the staff, can be used to create a defensive barrier. Does not create normal spell entity                    |
+| Blast opal | Greater explosion                                 | 25 blocks                 | Destroys blocks in a radius, a low % will be mined, the rest will be destroyed                                                                        |
 | Dartle Gem | Dart further                                      | 10 blocks                 | Allow player to teleport short distances (i.e., dart)                                                                                                 |
-| Obsidian   | More damage pr projectile                         | 100% of players health    | Destroys blocks in a radius, a low % will be mined, the rest will be destroyed                                                                        |
+| Obsidian   | More damage pr projectile                         | 90% of players health     | Spell which damages player                                                                                                                            |
 
-### Flaw ratings - more flawed decrease the power of the gem
+### Gem flaw ratings - more flawed decrease the power of the gem
 
 Note that the flaw rating will only affect the power of the gem, not the whole staff
 
@@ -149,9 +151,9 @@ If a ring had a negative effect, then no player would have equipped it.
 | Minor scratch    | 150%         | 5%                | A small few surface scratches shouldn't be too much of an issue |
 | Major scratch    | 145%         | 5%                | A large few surface scratches, might be an issue                |
 | Minor chip       | 140%         | 5%                | Someone got a matching small piece of this                      |
-| Major chip     | 135%     | 10%               | Someone got a matching big piece of this                        |
-| Large fragment | 125%     | 10%               | Almost whole, just missing most of it                           |
-| Small fragment | 115%     | 5%                | More than the pieces                                            |
-| Some pieces    | 110%     | 5%                | Pieces, nothing more                                            |
-| Small pieces   | 105%     | 4%                | At least its not _just_ dust                                    |
-| Dust           | 101%     | 1%                | This is almost useless                                          |
+| Major chip       | 135%         | 10%               | Someone got a matching big piece of this                        |
+| Large fragment   | 125%         | 10%               | Almost whole, just missing most of it                           |
+| Small fragment   | 115%         | 5%                | More than the pieces                                            |
+| Some pieces      | 110%         | 5%                | Pieces, nothing more                                            |
+| Small pieces     | 105%         | 4%                | At least its not _just_ dust                                    |
+| Dust             | 101%         | 1%                | This is almost useless                                          |
