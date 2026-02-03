@@ -26,6 +26,15 @@ data class LightMap(val r: BrightnessArray = fullyDark(), val g: BrightnessArray
   }
 
   companion object {
+
+    /**
+     * How bright a block is
+     *
+     * The range is from [BlockLight.Companion.COMPLETE_DARKNESS] to [BlockLight.Companion.FULL_BRIGHTNESS]
+     */
+    typealias Brightness = Float
+    typealias BrightnessArray = FloatArray
+
     fun fullyDark() = BrightnessArray(LIGHT_RESOLUTION_SQUARE) { COMPLETE_DARKNESS }
     fun fullyBright() = BrightnessArray(LIGHT_RESOLUTION_SQUARE) { COMPLETE_DARKNESS }
 

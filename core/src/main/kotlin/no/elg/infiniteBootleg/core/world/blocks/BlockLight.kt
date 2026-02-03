@@ -19,20 +19,13 @@ import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.LIGHT_RESOLUTION
+import no.elg.infiniteBootleg.core.world.blocks.LightMap.Companion.Brightness
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.core.world.world.World
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sign
-
-/**
- * How bright a block is
- *
- * The range is from [BlockLight.Companion.COMPLETE_DARKNESS] to [BlockLight.Companion.FULL_BRIGHTNESS]
- */
-typealias Brightness = Float
-typealias BrightnessArray = FloatArray
 
 class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoord) {
 
@@ -338,7 +331,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
       // thus no skylight can reach this block
       return World.EMPTY_BLOCKS_ARRAY
     }
-    return chunk.world.getBlocksAABB(topWorldX, worldYBtm, 0f, columnHeight, raw = false, loadChunk = false, includeAir = true) { it ->
+    return chunk.world.getBlocksAABB(topWorldX, worldYBtm, 0f, columnHeight, raw = false, loadChunk = false, includeAir = true) {
       skylightBlockFilter(worldX, worldY, it)
     }
   }
@@ -383,7 +376,6 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
     inline fun lightMapIndex(dx: Int, dy: Int): Int = dx * LIGHT_RESOLUTION + dy
 
     const val MIN_Y_OFFSET = 1
-    val color4000k = Color.valueOf("#FFCEA6")
     val color5000k = Color.valueOf("#FFE4CE")
 
     fun centerOfSubcell(subcellCoordinate: Int): Double = ((1.0 / LIGHT_RESOLUTION) + subcellCoordinate.toDouble()) / LIGHT_RESOLUTION

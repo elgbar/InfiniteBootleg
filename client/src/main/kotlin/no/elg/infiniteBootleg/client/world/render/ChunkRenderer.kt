@@ -35,8 +35,8 @@ import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.getRawRelative
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight
-import no.elg.infiniteBootleg.core.world.blocks.Brightness
 import no.elg.infiniteBootleg.core.world.blocks.LightMap
+import no.elg.infiniteBootleg.core.world.blocks.LightMap.Companion.Brightness
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
@@ -55,8 +55,7 @@ class ChunkRenderer(private val worldRender: WorldRender) :
   Disposable {
 
   private val batch: SpriteBatch = SpriteBatch().also {
-    it.projectionMatrix =
-      Matrix4().setToOrtho2D(0f, 0f, Chunk.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat())
+    it.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, Chunk.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat())
   }
 
   // long = SystemTimeMillis
@@ -67,8 +66,7 @@ class ChunkRenderer(private val worldRender: WorldRender) :
   // When the chunk was added to the queue
   // map: SystemTimeMillis -> Chunk[]
   @GuardedBy("QUEUE_LOCK")
-  private val renderTimeAdded: Long2ObjectLinkedOpenHashMap<ObjectLinkedOpenHashSet<TexturedChunk>> =
-    Long2ObjectLinkedOpenHashMap()
+  private val renderTimeAdded: Long2ObjectLinkedOpenHashMap<ObjectLinkedOpenHashSet<TexturedChunk>> = Long2ObjectLinkedOpenHashMap()
 
   // current rendering chunk
   @GuardedBy("QUEUE_LOCK")
@@ -79,11 +77,10 @@ class ChunkRenderer(private val worldRender: WorldRender) :
     }
   private val splitCache: MutableMap<TextureRegion, Array<Array<TextureRegion>>> = HashMap()
 
-  private val rotationNoise: FastNoiseLite =
-    FastNoiseLite(worldRender.world.seed.toInt()).also {
-      it.setNoiseType(FastNoiseLite.NoiseType.OpenSimplex2)
-      it.setFrequency(1.0)
-    }
+  private val rotationNoise: FastNoiseLite = FastNoiseLite(worldRender.world.seed.toInt()).also {
+    it.setNoiseType(FastNoiseLite.NoiseType.OpenSimplex2)
+    it.setFrequency(1.0)
+  }
 
   @GuardedBy("QUEUE_LOCK")
   private fun nextChunk(): TexturedChunk? {
@@ -115,14 +112,12 @@ class ChunkRenderer(private val worldRender: WorldRender) :
         }
 
         // Time used to prioritize the chunk, a chunk added a while a go should be prioritized over a chunk added just now with prioritize = true to not get stale chunk textures
-        val newTime: SystemTimeMillis =
-          System.currentTimeMillis() + if (prioritize) -PRIORITIZATION_ADVANTAGE_ADD_TIME else 0
+        val newTime: SystemTimeMillis = System.currentTimeMillis() + if (prioritize) -PRIORITIZATION_ADVANTAGE_ADD_TIME else 0
         val existingTime: SystemTimeMillis = chunkLocToTimeAdded[pos]
 
         // Remove existing chunk from time bucket when the new time is less than the existing time to push it forward in the queue
         if (existingTime != NOT_IN_COLLECTION && newTime < existingTime) {
-          val chunks =
-            renderTimeAdded[existingTime] ?: error("Chunk $chunk is in the queue but not in the renderTimeAdded map")
+          val chunks = renderTimeAdded[existingTime] ?: error("Chunk $chunk is in the queue but not in the renderTimeAdded map")
           chunks.remove(chunk)
           if (chunks.isEmpty()) {
             renderTimeAdded.remove(existingTime)
@@ -131,8 +126,7 @@ class ChunkRenderer(private val worldRender: WorldRender) :
         // Add the chunk to the queue
         if (existingTime == NOT_IN_COLLECTION || newTime < existingTime) {
           chunkLocToTimeAdded[pos] = newTime
-          val timeSet =
-            renderTimeAdded.computeIfAbsent(newTime) { ObjectLinkedOpenHashSet() }
+          val timeSet = renderTimeAdded.computeIfAbsent(newTime) { ObjectLinkedOpenHashSet() }
           timeSet.addAndMoveToLast(chunk)
         }
       }
