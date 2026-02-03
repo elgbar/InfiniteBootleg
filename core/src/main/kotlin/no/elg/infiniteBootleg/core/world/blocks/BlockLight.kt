@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.core.world.blocks
 
+import com.badlogic.gdx.graphics.Color
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -14,6 +15,7 @@ import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.chunkToWorld
 import no.elg.infiniteBootleg.core.util.distCubed
 import no.elg.infiniteBootleg.core.util.dst2
+import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.LIGHT_RESOLUTION
@@ -64,7 +66,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
    * Do not modify
    */
   @field:Volatile
-  var lightMap: BrightnessArray = NO_LIGHTS_LIGHT_MAP
+  var lightMap: LightMap = NO_LIGHTS_LIGHT_MAP
     private set
 
   private val event = BlockLightChangedEvent(chunk, localX, localY)
@@ -81,26 +83,52 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
     neighbor: Block,
     worldX: WorldCoord,
     worldY: WorldCoord,
-    tmpLightMap: FloatArray,
+    tmpLightMap: LightMap,
     firstTime: Boolean
   ) {
+    val nx = neighbor.worldX + 0.5
+    val ny = neighbor.worldY + 0.5
+    val color: Color = if (neighbor.material is Material.Torch) {
+      color5000k
+    } else {
+      Color.WHITE
+    }
+    val f = World.LIGHT_SOURCE_LOOK_BLOCKS * World.LIGHT_SOURCE_LOOK_BLOCKS
     // Written to hopefully be auto-vectorized by the JVM
     for (dx in 0 until LIGHT_RESOLUTION) {
       for (dy in 0 until LIGHT_RESOLUTION) {
         // Calculate distance for each light cell
         val cellX = worldX + centerOfSubcell(dx)
         val cellY = worldY + centerOfSubcell(dy)
-        val nx = neighbor.worldX + 0.5
-        val ny = neighbor.worldY + 0.5
         val distCubed1 = distCubed(cellX, cellY, nx, ny)
-        val f = World.LIGHT_SOURCE_LOOK_BLOCKS * World.LIGHT_SOURCE_LOOK_BLOCKS
         val distCubed = distCubed1 / f
         val negSignum = -sign(distCubed)
-        val intensity = 1 + (negSignum * distCubed)
-
+        val intensity = (1f + (negSignum * distCubed)).toFloat()
         val lightMapIndex = lightMapIndex(dx, dy)
-        if (firstTime || tmpLightMap[lightMapIndex] < intensity) {
-          tmpLightMap[lightMapIndex] = intensity.toFloat()
+
+        val rIntensity = intensity * color.r
+        val gIntensity = intensity * color.g
+        val bIntensity = intensity * color.b
+
+        if (firstTime) {
+          tmpLightMap.r[lightMapIndex] = rIntensity
+          tmpLightMap.g[lightMapIndex] = gIntensity
+          tmpLightMap.b[lightMapIndex] = bIntensity
+        } else {
+          var brightnessArray = tmpLightMap.r
+          if (brightnessArray[lightMapIndex] < rIntensity) {
+            brightnessArray[lightMapIndex] = rIntensity
+          }
+
+          brightnessArray = tmpLightMap.g
+          if (brightnessArray[lightMapIndex] < gIntensity) {
+            brightnessArray[lightMapIndex] = gIntensity
+          }
+
+          brightnessArray = tmpLightMap.b
+          if (brightnessArray[lightMapIndex] < bIntensity) {
+            brightnessArray[lightMapIndex] = bIntensity
+          }
         }
       }
     }
@@ -186,7 +214,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
         skyLights
       }
       ensureActive()
-      val tmpLightMap: BrightnessArray = FloatArray(LIGHT_RESOLUTION_SQUARE) { COMPLETE_DARKNESS }
+      val tmpLightMap = LightMap()
       var firstTime = true
       for (neighbor in lightBlocks) {
         calculateLightFrom(neighbor, worldX, worldY, tmpLightMap, firstTime)
@@ -196,8 +224,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
       isSkylight = false
       isLit = true
       lightMap = tmpLightMap
-      val total = tmpLightMap.sum()
-      averageBrightness = total / LIGHT_RESOLUTION_SQUARE
+      averageBrightness = tmpLightMap.averageBrightness()
       dispatchLightChangeEvent()
       return@coroutineScope true
     }
@@ -353,12 +380,11 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
 
     val EMITS_LIGHT_FILTER = { block: Block -> block.material.emitsLight }
 
-    val SKYLIGHT_LIGHT_MAP: BrightnessArray = FloatArray(LIGHT_RESOLUTION_SQUARE) { FULL_BRIGHTNESS }
-    val NO_LIGHTS_LIGHT_MAP: BrightnessArray = FloatArray(LIGHT_RESOLUTION_SQUARE) { COMPLETE_DARKNESS }
-
     inline fun lightMapIndex(dx: Int, dy: Int): Int = dx * LIGHT_RESOLUTION + dy
 
     const val MIN_Y_OFFSET = 1
+    val color4000k = Color.valueOf("#FFCEA6")
+    val color5000k = Color.valueOf("#FFE4CE")
 
     fun centerOfSubcell(subcellCoordinate: Int): Double = ((1.0 / LIGHT_RESOLUTION) + subcellCoordinate.toDouble()) / LIGHT_RESOLUTION
   }

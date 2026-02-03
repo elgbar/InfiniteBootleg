@@ -36,7 +36,7 @@ import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.getRawRelative
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight
 import no.elg.infiniteBootleg.core.world.blocks.Brightness
-import no.elg.infiniteBootleg.core.world.blocks.BrightnessArray
+import no.elg.infiniteBootleg.core.world.blocks.LightMap
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
@@ -334,7 +334,7 @@ class ChunkRenderer(private val worldRender: WorldRender) :
 
   private fun drawShadedBlock(
     textureRegion: RotatableTextureRegion,
-    lights: BrightnessArray,
+    lights: LightMap,
     dx: Float,
     dy: Float,
     rotation: Int
@@ -351,8 +351,11 @@ class ChunkRenderer(private val worldRender: WorldRender) :
       val regionsLength = regions.size
       while (rx < regionsLength) {
         val region = regions[rx]
-        val brightness: Brightness = lights[BlockLight.lightMapIndex(rx, ry)]
-        batch.setColor(brightness, brightness, brightness, 1f)
+        val lightMapIndex = BlockLight.lightMapIndex(rx, ry)
+        val brightnessR: Brightness = lights.r[lightMapIndex]
+        val brightnessG: Brightness = lights.g[lightMapIndex]
+        val brightnessB: Brightness = lights.b[lightMapIndex]
+        batch.setColor(brightnessR, brightnessG, brightnessB, 1f)
         if (textureRegion.rotationAllowed || rotation == 0) {
           batch.draw(
             region,

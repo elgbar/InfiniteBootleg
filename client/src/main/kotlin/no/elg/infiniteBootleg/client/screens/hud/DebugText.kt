@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.client.screens.hud
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.world.render.ChunkRenderer
 import no.elg.infiniteBootleg.client.world.textureRegion
@@ -16,8 +17,6 @@ import no.elg.infiniteBootleg.core.util.toComponentsString
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.LIGHT_RESOLUTION
-import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.NO_LIGHTS_LIGHT_MAP
-import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.SKYLIGHT_LIGHT_MAP
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.lightMapIndex
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag
@@ -35,15 +34,14 @@ import java.text.DecimalFormat
 object DebugText {
 
   private val dotFourFormat = DecimalFormat("0.0000")
+  private val cellColor = Color()
 
   fun fpsString(sb: StringBuilder, world: ClientWorld?) {
     val worldTps = world?.worldTicker?.realTPS ?: -1
     val physicsTps = world?.worldTicker?.box2DTicker?.ticker?.realTPS ?: -1
 
-    sb.append("FPS: ").fastIntFormat(Gdx.graphics.framesPerSecond, 4)
-      .append(" | delta: ").append(dotFourFormat.format(Gdx.graphics.deltaTime.toDouble())).append(" ms")
-      .append(" | wtps: ").fastIntFormat(worldTps.toInt(), 2)
-      .append(" | ptps: ").fastIntFormat(physicsTps.toInt(), 2)
+    sb.append("FPS: ").fastIntFormat(Gdx.graphics.framesPerSecond, 4).append(" | delta: ").append(dotFourFormat.format(Gdx.graphics.deltaTime.toDouble())).append(" ms")
+      .append(" | wtps: ").fastIntFormat(worldTps.toInt(), 2).append(" | ptps: ").fastIntFormat(physicsTps.toInt(), 2)
   }
 
   fun lights(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
@@ -66,9 +64,14 @@ object DebugText {
     val usingSkyArr = blockLight?.lightMap === SKYLIGHT_LIGHT_MAP
     val usingNoLigArr = blockLight?.lightMap === NO_LIGHTS_LIGHT_MAP
     val avg = blockLight?.averageBrightness ?: Float.NaN
-    val sub = blockLight?.lightMap?.get(lightMapIndex(rawX, rawY)) ?: Float.NaN
-    val format = "lit? %-5s (using no light arr? %-5s) sky? %-5s (using sky arr? %-5s) avg brt %1.3f sub-cell[%1d, %1d] %1.3f"
-    sb.append(String.format(format, isLit, usingNoLigArr, skylight, usingSkyArr, avg, rawX, rawY, sub))
+    blockLight?.lightMap?.apply {
+      val lightMapIndex = lightMapIndex(rawX, rawY)
+      cellColor.r = r[lightMapIndex]
+      cellColor.g = g[lightMapIndex]
+      cellColor.b = b[lightMapIndex]
+    }
+    val format = "lit? %-5s (using no light arr? %-5s) sky? %-5s (using sky arr? %-5s) avg brt %1.3f sub-cell[%1d, %1d] %s"
+    sb.append(String.format(format, isLit, usingNoLigArr, skylight, usingSkyArr, avg, rawX, rawY, cellColor.toString()))
   }
 
   fun pointing(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
@@ -114,20 +117,7 @@ object DebugText {
       val format = "chunk (% 4d,% 4d) [top/solid/light % 3d/% 3d/% 3d]: type: %-9.9s|noise % .2f|gheight % .3f|all air?%-5b|can unload?%-5b|sky?%-5b|modified?%-5b|has texture?%-5b"
       sb.append(
         String.format(
-          format,
-          chunkX,
-          chunkY,
-          topBlock,
-          topBlockSolid,
-          topBlockLight,
-          biome::class.simpleName,
-          biomeHeight,
-          rawHeight,
-          allAir,
-          allowUnloading,
-          skychunk,
-          modified,
-          hasTexture
+          format, chunkX, chunkY, topBlock, topBlockSolid, topBlockLight, biome::class.simpleName, biomeHeight, rawHeight, allAir, allowUnloading, skychunk, modified, hasTexture
         )
       )
     }
@@ -187,7 +177,8 @@ object DebugText {
         position.y,
         velocity.dx,
         velocity.dy,
-        0f, 0f,
+        0f,
+        0f,
         onGround,
         canJump,
         canMoveLeft,
@@ -203,13 +194,11 @@ object DebugText {
   }
 
   fun counters(builder: StringBuilder, world: ClientWorld) {
-    builder.append("Chunk reads/writes: ").append(world.chunkReads.get()).append(" / ").append(world.chunkWrites.get())
-      .append(" | active listeners: ").append(EventManager.activeListeners.get())
-      .append(", added/removed ").append(EventManager.registeredListeners.get()).append(" / ").append(EventManager.unregisteredListeners.get())
-      .append(", active 1sh: ").append(EventManager.activeOneTimeRefListeners.get()).append(" | Dispatched events: ")
-      .append(EventManager.dispatchedEvents.get()).append(" listened to: ").append(EventManager.listenerListenedToEvent.get())
-      .appendLine()
-      .append(" > Chunk Rdr Q: ").append(ChunkRenderer.chunksInRenderQueue).append(" | Chunk size avg: ")
+    builder.append("Chunk reads/writes: ").append(world.chunkReads.get()).append(" / ").append(world.chunkWrites.get()).append(" | active listeners: ")
+      .append(EventManager.activeListeners.get()).append(", added/removed ").append(EventManager.registeredListeners.get()).append(" / ")
+      .append(EventManager.unregisteredListeners.get()).append(", active 1sh: ").append(EventManager.activeOneTimeRefListeners.get()).append(" | Dispatched events: ")
+      .append(EventManager.dispatchedEvents.get()).append(" listened to: ").append(EventManager.listenerListenedToEvent.get()).appendLine().append(" > Chunk Rdr Q: ")
+      .append(ChunkRenderer.chunksInRenderQueue).append(" | Chunk size avg: ")
       .append((World.CHUNK_ADDED_THREAD_LOCAL.get() - World.CHUNK_REMOVED_THREAD_LOCAL.get()) / World.CHUNK_THREAD_LOCAL.get())
   }
 
