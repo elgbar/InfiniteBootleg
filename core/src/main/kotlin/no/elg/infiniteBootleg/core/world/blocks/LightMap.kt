@@ -1,11 +1,34 @@
 package no.elg.infiniteBootleg.core.world.blocks
 
+import com.badlogic.gdx.graphics.Color
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.COMPLETE_DARKNESS
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.LIGHT_RESOLUTION_SQUARE
 
 data class LightMap(val r: BrightnessArray = fullyDark(), val g: BrightnessArray = fullyDark(), val b: BrightnessArray = fullyDark()) {
 
   fun averageBrightness() = (r.sum() + g.sum() + b.sum()) * (1f / (3f * LIGHT_RESOLUTION_SQUARE))
+
+  fun updateColor(lightMapIndex: Int, intensity: Float, tint: Color, firstTime: Boolean) {
+    val rIntensity = intensity * tint.r
+    val gIntensity = intensity * tint.g
+    val bIntensity = intensity * tint.b
+
+    if (firstTime) {
+      r[lightMapIndex] = rIntensity
+      g[lightMapIndex] = gIntensity
+      b[lightMapIndex] = bIntensity
+    } else {
+      if (r[lightMapIndex] < rIntensity) {
+        r[lightMapIndex] = rIntensity
+      }
+      if (g[lightMapIndex] < gIntensity) {
+        g[lightMapIndex] = gIntensity
+      }
+      if (b[lightMapIndex] < bIntensity) {
+        b[lightMapIndex] = bIntensity
+      }
+    }
+  }
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

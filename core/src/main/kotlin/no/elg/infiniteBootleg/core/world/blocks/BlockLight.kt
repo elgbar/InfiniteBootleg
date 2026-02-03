@@ -81,7 +81,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
   ) {
     val nx = neighbor.worldX + 0.5
     val ny = neighbor.worldY + 0.5
-    val color: Color = if (neighbor.material is Material.Torch) {
+    val tint: Color = if (neighbor.material is Material.Torch) {
       color5000k
     } else {
       Color.WHITE
@@ -99,30 +99,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
         val intensity = (1f + (negSignum * distCubed)).toFloat()
         val lightMapIndex = lightMapIndex(dx, dy)
 
-        val rIntensity = intensity * color.r
-        val gIntensity = intensity * color.g
-        val bIntensity = intensity * color.b
-
-        if (firstTime) {
-          tmpLightMap.r[lightMapIndex] = rIntensity
-          tmpLightMap.g[lightMapIndex] = gIntensity
-          tmpLightMap.b[lightMapIndex] = bIntensity
-        } else {
-          var brightnessArray = tmpLightMap.r
-          if (brightnessArray[lightMapIndex] < rIntensity) {
-            brightnessArray[lightMapIndex] = rIntensity
-          }
-
-          brightnessArray = tmpLightMap.g
-          if (brightnessArray[lightMapIndex] < gIntensity) {
-            brightnessArray[lightMapIndex] = gIntensity
-          }
-
-          brightnessArray = tmpLightMap.b
-          if (brightnessArray[lightMapIndex] < bIntensity) {
-            brightnessArray[lightMapIndex] = bIntensity
-          }
-        }
+        tmpLightMap.updateColor(lightMapIndex, intensity, tint, firstTime)
       }
     }
   }
