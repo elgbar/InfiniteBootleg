@@ -90,7 +90,8 @@ data class MutableSpellState(
       return if (delay < SpellState.MIN_CAST_DELAY) {
         logger.warn { "Spell made which is less than the min cast delay! $this" }
         SpellState.MIN_CAST_DELAY
-      } else
+      } else {
         delay
+      }
     }
 }
