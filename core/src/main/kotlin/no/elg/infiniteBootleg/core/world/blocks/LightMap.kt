@@ -4,9 +4,18 @@ import com.badlogic.gdx.graphics.Color
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.COMPLETE_DARKNESS
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.LIGHT_RESOLUTION_SQUARE
 
-data class LightMap(val r: BrightnessArray = fullyDark(), val g: BrightnessArray = fullyDark(), val b: BrightnessArray = fullyDark()) {
+data class LightMap(
+  /** red channel */
+  val r: BrightnessArray = fullyDark(),
+  /** green channel */
+  val g: BrightnessArray = fullyDark(),
+  /** blue channel */
+  val b: BrightnessArray = fullyDark(),
+  /** intensity channel (alpha?) */
+  val i: BrightnessArray = fullyDark()
+) {
 
-  fun averageBrightness() = (r.sum() + g.sum() + b.sum()) * (1f / (3f * LIGHT_RESOLUTION_SQUARE))
+  fun averageBrightness() = i.sum() / LIGHT_RESOLUTION_SQUARE
 
   fun updateColor(lightMapIndex: Int, intensity: Float, tint: Color, firstTime: Boolean) {
     val rIntensity = intensity * tint.r
@@ -17,7 +26,11 @@ data class LightMap(val r: BrightnessArray = fullyDark(), val g: BrightnessArray
       r[lightMapIndex] = rIntensity
       g[lightMapIndex] = gIntensity
       b[lightMapIndex] = bIntensity
+      i[lightMapIndex] = intensity
     } else {
+      if (i[lightMapIndex] < intensity) {
+        i[lightMapIndex] = intensity
+      }
       if (r[lightMapIndex] < rIntensity) {
         r[lightMapIndex] = rIntensity
       }
