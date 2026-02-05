@@ -11,35 +11,36 @@ data class LightMap(
   val g: BrightnessArray = fullyDark(),
   /** blue channel */
   val b: BrightnessArray = fullyDark(),
-  /** intensity channel (alpha?) */
+  /** intensity channel - distance to closest light source (alpha?) */
   val i: BrightnessArray = fullyDark()
 ) {
 
   fun averageBrightness() = i.sum() / LIGHT_RESOLUTION_SQUARE
 
-  fun updateColor(lightMapIndex: Int, intensity: Float, tint: Color, firstTime: Boolean) {
+  fun updateColor(lightMapIndex: Int, intensity: Float, tint: Color) {
     val rIntensity = intensity * tint.r
     val gIntensity = intensity * tint.g
     val bIntensity = intensity * tint.b
 
-    if (firstTime) {
-      r[lightMapIndex] = rIntensity
-      g[lightMapIndex] = gIntensity
-      b[lightMapIndex] = bIntensity
+    if (i[lightMapIndex] < intensity) {
       i[lightMapIndex] = intensity
-    } else {
-      if (i[lightMapIndex] < intensity) {
-        i[lightMapIndex] = intensity
-      }
-      if (r[lightMapIndex] < rIntensity) {
-        r[lightMapIndex] = rIntensity
-      }
-      if (g[lightMapIndex] < gIntensity) {
-        g[lightMapIndex] = gIntensity
-      }
-      if (b[lightMapIndex] < bIntensity) {
-        b[lightMapIndex] = bIntensity
-      }
+    }
+    r[lightMapIndex] += rIntensity
+    g[lightMapIndex] += gIntensity
+    b[lightMapIndex] += bIntensity
+  }
+
+  fun calculateReinhardToneMapping() {
+    for (lightMapIndex in 0 until LIGHT_RESOLUTION_SQUARE) {
+      val rHDR = r[lightMapIndex]
+      val gHDR = g[lightMapIndex]
+      val bHDR = b[lightMapIndex]
+
+      // Reinhard tone mapping: x / (1 + x)
+      // This compresses bright values while preserving color ratios
+      r[lightMapIndex] = rHDR / (1f + rHDR)
+      g[lightMapIndex] = gHDR / (1f + gHDR)
+      b[lightMapIndex] = bHDR / (1f + bHDR)
     }
   }
 
@@ -50,6 +51,7 @@ data class LightMap(
     if (!r.contentEquals(other.r)) return false
     if (!g.contentEquals(other.g)) return false
     if (!b.contentEquals(other.b)) return false
+    if (!i.contentEquals(other.i)) return false
 
     return true
   }
@@ -58,6 +60,7 @@ data class LightMap(
     var result = r.contentHashCode()
     result = 31 * result + g.contentHashCode()
     result = 31 * result + b.contentHashCode()
+    result = 31 * result + i.contentHashCode()
     return result
   }
 

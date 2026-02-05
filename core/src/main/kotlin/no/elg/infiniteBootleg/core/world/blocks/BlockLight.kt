@@ -25,7 +25,7 @@ import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.core.world.world.World
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.sign
+import kotlin.math.sqrt
 
 class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoord) {
 
@@ -72,13 +72,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
     }
   }
 
-  fun calculateLightFrom(
-    neighbor: Block,
-    worldX: WorldCoord,
-    worldY: WorldCoord,
-    tmpLightMap: LightMap,
-    firstTime: Boolean
-  ) {
+  fun calculateLightFrom(neighbor: Block, worldX: WorldCoord, worldY: WorldCoord, tmpLightMap: LightMap) {
     val nx = neighbor.worldX + 0.5
     val ny = neighbor.worldY + 0.5
     val tint: Color = if (neighbor.material is Material.Torch) {
@@ -86,20 +80,20 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
     } else {
       Color.WHITE
     }
-    val f = World.LIGHT_SOURCE_LOOK_BLOCKS * World.LIGHT_SOURCE_LOOK_BLOCKS
-    // Written to hopefully be auto-vectorized by the JVM
+    val maxDistance = World.LIGHT_SOURCE_LOOK_BLOCKS.toDouble()
+
     for (dx in 0 until LIGHT_RESOLUTION) {
       for (dy in 0 until LIGHT_RESOLUTION) {
-        // Calculate distance for each light cell
         val cellX = worldX + centerOfSubcell(dx)
         val cellY = worldY + centerOfSubcell(dy)
-        val distCubed1 = distCubed(cellX, cellY, nx, ny)
-        val distCubed = distCubed1 / f
-        val negSignum = -sign(distCubed)
-        val intensity = (1f + (negSignum * distCubed)).toFloat()
-        val lightMapIndex = lightMapIndex(dx, dy)
 
-        tmpLightMap.updateColor(lightMapIndex, intensity, tint, firstTime)
+        val distance = sqrt(distCubed(cellX, cellY, nx, ny))
+
+        // Linear falloff: 1.0 at source, 0.0 at maxDistance
+        val intensity = (1.0 - (distance / maxDistance)).coerceAtLeast(0.0)
+
+        val lightMapIndex = lightMapIndex(dx, dy)
+        tmpLightMap.updateColor(lightMapIndex, intensity.toFloat(), tint)
       }
     }
   }
@@ -185,11 +179,10 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
       }
       ensureActive()
       val tmpLightMap = LightMap()
-      var firstTime = true
       for (neighbor in lightBlocks) {
-        calculateLightFrom(neighbor, worldX, worldY, tmpLightMap, firstTime)
-        firstTime = false
+        calculateLightFrom(neighbor, worldX, worldY, tmpLightMap)
       }
+      tmpLightMap.calculateReinhardToneMapping()
       ensureActive()
       isSkylight = false
       isLit = true
