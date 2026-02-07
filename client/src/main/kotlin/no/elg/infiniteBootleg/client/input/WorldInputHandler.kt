@@ -12,7 +12,10 @@ import no.elg.infiniteBootleg.client.util.isControlPressed
 import no.elg.infiniteBootleg.client.util.isShiftPressed
 import no.elg.infiniteBootleg.client.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
+import no.elg.infiniteBootleg.client.world.world.ClientWorld.Companion.recalculateLights
+import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.main.Main
+import no.elg.infiniteBootleg.core.util.launchOnMain
 import no.elg.infiniteBootleg.core.world.render.WorldRender
 import no.elg.infiniteBootleg.core.world.ticker.Ticker
 
@@ -54,6 +57,15 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) :
       Input.Keys.TAB -> world.controlledPlayerEntities.forEach { it.toggleContainer() }
 
       Input.Keys.F5 -> world.save()
+      Input.Keys.F6 -> {
+        launchOnMain {
+          val entries = Settings.LightToneMapping.entries
+          val nextOrdinal = Settings.lightToneMapping.ordinal + if (isShiftPressed()) -1 else 1
+          Settings.lightToneMapping = entries[nextOrdinal % entries.size]
+          world.recalculateLights()
+        }
+      }
+
       Input.Keys.F12 -> {
         val ticker: Ticker = world.worldTicker
         if (ticker.isPaused) {

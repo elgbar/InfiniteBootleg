@@ -15,20 +15,28 @@ data class LightMap(
   val i: BrightnessArray = fullyDark()
 ) {
 
-  fun averageBrightness() = i.sum() / LIGHT_RESOLUTION_SQUARE
+  fun averageBrightness() = luminance(r.sum() / LIGHT_RESOLUTION_SQUARE, g.sum() / LIGHT_RESOLUTION_SQUARE, b.sum() / LIGHT_RESOLUTION_SQUARE)
 
   fun updateColor(lightMapIndex: Int, intensity: Float, tint: Color) {
     val rIntensity = intensity * tint.r
     val gIntensity = intensity * tint.g
     val bIntensity = intensity * tint.b
 
-    if (i[lightMapIndex] < intensity) {
-      i[lightMapIndex] = intensity
-    }
+    i[lightMapIndex] += intensity
     r[lightMapIndex] += rIntensity
     g[lightMapIndex] += gIntensity
     b[lightMapIndex] += bIntensity
   }
+
+  inline fun reinhard(inp: Float, lumen: Float = 1f): Float = inp / (lumen + inp)
+  fun lerp(a: Float, b: Float, t: Float): Float = a + t * (b - a)
+
+  fun reinhardJodie(v: Float, l: Float): Float {
+    val tv = reinhard(v)
+    return lerp(v / (1f + l), tv, tv)
+  }
+
+  fun luminance(rHDR: Float, gHDR: Float, bHDR: Float) = rHDR * 0.2126f + gHDR * 0.7152f + bHDR * 0.0722f
 
   fun calculateReinhardToneMapping() {
     for (lightMapIndex in 0 until LIGHT_RESOLUTION_SQUARE) {
@@ -36,11 +44,37 @@ data class LightMap(
       val gHDR = g[lightMapIndex]
       val bHDR = b[lightMapIndex]
 
-      // Reinhard tone mapping: x / (1 + x)
-      // This compresses bright values while preserving color ratios
-      r[lightMapIndex] = rHDR / (1f + rHDR)
-      g[lightMapIndex] = gHDR / (1f + gHDR)
-      b[lightMapIndex] = bHDR / (1f + bHDR)
+      r[lightMapIndex] = reinhard(rHDR)
+      g[lightMapIndex] = reinhard(gHDR)
+      b[lightMapIndex] = reinhard(bHDR)
+    }
+  }
+
+  fun calculateReinhardJodieToneMapping() {
+    for (lightMapIndex in 0 until LIGHT_RESOLUTION_SQUARE) {
+      val rHDR = r[lightMapIndex]
+      val gHDR = g[lightMapIndex]
+      val bHDR = b[lightMapIndex]
+
+      val l = i[lightMapIndex]
+
+      r[lightMapIndex] = reinhardJodie(rHDR, l)
+      g[lightMapIndex] = reinhardJodie(gHDR, l)
+      b[lightMapIndex] = reinhardJodie(bHDR, l)
+    }
+  }
+
+  fun calculateReinhardJodieToneMappingLuminanceByColor() {
+    for (lightMapIndex in 0 until LIGHT_RESOLUTION_SQUARE) {
+      val rHDR = r[lightMapIndex]
+      val gHDR = g[lightMapIndex]
+      val bHDR = b[lightMapIndex]
+
+      val l = luminance(rHDR, gHDR, bHDR)
+
+      r[lightMapIndex] = reinhardJodie(rHDR, l)
+      g[lightMapIndex] = reinhardJodie(gHDR, l)
+      b[lightMapIndex] = reinhardJodie(bHDR, l)
     }
   }
 

@@ -182,7 +182,12 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
       for (neighbor in lightBlocks) {
         calculateLightFrom(neighbor, worldX, worldY, tmpLightMap)
       }
-      tmpLightMap.calculateReinhardToneMapping()
+      when (Settings.lightToneMapping) {
+        Settings.LightToneMapping.REINHARD -> tmpLightMap.calculateReinhardToneMapping()
+        Settings.LightToneMapping.REINHARD_JODIE_LUMINANCE_BY_INTENSITY -> tmpLightMap.calculateReinhardJodieToneMapping()
+        Settings.LightToneMapping.REINHARD_JODIE_LUMINANCE_BY_COLOR -> tmpLightMap.calculateReinhardJodieToneMappingLuminanceByColor()
+        Settings.LightToneMapping.CLAMP -> Unit
+      }
       ensureActive()
       isSkylight = false
       isLit = true

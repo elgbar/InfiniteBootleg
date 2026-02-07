@@ -47,6 +47,14 @@ object Settings {
   var dayTicking = false
 
   var renderLight = true
+  var lightToneMapping: LightToneMapping = REINHARD_JODIE_LUMINANCE_BY_COLOR
+
+  enum class LightToneMapping {
+    REINHARD,
+    REINHARD_JODIE_LUMINANCE_BY_INTENSITY,
+    REINHARD_JODIE_LUMINANCE_BY_COLOR,
+    CLAMP
+  }
 
   var renderBox2dDebug = false
 
