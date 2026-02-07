@@ -255,12 +255,7 @@ class ChunkRenderer(private val worldRender: WorldRender) :
               if (blockLight.isLit && (!blockLight.isSkylight || texture.rotationAllowed)) {
                 val rotation = calculateRotation(chunk, localX, localY)
                 if (secondaryTexture != null) {
-                  // Optimization: If the block is emitting light there is no point in drawing it shaded
-                  if (material.emitsLight) {
-                    drawRotatedTexture(secondaryTexture, dx, dy, rotation)
-                  } else {
-                    drawShadedBlock(secondaryTexture, blockLight.lightMap, dx, dy, rotation)
-                  }
+                  drawShadedBlock(secondaryTexture, blockLight.lightMap, dx, dy, rotation)
                 }
                 drawShadedBlock(texture, blockLight.lightMap, dx, dy, rotation)
               } else {
