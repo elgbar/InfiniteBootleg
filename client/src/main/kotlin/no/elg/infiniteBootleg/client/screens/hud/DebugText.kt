@@ -71,8 +71,22 @@ object DebugText {
       cellColor.g = g[lightMapIndex]
       cellColor.b = b[lightMapIndex]
     }
-    val format = "lit? %-5s (using no light arr? %-5s) sky? %-5s (using sky arr? %-5s) avg brt %1.3f sub-cell[%1d, %1d] c %s tm %s"
-    sb.append(String.format(format, isLit, usingNoLigArr, skylight, usingSkyArr, avg, rawX, rawY, cellColor.toString(), Settings.lightToneMapping.name))
+    val format = "lit? %-5s (using no light arr? %-5s) sky? %-5s (using sky arr? %-5s) avg brt %1.3f sub-cell[%1d, %1d] c %s tm %s im %s"
+    sb.append(
+      String.format(
+        format,
+        isLit,
+        usingNoLigArr,
+        skylight,
+        usingSkyArr,
+        avg,
+        rawX,
+        rawY,
+        cellColor.toString(),
+        Settings.lightToneMapping.name,
+        Settings.lightIntensityMapping.name
+      )
+    )
   }
 
   fun pointing(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {

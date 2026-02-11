@@ -78,17 +78,32 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
     // If null but we still got here, then the block is a skylight and thus should be white
     val tint: Color = neighbor.material.lightColor ?: Color.WHITE
     val maxDistance = World.LIGHT_SOURCE_LOOK_BLOCKS.toDouble()
+    val maxDistSq = maxDistance * maxDistance
 
     for (dx in 0 until LIGHT_RESOLUTION) {
       for (dy in 0 until LIGHT_RESOLUTION) {
         val cellX = worldX + centerOfSubcell(dx)
         val cellY = worldY + centerOfSubcell(dy)
 
-        val distance = sqrt(distCubed(cellX, cellY, nx, ny))
+        val distSq = distCubed(cellX, cellY, nx, ny)
 
-        // Smoothstep falloff: 1.0 at source, 0.0 at maxDistance, zero derivative at both ends
-        val t = (distance / maxDistance).coerceIn(0.0, 1.0)
-        val intensity = 1.0 - t * t * (3.0 - 2.0 * t)
+        val intensity = when (Settings.lightIntensityMapping) {
+          // Linear falloff: 1.0 at source, 0.0 at maxDistance
+          Settings.LightIntensityMapping.LINEAR -> {
+            val t = (sqrt(distSq) / maxDistance).coerceIn(0.0, 1.0)
+            1.0 - t
+          }
+          // Smoothstep falloff: zero derivative at both ends, same brightness profile as linear
+          Settings.LightIntensityMapping.SMOOTH_FALLOFF_LINEAR_SPACE -> {
+            val t = (sqrt(distSq) / maxDistance).coerceIn(0.0, 1.0)
+            1.0 - t * t * (3.0 - 2.0 * t)
+          }
+          // Smoothstep in squared-distance space: bright for longer, fast falloff near edge, no sqrt needed
+          Settings.LightIntensityMapping.SMOOTH_FALLOFF_SQUARED_SPACE -> {
+            val tSq = (distSq / maxDistSq).coerceIn(0.0, 1.0)
+            1.0 - tSq * tSq * (3.0 - 2.0 * tSq)
+          }
+        }
 
         val lightMapIndex = lightMapIndex(dx, dy)
         tmpLightMap.updateColor(lightMapIndex, intensity.toFloat(), tint)

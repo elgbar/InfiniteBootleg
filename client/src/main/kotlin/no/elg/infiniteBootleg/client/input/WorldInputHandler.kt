@@ -66,6 +66,15 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) :
         }
       }
 
+      Input.Keys.F4 -> {
+        launchOnMain {
+          val entries = Settings.LightIntensityMapping.entries
+          val nextOrdinal = Settings.lightIntensityMapping.ordinal + if (isShiftPressed()) -1 else 1
+          Settings.lightIntensityMapping = entries[nextOrdinal % entries.size]
+          world.recalculateLights()
+        }
+      }
+
       Input.Keys.F12 -> {
         val ticker: Ticker = world.worldTicker
         if (ticker.isPaused) {

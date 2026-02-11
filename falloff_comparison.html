@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head><title>Falloff Comparison</title></head>
+<body style="background:#1a1a1a;color:#eee;font-family:monospace;display:flex;flex-direction:column;align-items:center;padding:20px">
+<h2>Linear vs Smoothstep Falloff</h2>
+<canvas id="c" width="700" height="500"></canvas>
+<div style="margin-top:10px">
+  <span style="color:#ff4444">&#9644; Linear: 1 - t</span> &nbsp;&nbsp;
+  <span style="color:#44ff44">&#9644; Smoothstep: 1 - t²(3 - 2t)</span> &nbsp;&nbsp;
+  <span style="color:#4488ff">&#9644; Two lights overlap (linear)</span> &nbsp;&nbsp;
+  <span style="color:#ffaa00">&#9644; Two lights overlap (smoothstep)</span>
+</div>
+<h3 style="margin-top:30px">Derivative (slope)</h3>
+<canvas id="d" width="700" height="300"></canvas>
+<div style="margin-top:10px">
+  <span style="color:#ff4444">&#9644; Linear derivative: -1 (then jumps to 0)</span> &nbsp;&nbsp;
+  <span style="color:#44ff44">&#9644; Smoothstep derivative: -6t(1-t) (smoothly reaches 0)</span>
+</div>
+<script>
+function linear(t) { return Math.max(0, 1 - t); }
+function smoothstep(t) { t = Math.min(1, Math.max(0, t)); return 1 - t*t*(3 - 2*t); }
+function linearDeriv(t) { return t >= 1 ? 0 : -1; }
+function smoothstepDeriv(t) { t = Math.min(1, Math.max(0, t)); return -6*t*(1-t); }
+
+function drawGraph(canvasId, funcs, colors, labels, yMin, yMax) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const pad = {l:60, r:20, t:20, b:40};
+  const gw = W-pad.l-pad.r, gh = H-pad.t-pad.b;
+
+  // Grid
+  ctx.strokeStyle = '#333'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 10; i++) {
+    let x = pad.l + gw * i/10;
+    ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t+gh); ctx.stroke();
+  }
+  for (let v = yMin; v <= yMax; v += 0.25) {
+    let y = pad.t + gh * (1 - (v-yMin)/(yMax-yMin));
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l+gw, y); ctx.stroke();
+    ctx.fillStyle='#888'; ctx.font='11px monospace';
+    ctx.fillText(v.toFixed(2), 5, y+4);
+  }
+
+  // Axes
+  ctx.strokeStyle='#666'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+gh); ctx.lineTo(pad.l+gw,pad.t+gh); ctx.stroke();
+
+  // X labels
+  ctx.fillStyle='#888'; ctx.font='12px monospace';
+  for (let i = 0; i <= 10; i++) {
+    ctx.fillText((i/10).toFixed(1), pad.l + gw*i/10 - 12, H-5);
+  }
+  ctx.fillText('t (distance / maxDistance)', pad.l + gw/2 - 80, H-5);
+
+  // Curves
+  funcs.forEach((fn, idx) => {
+    ctx.strokeStyle = colors[idx];
+    ctx.lineWidth = idx < 2 ? 3 : 2;
+    if (idx >= 2) ctx.setLineDash([6,4]); else ctx.setLineDash([]);
+    ctx.beginPath();
+    for (let px = 0; px <= gw; px++) {
+      let t = px / gw;
+      let v = fn(t);
+      let y = pad.t + gh * (1 - (v-yMin)/(yMax-yMin));
+      if (px === 0) ctx.moveTo(pad.l+px, y); else ctx.lineTo(pad.l+px, y);
+    }
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  // Mark the kink point at t=1 for overlap graphs
+  let zeroY = pad.t + gh * (1 - (0-yMin)/(yMax-yMin));
+  ctx.strokeStyle='#ffffff44'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  let kinkX = pad.l + gw * 0.5;
+  ctx.beginPath(); ctx.moveTo(kinkX, pad.t); ctx.lineTo(kinkX, pad.t+gh); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#aaa'; ctx.font='11px monospace';
+  if (canvasId === 'c') ctx.fillText('↑ overlap boundary', kinkX+4, pad.t+30);
+}
+
+// Two lights: light A centered at t=0, light B centered at t=1.0
+// We observe along a line from A to B, with maxDistance=1.0
+// At position p: distA = p, distB = |1.0 - p|... but let's simplify
+// Show single light and overlap with second light starting at t=0.5
+function twoLinear(t) {
+  let a = linear(t);          // light A at position 0
+  let b = linear(Math.abs(t - 1.0) / 1.0); // light B at position 1.0, range 0.5 mapped
+  // Actually let's show: light A covers 0..1, light B covers 0.5..1.5
+  // At position t (0..1): distA=t, distB=|t-0.5|/0.5 mapped...
+  // Simpler: just show additive of two shifted lights
+  let bDist = Math.abs(1.0 - t) * 2; // light B at t=1, half range overlaps
+  return a + linear(bDist) * 0.7;
+}
+function twoSmooth(t) {
+  let a = smoothstep(t);
+  let bDist = Math.abs(1.0 - t) * 2;
+  return a + smoothstep(bDist) * 0.7;
+}
+
+drawGraph('c', [linear, smoothstep, twoLinear, twoSmooth],
+  ['#ff4444','#44ff44','#4488ff','#ffaa00'], [], 0, 1.8);
+drawGraph('d', [linearDeriv, smoothstepDeriv],
+  ['#ff4444','#44ff44'], [], -1.2, 0.2);
+</script>
+</body>
+</html>

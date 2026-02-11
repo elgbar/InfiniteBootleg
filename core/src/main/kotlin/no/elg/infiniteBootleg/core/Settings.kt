@@ -56,6 +56,14 @@ object Settings {
     CLAMP
   }
 
+  var lightIntensityMapping: LightIntensityMapping = LightIntensityMapping.SMOOTH_FALLOFF_LINEAR_SPACE
+
+  enum class LightIntensityMapping {
+    LINEAR,
+    SMOOTH_FALLOFF_LINEAR_SPACE,
+    SMOOTH_FALLOFF_SQUARED_SPACE
+  }
+
   var renderBox2dDebug = false
 
   var debugEntityLight = false
