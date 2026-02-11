@@ -75,7 +75,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
   fun calculateLightFrom(neighbor: Block, worldX: WorldCoord, worldY: WorldCoord, tmpLightMap: LightMap) {
     val nx = neighbor.worldX + 0.5
     val ny = neighbor.worldY + 0.5
-    //If null but we still got here, then the block is a skylight and thus should be white
+    // If null but we still got here, then the block is a skylight and thus should be white
     val tint: Color = neighbor.material.lightColor ?: Color.WHITE
     val maxDistance = World.LIGHT_SOURCE_LOOK_BLOCKS.toDouble()
 
@@ -86,8 +86,9 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
 
         val distance = sqrt(distCubed(cellX, cellY, nx, ny))
 
-        // Linear falloff: 1.0 at source, 0.0 at maxDistance
-        val intensity = (1.0 - (distance / maxDistance)).coerceAtLeast(0.0)
+        // Smoothstep falloff: 1.0 at source, 0.0 at maxDistance, zero derivative at both ends
+        val t = (distance / maxDistance).coerceIn(0.0, 1.0)
+        val intensity = 1.0 - t * t * (3.0 - 2.0 * t)
 
         val lightMapIndex = lightMapIndex(dx, dy)
         tmpLightMap.updateColor(lightMapIndex, intensity.toFloat(), tint)
