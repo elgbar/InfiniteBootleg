@@ -15,7 +15,7 @@ data class LightMap(
   val i: BrightnessArray = fullyDark()
 ) {
 
-  fun averageBrightness() = luminance(r.sum() / LIGHT_RESOLUTION_SQUARE, g.sum() / LIGHT_RESOLUTION_SQUARE, b.sum() / LIGHT_RESOLUTION_SQUARE)
+  fun averageBrightness() = maxOf(r.sum() / LIGHT_RESOLUTION_SQUARE, g.sum() / LIGHT_RESOLUTION_SQUARE, b.sum() / LIGHT_RESOLUTION_SQUARE).coerceIn(0f, 1f)
 
   fun updateColor(lightMapIndex: Int, intensity: Float, tint: Color) {
     val rIntensity = intensity * tint.r
