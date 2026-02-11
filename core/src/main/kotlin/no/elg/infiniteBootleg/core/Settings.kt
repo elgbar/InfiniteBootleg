@@ -64,6 +64,8 @@ object Settings {
     SMOOTH_FALLOFF_SQUARED_SPACE
   }
 
+  var lightIntensityMultiplier: Float = 1.0f
+
   var renderBox2dDebug = false
 
   var debugEntityLight = false

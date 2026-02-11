@@ -106,7 +106,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
         }
 
         val lightMapIndex = lightMapIndex(dx, dy)
-        tmpLightMap.updateColor(lightMapIndex, intensity.toFloat(), tint)
+        tmpLightMap.updateColor(lightMapIndex, (intensity * Settings.lightIntensityMultiplier).toFloat(), tint)
       }
     }
   }

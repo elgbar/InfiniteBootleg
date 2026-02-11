@@ -253,7 +253,11 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           onAnyElementChanged = onAnyElementChanged,
           property = Settings::renderEntityPosDifference
         )
-//       Room for three more buttons
+        floatSpinner("light intens. mul.", Settings::lightIntensityMultiplier, 0f, 10f, 0.1f, 1, onAnyElementChanged) { it ->
+          Settings.lightIntensityMultiplier = it
+          world.recalculateLights()
+        }
+//       Room for two more buttons
       }
 
       sep()
