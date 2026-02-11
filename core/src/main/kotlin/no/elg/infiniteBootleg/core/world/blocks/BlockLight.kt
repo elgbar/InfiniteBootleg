@@ -24,6 +24,7 @@ import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.core.world.world.World
 import kotlin.math.abs
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
@@ -84,18 +85,18 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
     val maxDistance = World.LIGHT_SOURCE_LOOK_BLOCKS.toDouble()
     val maxDistSq = maxDistance * maxDistance
 
-    // Compute ray attenuation once per (source, target) pair
-    val attenuation = if (Settings.lightOcclusion) {
-      computeRayAttenuation(neighbor.worldX, neighbor.worldY, worldX, worldY)
-    } else {
-      1.0f
-    }
-    if (attenuation <= 0f) return
-
     for (dx in 0 until LIGHT_RESOLUTION) {
       for (dy in 0 until LIGHT_RESOLUTION) {
         val cellX = worldX + centerOfSubcell(dx)
         val cellY = worldY + centerOfSubcell(dy)
+
+        // Compute ray attenuation per subcell, stepping at subcell resolution
+        val attenuation = if (Settings.lightOcclusion) {
+          computeRayAttenuation(nx, ny, cellX, cellY)
+        } else {
+          1.0f
+        }
+        if (attenuation <= 0f) continue
 
         val distSq = distCubed(cellX, cellY, nx, ny)
 
@@ -124,59 +125,75 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
   }
 
   /**
-   * Compute light attenuation along the ray from source to destination using Bresenham's line.
-   * Skips source and destination blocks. Each intermediate block attenuates by its material's lightOpacity.
+   * Compute light attenuation along the ray from source to destination using DDA at subcell resolution.
+   * Steps through a grid that is [LIGHT_RESOLUTION] times finer than the block grid.
+   * Each subcell-sized step through a solid material attenuates by its lightOpacity.
+   * Skips source and destination subcells.
    *
    * @return attenuation in [0.0, 1.0] where 1.0 = no occlusion, 0.0 = fully blocked
    */
-  private fun computeRayAttenuation(srcX: WorldCoord, srcY: WorldCoord, dstX: WorldCoord, dstY: WorldCoord): Float {
-    val dx = dstX - srcX
-    val dy = dstY - srcY
-    val sx = if (dx > 0) {
-      1
-    } else if (dx < 0) {
-      -1
-    } else {
-      0
-    }
-    val sy = if (dy > 0) {
-      1
-    } else if (dy < 0) {
-      -1
-    } else {
-      0
-    }
-    val absDx = abs(dx)
-    val absDy = abs(dy)
+  private fun computeRayAttenuation(srcX: Double, srcY: Double, dstX: Double, dstY: Double): Float {
+    val cellSize = 1.0 / LIGHT_RESOLUTION
 
+    // Convert to subcell grid coordinates
+    val srcCellX = floor(srcX / cellSize).toInt()
+    val srcCellY = floor(srcY / cellSize).toInt()
+    val dstCellX = floor(dstX / cellSize).toInt()
+    val dstCellY = floor(dstY / cellSize).toInt()
+
+    if (srcCellX == dstCellX && srcCellY == dstCellY) return 1.0f
+
+    val dirX = dstX - srcX
+    val dirY = dstY - srcY
+
+    val stepX = if (dirX > 0) 1 else -1
+    val stepY = if (dirY > 0) 1 else -1
+
+    val tDeltaX = if (dirX != 0.0) abs(cellSize / dirX) else Double.MAX_VALUE
+    val tDeltaY = if (dirY != 0.0) abs(cellSize / dirY) else Double.MAX_VALUE
+
+    var tMaxX = if (dirX > 0) {
+      ((srcCellX + 1) * cellSize - srcX) / dirX
+    } else if (dirX < 0) {
+      (srcX - srcCellX * cellSize) / -dirX
+    } else {
+      Double.MAX_VALUE
+    }
+
+    var tMaxY = if (dirY > 0) {
+      ((srcCellY + 1) * cellSize - srcY) / dirY
+    } else if (dirY < 0) {
+      (srcY - srcCellY * cellSize) / -dirY
+    } else {
+      Double.MAX_VALUE
+    }
+
+    var cx = srcCellX
+    var cy = srcCellY
     var attenuation = 1.0f
     val world = chunk.world
 
-    var x = srcX
-    var y = srcY
-    var err = absDx - absDy
-    var isFirst = true
-
     while (true) {
-      if (x == dstX && y == dstY) break
+      // Step to the next subcell
+      if (tMaxX < tMaxY) {
+        cx += stepX
+        tMaxX += tDeltaX
+      } else {
+        cy += stepY
+        tMaxY += tDeltaY
+      }
 
-      if (!isFirst) {
-        val block = world.getRawBlock(x, y, loadChunk = false)
-        val opacity = block?.material?.lightOpacity ?: 0f
-        attenuation *= (1.0f - opacity)
-        if (attenuation <= 0f) return 0f
-      }
-      isFirst = false
+      // Reached destination subcell, stop
+      if (cx == dstCellX && cy == dstCellY) break
 
-      val e2 = 2 * err
-      if (e2 > -absDy) {
-        err -= absDy
-        x += sx
-      }
-      if (e2 < absDx) {
-        err += absDx
-        y += sy
-      }
+      // Convert subcell coords to block coords
+      val blockX = Math.floorDiv(cx, LIGHT_RESOLUTION)
+      val blockY = Math.floorDiv(cy, LIGHT_RESOLUTION)
+
+      val block = world.getRawBlock(blockX, blockY, loadChunk = false)
+      val opacity = block?.material?.lightOpacity ?: 0f
+      attenuation *= (1.0f - opacity)
+      if (attenuation <= 0f) return 0f
     }
 
     return attenuation

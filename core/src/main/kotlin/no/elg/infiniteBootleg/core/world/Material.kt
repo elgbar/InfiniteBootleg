@@ -66,7 +66,7 @@ sealed interface Material : ContainerElement {
    * How much this material attenuates light passing through it.
    * 0.0 = fully transparent to light, 1.0 = fully opaque
    */
-  val lightOpacity: Float get() = if (blocksLight) 0.5f else 0.0f
+  val lightOpacity: Float get() = if (blocksLight) 0.25f else 0.0f
 
   /**
    * @return What color this material emits. If null, the material does not emit light
@@ -195,7 +195,7 @@ sealed interface Material : ContainerElement {
     override val textureName: String get() = "glass"
     override val hasTransparentTexture get() = true
     override val blocksLight get() = false
-    override val lightOpacity get() = 0.15f
+    override val lightOpacity get() = 0.01f
   }
 
   object Door : Material, TexturedContainerElement {
@@ -238,7 +238,7 @@ sealed interface Material : ContainerElement {
     override val hasTransparentTexture = true
     override val isCollidable = false
     override val blocksLight = false
-    override val lightOpacity = 0.4f
+    override val lightOpacity = 0.2f
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createLeafEntity(world, worldX, worldY, material)
     }
