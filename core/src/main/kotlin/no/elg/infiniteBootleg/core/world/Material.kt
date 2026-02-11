@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.core.world
 
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.graphics.Color
 import io.github.oshai.kotlinlogging.KotlinLogging
 import it.unimi.dsi.fastutil.longs.LongIterators
 import no.elg.infiniteBootleg.core.items.ItemType
@@ -17,6 +18,7 @@ import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.stringifyCompactLocWithChunk
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.BlockImpl
+import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.color5000k
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.ecs.api.ProtoConverter
 import no.elg.infiniteBootleg.core.world.ecs.components.ExplosiveComponent
@@ -61,9 +63,9 @@ sealed interface Material : ContainerElement {
   val blocksLight: Boolean get() = true
 
   /**
-   * @return If this material emits light
+   * @return What color this material emits. If null, the material does not emit light
    */
-  val emitsLight: Boolean get() = false
+  val lightColor: Color? get() = null
 
   /**
    * @return If this material has no texture
@@ -149,7 +151,7 @@ sealed interface Material : ContainerElement {
     override val hasTransparentTexture get() = true
     override val isCollidable get() = false
     override val blocksLight get() = false
-    override val emitsLight get() = true
+    override val lightColor: Color get() = color5000k
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createGravityAffectedBlockEntity(world, worldX, worldY, material)
     }
@@ -342,6 +344,11 @@ sealed interface Material : ContainerElement {
     private val nameToMaterial: Map<String, Material> = materials.associateBy { it.javaClass.simpleName.lowercase() } + mapOf("" to Air)
 
     private val materialToName: Map<Material, String> = materials.associateWith { it.javaClass.simpleName.lowercase() }
+
+    /**
+     * @return If this material emits light
+     */
+    val Material.emitsLight: Boolean get() = lightColor != null
 
     fun nameOf(material: Material): String = materialToName[material] ?: error("Failed to find name for material $material")
 

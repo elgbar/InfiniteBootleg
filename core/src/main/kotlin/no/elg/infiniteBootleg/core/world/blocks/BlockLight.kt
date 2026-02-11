@@ -15,7 +15,7 @@ import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.chunkToWorld
 import no.elg.infiniteBootleg.core.util.distCubed
 import no.elg.infiniteBootleg.core.util.dst2
-import no.elg.infiniteBootleg.core.world.Material
+import no.elg.infiniteBootleg.core.world.Material.Companion.emitsLight
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.LIGHT_RESOLUTION
@@ -75,11 +75,8 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
   fun calculateLightFrom(neighbor: Block, worldX: WorldCoord, worldY: WorldCoord, tmpLightMap: LightMap) {
     val nx = neighbor.worldX + 0.5
     val ny = neighbor.worldY + 0.5
-    val tint: Color = if (neighbor.material is Material.Torch) {
-      color5000k
-    } else {
-      Color.WHITE
-    }
+    //If null but we still got here, then the block is a skylight and thus should be white
+    val tint: Color = neighbor.material.lightColor ?: Color.WHITE
     val maxDistance = World.LIGHT_SOURCE_LOOK_BLOCKS.toDouble()
 
     for (dx in 0 until LIGHT_RESOLUTION) {

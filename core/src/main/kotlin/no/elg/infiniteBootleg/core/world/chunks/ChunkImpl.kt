@@ -35,6 +35,7 @@ import no.elg.infiniteBootleg.core.util.singleLinePrinter
 import no.elg.infiniteBootleg.core.util.stringifyChunkToWorld
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.Material
+import no.elg.infiniteBootleg.core.world.Material.Companion.emitsLight
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight
 import no.elg.infiniteBootleg.core.world.box2d.ChunkBody
