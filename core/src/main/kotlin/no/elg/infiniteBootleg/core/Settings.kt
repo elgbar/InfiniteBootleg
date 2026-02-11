@@ -66,6 +66,8 @@ object Settings {
 
   var lightIntensityMultiplier: Float = 1.0f
 
+  var lightColorEnergyCompensation = true
+
   var renderBox2dDebug = false
 
   var debugEntityLight = false

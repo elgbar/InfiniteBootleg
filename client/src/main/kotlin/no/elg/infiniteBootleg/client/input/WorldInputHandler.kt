@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.client.inventory.container.toggleContainer
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.screens.HUDRenderer
 import no.elg.infiniteBootleg.client.screens.WorldScreen
+import no.elg.infiniteBootleg.client.util.isAltPressed
 import no.elg.infiniteBootleg.client.util.isControlPressed
 import no.elg.infiniteBootleg.client.util.isShiftPressed
 import no.elg.infiniteBootleg.client.world.render.ClientWorldRender
@@ -59,18 +60,17 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) :
       Input.Keys.F5 -> world.save()
       Input.Keys.F6 -> {
         launchOnMain {
-          val entries = Settings.LightToneMapping.entries
-          val nextOrdinal = Settings.lightToneMapping.ordinal + if (isShiftPressed()) -1 else 1
-          Settings.lightToneMapping = entries[nextOrdinal % entries.size]
-          world.recalculateLights()
-        }
-      }
-
-      Input.Keys.F4 -> {
-        launchOnMain {
-          val entries = Settings.LightIntensityMapping.entries
-          val nextOrdinal = Settings.lightIntensityMapping.ordinal + if (isShiftPressed()) -1 else 1
-          Settings.lightIntensityMapping = entries[nextOrdinal % entries.size]
+          if (isControlPressed()) {
+            val entries = Settings.LightIntensityMapping.entries
+            val nextOrdinal = (Settings.lightIntensityMapping.ordinal + if (isShiftPressed()) -1 else 1).mod(entries.size)
+            Settings.lightIntensityMapping = entries[nextOrdinal]
+          } else if (isAltPressed()) {
+            Settings.lightColorEnergyCompensation = !Settings.lightColorEnergyCompensation
+          } else {
+            val entries = Settings.LightToneMapping.entries
+            val nextOrdinal = (Settings.lightToneMapping.ordinal + if (isShiftPressed()) -1 else 1).mod(entries.size)
+            Settings.lightToneMapping = entries[nextOrdinal]
+          }
           world.recalculateLights()
         }
       }

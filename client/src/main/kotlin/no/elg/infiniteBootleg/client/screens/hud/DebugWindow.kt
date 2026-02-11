@@ -257,7 +257,15 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           Settings.lightIntensityMultiplier = it
           world.recalculateLights()
         }
-//       Room for two more buttons
+        toggleableDebugButton(
+          "Light intensity compensation",
+          "If the color of the light should be compensated based on the 'energy' of the light, which is the intensity before color is applied.",
+          onAnyElementChanged = onAnyElementChanged,
+          property = Settings::lightColorEnergyCompensation
+        ) {
+          world.recalculateLights()
+        }
+//       Room for one more buttons
       }
 
       sep()

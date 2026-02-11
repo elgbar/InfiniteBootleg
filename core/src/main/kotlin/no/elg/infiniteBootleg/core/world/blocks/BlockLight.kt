@@ -77,6 +77,9 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
     val ny = neighbor.worldY + 0.5
     // If null but we still got here, then the block is a skylight and thus should be white
     val tint: Color = neighbor.material.lightColor ?: Color.WHITE
+    // Compensate intensity so all tint colors produce equal total light energy as white
+    val tintSum = tint.r + tint.g + tint.b
+    val brightnessCompensation = if (Settings.lightColorEnergyCompensation && tintSum > 0f) 3f / tintSum else 1f
     val maxDistance = World.LIGHT_SOURCE_LOOK_BLOCKS.toDouble()
     val maxDistSq = maxDistance * maxDistance
 
@@ -106,7 +109,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
         }
 
         val lightMapIndex = lightMapIndex(dx, dy)
-        tmpLightMap.updateColor(lightMapIndex, (intensity * Settings.lightIntensityMultiplier).toFloat(), tint)
+        tmpLightMap.updateColor(lightMapIndex, (intensity * Settings.lightIntensityMultiplier * brightnessCompensation).toFloat(), tint)
       }
     }
   }

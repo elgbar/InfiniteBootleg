@@ -71,7 +71,7 @@ object DebugText {
       cellColor.g = g[lightMapIndex]
       cellColor.b = b[lightMapIndex]
     }
-    val format = "lit? %-5s (using no light arr? %-5s) sky? %-5s (using sky arr? %-5s) avg brt %1.3f sub-cell[%1d, %1d] c %s tm %s im %s"
+    val format = "lit? %-5s (darkness arr? %-5s) sky? %-5s (sky arr? %-5s) avg brt %1.3f sub-cell[%1d, %1d] c %s tm %s im %s cec %-5s"
     sb.append(
       String.format(
         format,
@@ -84,7 +84,8 @@ object DebugText {
         rawY,
         cellColor.toString(),
         Settings.lightToneMapping.name,
-        Settings.lightIntensityMapping.name
+        Settings.lightIntensityMapping.name,
+        Settings.lightColorEnergyCompensation
       )
     )
   }

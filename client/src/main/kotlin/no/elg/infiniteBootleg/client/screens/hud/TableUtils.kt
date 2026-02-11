@@ -43,8 +43,13 @@ fun KTable.toggleableDebugButton(
   description: String? = null,
   style: String = "debug-menu-button",
   onAnyElementChanged: MutableList<() -> Unit>,
-  property: KMutableProperty0<Boolean>
-): VisTextButton = toggleableDebugButton(name, description, style, onAnyElementChanged, property::get) { property.set(!property.get()) }
+  property: KMutableProperty0<Boolean>,
+  effectOnToggle: () -> Unit = {}
+): VisTextButton =
+  toggleableDebugButton(name, description, style, onAnyElementChanged, property::get) {
+    property.set(!property.get())
+    effectOnToggle()
+  }
 
 @Scene2dDsl
 fun KTable.toggleableDebugButton(
