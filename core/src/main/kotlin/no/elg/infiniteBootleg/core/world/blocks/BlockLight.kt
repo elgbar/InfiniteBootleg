@@ -126,8 +126,8 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
 
   /**
    * Compute light attenuation along the ray from source to destination using DDA at subcell resolution.
-   * Steps through a grid that is [LIGHT_RESOLUTION] times finer than the block grid.
-   * Each subcell-sized step through a solid material attenuates by its lightOpacity.
+   * Steps through a grid that is [LIGHT_RESOLUTION] times finer than the block grid for precise ray paths.
+   * Opacity is applied once per block entry (not per subcell) so diagonal rays aren't over-attenuated.
    * Skips source and destination subcells.
    *
    * @return attenuation in [0.0, 1.0] where 1.0 = no occlusion, 0.0 = fully blocked
@@ -145,6 +145,13 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
 
     val dirX = dstX - srcX
     val dirY = dstY - srcY
+
+    // Normalize per-step opacity by L2/L1 ratio of the ray direction.
+    // Diagonal rays have more DDA steps than axis-aligned rays for the same distance,
+    // so we scale down each step's opacity to compensate, producing circular shadows.
+    val euclidean = sqrt(dirX * dirX + dirY * dirY)
+    val manhattan = abs(dirX) + abs(dirY)
+    val opacityNormalizer = if (manhattan > 0) (euclidean / manhattan).toFloat() else 1f
 
     val stepX = if (dirX > 0) 1 else -1
     val stepY = if (dirY > 0) 1 else -1
@@ -192,7 +199,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
 
       val block = world.getRawBlock(blockX, blockY, loadChunk = false)
       val opacity = block?.material?.lightOpacity ?: 0f
-      attenuation *= (1.0f - opacity)
+      attenuation *= (1.0f - opacity * opacityNormalizer)
       if (attenuation <= 0f) return 0f
     }
 
