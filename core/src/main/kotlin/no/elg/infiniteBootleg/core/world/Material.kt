@@ -63,6 +63,12 @@ sealed interface Material : ContainerElement {
   val blocksLight: Boolean get() = true
 
   /**
+   * How much this material attenuates light passing through it.
+   * 0.0 = fully transparent to light, 1.0 = fully opaque
+   */
+  val lightOpacity: Float get() = if (blocksLight) 0.5f else 0.0f
+
+  /**
    * @return What color this material emits. If null, the material does not emit light
    */
   val lightColor: Color? get() = null
@@ -157,11 +163,39 @@ sealed interface Material : ContainerElement {
     }
   }
 
+  object TorchStill : Material, TexturedContainerElement {
+    override val hardness get() = 0.1f
+    override val textureName: String get() = "torch"
+    override val hasTransparentTexture get() = true
+    override val isCollidable get() = false
+    override val blocksLight get() = false
+    override val lightColor: Color get() = Color.RED
+  }
+
+  object TorchStillGreen : Material, TexturedContainerElement {
+    override val hardness get() = 0.1f
+    override val textureName: String get() = "torch"
+    override val hasTransparentTexture get() = true
+    override val isCollidable get() = false
+    override val blocksLight get() = false
+    override val lightColor: Color get() = Color.GREEN
+  }
+
+  object TorchStillBlue : Material, TexturedContainerElement {
+    override val hardness get() = 0.1f
+    override val textureName: String get() = "torch"
+    override val hasTransparentTexture get() = true
+    override val isCollidable get() = false
+    override val blocksLight get() = false
+    override val lightColor: Color get() = Color.BLUE
+  }
+
   object Glass : Material, TexturedContainerElement {
     override val hardness get() = 0.1f
     override val textureName: String get() = "glass"
     override val hasTransparentTexture get() = true
     override val blocksLight get() = false
+    override val lightOpacity get() = 0.15f
   }
 
   object Door : Material, TexturedContainerElement {
@@ -204,6 +238,7 @@ sealed interface Material : ContainerElement {
     override val hasTransparentTexture = true
     override val isCollidable = false
     override val blocksLight = false
+    override val lightOpacity = 0.4f
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createLeafEntity(world, worldX, worldY, material)
     }

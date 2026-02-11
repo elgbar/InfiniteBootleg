@@ -23,6 +23,7 @@ import no.elg.infiniteBootleg.core.world.blocks.LightMap.Companion.Brightness
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.core.world.world.World
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
@@ -83,6 +84,14 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
     val maxDistance = World.LIGHT_SOURCE_LOOK_BLOCKS.toDouble()
     val maxDistSq = maxDistance * maxDistance
 
+    // Compute ray attenuation once per (source, target) pair
+    val attenuation = if (Settings.lightOcclusion) {
+      computeRayAttenuation(neighbor.worldX, neighbor.worldY, worldX, worldY)
+    } else {
+      1.0f
+    }
+    if (attenuation <= 0f) return
+
     for (dx in 0 until LIGHT_RESOLUTION) {
       for (dy in 0 until LIGHT_RESOLUTION) {
         val cellX = worldX + centerOfSubcell(dx)
@@ -109,9 +118,68 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
         }
 
         val lightMapIndex = lightMapIndex(dx, dy)
-        tmpLightMap.updateColor(lightMapIndex, (intensity * Settings.lightIntensityMultiplier * brightnessCompensation).toFloat(), tint)
+        tmpLightMap.updateColor(lightMapIndex, (intensity * Settings.lightIntensityMultiplier * brightnessCompensation * attenuation).toFloat(), tint)
       }
     }
+  }
+
+  /**
+   * Compute light attenuation along the ray from source to destination using Bresenham's line.
+   * Skips source and destination blocks. Each intermediate block attenuates by its material's lightOpacity.
+   *
+   * @return attenuation in [0.0, 1.0] where 1.0 = no occlusion, 0.0 = fully blocked
+   */
+  private fun computeRayAttenuation(srcX: WorldCoord, srcY: WorldCoord, dstX: WorldCoord, dstY: WorldCoord): Float {
+    val dx = dstX - srcX
+    val dy = dstY - srcY
+    val sx = if (dx > 0) {
+      1
+    } else if (dx < 0) {
+      -1
+    } else {
+      0
+    }
+    val sy = if (dy > 0) {
+      1
+    } else if (dy < 0) {
+      -1
+    } else {
+      0
+    }
+    val absDx = abs(dx)
+    val absDy = abs(dy)
+
+    var attenuation = 1.0f
+    val world = chunk.world
+
+    var x = srcX
+    var y = srcY
+    var err = absDx - absDy
+    var isFirst = true
+
+    while (true) {
+      if (x == dstX && y == dstY) break
+
+      if (!isFirst) {
+        val block = world.getRawBlock(x, y, loadChunk = false)
+        val opacity = block?.material?.lightOpacity ?: 0f
+        attenuation *= (1.0f - opacity)
+        if (attenuation <= 0f) return 0f
+      }
+      isFirst = false
+
+      val e2 = 2 * err
+      if (e2 > -absDy) {
+        err -= absDy
+        x += sx
+      }
+      if (e2 < absDx) {
+        err += absDx
+        y += sy
+      }
+    }
+
+    return attenuation
   }
 
   private fun isAboveTopBlock(worldY: WorldCoord = chunk.chunkY.chunkToWorld(localY)): Boolean =

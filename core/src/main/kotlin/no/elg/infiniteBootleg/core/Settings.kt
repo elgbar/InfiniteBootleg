@@ -68,6 +68,8 @@ object Settings {
 
   var lightColorEnergyCompensation = true
 
+  var lightOcclusion = true
+
   var renderBox2dDebug = false
 
   var debugEntityLight = false
