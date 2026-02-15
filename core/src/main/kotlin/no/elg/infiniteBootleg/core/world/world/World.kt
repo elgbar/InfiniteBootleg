@@ -587,9 +587,15 @@ abstract class World(
 
   fun getChunk(chunkX: ChunkCoord, chunkY: ChunkCoord, load: Boolean): Chunk? = getChunk(compactInt(chunkX, chunkY), load)
 
-  private val threadLocalChunksView = ThreadLocal.withInitial<Long2ObjectMap<WeakReference<Chunk>>> {
+  private class ThreadLocalChunkCache {
+    var lastLoc: Long = Long.MIN_VALUE
+    var lastChunk: Chunk? = null
+    val chunks = Long2ObjectOpenHashMap<WeakReference<Chunk>>(32)
+  }
+
+  private val threadLocalChunkCache = ThreadLocal.withInitial {
     CHUNK_THREAD_LOCAL.incrementAndGet()
-    Long2ObjectOpenHashMap(32)
+    ThreadLocalChunkCache()
   }
 
   /**
@@ -601,15 +607,30 @@ abstract class World(
    */
   fun getChunk(chunkLoc: Long, load: Boolean = true): Chunk? {
     assertNotDisposed()
-    val localChunks: Long2ObjectMap<WeakReference<Chunk>> = threadLocalChunksView.get()
+    val cache = threadLocalChunkCache.get()
+
+    // Fast path: check last accessed chunk (same-chunk spatial locality)
+    if (cache.lastLoc == chunkLoc) {
+      val lastChunk = cache.lastChunk
+      if (lastChunk != null && lastChunk.isValid) {
+        return lastChunk
+      }
+    }
+
+    // Medium path: check thread-local map
+    val localChunks = cache.chunks
     val localChunk: Chunk? = localChunks.get(chunkLoc)?.get()
     if (localChunk != null) {
       if (localChunk.isValid) {
+        cache.lastLoc = chunkLoc
+        cache.lastChunk = localChunk
         return localChunk
       } else {
         localChunks.remove(chunkLoc)
       }
     }
+
+    // Slow path: read from main store
     // Give a larger timeout when disposing as it might take longer to acquire the lock as all chunks are being saved
     val timeoutMillis = if (hasDisposeBegun) LONG_WAIT_DURATION_CHUNK_LOCK_MS else TRY_LOCK_CHUNKS_DURATION_MS
     // This is a long lock, it must appear to be an atomic operation though
@@ -626,6 +647,8 @@ abstract class World(
     return if (finalChunk.valid()) {
       CHUNK_ADDED_THREAD_LOCAL.incrementAndGet()
       localChunks.put(chunkLoc, WeakReference(finalChunk))
+      cache.lastLoc = chunkLoc
+      cache.lastChunk = finalChunk
       finalChunk
     } else {
       null
