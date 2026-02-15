@@ -265,8 +265,18 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
         ) {
           world.recalculateLights()
         }
-//       Room for one more buttons
+        toggleableDebugButton(
+          "Light occlusion",
+          "Toggle whether light occlusion is enabled",
+          onAnyElementChanged = onAnyElementChanged,
+          property = Settings::lightOcclusion
+        ) {
+          world.recalculateLights()
+        }
       }
+//      section {
+//       Room for four more buttons
+//      }
 
       sep()
       // Future positions renderers
