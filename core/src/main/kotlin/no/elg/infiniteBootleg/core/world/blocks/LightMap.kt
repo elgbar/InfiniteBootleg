@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.core.world.blocks
 
 import com.badlogic.gdx.graphics.Color
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.COMPLETE_DARKNESS
+import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.FULL_BRIGHTNESS
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.LIGHT_RESOLUTION_SQUARE
 
 data class LightMap(
@@ -109,9 +110,9 @@ data class LightMap(
     typealias BrightnessArray = FloatArray
 
     fun fullyDark() = BrightnessArray(LIGHT_RESOLUTION_SQUARE) { COMPLETE_DARKNESS }
-    fun fullyBright() = BrightnessArray(LIGHT_RESOLUTION_SQUARE) { COMPLETE_DARKNESS }
+    fun fullyBright() = BrightnessArray(LIGHT_RESOLUTION_SQUARE) { FULL_BRIGHTNESS }
 
-    val SKYLIGHT_LIGHT_MAP: LightMap = LightMap(fullyBright(), fullyBright(), fullyBright())
+    val SKYLIGHT_LIGHT_MAP: LightMap = LightMap(fullyBright(), fullyBright(), fullyBright(), fullyBright())
     val NO_LIGHTS_LIGHT_MAP: LightMap = LightMap()
   }
 }
