@@ -297,11 +297,16 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
         Settings.LightToneMapping.CLAMP -> Unit
       }
       ensureActive()
-      isSkylight = false
-      isLit = true
-      lightMap = tmpLightMap
+
       averageBrightness = tmpLightMap.averageBrightness()
-      dispatchLightChangeEvent()
+      if (averageBrightness == COMPLETE_DARKNESS) {
+        setToNoLight(publishEvent = isLit)
+      } else {
+        isLit = true
+        isSkylight = false
+        lightMap = tmpLightMap
+        dispatchLightChangeEvent()
+      }
       return@coroutineScope true
     }
   }
