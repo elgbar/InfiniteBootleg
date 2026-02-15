@@ -234,8 +234,12 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
         // Only dispatch events when there is a real change and the chunk is initialized
         EventManager.dispatchEventAsync(BlockChangedEvent(currBlock, block))
 
-        if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
-          if (Settings.renderLight) {
+        if (Settings.renderLight) {
+          // Optimized to check blockLight last, ok to do it twice (it should be cached for the second lookup anyway(?))
+          fun affectedByLight(block: Block?): Boolean =
+            block != null && (block.material.emitsLight || (Settings.lightOcclusion && block.material.lightOpacity > 0f && getBlockLight(localX, localY).isLit))
+
+          if (affectedByLight(block) || affectedByLight(currBlock)) {
             EventManager.dispatchEventAsync(ChunkLightChangedEvent(compactLocation, localX, localY))
           }
         }
@@ -290,8 +294,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
       coroutineScope {
         for (localX in 0 until Chunk.CHUNK_SIZE) {
           for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
-            if (checkDistance &&
-              isNoneWithinDistance(
+            if (checkDistance && isNoneWithinDistance(
                 sources,
                 this@ChunkImpl.chunkX.chunkToWorld(localX),
                 this@ChunkImpl.chunkY.chunkToWorld(localY)

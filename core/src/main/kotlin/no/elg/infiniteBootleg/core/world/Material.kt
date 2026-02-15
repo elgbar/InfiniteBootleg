@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Color
 import io.github.oshai.kotlinlogging.KotlinLogging
 import it.unimi.dsi.fastutil.longs.LongIterators
+import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.items.ItemType
 import no.elg.infiniteBootleg.core.items.MaterialItem
 import no.elg.infiniteBootleg.core.main.Main
@@ -238,7 +239,7 @@ sealed interface Material : ContainerElement {
     override val hasTransparentTexture = true
     override val isCollidable = false
     override val blocksLight = false
-    override val lightOpacity = 0.2f
+    override val lightOpacity = 0.1f
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createLeafEntity(world, worldX, worldY, material)
     }
