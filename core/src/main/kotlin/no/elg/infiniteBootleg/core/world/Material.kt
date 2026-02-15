@@ -196,7 +196,6 @@ sealed interface Material : ContainerElement {
     override val textureName: String get() = "glass"
     override val hasTransparentTexture get() = true
     override val blocksLight get() = false
-    override val lightOpacity get() = 0.01f
   }
 
   object Door : Material, TexturedContainerElement {
