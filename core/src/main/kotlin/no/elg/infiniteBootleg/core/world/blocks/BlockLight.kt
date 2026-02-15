@@ -64,7 +64,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
   var lightMap: LightMap = NO_LIGHTS_LIGHT_MAP
     private set
 
-  private val event = BlockLightChangedEvent(chunk, localX, localY)
+  private val event by lazy(LazyThreadSafetyMode.PUBLICATION) { BlockLightChangedEvent(chunk, localX, localY) }
 
   init {
     if (isAboveTopBlock()) {
@@ -234,6 +234,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
   }
 
   private fun dispatchLightChangeEvent() {
+    // Note: Currently we only use this event for debugging
     if (Settings.renderBlockLightUpdates) {
       EventManager.dispatchEventAsync(event)
     }
