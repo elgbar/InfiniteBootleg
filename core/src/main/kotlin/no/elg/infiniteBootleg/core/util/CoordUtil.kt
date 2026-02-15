@@ -85,7 +85,7 @@ inline fun WorldCoordNumber.worldToScreen(): Float = toFloat() * Block.BLOCK_TEX
  * @return The local coordinate given coordinate have in chunk view
  */
 @Contract(pure = true)
-inline fun WorldCoord.chunkOffset(): LocalCoord = this - worldToChunk().chunkToWorld()
+inline fun WorldCoord.chunkOffset(): LocalCoord = this and (Chunk.CHUNK_SIZE - 1)
 
 @Contract(pure = true)
 inline fun WorldCompactLoc.chunkOffsetX(): LocalCoord = this.decompactLocX().chunkOffset()

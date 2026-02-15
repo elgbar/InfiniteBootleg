@@ -202,12 +202,17 @@ interface Chunk :
     /**
      * Chunks size in blocks
      */
-    const val CHUNK_SIZE: BlockUnit = 16
+    const val CHUNK_SIZE: BlockUnit = 16 // Note if changed, CHUNK_SIZE_SHIFT must be updated
     const val CHUNK_SIZE_F: BlockUnitF = CHUNK_SIZE.toFloat()
     const val CHUNK_TEXTURE_SIZE = CHUNK_SIZE * Block.BLOCK_TEXTURE_SIZE
     const val CHUNK_TEXTURE_SIZE_F = CHUNK_TEXTURE_SIZE.toFloat()
     const val CHUNK_TEXTURE_SIZE_HALF = CHUNK_TEXTURE_SIZE / 2
-    val CHUNK_SIZE_SHIFT = (ln(CHUNK_SIZE.toDouble()) / ln(2.0)).toInt()
+    const val CHUNK_SIZE_SHIFT = 4
+
+    init {
+      val calculatedShift = (ln(CHUNK_SIZE.toDouble()) / ln(2.0)).toInt()
+      require(CHUNK_SIZE_SHIFT == calculatedShift) { "Chunk size shift have changed! Old: $CHUNK_SIZE_SHIFT, calculated: $calculatedShift" }
+    }
 
     fun Chunk?.valid(): Boolean {
       contract { returns(true) implies (this@valid != null) }
