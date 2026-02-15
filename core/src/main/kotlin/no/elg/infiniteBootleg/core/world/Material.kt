@@ -19,7 +19,7 @@ import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.stringifyCompactLocWithChunk
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.BlockImpl
-import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.color5000k
+import no.elg.infiniteBootleg.core.world.blocks.BlockLight
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.ecs.api.ProtoConverter
 import no.elg.infiniteBootleg.core.world.ecs.components.ExplosiveComponent
@@ -158,7 +158,7 @@ sealed interface Material : ContainerElement {
     override val hasTransparentTexture get() = true
     override val isCollidable get() = false
     override val blocksLight get() = false
-    override val lightColor: Color get() = color5000k
+    override val lightColor: Color = Color.valueOf("#FFE4CE") // 5000k ish
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createGravityAffectedBlockEntity(world, worldX, worldY, material)
     }

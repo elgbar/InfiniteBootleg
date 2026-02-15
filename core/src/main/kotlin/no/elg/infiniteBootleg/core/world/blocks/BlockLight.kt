@@ -464,7 +464,6 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
     inline fun lightMapIndex(dx: Int, dy: Int): Int = dx * LIGHT_RESOLUTION + dy
 
     const val MIN_Y_OFFSET = 1
-    val color5000k = Color.valueOf("#FFE4CE")
 
     fun centerOfSubcell(subcellCoordinate: Int): Double = ((1.0 / LIGHT_RESOLUTION) + subcellCoordinate.toDouble()) / LIGHT_RESOLUTION
   }
