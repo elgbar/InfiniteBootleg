@@ -1261,8 +1261,8 @@ abstract class World(
    * @param worldY The y coordinate in world view
    * @return The material at the given location
    */
-  fun getMaterial(worldX: WorldCoord, worldY: WorldCoord, load: Boolean = true): Material = getRawBlock(worldX, worldY, load).materialOrAir()
-  fun getMaterial(compactLoc: Long, load: Boolean = true): Material = getRawBlock(compactLoc, load).materialOrAir()
+  fun getMaterial(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true): Material = getRawBlock(worldX, worldY, loadChunk).materialOrAir()
+  fun getMaterial(compactLoc: Long, loadChunk: Boolean = true): Material = getRawBlock(compactLoc, loadChunk).materialOrAir()
 
   /**
    * Alias to `WorldBody#postBox2dRunnable`

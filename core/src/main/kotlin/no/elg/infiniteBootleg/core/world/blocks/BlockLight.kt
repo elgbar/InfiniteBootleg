@@ -194,11 +194,11 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
       if (cx == dstCellX && cy == dstCellY) break
 
       // Convert subcell coords to block coords
-      val blockX = Math.floorDiv(cx, LIGHT_RESOLUTION)
-      val blockY = Math.floorDiv(cy, LIGHT_RESOLUTION)
+      val blockX: WorldCoord = Math.floorDiv(cx, LIGHT_RESOLUTION)
+      val blockY: WorldCoord = Math.floorDiv(cy, LIGHT_RESOLUTION)
 
-      val block = world.getRawBlock(blockX, blockY, loadChunk = false)
-      val opacity = block?.material?.lightOpacity ?: 0f
+      val material = world.getMaterial(blockX, blockY, loadChunk = false)
+      val opacity = material.lightOpacity
       attenuation *= (1.0f - opacity * opacityNormalizer)
       if (attenuation <= 0f) return 0f
     }
