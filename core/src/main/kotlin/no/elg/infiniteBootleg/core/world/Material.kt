@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Color
 import io.github.oshai.kotlinlogging.KotlinLogging
 import it.unimi.dsi.fastutil.longs.LongIterators
-import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.items.ItemType
 import no.elg.infiniteBootleg.core.items.MaterialItem
 import no.elg.infiniteBootleg.core.main.Main
@@ -19,7 +18,6 @@ import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.stringifyCompactLocWithChunk
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.BlockImpl
-import no.elg.infiniteBootleg.core.world.blocks.BlockLight
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.ecs.api.ProtoConverter
 import no.elg.infiniteBootleg.core.world.ecs.components.ExplosiveComponent
@@ -233,24 +231,24 @@ sealed interface Material : ContainerElement {
   }
 
   object BirchLeaves : Material, TexturedContainerElement {
-    override val hardness = 0.5f
+    override val hardness get() = 0.5f
     override val textureName: String get() = "birch_leaves"
-    override val hasTransparentTexture = true
-    override val isCollidable = false
-    override val blocksLight = false
-    override val lightOpacity = 0.1f
+    override val hasTransparentTexture get() = true
+    override val isCollidable get() = false
+    override val blocksLight get() = false
+    override val lightOpacity get() = 0.1f
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createLeafEntity(world, worldX, worldY, material)
     }
   }
 
   object Sandstone : Material, TexturedContainerElement {
-    override val hardness = 1f
+    override val hardness get() = 1f
     override val textureName: String get() = "sandstone"
   }
 
   object Container : Material, TexturedContainerElement {
-    override val hardness = 1f
+    override val hardness get() = 1f
     override val textureName: String get() = "container"
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createContainerEntity(world, worldX, worldY, material)
@@ -258,22 +256,22 @@ sealed interface Material : ContainerElement {
   }
 
   object CoalOre : Material, TexturedContainerElement {
-    override val hardness = 1.25f
+    override val hardness get() = 1.25f
     override val textureName: String get() = "coal_ore"
   }
 
   object CopperOre : Material, TexturedContainerElement {
-    override val hardness = 2f
+    override val hardness get() = 2f
     override val textureName: String get() = "copper_ore"
   }
 
   object IronOre : Material, TexturedContainerElement {
-    override val hardness = 3f
+    override val hardness get() = 3f
     override val textureName: String get() = "iron_ore"
   }
 
   object GoldOre : Material, TexturedContainerElement {
-    override val hardness = 1f
+    override val hardness get() = 1f
     override val textureName: String get() = "gold_ore"
   }
 
