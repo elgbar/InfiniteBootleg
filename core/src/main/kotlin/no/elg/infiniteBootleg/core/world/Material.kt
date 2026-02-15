@@ -128,6 +128,7 @@ sealed interface Material : ContainerElement {
 
   object Grass : Material, TexturedContainerElement {
     override val hardness get() = 0.8f
+    override val lightOpacity: Float get() = 0.15f
     override val textureName: String get() = "grass"
   }
 
