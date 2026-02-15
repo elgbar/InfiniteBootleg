@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.core.world.magic
 
 import com.badlogic.ashley.core.Entity
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.world.magic.parts.GemRating
 import no.elg.infiniteBootleg.core.world.magic.parts.GemType
 import no.elg.infiniteBootleg.core.world.magic.parts.RingRating
@@ -11,6 +12,8 @@ import no.elg.infiniteBootleg.protobuf.ElementKt.StaffKt.gem
 import no.elg.infiniteBootleg.protobuf.ElementKt.StaffKt.ring
 import no.elg.infiniteBootleg.protobuf.ElementKt.StaffKt.wood
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Element as ProtoElement
+
+private val logger = KotlinLogging.logger {}
 
 data class Wood(val type: WoodType, val rating: WoodRating) :
   MagicEffects,
@@ -91,11 +94,14 @@ data class Ring(val type: RingType<RingRating?>, val rating: RingRating?) :
 
   companion object {
     fun fromProto(proto: ProtoElement.Staff.Ring): Ring? =
-      RingType.valueOf(proto.type)?.let { ringType ->
+      try {
         Ring(
-          ringType,
+          RingType.valueOf(proto.type),
           if (proto.hasRating()) RingRating.valueOf(proto.rating) else null
         )
+      } catch (ex: IllegalArgumentException) {
+        logger.error(ex) { "Failed to deserialize Ring for $proto" }
+        null
       }
   }
 }
