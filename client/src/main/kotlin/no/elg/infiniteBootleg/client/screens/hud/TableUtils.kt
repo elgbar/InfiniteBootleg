@@ -23,6 +23,7 @@ import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visTextTooltip
 import no.elg.infiniteBootleg.core.util.IBVisSelectBox
+import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.sealedSubclassObjectInstances
 import no.elg.infiniteBootleg.core.util.toAbled
 import no.elg.infiniteBootleg.core.util.toTitleCase
@@ -33,8 +34,10 @@ import kotlin.contracts.contract
 import kotlin.reflect.KMutableProperty0
 
 fun updateAllValues(onAnyElementChanged: MutableList<suspend () -> Unit>) {
-  for (onChange in onAnyElementChanged) {
-    runBlocking { onChange() }
+  launchOnMainSuspendable {
+    for (onChange in onAnyElementChanged) {
+      onChange()
+    }
   }
 }
 
