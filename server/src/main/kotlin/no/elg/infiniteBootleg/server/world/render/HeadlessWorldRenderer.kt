@@ -1,19 +1,17 @@
 package no.elg.infiniteBootleg.server.world.render
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.utils.ImmutableArray
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.runBlocking
 import no.elg.infiniteBootleg.core.events.WorldSpawnUpdatedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.util.ChunkCoord
-import no.elg.infiniteBootleg.core.util.asyncOnBox2dSuspendable
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.util.worldToChunkX
 import no.elg.infiniteBootleg.core.util.worldToChunkY
+import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEntitySet
 import no.elg.infiniteBootleg.core.world.render.ChunksInView.Companion.chunkColumnsInView
 import no.elg.infiniteBootleg.core.world.render.ChunksInView.Companion.sequence
 import no.elg.infiniteBootleg.core.world.render.ServerClientChunksInView
@@ -29,7 +27,8 @@ private val logger = KotlinLogging.logger {}
  */
 class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
 
-  private val inViewEntities: ImmutableArray<Entity> = world.engine.getEntitiesFor(InViewFamily)
+  private val inViewEntitiesSet = ThreadSafeEntitySet()
+  private val inViewEntities: Set<Entity> = inViewEntitiesSet.entities
 
   private val spawnChunksInView: ServerClientChunksInView = world.spawn.worldToChunk().let { (chunkX, chunkY) ->
     ServerClientChunksInView(chunkX, chunkY)
@@ -48,6 +47,10 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
     }
   }
 
+  init {
+    world.engine.addEntityListener(InViewFamily, inViewEntitiesSet)
+  }
+
   override fun render() {
     // Note to self: do not call chunkBody#update while under the chunksLock.readLock() or chunksLock.writeLock()
     val filter = world.loadedChunks.filter { chunk -> chunk.isValid && chunk.isDirty }
@@ -62,25 +65,19 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
 
   override fun dispose() {
     onSpawnChanged.removeListener()
+    world.engine.removeEntityListener(inViewEntitiesSet)
   }
 
   override fun resize(width: Int, height: Int) = Unit
   override fun update() = Unit
 
   override fun isOutOfView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean =
-    spawnChunksInView.isOutOfView(chunkX, chunkY) &&
-      runBlocking { world.asyncOnBox2dSuspendable { inViewEntities.all { it.chunksInView.isOutOfView(chunkX, chunkY) } }.await() }
+    spawnChunksInView.isOutOfView(chunkX, chunkY) && inViewEntities.all { it.chunksInView.isOutOfView(chunkX, chunkY) }
 
   override fun isInView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean =
-    spawnChunksInView.isInView(chunkX, chunkY) ||
-      runBlocking { world.asyncOnBox2dSuspendable { inViewEntities.any { it.chunksInView.isInView(chunkX, chunkY) } }.await() }
+    spawnChunksInView.isInView(chunkX, chunkY) || inViewEntities.any { it.chunksInView.isInView(chunkX, chunkY) }
 
-  private fun allChunksInView(): Sequence<ServerClientChunksInView> =
-    sequenceOf(spawnChunksInView) + runBlocking {
-      world.asyncOnBox2dSuspendable {
-        inViewEntities.map { it.chunksInView }.asSequence()
-      }.await()
-    }
+  private fun allChunksInView(): Sequence<ServerClientChunksInView> = sequenceOf(spawnChunksInView) + inViewEntities.map { it.chunksInView }.asSequence()
 
   override val chunkLocationsInView: Sequence<Long>
     get() = allChunksInView().flatMap { it.sequence() }.distinct()
