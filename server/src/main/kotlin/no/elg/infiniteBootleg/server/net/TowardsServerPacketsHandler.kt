@@ -90,41 +90,29 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
   when (packet.type) {
     Packets.Packet.Type.DX_HEARTBEAT -> handleHeartbeat(ctx)
 
-    Packets.Packet.Type.DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleMovePlayer(ctx, it) } }
-
-    Packets.Packet.Type.DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let {
-      PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleBlockUpdate(ctx, it) }
-    }
-
     Packets.Packet.Type.SB_CONTENT_REQUEST -> packet.contentRequestOrNull?.let { handleContentRequest(ctx, it) }
 
-    Packets.Packet.Type.DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let {
-      launchOnAsyncSuspendable { asyncHandleBreakingBlock(ctx, it) }
-    }
+    Packets.Packet.Type.DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleMovePlayer(ctx, it) } }
 
-    Packets.Packet.Type.DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let {
-      launchOnAsyncSuspendable { asyncHandleContainerUpdate(ctx, it) }
-    }
+    Packets.Packet.Type.DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleBlockUpdate(ctx, it) } }
 
-    Packets.Packet.Type.SB_SELECT_SLOT -> packet.updateSelectedSlotOrNull?.let {
-      PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleUpdateSelectedSlot(ctx, it) }
-    }
+    Packets.Packet.Type.SB_SELECT_SLOT -> packet.updateSelectedSlotOrNull?.let { PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleUpdateSelectedSlot(ctx, it) } }
 
     Packets.Packet.Type.SB_LOGIN -> packet.loginOrNull?.let { PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleLoginPacket(ctx, it) } }
 
     Packets.Packet.Type.SB_CLIENT_WORLD_LOADED -> PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleClientsWorldLoaded(ctx) }
 
-    Packets.Packet.Type.DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let {
-      launchOnMainSuspendable { handleSecretExchange(ctx, it) }
-    }
+    Packets.Packet.Type.SB_CAST_SPELL -> PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleCastSpell(ctx) }
+
+    Packets.Packet.Type.DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { launchOnAsyncSuspendable { asyncHandleBreakingBlock(ctx, it) } }
+
+    Packets.Packet.Type.DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { launchOnAsyncSuspendable { asyncHandleContainerUpdate(ctx, it) } }
+
+    Packets.Packet.Type.DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let { launchOnMainSuspendable { handleSecretExchange(ctx, it) } }
 
     Packets.Packet.Type.DX_DISCONNECT -> launchOnMainSuspendable { handleDisconnect(ctx, packet.disconnectOrNull) }
 
-    Packets.Packet.Type.DX_WORLD_SETTINGS -> packet.worldSettingsOrNull?.let {
-      launchOnMainSuspendable { handleWorldSettings(ctx, it) }
-    }
-
-    Packets.Packet.Type.SB_CAST_SPELL -> PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleCastSpell(ctx) }
+    Packets.Packet.Type.DX_WORLD_SETTINGS -> packet.worldSettingsOrNull?.let { launchOnMainSuspendable { handleWorldSettings(ctx, it) } }
 
     Packets.Packet.Type.UNRECOGNIZED -> ctx.fatal("Unknown packet type received by server: ${packet.type}")
 
@@ -138,9 +126,10 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
     }
   }
 }
-// ///////////////////
-// SYNCED HANDLERS  //
-// ///////////////////
+
+// /////////////////////
+// UNSYNCED HANDLERS  //
+// /////////////////////
 
 private fun handleContentRequest(ctx: ChannelHandlerContextWrapper, contentRequest: Packets.ContentRequest) {
   // Chunk request
@@ -158,6 +147,39 @@ private fun handleContentRequest(ctx: ChannelHandlerContextWrapper, contentReque
     launchOnAsyncSuspendable {
       asyncHandleContainerRequest(ctx, owner.fromProto() ?: return@launchOnAsyncSuspendable)
     }
+  }
+}
+
+private fun handleHeartbeat(ctx: ChannelHandlerContextWrapper) {
+  ctx.getSharedInformation()?.beat() ?: logger.error { "Failed to beat, because of null shared information" }
+}
+
+// /////////////////
+// MAIN HANDLERS  //
+// /////////////////
+
+private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchange: Packets.SecretExchange) {
+  val shared = ctx.getSharedInformation()
+  if (shared == null) {
+    ctx.fatal("No secret with this channel, send login request first")
+    return
+  }
+
+  try {
+    val id = secretExchange.ref.id
+    if (id != shared.entityId || secretExchange.secret != shared.secret) {
+      ctx.fatal("Wrong shared information returned by client")
+      return
+    }
+    val player = Main.inst().world?.getEntity(shared.entityId)
+    if (player != null) {
+      ctx.writeAndFlushPacket(clientBoundStartGamePacket(player))
+    } else {
+      ctx.fatal("handleSecretExchange: Failed to find entity with the given uuid")
+    }
+  } catch (e: Exception) {
+    ctx.fatal("handleSecretExchange: ${e::class} thrown when trying to handle secret exchange")
+    e.printStackTrace()
   }
 }
 
@@ -183,6 +205,47 @@ private fun handleWorldSettings(ctx: ChannelHandlerContextWrapper, worldSettings
   // Rebroadcast the packet to all clients to stay in sync
   ServerMain.inst().packetSender.broadcast(clientBoundWorldSettings(spawn, time, timeScale)) { c -> c != ctx.channel() }
 }
+
+private fun handleDisconnect(ctx: ChannelHandlerContextWrapper, disconnect: Packets.Disconnect?) {
+  logger.info { "Client sent disconnect packet. Reason: ${disconnect?.reason ?: "No reason given"}" }
+  ctx.close()
+}
+
+// //////////////////
+// ASYNC HANDLERS  //
+// //////////////////
+
+private fun asyncHandleBreakingBlock(ctx: ChannelHandlerContextWrapper, breakingBlock: Packets.BreakingBlock) {
+  // Naive and simple re-broadcast
+  ServerMain.inst().packetSender.broadcast(clientBoundPacketBuilder(Packets.Packet.Type.DX_BREAKING_BLOCK).setBreakingBlock(breakingBlock).build()) { c -> c != ctx.channel() }
+}
+
+private fun asyncHandleContainerUpdate(ctx: ChannelHandlerContextWrapper, containerUpdate: Packets.ContainerUpdate) {
+  // Naive and simple re-broadcast
+  // TODO check that the player can do this
+  // FIXME make sure not to broadcast when no changes are made
+  val (owner, container) = containerUpdate.worldContainer.fromProto()
+  ServerMain.inst().serverWorld.worldContainerManager.find(owner).thenApply { serverOwnedContainer ->
+    container.content.copyInto(serverOwnedContainer.container.content)
+  }
+  ServerMain.inst().packetSender.broadcast(
+    clientBoundPacketBuilder(Packets.Packet.Type.DX_CONTAINER_UPDATE).setContainerUpdate(containerUpdate).build()
+  ) { c -> c != ctx.channel() }
+}
+
+private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, owner: ContainerOwner) {
+  ServerMain.inst().serverWorld.worldContainerManager.find(owner).thenApply { ownedContainer ->
+    if (ownedContainer == null) {
+      logger.warn { "Failed to find container for $owner" }
+    } else {
+      ctx.writeAndFlushPacket(clientBoundContainerUpdate(ownedContainer))
+    }
+  }
+}
+
+// ////////////////////
+// PHYSICS HANDLERS  //
+// ////////////////////
 
 private const val MAX_BLOCKS_PER_SECOND_SQUARED = 4 * 4
 private const val MAX_BLOCKS_PER_SECOND_FALLING_SQUARED = MAX_BLOCKS_PER_SECOND_SQUARED * 4
@@ -210,8 +273,7 @@ private fun physicsHandleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntit
   val isFalling = velocity.y < NEG_Y_VEL_TO_BE_FALLING
   val maxMovement = if (isFalling) MAX_BLOCKS_PER_SECOND_FALLING_SQUARED else MAX_BLOCKS_PER_SECOND_SQUARED
   logger.debug {
-    "Player ${player.nameOrNull} moved $deltaPos blocks in $elapsedSeconds seconds (falling? $isFalling). " +
-      "Max allowed for this timeframe is ${elapsedSeconds * maxMovement})"
+    "Player ${player.nameOrNull} moved $deltaPos blocks in $elapsedSeconds seconds (falling? $isFalling). " + "Max allowed for this timeframe is ${elapsedSeconds * maxMovement})"
   }
 
   val maxDistance = maxMovement * elapsedSeconds
@@ -227,31 +289,6 @@ private fun physicsHandleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntit
 
     // Only set look direction if it exists on the entity from before
     moveEntity.lookDirectionOrNull?.let { player.lookDirectionComponentOrNull?.direction = Direction.valueOf(it) }
-  }
-}
-
-private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchange: Packets.SecretExchange) {
-  val shared = ctx.getSharedInformation()
-  if (shared == null) {
-    ctx.fatal("No secret with this channel, send login request first")
-    return
-  }
-
-  try {
-    val id = secretExchange.ref.id
-    if (id != shared.entityId || secretExchange.secret != shared.secret) {
-      ctx.fatal("Wrong shared information returned by client")
-      return
-    }
-    val player = Main.inst().world?.getEntity(shared.entityId)
-    if (player != null) {
-      ctx.writeAndFlushPacket(clientBoundStartGamePacket(player))
-    } else {
-      ctx.fatal("handleSecretExchange: Failed to find entity with the given uuid")
-    }
-  } catch (e: Exception) {
-    ctx.fatal("handleSecretExchange: ${e::class} thrown when trying to handle secret exchange")
-    e.printStackTrace()
   }
 }
 
@@ -283,31 +320,16 @@ private fun physicsHandleLoginPacket(ctx: ChannelHandlerContextWrapper, login: P
   val sharedInformation = SharedInformation(entityId, secret.toString())
   ServerBoundHandler.clients[ctx.channel()] = sharedInformation
 
-  ServerWorldLoader.spawnServerPlayer(world, entityId, username, sharedInformation)
-    .orTimeout(10, TimeUnit.SECONDS)
-    .whenComplete { _, ex ->
-      if (ex == null) {
-        // Exchange the UUID and secret, which will be used to verify the sender, kinda like a bearer bond.
-        ctx.writeAndFlushPacket(clientBoundSecretExchange(sharedInformation))
-        logger.debug { "Secret sent to player ${sharedInformation.entityId}, waiting for confirmation" }
-      } else {
-        ctx.fatal("Failed to spawn player ${sharedInformation.entityId} server side.\n  ${ex::class.simpleName}: ${ex.message}")
-      }
+  ServerWorldLoader.spawnServerPlayer(world, entityId, username, sharedInformation).orTimeout(10, TimeUnit.SECONDS).whenComplete { _, ex ->
+    if (ex == null) {
+      // Exchange the UUID and secret, which will be used to verify the sender, kinda like a bearer bond.
+      ctx.writeAndFlushPacket(clientBoundSecretExchange(sharedInformation))
+      logger.debug { "Secret sent to player ${sharedInformation.entityId}, waiting for confirmation" }
+    } else {
+      ctx.fatal("Failed to spawn player ${sharedInformation.entityId} server side.\n  ${ex::class.simpleName}: ${ex.message}")
     }
+  }
 }
-
-private fun handleHeartbeat(ctx: ChannelHandlerContextWrapper) {
-  ctx.getSharedInformation()?.beat() ?: logger.error { "Failed to beat, because of null shared information" }
-}
-
-private fun handleDisconnect(ctx: ChannelHandlerContextWrapper, disconnect: Packets.Disconnect?) {
-  logger.info { "Client sent disconnect packet. Reason: ${disconnect?.reason ?: "No reason given"}" }
-  ctx.close()
-}
-
-// //////////////////
-// ASYNC HANDLERS  //
-// //////////////////
 
 private fun physicsHandleBlockUpdate(ctx: ChannelHandlerContextWrapper, blockUpdate: Packets.UpdateBlock) {
   val worldX = blockUpdate.pos.x
@@ -354,8 +376,7 @@ private fun physicsHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
   ctx.writeAndFlushPacket(clientBoundPacketBuilder(Packets.Packet.Type.CB_INITIAL_CHUNKS_SENT).build())
   logger.debug { "Initial ${chunksInView.size} chunks sent to player ${player.name}" }
 
-  val validEntitiesToSendToClient = world.validEntitiesToSendToClient
-    .filterNot { it.id == shared.entityId } // don't send the player to themselves
+  val validEntitiesToSendToClient = world.validEntitiesToSendToClient.filterNot { it.id == shared.entityId } // don't send the player to themselves
     .filter {
       val (worldX, worldY) = it.positionComponent
       isLocInView(ctx, worldX.toInt(), worldY.toInt())
@@ -400,39 +421,11 @@ private fun physicsHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entity
   }
 }
 
-private fun asyncHandleBreakingBlock(ctx: ChannelHandlerContextWrapper, breakingBlock: Packets.BreakingBlock) {
-  // Naive and simple re-broadcast
-  ServerMain.inst().packetSender.broadcast(clientBoundPacketBuilder(Packets.Packet.Type.DX_BREAKING_BLOCK).setBreakingBlock(breakingBlock).build()) { c -> c != ctx.channel() }
-}
-
-private fun asyncHandleContainerUpdate(ctx: ChannelHandlerContextWrapper, containerUpdate: Packets.ContainerUpdate) {
-  // Naive and simple re-broadcast
-  // TODO check that the player can do this
-  // FIXME make sure not to broadcast when no changes are made
-  val (owner, container) = containerUpdate.worldContainer.fromProto()
-  ServerMain.inst().serverWorld.worldContainerManager.find(owner).thenApply { serverOwnedContainer ->
-    container.content.copyInto(serverOwnedContainer.container.content)
-  }
-  ServerMain.inst().packetSender.broadcast(
-    clientBoundPacketBuilder(Packets.Packet.Type.DX_CONTAINER_UPDATE).setContainerUpdate(containerUpdate).build()
-  ) { c -> c != ctx.channel() }
-}
-
 private fun physicsHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
   val player = ctx.getCurrentPlayer() ?: return
   val staff = player.selectedItem?.element as? Staff ?: return
   val inputEventQueue = player.inputEventQueueOrNull ?: return
   ServerMain.inst().serverWorld.launchOnBox2d { inputEventQueue.enqueue(InputEvent.SpellCastEvent(staff)) }
-}
-
-private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, owner: ContainerOwner) {
-  ServerMain.inst().serverWorld.worldContainerManager.find(owner).thenApply { ownedContainer ->
-    if (ownedContainer == null) {
-      logger.warn { "Failed to find container for $owner" }
-    } else {
-      ctx.writeAndFlushPacket(clientBoundContainerUpdate(ownedContainer))
-    }
-  }
 }
 
 private fun physicsHandleUpdateSelectedSlot(ctx: ChannelHandlerContextWrapper, updateSelectedSlot: Packets.UpdateSelectedSlot) {
