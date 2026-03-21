@@ -45,7 +45,7 @@ abstract class ClientWorld : World {
     render.resize(width, height)
   }
 
-  private lateinit var controlledPlayerEntitySet: ThreadSafeEntitySet // late init to be
+  private lateinit var controlledPlayerEntitySet: ThreadSafeEntitySet
   val controlledPlayerEntities: Set<Entity> get() = controlledPlayerEntitySet.entities
 
   override fun addEntityListeners(engine: Engine) {
@@ -75,11 +75,9 @@ abstract class ClientWorld : World {
     Gdx.app.postRunnable { render.dispose { it.printStackTrace() } }
   }
 
-  companion object {
-    fun ClientWorld.recalculateLights() {
-      readChunks { readableChunks ->
-        readableChunks.values().forEach(Chunk::updateAllBlockLights)
-      }
+  fun recalculateLights() {
+    readChunks { readableChunks ->
+      readableChunks.values().forEach(Chunk::updateAllBlockLights)
     }
   }
 }

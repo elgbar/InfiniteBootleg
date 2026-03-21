@@ -13,7 +13,6 @@ import no.elg.infiniteBootleg.client.util.isControlPressed
 import no.elg.infiniteBootleg.client.util.isShiftPressed
 import no.elg.infiniteBootleg.client.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
-import no.elg.infiniteBootleg.client.world.world.ClientWorld.Companion.recalculateLights
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.util.launchOnMain

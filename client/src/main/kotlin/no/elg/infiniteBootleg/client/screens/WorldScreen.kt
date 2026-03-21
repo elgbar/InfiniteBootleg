@@ -9,7 +9,6 @@ import no.elg.infiniteBootleg.client.screens.hud.addDebugOverlay
 import no.elg.infiniteBootleg.client.screens.hud.addStaffCreatorOverlay
 import no.elg.infiniteBootleg.client.util.IBVisWindow
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
-import no.elg.infiniteBootleg.client.world.world.ClientWorld.Companion.recalculateLights
 import no.elg.infiniteBootleg.core.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.main.Main
