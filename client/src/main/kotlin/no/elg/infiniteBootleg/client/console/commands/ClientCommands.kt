@@ -97,7 +97,7 @@ class ClientCommands : CommonCommands() {
   ) {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
-    if (entities.size() == 0) {
+    if (entities.isEmpty()) {
       logger.error { "There is no local, controlled, player in this world" }
       return
     }
@@ -205,7 +205,7 @@ class ClientCommands : CommonCommands() {
   fun fly() {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
-    if (entities.size() == 0) {
+    if (entities.isEmpty()) {
       logger.info { "There is no local, controlled player in this world" }
     }
     for (entity in entities) {
@@ -378,7 +378,7 @@ class ClientCommands : CommonCommands() {
     val clientWorld = clientWorld ?: return
     ThreadType.PHYSICS.launchOrRun(clientWorld) {
       val entities = clientWorld.controlledPlayerEntities
-      if (entities.size() > 0) {
+      if (entities.isNotEmpty()) {
         world?.loadChunk(worldX.worldToChunk(), worldY.worldToChunk())
         clientWorld.render.lookAt(worldX, worldY) // Do not lerp when teleporting
         entities.forEach { it.teleport(worldX, worldY, killVelocity = true) }
@@ -457,7 +457,7 @@ class ClientCommands : CommonCommands() {
   fun brush() {
     val world = clientWorld ?: return
     val localPlayers = world.controlledPlayerEntities
-    if (localPlayers.size() == 0) {
+    if (localPlayers.isEmpty()) {
       logger.info { "There is no local, controlled player in this world" }
     }
     for (entity in localPlayers) {
@@ -471,7 +471,7 @@ class ClientCommands : CommonCommands() {
   fun brush(size: Float) {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
-    if (entities.size() == 0) {
+    if (entities.isEmpty()) {
       logger.error { "There is no local, controlled player in this world" }
     }
     if (size < 1) {
@@ -490,7 +490,7 @@ class ClientCommands : CommonCommands() {
   fun interactRadius(interactRadius: Float) {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
-    if (entities.size() == 0) {
+    if (entities.isEmpty()) {
       logger.error { "There is no local, controlled player in this world" }
     }
     if (interactRadius < 1) {
@@ -508,7 +508,7 @@ class ClientCommands : CommonCommands() {
   fun instantBreak() {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
-    if (entities.size() == 0) {
+    if (entities.isEmpty()) {
       logger.error { "There is no local, controlled player in this world" }
     }
     for (entity in entities) {
@@ -523,7 +523,7 @@ class ClientCommands : CommonCommands() {
   fun placeCheck() {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
-    if (entities.size() == 0) {
+    if (entities.isEmpty()) {
       logger.error { "There is no local, controlled player in this world" }
     }
     for (entity in entities) {
@@ -566,7 +566,7 @@ class ClientCommands : CommonCommands() {
   fun inv(invType: String) {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
-    if (entities.size() == 0) {
+    if (entities.isEmpty()) {
       logger.error { "There is no local, controlled, player in this world" }
       return
     }

@@ -13,10 +13,12 @@ import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.TransientEntityTag.Companion.isTransientEntity
 import no.elg.infiniteBootleg.core.world.ecs.creation.createNewPlayer
 import no.elg.infiniteBootleg.core.world.ecs.load
+import no.elg.infiniteBootleg.core.world.ecs.save
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.core.world.loader.chunk.ChunkLoader
 import no.elg.infiniteBootleg.core.world.loader.chunk.FullChunkLoader
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.protobuf.WorldKt
 
 private val logger = KotlinLogging.logger {}
 
@@ -75,4 +77,10 @@ class SinglePlayerWorld(generator: ChunkGenerator, seed: Long, worldName: String
   }
 
   override fun isAuthorizedToChange(entity: Entity): Boolean = true
+
+  override fun WorldKt.Dsl.additionalToProtobuf() {
+    controlledPlayerEntities.firstOrNull()?.save(toAuthoritative = true, ignoreTransient = true)?.also {
+      player = it
+    }
+  }
 }

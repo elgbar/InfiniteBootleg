@@ -502,6 +502,7 @@ abstract class World(
     worldInfoFile.writeBytes(builder.toByteArray(), false)
   }
 
+  protected open fun WorldKt.Dsl.additionalToProtobuf() = Unit
   fun toProtobuf(): ProtoWorld.World =
     world {
       name = metadata.name
@@ -511,11 +512,7 @@ abstract class World(
       spawn = this@World.spawn.toVector2i()
       generator = ChunkGenerator.getGeneratorType(chunkLoader.generator)
       chunkColumns += chunkColumnsManager.toProtobuf()
-      if (Main.isSingleplayer) {
-        controlledPlayerEntities.firstOrNull()?.save(toAuthoritative = true, ignoreTransient = true)?.also {
-          player = it
-        }
-      }
+      this.additionalToProtobuf()
     }
 
   fun getChunkColumn(chunkX: ChunkCoord): ChunkColumn {

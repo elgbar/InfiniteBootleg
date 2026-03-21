@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.client.screens.hud
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import no.elg.infiniteBootleg.client.main.ClientMain
@@ -167,8 +166,8 @@ object DebugText {
     sb.append(String.format(format, chunksInView, blocks, blocksHor, blocksVer, zoom))
   }
 
-  fun pos(sb: StringBuilder, players: ImmutableArray<Entity>) {
-    if (players.size() == 0) {
+  fun pos(sb: StringBuilder, players: Set<Entity>) {
+    if (players.isEmpty()) {
       sb.append("No player")
       return
     }

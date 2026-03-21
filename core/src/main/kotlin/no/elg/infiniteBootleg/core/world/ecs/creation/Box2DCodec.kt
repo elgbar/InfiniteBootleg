@@ -16,7 +16,7 @@ import ktx.ashley.EngineEntity
 import ktx.ashley.plusAssign
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.util.WorldCoord
-import no.elg.infiniteBootleg.core.util.isBeingRemoved
+import no.elg.infiniteBootleg.core.util.isInvalid
 import no.elg.infiniteBootleg.core.util.toRadians
 import no.elg.infiniteBootleg.core.world.Constants
 import no.elg.infiniteBootleg.core.world.HorizontalDirection
@@ -237,7 +237,7 @@ internal fun createBody2DBodyComponent(
   bodyDefModifier(bodyDef)
 
   world.worldBody.createBody(bodyDef) {
-    if (entity.isBeingRemoved) {
+    if (entity.isInvalid) {
       // If the entity was removed before the body was created, destroy the body
       entity.world.worldBody.destroyBody(it)
       return@createBody

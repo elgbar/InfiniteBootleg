@@ -7,11 +7,11 @@ import com.badlogic.gdx.utils.Align
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.screens.ScreenRenderer
 import no.elg.infiniteBootleg.client.world.textureRegion
+import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.items.Item.Companion.displayName
 import no.elg.infiniteBootleg.core.items.Item.Companion.stockText
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
-import no.elg.infiniteBootleg.core.world.world.World
 
 object HeldBlockRenderer {
 
@@ -23,7 +23,7 @@ object HeldBlockRenderer {
 
   private val layout = GlyphLayout()
 
-  fun render(screenRenderer: ScreenRenderer, world: World) {
+  fun render(screenRenderer: ScreenRenderer, world: ClientWorld) {
     val entity = world.controlledPlayerEntities.firstOrNull() ?: return
     val item = entity.selectedItem ?: return
     val texture = item.element.textureRegion?.textureRegionOrNull ?: ClientMain.inst().assets.breakableBlockTexture.textureRegion
