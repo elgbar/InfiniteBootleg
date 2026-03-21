@@ -95,10 +95,8 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionCompone
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.core.world.ecs.disposeBox2dOnRemoval
 import no.elg.infiniteBootleg.core.world.ecs.ensureUniquenessListener
-import no.elg.infiniteBootleg.core.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.core.world.ecs.namedEntitiesFamily
 import no.elg.infiniteBootleg.core.world.ecs.playerFamily
-import no.elg.infiniteBootleg.core.world.ecs.save
 import no.elg.infiniteBootleg.core.world.ecs.system.MaxVelocitySystem
 import no.elg.infiniteBootleg.core.world.ecs.system.NoMovementInUnlockedChunksSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.OutOfBoundsSystem
@@ -122,6 +120,7 @@ import no.elg.infiniteBootleg.core.world.ticker.CommonWorldTicker
 import no.elg.infiniteBootleg.core.world.ticker.WorldTicker
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.protobuf.WorldKt
 import no.elg.infiniteBootleg.protobuf.world
 import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
@@ -258,13 +257,35 @@ abstract class World(
 
   val tick get() = worldTicker.tickId
 
-  val playersEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(playerFamily)
-  val controlledPlayerEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(localPlayerFamily)
-  val standaloneEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(basicStandaloneEntityFamily)
-  val validEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(basicRequiredEntityFamily)
+  val playersEntities: ImmutableArray<Entity>
+    get() {
+      assertOnPhysicsThread()
+      return engine.getEntitiesFor(playerFamily)
+    }
+
+  val standaloneEntities: ImmutableArray<Entity>
+    get() {
+      assertOnPhysicsThread()
+      return engine.getEntitiesFor(basicStandaloneEntityFamily)
+    }
+
+  val validEntities: ImmutableArray<Entity>
+    get() {
+      assertOnPhysicsThread()
+      return engine.getEntitiesFor(basicRequiredEntityFamily)
+    }
+
   val validEntitiesToSendToClient: ImmutableArray<Entity>
-    get() = engine.getEntitiesFor(basicRequiredEntityFamilyToSendToClient)
-  val namedEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(namedEntitiesFamily)
+    get() {
+      assertOnPhysicsThread()
+      return engine.getEntitiesFor(basicRequiredEntityFamilyToSendToClient)
+    }
+
+  val namedEntities: ImmutableArray<Entity>
+    get() {
+      assertOnPhysicsThread()
+      return engine.getEntitiesFor(namedEntitiesFamily)
+    }
 
   init {
     MathUtils.random.setSeed(seed)
@@ -1316,6 +1337,11 @@ abstract class World(
 
   fun assertNotDisposed() {
     check(!isDisposed) { "World $this is disposed" }
+  }
+
+  fun assertOnPhysicsThread() {
+    // FIXME move this check to directly on the engine
+    ThreadType.PHYSICS.requireCorrectThreadType { "This can only be called from the physics thread" }
   }
 
   override fun dispose() {
