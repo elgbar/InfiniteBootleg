@@ -599,11 +599,27 @@ class ClientCommands : CommonCommands() {
     val dx = 2
     val dy = 1
     val chunkXs = world.render.chunksInView.run { (horizontalStart + dx).chunkToWorld(0) until (horizontalEnd - dx).chunkToWorld(CHUNK_SIZE) }
-    val y = (world.render.chunksInView.verticalEnd - dy).chunkToWorld(0)
+    val y = (world.render.chunksInView.verticalEnd + dy).chunkToWorld(0)
     launchOnMainSuspendable {
       for (x in chunkXs) {
         coroutineScope {
           launchOnAsyncSuspendable { world.setBlock(x, y, Material.Sand, prioritize = true) }
+        }
+        delay(delayMillis)
+      }
+    }
+  }
+
+  fun airTest(delayMillis: Long = 50) {
+    val world = clientWorld ?: return
+    val dx = 2
+    val dy = 2
+    val chunkXs = world.render.chunksInView.run { (horizontalStart + dx).chunkToWorld(0) until (horizontalEnd - dx).chunkToWorld(CHUNK_SIZE) }
+    val y = (world.render.chunksInView.verticalStart + dy).chunkToWorld(0)
+    launchOnMainSuspendable {
+      for (x in chunkXs) {
+        coroutineScope {
+          launchOnAsyncSuspendable { world.removeBlock(x, y, prioritize = true) }
         }
         delay(delayMillis)
       }
