@@ -4,6 +4,7 @@ import com.strongjoshua.console.LogLevel
 import no.elg.infiniteBootleg.client.console.InGameConsoleHandler
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.core.Settings
+import no.elg.infiniteBootleg.core.main.Main
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.core.Appender
 import org.apache.logging.log4j.core.Core
@@ -36,6 +37,7 @@ class InGameConsoleAppender(name: String) : AbstractAppender(name, null, null, t
   }
 
   override fun append(event: LogEvent) {
+    if (!Main.hasInst()) return
     when (event.level) {
       Level.ERROR, Level.FATAL -> console.log(LogLevel.ERROR, event.message.toString())
       Level.WARN -> console.log(LogLevel.ERROR, "WARN ${event.message}")

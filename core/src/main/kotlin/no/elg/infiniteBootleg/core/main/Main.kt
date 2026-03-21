@@ -51,6 +51,7 @@ interface Main : ApplicationListener {
 
     @Suppress("NOTHING_TO_INLINE")
     inline fun inst(): Main = CommonMain.instField!!
+    fun hasInst(): Boolean = CommonMain.instField != null
 
     /**
      * @return If this is a client of a server
