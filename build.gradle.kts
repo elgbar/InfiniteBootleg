@@ -113,14 +113,10 @@ subprojects {
       freeCompilerArgs.add("-Xcontext-sensitive-resolution")
       // https://kotlinlang.org/docs/whatsnew22.html#all-meta-target-for-properties (experimental in 2.2)
       freeCompilerArgs.add("-Xannotation-target-all")
-      // https://kotlinlang.org/docs/whatsnew22.html#support-for-nested-type-aliases (beta in 2.2)
-      freeCompilerArgs.add("-Xnested-type-aliases")
       // https://kotlinlang.org/docs/whatsnew22.html#new-defaulting-rules-for-use-site-annotation-targets (experimental in 2.2)
       freeCompilerArgs.add("-Xannotation-default-target=param-property")
       // kotlinlang.org/docs/whatsnew2220.html#support-for-reified-types-in-catch-clauses (experimental in 2.2.20)
       freeCompilerArgs.add("-Xallow-reified-type-in-catch")
-      // kotlinlang.org/docs/whatsnew2220.html#data-flow-based-exhaustiveness-checks-for-when-expressions (experimental in 2.2.20)
-      freeCompilerArgs.add("-Xdata-flow-based-exhaustiveness")
     }
   }
 
