@@ -130,8 +130,11 @@ class Box2DBodyComponent(body: b2BodyId, val type: ProtoWorld.Entity.Box2D.BodyT
         }
 
         FALLING_BLOCK -> createFallingBlockBodyComponent(world, worldX, worldY, velX, velY, state)
+
         DOOR -> createDoorBodyComponent(world, worldX.toInt(), worldY.toInt(), state)
+
         SPELL -> createSpellBodyComponent(world, worldX, worldY, velX, velY, state)
+
         else -> error("Unknown body type ${protoEntity.box2D.bodyType}")
       }
       return null

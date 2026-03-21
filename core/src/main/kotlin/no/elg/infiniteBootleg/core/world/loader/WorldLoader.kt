@@ -102,6 +102,7 @@ object WorldLoader {
       )
 
       ProtoWorld.World.Generator.FLAT -> FlatChunkGenerator()
+
       ProtoWorld.World.Generator.EMPTY -> EmptyChunkGenerator()
     }
 }

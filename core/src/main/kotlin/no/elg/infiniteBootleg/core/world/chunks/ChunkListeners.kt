@@ -76,7 +76,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
        * Register a location to be updated when the world ticks
        */
       registerListenerConditionally { (chunkLoc, originLocalX, originLocalY): ChunkLightChangedEvent ->
-        if (Settings.renderLight && chunkCompactLocation == chunkLoc || chunk.isNeighbor(chunkLoc)) {
+        if ((Settings.renderLight && (chunkCompactLocation == chunkLoc)) || chunk.isNeighbor(chunkLoc)) {
           val compactLoc = compactChunkToWorld(chunkLoc, originLocalX, originLocalY)
           val sources = lightLocs
           synchronized(sources) {

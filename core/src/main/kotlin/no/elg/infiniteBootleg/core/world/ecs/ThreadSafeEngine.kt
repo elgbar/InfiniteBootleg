@@ -115,6 +115,7 @@ class ThreadSafeEngine :
 
     when (system) {
       is AuthoritativeSystem -> addToSystemConditionally(system, "authoritative") { Main.isAuthoritative }
+
       else -> {
         logger.debug { "Adding system ${system::class.simpleName}" }
         super.addSystem(system)

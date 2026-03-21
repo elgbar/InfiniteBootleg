@@ -27,10 +27,11 @@ data class WorldMetadata(
 ) : Disposable {
 
   val uuid: String = generateUUIDFromLong(seed).toString()
+
+  /**
+   * @return The current folder of the world or `null` if no disk should be used
+   */
   var worldFolder: FileHandle? = null
-    /**
-     * @return The current folder of the world or `null` if no disk should be used
-     */
     get() {
       if (field == null) {
         field = WorldLoader.getWorldFolder(uuid)

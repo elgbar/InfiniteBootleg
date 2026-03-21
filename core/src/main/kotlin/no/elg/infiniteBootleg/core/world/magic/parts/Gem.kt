@@ -35,6 +35,7 @@ sealed interface GemType :
     fun valueOf(serializedName: String): GemType? =
       when (serializedName) {
         Diamond.serializedName -> Diamond
+
         else -> {
           logger.error { "Failed to parse gem type '$serializedName', it will be absent" }
           null

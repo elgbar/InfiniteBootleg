@@ -26,7 +26,9 @@ object DoorService : PhysicsEventSystem.PhysicsEventHandler {
   override fun handleEvent(entity: Entity, @Async.Execute event: PhysicsEvent) {
     when (event) {
       is PhysicsEvent.ContactBeginsEvent -> handleDoorContactEvent(entity, event, ObjectContactTracker<Entity>::add)
+
       is PhysicsEvent.ContactEndsEvent -> handleDoorContactEvent(entity, event, ObjectContactTracker<Entity>::remove)
+
       else -> {
       }
     }

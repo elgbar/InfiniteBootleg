@@ -237,12 +237,19 @@ open class CommonCommands : CommandExecutor() {
     } catch (ignored: NumberFormatException) {
       when (timeOfDay.lowercase(Locale.getDefault())) {
         "dawn" -> WorldTime.DAWN_TIME
+
         "day", "sunrise" -> WorldTime.SUNRISE_TIME
+
         "midday", "noon" -> WorldTime.MIDDAY_TIME
+
         "sunset" -> WorldTime.SUNSET_TIME
+
         "dusk" -> WorldTime.DUSK_TIME
+
         "midnight", "night" -> WorldTime.MIDNIGHT_TIME
+
         "end" -> Int.MAX_VALUE.toFloat()
+
         else -> {
           logger.error { "Unknown time of day, try sunrise, midday, sunset or midnight" }
           return

@@ -26,7 +26,9 @@ sealed interface ItemChangeType {
           }
 
         addedItem != null -> ItemAddedChangeType(addedItem)
+
         removedItem != null -> ItemRemovedChangeType(removedItem)
+
         else -> null // unknown change
       }
   }

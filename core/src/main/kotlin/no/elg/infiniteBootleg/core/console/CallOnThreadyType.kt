@@ -31,6 +31,7 @@ annotation class CallOnThreadyType(
         }
 
         ExecutionThread.RENDER -> ThreadType.RENDER.launchOrRun { func() }
+
         null -> func()
       }
     }

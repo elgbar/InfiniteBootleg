@@ -104,27 +104,40 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
   when (packet.type) {
     // Gameplay related packets
     DX_HEARTBEAT -> if (packet.hasHeartbeat()) handleHeartbeat()
+
     DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { worldOrNull?.postBox2dRunnable { physicsHandleMoveEntity(it) } }
+
     DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { launchOnAsyncSuspendable { asyncHandleBlockUpdate(it) } }
+
     CB_SPAWN_ENTITY -> packet.spawnEntityOrNull?.let { launchOnAsyncSuspendable { asyncHandleSpawnEntity(it) } }
+
     CB_UPDATE_CHUNK -> packet.updateChunkOrNull?.let { launchOnAsyncSuspendable { asyncHandleUpdateChunk(it) } }
+
     CB_DESPAWN_ENTITY -> packet.despawnEntityOrNull?.let { launchOnAsyncSuspendable { asyncHandleDespawnEntity(it) } }
+
     DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { launchOnAsyncSuspendable { asyncHandleBreakingBlock(it) } }
+
     DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { launchOnAsyncSuspendable { asyncHandleContainerUpdate(it) } }
+
     CB_HOLDING_ITEM -> packet.holdingItemOrNull?.let { launchOnAsyncSuspendable { asyncHandleHoldingItem(it) } }
 
     // Login related packets
     DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let { handleSecretExchange(it) }
+
     CB_START_GAME -> packet.startGameOrNull?.let { handleStartGame(it) }
+
     CB_LOGIN_STATUS -> packet.serverLoginStatusOrNull?.let { handleLoginStatus(it) }
+
     CB_INITIAL_CHUNKS_SENT -> handleInitialChunkSent()
 
     // Misc packets
     DX_DISCONNECT -> handleDisconnect(packet.disconnectOrNull)
+
     DX_WORLD_SETTINGS -> packet.worldSettingsOrNull?.let { handleWorldSettings(it) }
 
     // Error handling
     UNRECOGNIZED -> ctx.fatal("Unknown packet type received by client: ${packet.type}")
+
     else -> {
       if (packet.direction == Packets.Packet.Direction.SERVER || packet.type.name.startsWith("SB_")) {
         ctx.fatal("Client got a server packet ${packet.type} direction ${packet.direction}")
@@ -297,7 +310,9 @@ private fun ServerClient.asyncHandleSpawnEntity(spawnEntity: Packets.SpawnEntity
 
   when (protoEntity.entityType) {
     PLAYER -> world.load(protoEntity)
+
     FALLING_BLOCK -> world.engine.createFallingBlockStandaloneEntity(world, protoEntity)
+
     BLOCK -> {
       val localPosX = position.x.toInt().chunkOffset()
       val localPosY = position.y.toInt().chunkOffset()

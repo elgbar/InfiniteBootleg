@@ -63,12 +63,16 @@ class WorldTime(val world: World) {
     return when {
       // The sun has not set yet
       dir < SUNSET_TIME -> day(dir)
+
       // As the sun sinks the ambient light fades
       dir in SUNSET_TIME..DUSK_TIME -> dusk(dir)
+
       // Night between dusk and dawn
       dir in DUSK_TIME..DAWN_TIME -> night(dir)
+
       // As the sun returns the ambient light increases
       dir in DAWN_TIME..SUNRISE_TIME -> dawn(dir)
+
       // Day between sunrise and sunset, no need for an explicit check here
       else -> day(dir)
     }

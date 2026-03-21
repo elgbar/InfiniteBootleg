@@ -89,7 +89,9 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
   logPacket(serverSideServerBoundMarker, packet)
   when (packet.type) {
     Packets.Packet.Type.DX_HEARTBEAT -> handleHeartbeat(ctx)
+
     Packets.Packet.Type.DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { handleMovePlayer(ctx, it) } }
+
     Packets.Packet.Type.DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let {
       launchOnAsyncSuspendable {
         asyncHandleBlockUpdate(
@@ -129,7 +131,9 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
     }
 
     Packets.Packet.Type.SB_LOGIN -> packet.loginOrNull?.let { launchOnMainSuspendable { handleLoginPacket(ctx, it) } }
+
     Packets.Packet.Type.SB_CLIENT_WORLD_LOADED -> launchOnAsyncSuspendable { asyncHandleClientsWorldLoaded(ctx) }
+
     Packets.Packet.Type.DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let {
       launchOnMainSuspendable {
         handleSecretExchange(
@@ -140,6 +144,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
     }
 
     Packets.Packet.Type.DX_DISCONNECT -> launchOnMainSuspendable { handleDisconnect(ctx, packet.disconnectOrNull) }
+
     Packets.Packet.Type.DX_WORLD_SETTINGS -> packet.worldSettingsOrNull?.let {
       launchOnMainSuspendable {
         handleWorldSettings(
@@ -152,6 +157,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
     Packets.Packet.Type.SB_CAST_SPELL -> launchOnAsyncSuspendable { asyncHandleCastSpell(ctx) }
 
     Packets.Packet.Type.UNRECOGNIZED -> ctx.fatal("Unknown packet type received by server: ${packet.type}")
+
     else -> {
       if (packet.direction == Packets.Packet.Direction.CLIENT || packet.type.name.startsWith("CB_")) {
         ctx.fatal("Server got a client packet ${packet.type} direction ${packet.direction}")

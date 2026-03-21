@@ -130,7 +130,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
   }
 
   override fun remove(item: Item) {
-    if (validOnly && !item.isValid() || item.stock == 0u) {
+    if ((validOnly && !item.isValid()) || item.stock == 0u) {
       return
     }
     var i = 0

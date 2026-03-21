@@ -106,11 +106,13 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
             val t = (sqrt(distSq) / maxDistance).coerceIn(0.0, 1.0)
             1.0 - t
           }
+
           // Smoothstep falloff: zero derivative at both ends, same brightness profile as linear
           Settings.LightIntensityMapping.SMOOTH_FALLOFF_LINEAR_SPACE -> {
             val t = (sqrt(distSq) / maxDistance).coerceIn(0.0, 1.0)
             1.0 - t * t * (3.0 - 2.0 * t)
           }
+
           // Smoothstep in squared-distance space: bright for longer, fast falloff near edge, no sqrt needed
           Settings.LightIntensityMapping.SMOOTH_FALLOFF_SQUARED_SPACE -> {
             val tSq = (distSq / maxDistSq).coerceIn(0.0, 1.0)

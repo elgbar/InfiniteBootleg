@@ -577,7 +577,9 @@ class ClientCommands : CommonCommands() {
 
     val newContainer: Container = when (invType.lowercase(Locale.getDefault())) {
       "autosort", "as" -> AutoSortedContainer("Auto Sorted Inventory")
+
       "container", "co" -> ContainerImpl("Inventory")
+
       else -> {
         logger.error { "Unknown storage type '$invType'" }
         return

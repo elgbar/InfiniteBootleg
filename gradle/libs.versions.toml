@@ -17,7 +17,7 @@ netty = "4.2.10.Final"
 kotlinCoroutines = "1.10.2"
 
 stacktracedecoroutinator = "2.6.1"
-spotless = "8.1.0"
+spotless = "8.4.0"
 versionsPlugin = "0.53.0"
 protobufPlugin = "0.9.6"
 

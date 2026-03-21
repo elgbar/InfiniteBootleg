@@ -58,6 +58,7 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) :
       Input.Keys.TAB -> world.controlledPlayerEntities.forEach { it.toggleContainer() }
 
       Input.Keys.F5 -> world.save()
+
       Input.Keys.F6 -> {
         launchOnMain {
           if (isControlPressed()) {

@@ -30,8 +30,11 @@ enum class IllegalAction {
     val logger = KotlinLogging.logger {}
     when (this) {
       THROW -> throw RuntimeException(message(), cause)
+
       STACKTRACE -> logger.warn(cause) { "${message()}\n${stacktrace()}" }
+
       LOG -> logger.warn(cause, message)
+
       CRASH -> {
         logger.error(cause, message)
         exitProcess(333)
