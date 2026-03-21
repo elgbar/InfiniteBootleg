@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Align
 import com.kotcrab.vis.ui.widget.VisLabel
 import com.kotcrab.vis.ui.widget.VisTextButton
 import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel
+import kotlinx.coroutines.runBlocking
 import ktx.actors.onChange
 import ktx.actors.onClick
 import ktx.collections.GdxArray
@@ -31,9 +32,9 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.reflect.KMutableProperty0
 
-fun updateAllValues(onAnyElementChanged: MutableList<() -> Unit>) {
+fun updateAllValues(onAnyElementChanged: MutableList<suspend () -> Unit>) {
   for (onChange in onAnyElementChanged) {
-    onChange()
+    runBlocking { onChange() }
   }
 }
 
@@ -42,7 +43,7 @@ fun KTable.toggleableDebugButton(
   name: String,
   description: String? = null,
   style: String = "debug-menu-button",
-  onAnyElementChanged: MutableList<() -> Unit>,
+  onAnyElementChanged: MutableList<suspend () -> Unit>,
   property: KMutableProperty0<Boolean>,
   effectOnToggle: () -> Unit = {}
 ): VisTextButton =
@@ -56,13 +57,28 @@ fun KTable.toggleableDebugButton(
   name: String,
   description: String? = null,
   style: String = "debug-menu-button",
-  onAnyElementChanged: MutableList<() -> Unit>,
+  onAnyElementChanged: MutableList<suspend () -> Unit>,
   booleanGetter: () -> Boolean,
+  onToggle: () -> Unit
+): VisTextButton = suspendedToggleableDebugButton(name, description, style, onAnyElementChanged, booleanGetter, safeGetter = true, onToggle)
+
+@Scene2dDsl
+fun KTable.suspendedToggleableDebugButton(
+  name: String,
+  description: String? = null,
+  style: String = "debug-menu-button",
+  onAnyElementChanged: MutableList<suspend () -> Unit>,
+  booleanGetter: suspend () -> Boolean,
+  safeGetter: Boolean = false,
   onToggle: () -> Unit
 ): VisTextButton =
   visTextButton(name, style) {
     pad(5f)
-    isDisabled = booleanGetter()
+    isDisabled = if (safeGetter) {
+      runBlocking { booleanGetter() }
+    } else {
+      true
+    }
 
     val tooltipLabel: VisLabel
     fun tooltipText() = description ?: "$name is ${isDisabled.toAbled()}"
@@ -90,7 +106,7 @@ fun KTable.intSpinner(
   max: Number,
   step: Number,
   decimals: Int,
-  onAnyElementChanged: MutableList<() -> Unit>,
+  onAnyElementChanged: MutableList<suspend () -> Unit>,
   onChange: (Int) -> Unit
 ) = floatSpinner(name, srcValueGetter, min, max, step, decimals, onAnyElementChanged) { onChange(it.toInt()) }
 
@@ -102,10 +118,24 @@ fun KTable.floatSpinner(
   max: Number,
   step: Number,
   decimals: Int,
-  onAnyElementChanged: MutableList<() -> Unit>,
+  onAnyElementChanged: MutableList<suspend () -> Unit>,
+  onChange: (Float) -> Unit
+) = suspendedFloatSpinner(name, srcValueGetter, safeGetter = true, min, max, step, decimals, onAnyElementChanged, onChange)
+
+@Scene2dDsl
+fun KTable.suspendedFloatSpinner(
+  name: String,
+  srcValueGetter: suspend () -> Number,
+  safeGetter: Boolean = false,
+  min: Number,
+  max: Number,
+  step: Number,
+  decimals: Int,
+  onAnyElementChanged: MutableList<suspend () -> Unit>,
   onChange: (Float) -> Unit
 ) {
-  val model = FloatSpinnerModel(srcValueGetter().toString(), min.toString(), max.toString(), step.toString(), decimals)
+  val initialValue = if (safeGetter) runBlocking { srcValueGetter().toString() } else "0"
+  val model = FloatSpinnerModel(initialValue, min.toString(), max.toString(), step.toString(), decimals)
   spinner(name, model) {
     it.fillX()
 
@@ -121,7 +151,7 @@ fun KTable.floatSpinner(
 
 @Scene2dDsl
 inline fun <reified T : Enum<T>> KWidget<*>.enumSelector(
-  onAnyElementChanged: MutableList<() -> Unit>,
+  onAnyElementChanged: MutableList<suspend () -> Unit>,
   initialElement: T,
   name: String = T::class.java.simpleName.toTitleCase(),
   noinline onChange: (T) -> Unit = {}
@@ -132,7 +162,7 @@ inline fun <reified T : Enum<T>> KWidget<*>.enumSelector(
 
 @Scene2dDsl
 inline fun <reified T : Any> KWidget<*>.sealedSelector(
-  onAnyElementChanged: MutableList<() -> Unit>,
+  onAnyElementChanged: MutableList<suspend () -> Unit>,
   initialElement: T,
   name: String = T::class.java.simpleName.toTitleCase(),
   noinline onChange: (T) -> Unit = {}
@@ -143,7 +173,7 @@ inline fun <reified T : Any> KWidget<*>.sealedSelector(
 
 @Scene2dDsl
 fun <T> KWidget<*>.genericSelector(
-  onAnyElementChanged: MutableList<() -> Unit>,
+  onAnyElementChanged: MutableList<suspend () -> Unit>,
   name: String,
   items: GdxArray<T>,
   initialElement: T,
@@ -185,7 +215,7 @@ fun KTable.floatSlider(
   min: Number,
   max: Number,
   step: Number,
-  onAnyElementChanged: MutableList<() -> Unit>,
+  onAnyElementChanged: MutableList<suspend () -> Unit>,
   onChange: (Float) -> Unit
 ) {
   horizontalGroup {

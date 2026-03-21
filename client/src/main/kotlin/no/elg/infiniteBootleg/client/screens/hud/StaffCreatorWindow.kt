@@ -38,7 +38,7 @@ private val logger = KotlinLogging.logger {}
 inline fun <reified TYPE : Any, reified RATING : Enum<RATING>, RESULT> KVisTable.addSelector(
   initType: TYPE,
   initRating: RATING,
-  onAnyElementChanged: MutableList<() -> Unit>,
+  onAnyElementChanged: MutableList<suspend () -> Unit>,
   allowDisable: Boolean = true,
   crossinline gen: (type: TYPE, rating: RATING) -> RESULT
 ): () -> RESULT? {
@@ -63,7 +63,7 @@ inline fun <reified TYPE : Any, reified RATING : Enum<RATING>, RESULT> KVisTable
 }
 
 fun addStaffCreatorOverlay(world: ClientWorld): IBVisWindow {
-  val onAnyElementChanged: MutableList<() -> Unit> = mutableListOf()
+  val onAnyElementChanged: MutableList<suspend () -> Unit> = mutableListOf()
   return world.ibVisWindowClosed("Staff Creator") {
     closeOnEscape()
     addCloseButton()

@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.client.screens.hud
 
 import com.badlogic.gdx.box2d.structs.b2DebugDraw
 import com.badlogic.gdx.scenes.scene2d.Stage
+import kotlinx.coroutines.withContext
 import ktx.actors.isShown
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.vis.visTable
@@ -28,7 +29,7 @@ import no.elg.infiniteBootleg.core.world.render.WorldRender.Companion.MAX_ZOOM
 class DebugWindow(
   private val stage: Stage,
   private val debugMenu: IBVisWindow,
-  private val onAnyElementChanged: MutableList<() -> Unit>,
+  private val onAnyElementChanged: MutableList<suspend () -> Unit>,
   private val debugWindows: List<IBVisWindow>
 ) {
 
@@ -48,7 +49,7 @@ class DebugWindow(
 
 fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWindow {
   val debugWindows = mutableListOf<IBVisWindow>()
-  val onAnyElementChanged: MutableList<() -> Unit> = mutableListOf()
+  val onAnyElementChanged: MutableList<suspend () -> Unit> = mutableListOf()
   debugWindows += staffMenu
   val debugMenu = world.ibVisWindowClosed("Debug Menu") {
     closeOnEscape()
@@ -309,42 +310,56 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
       sep()
       // Player related debug controls
       section {
-        val entities = world.controlledPlayerEntities
-        val instantBreakGetter: () -> Boolean = {
-          entities.map { it.locallyControlledComponentOrNull }.firstOrNull()?.instantBreak ?: INITIAL_INSTANT_BREAK
-        }
-
-        val brushSizeGetter: () -> Number = {
-          entities.map { it.locallyControlledComponentOrNull }.firstOrNull()?.brushSize ?: INITIAL_BRUSH_SIZE
-        }
-        val reachRadiusGetter: () -> Number = {
-          entities.map { it.locallyControlledComponentOrNull }.firstOrNull()?.interactRadius ?: INITIAL_INTERACT_RADIUS
-        }
-        toggleableDebugButton(
+        suspendedToggleableDebugButton(
           "Ignore place check",
           "Whether to ignore the placeable check when placing blocks. This is useful for debugging and building",
           onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = { world.controlledPlayerEntities.any { it.ignorePlaceableCheck } },
-          onToggle = ClientMain.inst().console.exec::placeCheck
+          onToggle = ClientMain.inst().console.exec::placeCheck,
+          booleanGetter = {
+            withContext(world.box2dCoroutineDispatcher) {
+              world.controlledPlayerEntities.any { it.ignorePlaceableCheck }
+            }
+          }
         )
-        toggleableDebugButton(
+        suspendedToggleableDebugButton(
           "Instant break",
           "Whether to instantly break blocks instead of slowly mining them",
           onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = instantBreakGetter,
-          onToggle = ClientMain.inst().console.exec::instantBreak
+          onToggle = ClientMain.inst().console.exec::instantBreak,
+          booleanGetter = {
+            withContext(world.box2dCoroutineDispatcher) {
+              world.controlledPlayerEntities.map { it.locallyControlledComponentOrNull }.firstOrNull()?.instantBreak ?: INITIAL_INSTANT_BREAK
+            }
+          }
         )
-        floatSpinner(
+        suspendedFloatSpinner(
           name = "Brush size",
-          srcValueGetter = brushSizeGetter,
           min = 1f,
           max = 64f,
           step = 0.25f,
           decimals = 2,
           onAnyElementChanged = onAnyElementChanged,
-          onChange = ClientMain.inst().console.exec::brush
+          onChange = ClientMain.inst().console.exec::brush,
+          srcValueGetter = {
+            withContext(world.box2dCoroutineDispatcher) {
+              world.controlledPlayerEntities.map { it.locallyControlledComponentOrNull }.firstOrNull()?.brushSize ?: INITIAL_BRUSH_SIZE
+            }
+          }
         )
-        floatSpinner("Reach radius", reachRadiusGetter, 1f, 512f, 1f, 0, onAnyElementChanged, ClientMain.inst().console.exec::interactRadius)
+        suspendedFloatSpinner(
+          name = "Reach radius",
+          min = 1f,
+          max = 512f,
+          step = 1f,
+          decimals = 0,
+          onAnyElementChanged = onAnyElementChanged,
+          onChange = ClientMain.inst().console.exec::interactRadius,
+          srcValueGetter = {
+            withContext(world.box2dCoroutineDispatcher) {
+              world.controlledPlayerEntities.map { it.locallyControlledComponentOrNull }.firstOrNull()?.interactRadius ?: INITIAL_INTERACT_RADIUS
+            }
+          }
+        )
       }
 
       section {
