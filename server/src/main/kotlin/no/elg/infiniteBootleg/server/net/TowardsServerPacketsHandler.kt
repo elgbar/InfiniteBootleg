@@ -90,71 +90,41 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
   when (packet.type) {
     Packets.Packet.Type.DX_HEARTBEAT -> handleHeartbeat(ctx)
 
-    Packets.Packet.Type.DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { handleMovePlayer(ctx, it) } }
+    Packets.Packet.Type.DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleMovePlayer(ctx, it) } }
 
     Packets.Packet.Type.DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let {
-      launchOnAsyncSuspendable {
-        asyncHandleBlockUpdate(
-          ctx,
-          it
-        )
-      }
+      PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleBlockUpdate(ctx, it) }
     }
 
     Packets.Packet.Type.SB_CONTENT_REQUEST -> packet.contentRequestOrNull?.let { handleContentRequest(ctx, it) }
 
     Packets.Packet.Type.DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let {
-      launchOnAsyncSuspendable {
-        asyncHandleBreakingBlock(
-          ctx,
-          it
-        )
-      }
+      launchOnAsyncSuspendable { asyncHandleBreakingBlock(ctx, it) }
     }
 
     Packets.Packet.Type.DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let {
-      launchOnAsyncSuspendable {
-        asyncHandleContainerUpdate(
-          ctx,
-          it
-        )
-      }
+      launchOnAsyncSuspendable { asyncHandleContainerUpdate(ctx, it) }
     }
 
     Packets.Packet.Type.SB_SELECT_SLOT -> packet.updateSelectedSlotOrNull?.let {
-      launchOnAsyncSuspendable {
-        asyncHandleUpdateSelectedSlot(
-          ctx,
-          it
-        )
-      }
+      PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleUpdateSelectedSlot(ctx, it) }
     }
 
-    Packets.Packet.Type.SB_LOGIN -> packet.loginOrNull?.let { launchOnMainSuspendable { handleLoginPacket(ctx, it) } }
+    Packets.Packet.Type.SB_LOGIN -> packet.loginOrNull?.let { PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleLoginPacket(ctx, it) } }
 
-    Packets.Packet.Type.SB_CLIENT_WORLD_LOADED -> launchOnAsyncSuspendable { asyncHandleClientsWorldLoaded(ctx) }
+    Packets.Packet.Type.SB_CLIENT_WORLD_LOADED -> PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleClientsWorldLoaded(ctx) }
 
     Packets.Packet.Type.DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let {
-      launchOnMainSuspendable {
-        handleSecretExchange(
-          ctx,
-          it
-        )
-      }
+      launchOnMainSuspendable { handleSecretExchange(ctx, it) }
     }
 
     Packets.Packet.Type.DX_DISCONNECT -> launchOnMainSuspendable { handleDisconnect(ctx, packet.disconnectOrNull) }
 
     Packets.Packet.Type.DX_WORLD_SETTINGS -> packet.worldSettingsOrNull?.let {
-      launchOnMainSuspendable {
-        handleWorldSettings(
-          ctx,
-          it
-        )
-      }
+      launchOnMainSuspendable { handleWorldSettings(ctx, it) }
     }
 
-    Packets.Packet.Type.SB_CAST_SPELL -> launchOnAsyncSuspendable { asyncHandleCastSpell(ctx) }
+    Packets.Packet.Type.SB_CAST_SPELL -> PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleCastSpell(ctx) }
 
     Packets.Packet.Type.UNRECOGNIZED -> ctx.fatal("Unknown packet type received by server: ${packet.type}")
 
@@ -174,13 +144,13 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
 
 private fun handleContentRequest(ctx: ChannelHandlerContextWrapper, contentRequest: Packets.ContentRequest) {
   // Chunk request
-  contentRequest.chunkLocationOrNull?.let { launchOnAsyncSuspendable { asyncHandleChunkRequest(ctx, it.x, it.y) } }
+  contentRequest.chunkLocationOrNull?.let { PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleChunkRequest(ctx, it.x, it.y) } }
   // Entity request
   if (contentRequest.hasEntityRef()) {
     val entityId: String = contentRequest.entityRef.id
     val requestedEntities = ctx.getSharedInformation()?.requestedEntities ?: return
     requestedEntities.get(entityId) {
-      launchOnAsyncSuspendable { asyncHandleEntityRequest(ctx, entityId) }
+      PHYSICS.launchOrRun(ServerMain.inst().serverWorld) { physicsHandleEntityRequest(ctx, entityId) }
     }
   }
   // Container
@@ -218,7 +188,7 @@ private const val MAX_BLOCKS_PER_SECOND_SQUARED = 4 * 4
 private const val MAX_BLOCKS_PER_SECOND_FALLING_SQUARED = MAX_BLOCKS_PER_SECOND_SQUARED * 4
 private const val NEG_Y_VEL_TO_BE_FALLING = -10
 
-private fun handleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: Packets.MoveEntity) {
+private fun physicsHandleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: Packets.MoveEntity) {
   val player = ctx.getCurrentPlayer()
   if (player == null) {
     ctx.fatal("No server side player found!")
@@ -285,7 +255,7 @@ private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchan
   }
 }
 
-private fun handleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.Login) {
+private fun physicsHandleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.Login) {
   val version = Util.version
   if (login.version != version) {
     ctx.fatal("Version mismatch! Client: '${login.version}' Server: '$version'")
@@ -339,7 +309,7 @@ private fun handleDisconnect(ctx: ChannelHandlerContextWrapper, disconnect: Pack
 // ASYNC HANDLERS  //
 // //////////////////
 
-private fun asyncHandleBlockUpdate(ctx: ChannelHandlerContextWrapper, blockUpdate: Packets.UpdateBlock) {
+private fun physicsHandleBlockUpdate(ctx: ChannelHandlerContextWrapper, blockUpdate: Packets.UpdateBlock) {
   val worldX = blockUpdate.pos.x
   val worldY = blockUpdate.pos.y
   if (isLocInView(ctx, worldX, worldY)) {
@@ -347,7 +317,7 @@ private fun asyncHandleBlockUpdate(ctx: ChannelHandlerContextWrapper, blockUpdat
   }
 }
 
-private fun asyncHandleChunkRequest(ctx: ChannelHandlerContextWrapper, chunkX: ChunkCoord, chunkY: ChunkCoord) {
+private fun physicsHandleChunkRequest(ctx: ChannelHandlerContextWrapper, chunkX: ChunkCoord, chunkY: ChunkCoord) {
   val serverWorld = ServerMain.inst().serverWorld
 
   // Only send chunks which the player is allowed to see
@@ -359,7 +329,7 @@ private fun asyncHandleChunkRequest(ctx: ChannelHandlerContextWrapper, chunkX: C
   }
 }
 
-private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
+private fun physicsHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
   val world = ServerMain.inst().serverWorld
   val shared = ctx.getSharedInformation()
   val player = ctx.getCurrentPlayer()
@@ -417,7 +387,7 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
   logger.info { "Player ${player.name} joined" }
 }
 
-private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entityId: String) {
+private fun physicsHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entityId: String) {
   val world = ServerMain.inst().serverWorld
 
   val entity = world.getEntity(entityId) ?: run {
@@ -448,7 +418,7 @@ private fun asyncHandleContainerUpdate(ctx: ChannelHandlerContextWrapper, contai
   ) { c -> c != ctx.channel() }
 }
 
-private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
+private fun physicsHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
   val player = ctx.getCurrentPlayer() ?: return
   val staff = player.selectedItem?.element as? Staff ?: return
   val inputEventQueue = player.inputEventQueueOrNull ?: return
@@ -465,7 +435,7 @@ private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, owner
   }
 }
 
-private fun asyncHandleUpdateSelectedSlot(ctx: ChannelHandlerContextWrapper, updateSelectedSlot: Packets.UpdateSelectedSlot) {
+private fun physicsHandleUpdateSelectedSlot(ctx: ChannelHandlerContextWrapper, updateSelectedSlot: Packets.UpdateSelectedSlot) {
   val entity = ctx.getCurrentPlayer() ?: return
   val slot = HotbarComponent.Companion.HotbarSlot.fromOrdinalOrNull(updateSelectedSlot.slot) ?: return
   val hotbarComponent = entity.hotbarComponentOrNull ?: run {
