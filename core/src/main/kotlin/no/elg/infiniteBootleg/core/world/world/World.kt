@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.core.world.world
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntitySystem
-import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
@@ -86,7 +85,6 @@ import no.elg.infiniteBootleg.core.world.chunks.ChunkColumnsManager
 import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEngine
 import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEntitySet
 import no.elg.infiniteBootleg.core.world.ecs.basicRequiredEntityFamily
-import no.elg.infiniteBootleg.core.world.ecs.basicRequiredEntityFamilyToSendToClient
 import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrToString
@@ -96,7 +94,6 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionCompone
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.core.world.ecs.disposeBox2dOnRemoval
 import no.elg.infiniteBootleg.core.world.ecs.ensureUniquenessListener
-import no.elg.infiniteBootleg.core.world.ecs.namedEntitiesFamily
 import no.elg.infiniteBootleg.core.world.ecs.playerFamily
 import no.elg.infiniteBootleg.core.world.ecs.system.MaxVelocitySystem
 import no.elg.infiniteBootleg.core.world.ecs.system.NoMovementInUnlockedChunksSystem
@@ -204,6 +201,11 @@ abstract class World(
   private val chunksLock: StampedLock = StampedLock()
 
   private val standaloneEntitySet = ThreadSafeEntitySet()
+  private val playersEntitiesSet = ThreadSafeEntitySet()
+  private val validEntitiesSet = ThreadSafeEntitySet()
+
+  val playersEntities: Set<Entity> get() = playersEntitiesSet.entities
+  val validEntities: Set<Entity> get() = validEntitiesSet.entities
 
   /**
    * The entity engine of this world
@@ -260,18 +262,6 @@ abstract class World(
 
   val tick get() = worldTicker.tickId
 
-  val playersEntities: ImmutableArray<Entity>
-    get() = engine.getEntitiesFor(playerFamily)
-
-  val validEntities: ImmutableArray<Entity>
-    get() = engine.getEntitiesFor(basicRequiredEntityFamily)
-
-  val validEntitiesToSendToClient: ImmutableArray<Entity>
-    get() = engine.getEntitiesFor(basicRequiredEntityFamilyToSendToClient)
-
-  val namedEntities: ImmutableArray<Entity>
-    get() = engine.getEntitiesFor(namedEntitiesFamily)
-
   init {
     MathUtils.random.setSeed(seed)
     val world: World = this
@@ -312,6 +302,8 @@ abstract class World(
     ensureUniquenessListener(engine)
     disposeBox2dOnRemoval(engine)
     engine.addEntityListener(basicStandaloneEntityFamily, standaloneEntitySet)
+    engine.addEntityListener(playerFamily, playersEntitiesSet)
+    engine.addEntityListener(basicRequiredEntityFamily, validEntitiesSet)
     addEntityListeners(engine)
     return engine
   }
@@ -1108,8 +1100,6 @@ abstract class World(
     return false
   }
 
-  fun containsEntity(entityId: String): Boolean = getEntity(entityId) != null
-
   fun getEntity(entityId: String): Entity? {
     assertNotDisposed()
     for (entity in validEntities) {
@@ -1119,6 +1109,18 @@ abstract class World(
     }
     return null
   }
+
+  fun getPlayer(entityId: String): Entity? {
+    assertNotDisposed()
+    for (entity in playersEntities) {
+      if (entity.id == entityId) {
+        return entity
+      }
+    }
+    return null
+  }
+
+  fun hasPlayer(entityId: String): Boolean = getPlayer(entityId) != null
 
   /**
    * Remove and disposes the given entity directly.
@@ -1135,18 +1137,6 @@ abstract class World(
     assertNotDisposed()
     engine.removeEntity(entity)
   }
-
-  fun getPlayer(entityId: String): Entity? {
-    assertNotDisposed()
-    for (entity in playersEntities) {
-      if (entity.id == entityId) {
-        return entity
-      }
-    }
-    return null
-  }
-
-  fun hasPlayer(entityId: String): Boolean = getPlayer(entityId) != null
 
   /**
    * @param worldX X center (center of each block

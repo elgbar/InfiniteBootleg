@@ -10,7 +10,9 @@ import no.elg.infiniteBootleg.core.net.SharedInformation
 import no.elg.infiniteBootleg.core.net.clientBoundSpawnEntity
 import no.elg.infiniteBootleg.core.util.IllegalAction
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
+import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEntitySet
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
+import no.elg.infiniteBootleg.core.world.ecs.basicRequiredEntityFamilyToSendToClient
 import no.elg.infiniteBootleg.core.world.ecs.components.required.EntityTypeComponent.Companion.isType
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkGenerator
@@ -45,6 +47,9 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
   override val worldTicker: WorldTicker = ServerWorldTicker(this)
   override val chunkLoader: ChunkLoader = FullChunkLoader(this, generator)
 
+  private lateinit var validEntitiesToSendToClientSet: ThreadSafeEntitySet
+  val validEntitiesToSendToClient: Set<Entity> get() = validEntitiesToSendToClientSet.entities
+
   override fun initialize() {
     super.initialize()
     if (isTransient) {
@@ -74,6 +79,8 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
     )
 
   override fun addEntityListeners(engine: Engine) {
+    validEntitiesToSendToClientSet = ThreadSafeEntitySet()
+    engine.addEntityListener(basicRequiredEntityFamilyToSendToClient, validEntitiesToSendToClientSet)
     engine.addEntityListener(
       basicDynamicEntityFamily,
       object : EntityListener {

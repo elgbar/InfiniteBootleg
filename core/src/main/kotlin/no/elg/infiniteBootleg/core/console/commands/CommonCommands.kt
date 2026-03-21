@@ -29,7 +29,6 @@ import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.ClientCom
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.DebuggableComponent.Companion.debugString
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.TagComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.idAndName
-import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.name
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.teleport
@@ -61,10 +60,10 @@ open class CommonCommands : CommandExecutor() {
   protected fun findEntity(idOrName: String): Entity? {
     val world = world ?: return null
     return world.getEntity(idOrName)
-      ?: world.namedEntities.find { it.nameOrNull == idOrName }
+      ?: world.validEntities.find { it.nameOrNull == idOrName }
       ?: world.validEntities.find { it.id.startsWith(idOrName) }
-      ?: world.namedEntities.find { it.name.startsWith(idOrName) }
-      ?: world.namedEntities.find { it.name.lowercase().startsWith(idOrName.lowercase()) }
+      ?: world.validEntities.find { it.nameOrNull?.startsWith(idOrName) ?: false }
+      ?: world.validEntities.find { it.nameOrNull?.lowercase()?.startsWith(idOrName.lowercase()) ?: false }
       ?: run {
         logger.error { "No entity with id or name '$idOrName'" }
         return null
