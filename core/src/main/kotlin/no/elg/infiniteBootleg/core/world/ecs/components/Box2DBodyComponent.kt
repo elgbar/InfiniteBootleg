@@ -78,6 +78,16 @@ class Box2DBodyComponent(body: b2BodyId, val type: ProtoWorld.Entity.Box2D.BodyT
       return bodyId ?: error("Tried to access an invalid or null body!")
     }
 
+  /**
+   * Fetches the body of this entity or null if it is disposed. Use this when on a non-physics thread
+   */
+  val bodyOrNull: b2BodyId?
+    get() = if (disposed) {
+      null
+    } else {
+      internalBody
+    }
+
   fun disableGravity() {
     body.gravityScale = 0f
   }

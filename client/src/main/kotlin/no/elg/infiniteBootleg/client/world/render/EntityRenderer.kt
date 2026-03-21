@@ -206,7 +206,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       val activeScreenY: Float
       if (entity.materialComponentOrNull != null) {
         // Render blocks from their corner, not their center
-        val position = box2d.body.position
+        val position = box2d.bodyOrNull?.position ?: return // body disposed, do not render the entity
         activeScreenX = (position.x - box2d.halfBox2dWidth).worldToScreen()
         activeScreenY = (position.y - box2d.halfBox2dHeight).worldToScreen()
       } else {
@@ -222,11 +222,13 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       }
 
       if (renderEntityPosDifference) {
-        batch.color = ASHLEY_COLOR
-        val position = box2d.body.position
-        val ashleyScreenX = (position.x - box2d.halfBox2dWidth).worldToScreen()
-        val ashleyScreenY = (position.y - box2d.halfBox2dHeight).worldToScreen()
-        drawBox2d(box2d, texture, ashleyScreenX, ashleyScreenY)
+        box2d.bodyOrNull?.let {
+          batch.color = ASHLEY_COLOR
+          val position = it.position
+          val ashleyScreenX = (position.x - box2d.halfBox2dWidth).worldToScreen()
+          val ashleyScreenY = (position.y - box2d.halfBox2dHeight).worldToScreen()
+          drawBox2d(box2d, texture, ashleyScreenX, ashleyScreenY)
+        }
 
         batch.color = BOX2D_COLOR
         val screenX = (centerPos.x - box2d.halfBox2dWidth).worldToScreen()
