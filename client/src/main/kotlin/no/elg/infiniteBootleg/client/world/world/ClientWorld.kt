@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.client.world.world
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.core.EntityListener
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.gdx.Gdx
 import ktx.assets.dispose
@@ -16,14 +15,13 @@ import no.elg.infiniteBootleg.client.world.ecs.system.MineBlockSystem
 import no.elg.infiniteBootleg.client.world.ecs.system.event.ContinuousInputSystem
 import no.elg.infiniteBootleg.client.world.ecs.system.event.InputEventSystem
 import no.elg.infiniteBootleg.client.world.render.ClientWorldRender
-import no.elg.infiniteBootleg.core.util.isInvalid
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
+import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEntitySet
 import no.elg.infiniteBootleg.core.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsEventSystem
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import java.util.concurrent.CopyOnWriteArraySet
 
 /**
  * @author Elg
@@ -47,28 +45,12 @@ abstract class ClientWorld : World {
     render.resize(width, height)
   }
 
-  val controlledPlayerEntities: Set<Entity> get() = _controlledPlayerEntities
-  private val _controlledPlayerEntities: CopyOnWriteArraySet<Entity> = CopyOnWriteArraySet<Entity>()
+  private lateinit var controlledPlayerEntitySet: ThreadSafeEntitySet // late init to be
+  val controlledPlayerEntities: Set<Entity> get() = controlledPlayerEntitySet.entities
 
   override fun addEntityListeners(engine: Engine) {
-    engine.addEntityListener(
-      localPlayerFamily,
-      object : EntityListener {
-        override fun entityAdded(entity: Entity?) {
-          if (entity != null) {
-            _controlledPlayerEntities += entity
-          }
-          _controlledPlayerEntities.removeIf { it.isInvalid }
-        }
-
-        override fun entityRemoved(entity: Entity?) {
-          if (entity != null) {
-            _controlledPlayerEntities -= entity
-          }
-          _controlledPlayerEntities.removeIf { it.isInvalid }
-        }
-      }
-    )
+    controlledPlayerEntitySet = ThreadSafeEntitySet()
+    engine.addEntityListener(localPlayerFamily, controlledPlayerEntitySet)
   }
 
   override fun additionalSystems() =

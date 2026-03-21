@@ -84,6 +84,7 @@ import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.valid
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumnsManager
 import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEngine
+import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEntitySet
 import no.elg.infiniteBootleg.core.world.ecs.basicRequiredEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.basicRequiredEntityFamilyToSendToClient
 import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
@@ -202,6 +203,8 @@ abstract class World(
 
   private val chunksLock: StampedLock = StampedLock()
 
+  private val standaloneEntitySet = ThreadSafeEntitySet()
+
   /**
    * The entity engine of this world
    *
@@ -263,12 +266,6 @@ abstract class World(
       return engine.getEntitiesFor(playerFamily)
     }
 
-  val standaloneEntities: ImmutableArray<Entity>
-    get() {
-      assertOnPhysicsThread()
-      return engine.getEntitiesFor(basicStandaloneEntityFamily)
-    }
-
   val validEntities: ImmutableArray<Entity>
     get() {
       assertOnPhysicsThread()
@@ -325,6 +322,7 @@ abstract class World(
     val engine = ThreadSafeEngine()
     ensureUniquenessListener(engine)
     disposeBox2dOnRemoval(engine)
+    engine.addEntityListener(basicStandaloneEntityFamily, standaloneEntitySet)
     addEntityListeners(engine)
     return engine
   }
@@ -982,7 +980,7 @@ abstract class World(
   fun getEntities(worldX: WorldCoord, worldY: WorldCoord): GdxArray<Entity> {
     assertNotDisposed()
     val foundEntities = GdxArray<Entity>(false, 0)
-    for (entity in standaloneEntities) {
+    for (entity in standaloneEntitySet.entities) {
       val (x, y) = entity.positionComponent
       val size = entity.box2d
       if (worldX in MathUtils.floor(x - size.halfBox2dWidth) until MathUtils.ceil(x + size.halfBox2dWidth) &&
@@ -996,7 +994,7 @@ abstract class World(
 
   fun isAnyEntityAt(worldX: WorldCoord, worldY: WorldCoord): Boolean {
     assertNotDisposed()
-    for (entity in standaloneEntities) {
+    for (entity in standaloneEntitySet.entities) {
       val (x, y) = entity.positionComponent
       val box2d = entity.box2d
       if (worldX in MathUtils.floor(x - box2d.halfBox2dWidth) until MathUtils.ceil(x + box2d.halfBox2dWidth) &&
