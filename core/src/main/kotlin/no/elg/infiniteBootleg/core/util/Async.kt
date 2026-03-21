@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import ktx.async.AsyncExecutorDispatcher
 import ktx.async.KtxAsync
@@ -23,10 +24,15 @@ val singleThreadEventDispatcher: AsyncExecutorDispatcher = newSingleThreadAsyncC
 fun launchOnMainSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(MainDispatcher, start = start, block = block)
 
+fun <T> asyncOnMainSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> T) = KtxAsync.async(MainDispatcher, start = start, block = block)
+
 fun launchOnMain(block: () -> Unit) = Gdx.app.postRunnable(block)
 
 fun launchOnAsyncSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(singleThreadAsyncDispatcher, start = start, block = block)
+
+fun <T> asyncOnAsyncSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> T) =
+  KtxAsync.async(singleThreadAsyncDispatcher, start = start, block = block)
 
 /**
  * Launch task on the event thread
@@ -44,7 +50,13 @@ fun World.launchOnWorldTicker(block: () -> Unit) = launchOnWorldTickerSuspendabl
 fun World.launchOnWorldTickerSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(worldTickCoroutineDispatcher, start = start, block = block)
 
+fun <T> World.asyncOnWorldTickerSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> T) =
+  KtxAsync.async(worldTickCoroutineDispatcher, start = start, block = block)
+
 fun World.launchOnBox2dSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(box2dCoroutineDispatcher, start = start, block = block)
+
+fun <T> World.asyncOnBox2dSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> T) =
+  KtxAsync.async(box2dCoroutineDispatcher, start = start, block = block)
 
 fun World.launchOnBox2d(block: () -> Unit) = postBox2dRunnable(block)

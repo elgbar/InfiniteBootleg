@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.core.world.blocks
 
 import com.badlogic.ashley.core.Entity
+import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.util.LocalCoord
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Material.Companion.asProto
@@ -28,8 +29,10 @@ class BlockImpl(override val chunk: Chunk, override val localX: LocalCoord, over
     }
 
   override fun dispose() {
-    entity?.also {
-      world.removeEntity(it, Packets.DespawnEntity.DespawnReason.NATURAL)
+    entity?.also { entityToDispose ->
+      ThreadType.PHYSICS.launchOrRun(world) {
+        world.removeEntity(entityToDispose, Packets.DespawnEntity.DespawnReason.NATURAL)
+      }
       entity = null
     }
   }

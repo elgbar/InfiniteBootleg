@@ -261,28 +261,16 @@ abstract class World(
   val tick get() = worldTicker.tickId
 
   val playersEntities: ImmutableArray<Entity>
-    get() {
-      assertOnPhysicsThread()
-      return engine.getEntitiesFor(playerFamily)
-    }
+    get() = engine.getEntitiesFor(playerFamily)
 
   val validEntities: ImmutableArray<Entity>
-    get() {
-      assertOnPhysicsThread()
-      return engine.getEntitiesFor(basicRequiredEntityFamily)
-    }
+    get() = engine.getEntitiesFor(basicRequiredEntityFamily)
 
   val validEntitiesToSendToClient: ImmutableArray<Entity>
-    get() {
-      assertOnPhysicsThread()
-      return engine.getEntitiesFor(basicRequiredEntityFamilyToSendToClient)
-    }
+    get() = engine.getEntitiesFor(basicRequiredEntityFamilyToSendToClient)
 
   val namedEntities: ImmutableArray<Entity>
-    get() {
-      assertOnPhysicsThread()
-      return engine.getEntitiesFor(namedEntitiesFamily)
-    }
+    get() = engine.getEntitiesFor(namedEntitiesFamily)
 
   init {
     MathUtils.random.setSeed(seed)
@@ -307,6 +295,7 @@ abstract class World(
     EventManager.oneShotListener<WorldLoadedEvent> {
       logger.debug { "Handling WorldLoadedEvent, adding systems to the engine" }
       addSystems()
+      engine.start()
     }
   }
 
@@ -1335,11 +1324,6 @@ abstract class World(
 
   fun assertNotDisposed() {
     check(!isDisposed) { "World $this is disposed" }
-  }
-
-  fun assertOnPhysicsThread() {
-    // FIXME move this check to directly on the engine
-    ThreadType.PHYSICS.requireCorrectThreadType { "This can only be called from the physics thread" }
   }
 
   override fun dispose() {

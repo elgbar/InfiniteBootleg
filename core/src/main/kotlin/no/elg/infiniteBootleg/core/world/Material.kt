@@ -307,7 +307,7 @@ sealed interface Material : ContainerElement {
               world.removeEntity(entity)
               // This will fire when generating features in the world (i.e., trees next to other trees)
               logger.debug {
-                "Block@${stringifyCompactLocWithChunk(block)} was disposed" + " before entity (type ${entity.entityTypeComponent.hudDebug()}) was fully created. " +
+                "Block@${stringifyCompactLocWithChunk(block)} was disposed before entity (type ${entity.entityTypeComponent.hudDebug()}) was fully created. " +
                   "Is the chunk disposed? ${validChunk.isDisposed}, block disposed? ${block.isDisposed}"
               }
             } else {

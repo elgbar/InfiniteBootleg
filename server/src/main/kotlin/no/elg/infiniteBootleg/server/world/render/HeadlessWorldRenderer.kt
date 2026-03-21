@@ -3,9 +3,11 @@ package no.elg.infiniteBootleg.server.world.render
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.runBlocking
 import no.elg.infiniteBootleg.core.events.WorldSpawnUpdatedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.util.ChunkCoord
+import no.elg.infiniteBootleg.core.util.asyncOnBox2dSuspendable
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
@@ -67,18 +69,18 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
 
   override fun isOutOfView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean =
     spawnChunksInView.isOutOfView(chunkX, chunkY) &&
-      world.engine.doUnderEngineLock {
-        inViewEntities.all { it.chunksInView.isOutOfView(chunkX, chunkY) }
-      }
+      runBlocking { world.asyncOnBox2dSuspendable { inViewEntities.all { it.chunksInView.isOutOfView(chunkX, chunkY) } }.await() }
 
   override fun isInView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean =
     spawnChunksInView.isInView(chunkX, chunkY) ||
-      world.engine.doUnderEngineLock {
-        inViewEntities.any { it.chunksInView.isInView(chunkX, chunkY) }
-      }
+      runBlocking { world.asyncOnBox2dSuspendable { inViewEntities.any { it.chunksInView.isInView(chunkX, chunkY) } }.await() }
 
   private fun allChunksInView(): Sequence<ServerClientChunksInView> =
-    sequenceOf(spawnChunksInView) + world.engine.doUnderEngineLock { inViewEntities.map { it.chunksInView }.asSequence() }
+    sequenceOf(spawnChunksInView) + runBlocking {
+      world.asyncOnBox2dSuspendable {
+        inViewEntities.map { it.chunksInView }.asSequence()
+      }.await()
+    }
 
   override val chunkLocationsInView: Sequence<Long>
     get() = allChunksInView().flatMap { it.sequence() }.distinct()
