@@ -28,6 +28,6 @@ fun temporallyFilterPacket(vararg packets: Packets.Packet.Type, block: () -> Uni
 
 fun logPacket(directionMarker: Marker, packet: Packets.Packet) {
   if (Settings.logPackets && packet.type !in filterOutPackets) {
-    logger.debug(null as Throwable?, directionMarker) { singleLinePrinter.printToString(packet) }
+    logger.debug(directionMarker) { singleLinePrinter.printToString(packet) }
   }
 }
