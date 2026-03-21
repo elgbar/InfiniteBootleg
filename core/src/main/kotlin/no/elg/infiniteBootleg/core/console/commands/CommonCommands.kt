@@ -28,6 +28,7 @@ import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.Authorita
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.ClientComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.DebuggableComponent.Companion.debugString
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.TagComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.idAndName
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.name
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
@@ -70,8 +71,6 @@ open class CommonCommands : CommandExecutor() {
       }
   }
 
-  protected fun entityNameId(entity: Entity) = "${entity.id}${entity.nameOrNull?.let { " ($it)" } ?: ""}"
-
   // ///////////////////////////////
   // AUTHORITATIVE ONLY COMMANDS //
   // ///////////////////////////////
@@ -84,11 +83,11 @@ open class CommonCommands : CommandExecutor() {
     ThreadType.PHYSICS.launchOrRun(world) {
       val entity = findEntity(entity) ?: return@launchOrRun
       this@CommonCommands.world?.loadChunk(worldX.worldToChunk(), worldY.worldToChunk()) ?: let {
-        logger.error { "Failed to teleport entity ${entityNameId(entity)} to ${stringifyCompactLoc(worldX, worldY)}, chunk could not be loaded" }
+        logger.error { "Failed to teleport entity ${entity.idAndName} to ${stringifyCompactLoc(worldX, worldY)}, chunk could not be loaded" }
         return@launchOrRun
       }
       entity.teleport(worldX, worldY, killVelocity = true)
-      logger.info { "Teleported entity ${entityNameId(entity)} to ${stringifyCompactLoc(worldX, worldY)}" }
+      logger.info { "Teleported entity ${entity.idAndName} to ${stringifyCompactLoc(worldX, worldY)}" }
     }
   }
 
@@ -370,7 +369,7 @@ open class CommonCommands : CommandExecutor() {
   @ConsoleDoc(description = "List components of an entity", paramDescriptions = ["Entity id or name"])
   fun inspect(entityId: String) {
     val entity = findEntity(entityId) ?: return
-    logger.info { "===[ ${entityNameId(entity)} ]===" }
+    logger.info { "===[ ${entity.idAndName} ]===" }
     val (tags, nonTags) = entity.components.partition { it is TagComponent }
     if (nonTags.isNotEmpty()) {
       logger.info { "Components" }
@@ -392,7 +391,7 @@ open class CommonCommands : CommandExecutor() {
     val entity = findEntity(entityId) ?: return
     val searchTerm = componentName.removeSuffix("Component")
     val component = entity.components.filterNotNull().find { it::class.simpleName?.removeSuffix("Component")?.removeSuffix("Tag").equals(searchTerm, true) } ?: run {
-      logger.error { "No component with name '$componentName' in entity ${entityNameId(entity)}" }
+      logger.error { "No component with name '$componentName' in entity ${entity.idAndName}" }
       return
     }
 
@@ -423,7 +422,7 @@ open class CommonCommands : CommandExecutor() {
     }
     chunk.queryAllEntities { entities ->
       entities.forEach { entity ->
-        logger.info { entityNameId(entity) }
+        logger.info { entity.idAndName }
       }
       logger.info { "In total ${entities.size} entities were found in chunk ${stringifyCompactLoc(chunkX, chunkY)}" }
     }

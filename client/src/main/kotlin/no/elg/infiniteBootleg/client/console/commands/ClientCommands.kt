@@ -52,6 +52,7 @@ import no.elg.infiniteBootleg.core.world.box2d.extensions.position
 import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.idAndName
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerComponentOrNull
@@ -684,7 +685,7 @@ class ClientCommands : CommonCommands() {
     }
 
     fun entityInfo(userdata: Any?): String {
-      val entityName = (userdata as? Entity)?.let { "Entity ${entityNameId(it)}" }
+      val entityName = (userdata as? Entity)?.let { "Entity ${it.idAndName}" }
       val chunkBody = (userdata as? ChunkBody)?.let { "Chunk body @ ${stringifyCompactLoc(it.chunk)}" }
       val block = (userdata as? Block)?.let { "Block @ ${stringifyCompactLocWithChunk(it)} (local ${stringifyCompactLoc(it.localX, it.localY)})" }
       return entityName ?: chunkBody ?: block ?: userdata?.toString() ?: "null"
