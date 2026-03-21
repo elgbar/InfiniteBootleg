@@ -18,7 +18,9 @@ import no.elg.infiniteBootleg.client.screens.SelectWorldScreen.loadSingleplayerW
 import no.elg.infiniteBootleg.client.screens.WorldScreen
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.Settings
+import no.elg.infiniteBootleg.core.console.CallOnThreadyType
 import no.elg.infiniteBootleg.core.console.CmdArgNames
+import no.elg.infiniteBootleg.core.console.ExecutionThread
 import no.elg.infiniteBootleg.core.console.commands.CommonCommands
 import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.inventory.container.Container
@@ -76,10 +78,12 @@ class ClientCommands : CommonCommands() {
     }
 
   @HiddenCommand
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun ga() = giveAll()
 
   @CmdArgNames("quantity")
   @ConsoleDoc(description = "Give one of each element to player", paramDescriptions = ["Quantity to give, default 100"])
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun giveAll(quantity: Int = 100) {
     (Tool.tools + Material.normalMaterials).forEach { give(it::class.simpleName!!, quantity) }
   }
@@ -116,14 +120,17 @@ class ClientCommands : CommonCommands() {
 
   @CmdArgNames("item")
   @ConsoleDoc(description = "Give a single item to player", paramDescriptions = ["Item to give"])
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun give(elementName: String) = give(elementName, 1)
 
   @CmdArgNames("item")
   @ConsoleDoc(description = "Take a single item from the player", paramDescriptions = ["Item to take"])
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun take(elementName: String) = take(elementName, 1)
 
   @CmdArgNames("item", "quantity")
   @ConsoleDoc(description = "Give item to player", paramDescriptions = ["Item to take", "Quantity to give, default 1"])
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun take(elementName: String, quantity: Int) {
     takeOrGive(elementName, quantity, "take", "give") { container, element ->
       val notRemoved = container.remove(element, quantity.toUInt())
@@ -140,6 +147,7 @@ class ClientCommands : CommonCommands() {
 
   @CmdArgNames("item", "quantity")
   @ConsoleDoc(description = "Give item to player", paramDescriptions = ["Item to give", "Quantity to give, default 1"])
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun give(elementName: String, quantity: Int) {
     takeOrGive(elementName, quantity, "give", "take") { container, element ->
       val item = element.toItem(stock = quantity.toUInt())
@@ -193,6 +201,7 @@ class ClientCommands : CommonCommands() {
   }
 
   @ConsoleDoc(description = "Toggle flight for player")
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun fly() {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
@@ -364,6 +373,7 @@ class ClientCommands : CommonCommands() {
 
   @CmdArgNames("x", "y")
   @ConsoleDoc(description = "Teleport to given world coordinate", paramDescriptions = ["World x coordinate", "World y coordinate"])
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun tp(worldX: Float, worldY: Float) {
     val clientWorld = clientWorld ?: return
     ThreadType.PHYSICS.launchOrRun(clientWorld) {
@@ -443,6 +453,7 @@ class ClientCommands : CommonCommands() {
   }
 
   @ConsoleDoc(description = "Get the brush sizes")
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun brush() {
     val world = clientWorld ?: return
     val localPlayers = world.controlledPlayerEntities
@@ -456,6 +467,7 @@ class ClientCommands : CommonCommands() {
 
   @CmdArgNames("size")
   @ConsoleDoc(description = "Set the brush size of the mouse", paramDescriptions = ["New brush size, positive integer"])
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun brush(size: Float) {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
@@ -474,6 +486,7 @@ class ClientCommands : CommonCommands() {
 
   @CmdArgNames("interactRadius")
   @ConsoleDoc(description = "Set the interact radius from the player", paramDescriptions = ["New interact radius, positive integer"])
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun interactRadius(interactRadius: Float) {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
@@ -491,6 +504,7 @@ class ClientCommands : CommonCommands() {
   }
 
   @ConsoleDoc(description = "Set the interact radius from the player")
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun instantBreak() {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
@@ -505,6 +519,7 @@ class ClientCommands : CommonCommands() {
   }
 
   @ConsoleDoc(description = "Toggle whether a player can place blocks disconnected from other blocks")
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun placeCheck() {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities

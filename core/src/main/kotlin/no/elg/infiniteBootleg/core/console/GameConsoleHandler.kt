@@ -11,8 +11,10 @@ import com.strongjoshua.console.ConsoleUtils
 import com.strongjoshua.console.LogLevel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.api.Resizable
+import no.elg.infiniteBootleg.core.console.CallOnThreadyType.Companion.handle
 import no.elg.infiniteBootleg.core.console.GameConsoleLogger.Companion
 import kotlin.reflect.KParameter.Kind
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberFunctions
 
 private val logger = KotlinLogging.logger {}
@@ -97,8 +99,9 @@ abstract class GameConsoleHandler :
         }
         if (validFuncs.size == 1) {
           val func = validFuncs.first()
+          val callOnThreadyType = func.findAnnotation<CallOnThreadyType>()
           // Call the function with all default parameters (i.e., they are omitted) and the instance as the first parameter
-          func.callBy(mapOf(func.parameters[0] to exec))
+          callOnThreadyType.handle { func.callBy(mapOf(func.parameters[0] to exec)) }
         } else {
           logger.error { "Multiple functions with the same name found, will not execute default" }
         }
@@ -135,8 +138,8 @@ abstract class GameConsoleHandler :
             continue
           }
           if (HelpfulConsoleHelpUtil.allowedToExecute(method)) {
-            method.isAccessible = true
-            method.invoke(exec, *args.toTypedArray())
+            val callOnThreadyType = method.getDeclaredAnnotation(CallOnThreadyType::class.java)?.getAnnotation(CallOnThreadyType::class.java)
+            callOnThreadyType.handle { method.invoke(exec, *args.toTypedArray()) }
           } else {
             logger.error { "You cannot execute this command" }
             return true
