@@ -28,7 +28,6 @@ import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.events.ContainerEvent
 import no.elg.infiniteBootleg.core.events.InterfaceEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager.registerListener
-import no.elg.infiniteBootleg.core.events.api.RegisteredEventListener
 import no.elg.infiniteBootleg.core.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.core.items.Item
 import no.elg.infiniteBootleg.core.items.Item.Companion.fullName
@@ -40,7 +39,6 @@ import no.elg.infiniteBootleg.core.world.magic.Description
 @Scene2dDsl
 fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop: DragAndDrop, batch: Batch): IBVisWindow {
   val (owner, container) = ownedContainer
-  val events: Array<RegisteredEventListener>
   return ibVisWindowClosed(container.name, owner.toInterfaceId()) {
     isMovable = true
     isResizable = false
@@ -65,7 +63,7 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
     }
 
     val filter: (InterfaceEvent) -> Boolean = { it.interfaceId == interfaceId }
-    events = arrayOf(
+    arrayOf(
       registerListener<ContainerEvent.ContentChanged>({ it.container === container || it.owner?.toInterfaceId() == interfaceId }) {
         val serverContainer = this.container
         launchOnMainSuspendable {
