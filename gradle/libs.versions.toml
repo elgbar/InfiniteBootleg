@@ -1,19 +1,19 @@
 [versions]
-kotlin = "2.3.0"
+kotlin = "2.3.20"
 gdx = "1.14.0"
 gdx-box2d = "3.1.1-0"
 ktx = "1.13.1-rc1"
-protobuf = "4.33.2"
-vis = "1.5.7"
+protobuf = "4.34.1"
+vis = "1.5.8"
 caffeine = "3.2.3"
 uuid = "5.2.0"
 oshaiLogging = "7.0.13"
 log4j = "2.25.3"
-junit = "6.0.1"
-mockk = "1.14.7"
+junit = "6.0.3"
+mockk = "1.14.9"
 jansi = "2.4.2"
 fastutil = "8.5.18"
-netty = "4.2.9.Final"
+netty = "4.2.10.Final"
 kotlinCoroutines = "1.10.2"
 
 stacktracedecoroutinator = "2.6.1"
@@ -70,7 +70,7 @@ visUi = { group = "com.kotcrab.vis", name = "vis-ui", version.ref = "vis" }
 inGameConsole = { group = "com.strongjoshua", name = "libgdx-inGameConsole", version = "1.0.0" }
 netty-bom = { group = "io.netty", name = "netty-bom", version.ref = "netty" }
 netty-all = { group = "io.netty", name = "netty-all", version.ref = "netty" }
-annotations = { group = "org.jetbrains", name = "annotations", version = "26.0.2-1" }
+annotations = { group = "org.jetbrains", name = "annotations", version = "26.1.0" }
 oshaiLogging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "oshaiLogging" }
 fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
 jansi = { group = "org.fusesource.jansi", name = "jansi", version.ref = "jansi" } # deprecated, replace with https://github.com/jline/jline3
