@@ -17,7 +17,10 @@ import no.elg.infiniteBootleg.client.world.ecs.system.event.InputEventSystem
 import no.elg.infiniteBootleg.client.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEntitySet
+import no.elg.infiniteBootleg.core.world.ecs.drawableMaterialEntitiesFamily
+import no.elg.infiniteBootleg.core.world.ecs.drawableNonMaterialEntitiesFamily
 import no.elg.infiniteBootleg.core.world.ecs.localPlayerFamily
+import no.elg.infiniteBootleg.core.world.ecs.selectedMaterialComponentFamily
 import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsEventSystem
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.core.world.world.World
@@ -48,9 +51,20 @@ abstract class ClientWorld : World {
   private lateinit var controlledPlayerEntitySet: ThreadSafeEntitySet
   val controlledPlayerEntities: Set<Entity> get() = controlledPlayerEntitySet.entities
 
+  private lateinit var selectedMaterialEntitySet: ThreadSafeEntitySet
+  val selectedMaterialEntities: Set<Entity> get() = selectedMaterialEntitySet.entities
+
+  private lateinit var drawableNonMaterialEntitySet: ThreadSafeEntitySet
+  val drawableNonMaterialEntities: Set<Entity> get() = drawableNonMaterialEntitySet.entities
+
+  private lateinit var drawableMaterialEntitySet: ThreadSafeEntitySet
+  val drawableMaterialEntities: Set<Entity> get() = drawableMaterialEntitySet.entities
+
   override fun addEntityListeners(engine: Engine) {
-    controlledPlayerEntitySet = ThreadSafeEntitySet()
-    engine.addEntityListener(localPlayerFamily, controlledPlayerEntitySet)
+    controlledPlayerEntitySet = ThreadSafeEntitySet(engine, localPlayerFamily)
+    selectedMaterialEntitySet = ThreadSafeEntitySet(engine, selectedMaterialComponentFamily)
+    drawableNonMaterialEntitySet = ThreadSafeEntitySet(engine, drawableNonMaterialEntitiesFamily)
+    drawableMaterialEntitySet = ThreadSafeEntitySet(engine, drawableMaterialEntitiesFamily)
   }
 
   override fun additionalSystems() =

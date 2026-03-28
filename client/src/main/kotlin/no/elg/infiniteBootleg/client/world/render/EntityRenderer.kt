@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.client.world.render
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
@@ -43,7 +42,6 @@ import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponen
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FollowedByCameraTag.Companion.followedByCamera
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.LastSpellCastComponent.Companion.lastSpellCastOrNull
-import no.elg.infiniteBootleg.core.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.core.world.magic.SpellState.Companion.canNotCastAgain
 import no.elg.infiniteBootleg.core.world.magic.SpellState.Companion.timeToCast
 import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion
@@ -52,8 +50,6 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
-
-  private val entities: ImmutableArray<Entity> = worldRender.world.engine.getEntitiesFor(drawableEntitiesFamily)
 
   private val nameLayout = GlyphLayout()
   private val lightVector: Vector2 = Vector2()
@@ -184,72 +180,76 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       globalAnimationTimer += Gdx.graphics.deltaTime
     }
 
-    // Sort entities so that block entities are rendered behind other entities(centerPos.x - box2d.halfBox2dWidth).worldToScreen()
-    // (centerPos.y - box2d.halfBox2dHeight).worldToScreen()
-    val sortedEntities = entities.sortedBy { it.materialComponentOrNull == null }
-    for (entity in sortedEntities) {
-      val box2d: Box2DBodyComponent = entity.box2d
+    // Sort entities so that block entities are rendered behind other
+    val materialEntities = world.drawableMaterialEntities
+    val nonMaterialEntities = world.drawableNonMaterialEntities
 
-      @Suppress("GDXKotlinFlushInsideLoop")
-      val centerPos: Vector2 = if (entity.followedByCamera) {
-        // We must render the entity we're following at the same position as the last calculated position, otherwise we'll get a weird jitter effect
-        // Also to make camera is correct we must update the projection matrix again
-        batch.projectionMatrix = worldRender.camera.combined
-        FollowEntitySystem.processedPosition
-      } else {
-        entity.position(posVector)
-      }
+    materialEntities.forEach(::renderEntity)
+    nonMaterialEntities.forEach(::renderEntity)
+  }
 
-      val texture = entity.currentTexture()
+  fun renderEntity(entity: Entity) {
+    val box2d: Box2DBodyComponent = entity.box2d
 
-      val activeScreenX: Float
-      val activeScreenY: Float
-      if (entity.materialComponentOrNull != null) {
-        // Render blocks from their corner, not their center
-        val position = box2d.bodyOrNull?.position ?: return // body disposed, do not render the entity
-        activeScreenX = (position.x - box2d.halfBox2dWidth).worldToScreen()
-        activeScreenY = (position.y - box2d.halfBox2dHeight).worldToScreen()
-      } else {
-        activeScreenX = (centerPos.x - box2d.halfBox2dWidth).worldToScreen()
-        activeScreenY = (centerPos.y - box2d.halfBox2dHeight).worldToScreen()
-      }
-
-      setupEntityLight(centerPos, box2d)
-
-      // Draw with a tint if there is one
-      entity.tintedComponentOrNull?.also {
-        batch.color = tmpColor.set(batch.color).mul(it.tint)
-      }
-
-      if (renderEntityPosDifference) {
-        box2d.bodyOrNull?.let {
-          batch.color = ASHLEY_COLOR
-          val position = it.position
-          val ashleyScreenX = (position.x - box2d.halfBox2dWidth).worldToScreen()
-          val ashleyScreenY = (position.y - box2d.halfBox2dHeight).worldToScreen()
-          drawBox2d(box2d, texture, ashleyScreenX, ashleyScreenY)
-        }
-
-        batch.color = BOX2D_COLOR
-        val screenX = (centerPos.x - box2d.halfBox2dWidth).worldToScreen()
-        val screenY = (centerPos.y - box2d.halfBox2dHeight).worldToScreen()
-        drawBox2d(box2d, texture, screenX, screenY)
-
-        entity.lastServerPositionComponentOrNull?.let { serverPos ->
-          batch.color = SERVER_COLOR
-          val screenX = (serverPos.worldX - box2d.halfBox2dWidth).worldToScreen()
-          val screenY = (serverPos.worldY - box2d.halfBox2dHeight).worldToScreen()
-          drawBox2d(box2d, texture, screenX, screenY)
-        }
-
-        batch.color = Color.WHITE
-      } else {
-        drawBox2d(box2d, texture, activeScreenX, activeScreenY)
-      }
-      drawHolding(entity, entity.selectedElement, activeScreenX, activeScreenY)
-      drawName(entity, box2d, activeScreenX, activeScreenY)
-      debugEntityLight()
+    @Suppress("GDXKotlinFlushInsideLoop")
+    val centerPos: Vector2 = if (entity.followedByCamera) {
+      // We must render the entity we're following at the same position as the last calculated position, otherwise we'll get a weird jitter effect
+      // Also to make camera is correct we must update the projection matrix again
+      batch.projectionMatrix = worldRender.camera.combined
+      FollowEntitySystem.processedPosition
+    } else {
+      entity.position(posVector)
     }
+
+    val texture = entity.currentTexture()
+
+    val activeScreenX: Float
+    val activeScreenY: Float
+    if (entity.materialComponentOrNull != null) {
+      // Render blocks from their corner, not their center
+      val position = box2d.bodyOrNull?.position ?: return // body disposed, do not render the entity
+      activeScreenX = (position.x - box2d.halfBox2dWidth).worldToScreen()
+      activeScreenY = (position.y - box2d.halfBox2dHeight).worldToScreen()
+    } else {
+      activeScreenX = (centerPos.x - box2d.halfBox2dWidth).worldToScreen()
+      activeScreenY = (centerPos.y - box2d.halfBox2dHeight).worldToScreen()
+    }
+
+    setupEntityLight(centerPos, box2d)
+
+    // Draw with a tint if there is one
+    entity.tintedComponentOrNull?.also {
+      batch.color = tmpColor.set(batch.color).mul(it.tint)
+    }
+
+    if (renderEntityPosDifference) {
+      box2d.bodyOrNull?.let {
+        batch.color = ASHLEY_COLOR
+        val position = it.position
+        val ashleyScreenX = (position.x - box2d.halfBox2dWidth).worldToScreen()
+        val ashleyScreenY = (position.y - box2d.halfBox2dHeight).worldToScreen()
+        drawBox2d(box2d, texture, ashleyScreenX, ashleyScreenY)
+      }
+
+      batch.color = BOX2D_COLOR
+      val screenX = (centerPos.x - box2d.halfBox2dWidth).worldToScreen()
+      val screenY = (centerPos.y - box2d.halfBox2dHeight).worldToScreen()
+      drawBox2d(box2d, texture, screenX, screenY)
+
+      entity.lastServerPositionComponentOrNull?.let { serverPos ->
+        batch.color = SERVER_COLOR
+        val screenX = (serverPos.worldX - box2d.halfBox2dWidth).worldToScreen()
+        val screenY = (serverPos.worldY - box2d.halfBox2dHeight).worldToScreen()
+        drawBox2d(box2d, texture, screenX, screenY)
+      }
+
+      batch.color = Color.WHITE
+    } else {
+      drawBox2d(box2d, texture, activeScreenX, activeScreenY)
+    }
+    drawHolding(entity, entity.selectedElement, activeScreenX, activeScreenY)
+    drawName(entity, box2d, activeScreenX, activeScreenY)
+    debugEntityLight()
   }
 
   companion object {

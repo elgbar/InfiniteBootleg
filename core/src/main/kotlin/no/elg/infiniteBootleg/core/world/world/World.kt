@@ -200,9 +200,9 @@ abstract class World(
 
   private val chunksLock: StampedLock = StampedLock()
 
-  private val standaloneEntitySet = ThreadSafeEntitySet()
-  private val playersEntitiesSet = ThreadSafeEntitySet()
-  private val validEntitiesSet = ThreadSafeEntitySet()
+  private lateinit var standaloneEntitySet: ThreadSafeEntitySet
+  private lateinit var playersEntitiesSet: ThreadSafeEntitySet
+  private lateinit var validEntitiesSet: ThreadSafeEntitySet
 
   val playersEntities: Set<Entity> get() = playersEntitiesSet.entities
   val validEntities: Set<Entity> get() = validEntitiesSet.entities
@@ -301,9 +301,9 @@ abstract class World(
     val engine = ThreadSafeEngine()
     ensureUniquenessListener(engine)
     disposeBox2dOnRemoval(engine)
-    engine.addEntityListener(basicStandaloneEntityFamily, standaloneEntitySet)
-    engine.addEntityListener(playerFamily, playersEntitiesSet)
-    engine.addEntityListener(basicRequiredEntityFamily, validEntitiesSet)
+    standaloneEntitySet = ThreadSafeEntitySet(engine, basicStandaloneEntityFamily)
+    playersEntitiesSet = ThreadSafeEntitySet(engine, playerFamily)
+    validEntitiesSet = ThreadSafeEntitySet(engine, basicRequiredEntityFamily)
     addEntityListeners(engine)
     return engine
   }

@@ -79,24 +79,23 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
     )
 
   override fun addEntityListeners(engine: Engine) {
-    validEntitiesToSendToClientSet = ThreadSafeEntitySet()
-    engine.addEntityListener(basicRequiredEntityFamilyToSendToClient, validEntitiesToSendToClientSet)
+    validEntitiesToSendToClientSet = ThreadSafeEntitySet(engine, basicRequiredEntityFamilyToSendToClient)
     engine.addEntityListener(
       basicDynamicEntityFamily,
       object : EntityListener {
         fun isPlayer(entity: Entity) = entity.isType(ProtoWorld.Entity.EntityType.PLAYER)
         override fun entityAdded(entity: Entity) {
-          if (isPlayer(entity)) onEntityAdd(entity)
+          if (isPlayer(entity)) onPlayerEntityAdd(entity)
         }
 
         override fun entityRemoved(entity: Entity) {
-          if (isPlayer(entity)) onEntityRemove(entity)
+          if (isPlayer(entity)) onPlayerEntityRemove(entity)
         }
       }
     )
   }
 
-  private fun onEntityAdd(player: Entity) {
+  private fun onPlayerEntityAdd(player: Entity) {
     if (player.shouldSendToClients) {
       launchOnMainSuspendable {
         ServerMain.inst().packetSender.broadcastToInView(clientBoundSpawnEntity(player), player, excludeEntity = false)
@@ -104,7 +103,7 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
     }
   }
 
-  private fun onEntityRemove(player: Entity) {
+  private fun onPlayerEntityRemove(player: Entity) {
     ServerWorldLoader.saveServerPlayer(player)
   }
 

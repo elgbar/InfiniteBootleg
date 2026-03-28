@@ -1,7 +1,5 @@
 package no.elg.infiniteBootleg.client.world.render
 
-import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.world.textureRegion
@@ -22,13 +20,10 @@ import no.elg.infiniteBootleg.core.world.blocks.BlockLight
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.CurrentlyBreakingComponent.Companion.currentlyBreakingComponentOrNull
-import no.elg.infiniteBootleg.core.world.ecs.selectedMaterialComponentFamily
 import no.elg.infiniteBootleg.core.world.world.World
 import kotlin.math.roundToInt
 
 class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Renderer {
-
-  private val entities: ImmutableArray<Entity> = worldRender.world.engine.getEntitiesFor(selectedMaterialComponentFamily)
 
   override fun render() {
     val world = worldRender.world
@@ -43,7 +38,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
     }
     val mouseLocator = ClientMain.inst().mouseLocator
 
-    for (entity in entities) {
+    for (entity in worldRender.world.selectedMaterialEntities) {
       val controls = entity.locallyControlledComponentOrNull ?: continue
       val element = entity.selectedItem?.element ?: continue
       val isBreaking = controls.isBreaking(entity)
