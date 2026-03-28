@@ -14,7 +14,6 @@ import no.elg.infiniteBootleg.core.world.ecs.components.InputEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.controlledEntityFamily
-import no.elg.infiniteBootleg.core.world.ecs.controlledEntityWithInputEventFamily
 import no.elg.infiniteBootleg.core.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.core.world.ecs.entityWithPhysicsEventFamily
 import no.elg.infiniteBootleg.core.world.ecs.followEntityFamily
@@ -63,8 +62,7 @@ val CONTROLLED_CLIENT_PLAYER_FAMILIES: Array<Pair<Family, String>> = arrayOf(
   localPlayerFamily to "localPlayerFamily",
   controlledEntityFamily to "controlledEntityFamily",
   followEntityFamily to "followEntityFamily",
-  entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily",
-  controlledEntityWithInputEventFamily to "controlledEntityWithInputEventFamily"
+  entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily"
 )
 
 private fun EntityKt.Dsl.addCommonPlayerComponentsProto(

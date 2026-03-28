@@ -107,29 +107,27 @@ val playerFamily: Family = allOf(*PLAYERS_ENTITY_ARRAY).get()
 val localPlayerFamily: Family = allOf(
   *PLAYERS_ENTITY_ARRAY,
   *INVENTORY_COMPONENTS,
-  GroundedComponent::class,
-  LocallyControlledComponent::class,
+  *CONTROLLED_STANDALONE_ENTITY,
   FollowedByCameraTag::class,
   TextureRegionNameComponent::class,
-  InputEventQueueComponent::class,
-  PhysicsEventQueueComponent::class
+  PhysicsEventQueueComponent::class,
+  HotbarComponent::class
 ).get()
 
 val basicRequiredEntityFamily: Family = allOf(*REQUIRED_COMPONENTS).get()
 val basicRequiredEntityFamilyToSendToClient: Family = allOf(*REQUIRED_COMPONENTS).getExcluding(AuthoritativeOnlyTag::class)
 val basicStandaloneEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY).get()
 val drawableEntitiesFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, TextureRegionNameComponent::class).get()
+val drawableNonMaterialEntitiesFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, TextureRegionNameComponent::class).exclude(MaterialComponent::class).get()
+val drawableMaterialEntitiesFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, TextureRegionNameComponent::class, MaterialComponent::class).get()
 val selectedMaterialComponentFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, *INVENTORY_COMPONENTS).get()
 val basicDynamicEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY).get()
 
 val followEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, FollowedByCameraTag::class).get()
 val controlledEntityFamily: Family = allOf(*CONTROLLED_STANDALONE_ENTITY).get()
+val groundedEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, GroundedComponent::class).get()
 
-val controlledEntityWithInputEventFamily: Family = allOf(*CONTROLLED_STANDALONE_ENTITY, InputEventQueueComponent::class).get()
-val entityWithPhysicsEventFamily: Family = allOf(
-  *BASIC_STANDALONE_ENTITY,
-  PhysicsEventQueueComponent::class
-).get()
+val entityWithPhysicsEventFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, PhysicsEventQueueComponent::class).get()
 
 val spellEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, TextureRegionNameComponent::class, SpellStateComponent::class).get()
 val namedEntitiesFamily: Family = allOf(*REQUIRED_COMPONENTS, NameComponent::class).get()

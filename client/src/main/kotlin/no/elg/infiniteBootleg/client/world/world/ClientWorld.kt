@@ -19,8 +19,10 @@ import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEntitySet
 import no.elg.infiniteBootleg.core.world.ecs.drawableMaterialEntitiesFamily
 import no.elg.infiniteBootleg.core.world.ecs.drawableNonMaterialEntitiesFamily
+import no.elg.infiniteBootleg.core.world.ecs.groundedEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.core.world.ecs.selectedMaterialComponentFamily
+import no.elg.infiniteBootleg.core.world.ecs.spellEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsEventSystem
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.core.world.world.World
@@ -60,11 +62,19 @@ abstract class ClientWorld : World {
   private lateinit var drawableMaterialEntitySet: ThreadSafeEntitySet
   val drawableMaterialEntities: Set<Entity> get() = drawableMaterialEntitySet.entities
 
+  private lateinit var spellEntitySet: ThreadSafeEntitySet
+  val spellEntities: Set<Entity> get() = spellEntitySet.entities
+
+  private lateinit var groundedEntitySet: ThreadSafeEntitySet
+  val groundedEntities: Set<Entity> get() = groundedEntitySet.entities
+
   override fun addEntityListeners(engine: Engine) {
     controlledPlayerEntitySet = ThreadSafeEntitySet(engine, localPlayerFamily)
     selectedMaterialEntitySet = ThreadSafeEntitySet(engine, selectedMaterialComponentFamily)
     drawableNonMaterialEntitySet = ThreadSafeEntitySet(engine, drawableNonMaterialEntitiesFamily)
     drawableMaterialEntitySet = ThreadSafeEntitySet(engine, drawableMaterialEntitiesFamily)
+    spellEntitySet = ThreadSafeEntitySet(engine, spellEntityFamily)
+    groundedEntitySet = ThreadSafeEntitySet(engine, groundedEntityFamily)
   }
 
   override fun additionalSystems() =

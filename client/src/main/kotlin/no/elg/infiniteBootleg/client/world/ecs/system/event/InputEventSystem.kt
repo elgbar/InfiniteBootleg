@@ -39,14 +39,14 @@ import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponen
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.flying
-import no.elg.infiniteBootleg.core.world.ecs.controlledEntityWithInputEventFamily
+import no.elg.infiniteBootleg.core.world.ecs.controlledEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.system.api.EventSystem
 import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.math.sign
 
 object InputEventSystem : EventSystem<InputEvent, InputEventQueueComponent>(
-  controlledEntityWithInputEventFamily,
+  controlledEntityFamily,
   InputEvent::class,
   InputEventQueueComponent.mapper
 ) {

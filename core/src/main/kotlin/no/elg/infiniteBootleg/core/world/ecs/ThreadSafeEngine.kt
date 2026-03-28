@@ -145,19 +145,11 @@ class ThreadSafeEngine :
     return super.getSystems()
   }
 
+  // NOTE! Use ThreadSafeEntitySet if accessing entities outside the physics thread
+  // this method returns ImmutableArray which ARE modifiable and CAN cause crashes if updated while iterated!
   override fun getEntitiesFor(family: Family): ImmutableArray<Entity> {
     assertOnPhysicsThread()
-    synchronized(entityFamilyCache) {
-      val entities = entityFamilyCache.get(family)
-      if (entities != null) {
-        return entities
-      }
-    }
-    val entities = super.getEntitiesFor(family)
-    synchronized(entityFamilyCache) {
-      entityFamilyCache.put(family, entities)
-    }
-    return entities
+    return super.getEntitiesFor(family)
   }
 
   override fun addEntityListener(listener: EntityListener) {

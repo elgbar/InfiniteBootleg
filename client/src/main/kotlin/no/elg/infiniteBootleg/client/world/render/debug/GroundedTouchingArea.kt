@@ -9,7 +9,6 @@ import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent.Companion.groundedComponent
-import no.elg.infiniteBootleg.core.world.ecs.controlledEntityFamily
 import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion
 
 class GroundedTouchingArea(worldRender: ClientWorldRender) : SingleBlockDebugRenderer<List<GroundedComponent>>(worldRender) {
@@ -23,7 +22,7 @@ class GroundedTouchingArea(worldRender: ClientWorldRender) : SingleBlockDebugRen
     get() = ClientMain.inst().assets.whiteTexture
 
   override fun beforeAllRender(batch: Batch): List<GroundedComponent>? {
-    val entities: Array<Entity> = ClientMain.inst().engine?.getEntitiesFor(controlledEntityFamily)?.toArray<Entity>(Entity::class.java) ?: return null
+    val entities: Set<Entity> = worldRender.world.groundedEntities
     return if (entities.isEmpty()) null else entities.map { it.groundedComponent }
   }
 

@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.client.world.render
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.utils.ImmutableArray
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.core.api.Renderer
 import no.elg.infiniteBootleg.core.util.isNotAir
@@ -14,12 +13,9 @@ import no.elg.infiniteBootleg.core.world.box2d.extensions.x
 import no.elg.infiniteBootleg.core.world.box2d.extensions.y
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.SpellStateComponent.Companion.spellStateComponentOrNull
-import no.elg.infiniteBootleg.core.world.ecs.spellEntityFamily
 import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker
 
 class FuturePositionRenderer(private val worldRender: ClientWorldRender) : Renderer {
-
-  private val entities: ImmutableArray<Entity> = worldRender.world.engine.getEntitiesFor(spellEntityFamily)
 
   @Suppress("NOTHING_TO_INLINE")
   private inline fun futurePoint(startingPos: Double, startingVel: Double, gravity: Double, n: Double): Double {
@@ -32,7 +28,7 @@ class FuturePositionRenderer(private val worldRender: ClientWorldRender) : Rende
   override fun render() {
     if (enabled) {
       worldRender.batch.withColor(a = .75f) {
-        for (entity: Entity in entities) {
+        for (entity: Entity in worldRender.world.spellEntities) {
           val box2dComp = entity.box2d
           val body = box2dComp.body
           val spawn = entity.spellStateComponentOrNull ?: continue
