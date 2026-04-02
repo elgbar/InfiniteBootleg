@@ -84,7 +84,7 @@ subprojects {
   java {
     toolchain {
       // when updating also run updateDaemonJvm
-      languageVersion = JavaLanguageVersion.of(24)
+      languageVersion = JavaLanguageVersion.of(25)
     }
   }
 
@@ -96,7 +96,7 @@ subprojects {
 
   tasks.withType<KotlinCompilationTask<*>> {
     compilerOptions {
-      languageVersion.set(KotlinVersion.KOTLIN_2_3)
+      languageVersion.set(KotlinVersion.KOTLIN_2_4)
       progressiveMode.set(true)
       extraWarnings.set(false)
       optIn.add("kotlin.contracts.ExperimentalContracts")
