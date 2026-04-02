@@ -66,6 +66,7 @@ import no.elg.infiniteBootleg.protobuf.disconnectOrNull
 import no.elg.infiniteBootleg.protobuf.loginOrNull
 import no.elg.infiniteBootleg.protobuf.lookDirectionOrNull
 import no.elg.infiniteBootleg.protobuf.moveEntityOrNull
+import no.elg.infiniteBootleg.protobuf.secret
 import no.elg.infiniteBootleg.protobuf.secretExchangeOrNull
 import no.elg.infiniteBootleg.protobuf.updateBlockOrNull
 import no.elg.infiniteBootleg.protobuf.updateSelectedSlotOrNull
@@ -316,8 +317,13 @@ private fun physicsHandleLoginPacket(ctx: ChannelHandlerContextWrapper, login: P
   // Client is good to login (informational packet)
   ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(Packets.ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
 
-  val secret = UUID.nameUUIDFromBytes(ByteArray(128).also { secureRandom.nextBytes(it) })
-  val sharedInformation = SharedInformation(entityId, secret.toString())
+  val secret = UUID.nameUUIDFromBytes(ByteArray(128).also { secureRandom.nextBytes(it) }).let {
+    secret {
+      msb = it.mostSignificantBits
+      lsb = it.leastSignificantBits
+    }
+  }
+  val sharedInformation = SharedInformation(entityId, secret)
   ServerBoundHandler.clients[ctx.channel()] = sharedInformation
 
   ServerWorldLoader.spawnServerPlayer(world, entityId, username, sharedInformation).orTimeout(10, TimeUnit.SECONDS).whenComplete { _, ex ->

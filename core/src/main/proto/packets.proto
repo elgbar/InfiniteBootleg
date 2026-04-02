@@ -7,6 +7,11 @@ option java_multiple_files = false;
 option java_package = "no.elg.infiniteBootleg.protobuf";
 option java_outer_classname = "Packets";
 
+message Secret{
+  uint64 msb = 1;
+  uint64 lsb = 2;
+}
+
 message Packet {
   // There are three types of packets
   // 1. DX (duplex) Sent both to server and to client
@@ -44,7 +49,8 @@ message Packet {
 
   Type type = 1;
   Direction direction = 2;
-  optional string secret = 3; //Only optional before sharing the secret
+  //Only optional before sharing the secret
+  optional Secret secret = 3;
 
   //very frequent packets
   optional Heartbeat heartbeat = 8; //dual
@@ -97,7 +103,7 @@ message Disconnect {
 
 message SecretExchange{
   .persistence.EntityRef ref = 1;
-  string secret = 2;
+  Secret secret = 2;
 }
 
 //if not present, do not update setting

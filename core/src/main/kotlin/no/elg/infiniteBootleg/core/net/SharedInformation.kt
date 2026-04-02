@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.core.net
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
+import no.elg.infiniteBootleg.protobuf.Packets
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ScheduledFuture
@@ -12,7 +13,7 @@ import java.util.concurrent.ScheduledFuture
  *
  * @author Elg
  */
-data class SharedInformation(val entityId: String, val secret: String) {
+data class SharedInformation(val entityId: String, val secret: Packets.Secret) {
 
   private var lastHeartbeat: Instant = Instant.now()
 
