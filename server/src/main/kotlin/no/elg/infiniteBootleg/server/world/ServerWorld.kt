@@ -29,6 +29,7 @@ import no.elg.infiniteBootleg.server.net.despawnEntity
 import no.elg.infiniteBootleg.server.world.ecs.system.BroadcastMovingPlayerPositions
 import no.elg.infiniteBootleg.server.world.ecs.system.BroadcastPeriodicPlayerPositions
 import no.elg.infiniteBootleg.server.world.ecs.system.CenterViewOnEntity
+import no.elg.infiniteBootleg.server.world.ecs.system.InViewFamily
 import no.elg.infiniteBootleg.server.world.ecs.system.KickPlayerWithoutChannel
 import no.elg.infiniteBootleg.server.world.loader.ServerWorldLoader
 import no.elg.infiniteBootleg.server.world.render.HeadlessWorldRenderer
@@ -49,6 +50,9 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
 
   private lateinit var validEntitiesToSendToClientSet: ThreadSafeEntitySet
   val validEntitiesToSendToClient: Set<Entity> get() = validEntitiesToSendToClientSet.entities
+
+  private lateinit var inViewEntitiesSet: ThreadSafeEntitySet
+  val inViewEntities: Set<Entity> = inViewEntitiesSet.entities
 
   override fun initialize() {
     super.initialize()
@@ -80,6 +84,8 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
 
   override fun addEntityListeners(engine: Engine) {
     validEntitiesToSendToClientSet = ThreadSafeEntitySet(engine, basicRequiredEntityFamilyToSendToClient)
+    inViewEntitiesSet = ThreadSafeEntitySet(engine, InViewFamily)
+
     engine.addEntityListener(
       basicDynamicEntityFamily,
       object : EntityListener {
