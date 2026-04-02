@@ -1,6 +1,5 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.google.protobuf.gradle.GenerateProtoTask
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
@@ -84,7 +83,7 @@ subprojects {
   java {
     toolchain {
       // when updating also run updateDaemonJvm
-      languageVersion = JavaLanguageVersion.of(25)
+      languageVersion = JavaLanguageVersion.of(26)
     }
   }
 
@@ -96,7 +95,7 @@ subprojects {
 
   tasks.withType<KotlinCompilationTask<*>> {
     compilerOptions {
-      languageVersion.set(KotlinVersion.KOTLIN_2_4)
+      languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_5)
       progressiveMode.set(true)
       extraWarnings.set(false)
       optIn.add("kotlin.contracts.ExperimentalContracts")
