@@ -188,8 +188,8 @@ private fun ServerClient.handleWorldSettings(worldSettings: WorldSettings) {
 
 private fun ServerClient.handleSecretExchange(secretExchange: SecretExchange) {
   val id = secretExchange.ref.id
-  if (id.isEmpty() || secretExchange.secret.isEmpty()) {
-    ctx.fatal("Entity id nor secret can be empty")
+  if (id.isEmpty()) {
+    ctx.fatal("Entity id can not be empty")
   }
   val sharedInformation = SharedInformation(id, secretExchange.secret)
   this.sharedInformation = sharedInformation
