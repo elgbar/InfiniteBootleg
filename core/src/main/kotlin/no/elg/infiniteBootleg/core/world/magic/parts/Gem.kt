@@ -2,8 +2,8 @@ package no.elg.infiniteBootleg.core.world.magic.parts
 
 import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.core.util.breakableLocs
 import no.elg.infiniteBootleg.core.util.toTitleCase
+import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.magic.Description
@@ -58,7 +58,7 @@ data object Diamond : GemType {
     val world = spellEntity.world
     val pos = spellEntity.positionComponent
 
-    val breakableBlocks = spellEntity.breakableLocs(world, pos.blockX, pos.blockY, breakRadius.toFloat(), state.spellRange.toFloat()).asIterable()
+    val breakableBlocks = Tool.Pickaxe.breakableLocs(spellEntity, world, pos.blockX, pos.blockY, breakRadius.toFloat(), state.spellRange.toFloat()).asIterable()
     world.removeBlocks(breakableBlocks, state.caster)
   }
 }
