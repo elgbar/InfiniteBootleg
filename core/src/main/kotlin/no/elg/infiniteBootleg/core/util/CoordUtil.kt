@@ -186,7 +186,13 @@ inline fun worldXYtoChunkCompactLoc(worldX: WorldCoord, worldY: WorldCoord): Chu
  * @return A long containing both the x and y int
  */
 @Contract(pure = true)
-inline fun compactInt(x: Int, y: Int): Compacted2Int = x.toLong() shl Integer.SIZE or (y.toLong() and 0xffffffffL)
+inline fun compactInt(x: Int, y: Int): Compacted2Int = compactIntX(x) or compactIntY(y)
+
+@Contract(pure = true)
+inline fun compactIntX(x: Int): Long = x.toLong() shl Integer.SIZE
+
+@Contract(pure = true)
+inline fun compactIntY(y: Int): Long = y.toLong() and 0xffffffffL
 
 /**
  * An int have 32 bits and long 64, we can store two ints inside a long
@@ -208,7 +214,13 @@ inline fun compactFloat(x: Float, y: Float): Compacted2Float = compactInt(x.toRa
  * @return A long containing both the x and y int
  */
 @Contract(pure = true)
-inline fun compactLong(x: Long, y: Long): Compacted2Int = x shl Integer.SIZE or (y and 0xffffffffL)
+inline fun compactLong(x: Long, y: Long): Compacted2Int = compactLongX(x) or compactLongY(y)
+
+@Contract(pure = true)
+inline fun compactLongX(x: Long): Long = x shl Integer.SIZE
+
+@Contract(pure = true)
+inline fun compactLongY(y: Long): Long = y and 0xffffffffL
 
 /**
  * @param this@decompactLocX A long created by [compactFloat]
@@ -349,6 +361,13 @@ inline fun distCubed(x1: Int, y1: Int, x2: Int, y2: Int): Compacted2Int = (x2 - 
 @Contract(pure = true)
 inline fun distCubed(x1: Double, y1: Double, x2: Double, y2: Double): Double = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
 
+/**
+ * @return The center of the block for this coordinate
+ */
+inline fun WorldCoord.centerOfBlock(): WorldCoordDouble = this + HALF_BLOCK_SIZE_D
+inline fun WorldCoordDouble.centerOfBlock(): WorldCoordDouble = this + HALF_BLOCK_SIZE_D
+inline fun WorldCoordFloat.centerOfBlock(): WorldCoordDouble = this + HALF_BLOCK_SIZE_D
+
 typealias Progress = Float
 
 /**
@@ -380,6 +399,10 @@ typealias ChunkCoord = Int
 typealias LocalCoordFloat = Float
 typealias WorldCoordFloat = Float
 typealias ChunkCoordFloat = Float
+
+typealias LocalCoordDouble = Double
+typealias WorldCoordDouble = Double
+typealias ChunkCoordDouble = Double
 
 /** number of blocks **/
 typealias BlockUnitF = Float

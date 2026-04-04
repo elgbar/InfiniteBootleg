@@ -5,16 +5,15 @@ import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.world.textureRegion
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.api.Renderer
-import no.elg.infiniteBootleg.core.items.ItemType
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.util.Progress
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
-import no.elg.infiniteBootleg.core.util.breakableLocs
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.placeableBlocks
 import no.elg.infiniteBootleg.core.util.withColor
 import no.elg.infiniteBootleg.core.world.Material
+import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
@@ -44,8 +43,8 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
       val isBreaking = controls.isBreaking(entity)
       val breakingComponent = entity.currentlyBreakingComponentOrNull
 
-      if (element.itemType == ItemType.TOOL) {
-        val breakableBlocks = entity.breakableLocs(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
+      if (element is Tool) {
+        val breakableBlocks = element.breakableLocs(entity, world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
         if (breakableBlocks.none()) {
           renderPlaceableBlock(world, ClientMain.inst().assets.canNotBreakTexture, mouseLocator.mouseBlockCompactLoc)
         } else {

@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
+import no.elg.infiniteBootleg.core.items.ToolItem
 import no.elg.infiniteBootleg.core.util.ProgressHandler
 import no.elg.infiniteBootleg.core.util.toVector2i
 import no.elg.infiniteBootleg.core.world.blocks.Block
@@ -26,11 +27,19 @@ class CurrentlyBreakingComponent : DebuggableComponent {
     var Entity.currentlyBreakingComponentOrNull by optionalPropertyFor(mapper)
   }
 
-  data class CurrentlyBreaking(val block: Block, val progressHandler: ProgressHandler = ProgressHandler(block.material.hardness, Interpolation.linear, 0f, 1f)) {
+  data class CurrentlyBreaking(
+    val block: Block,
+    val item: ToolItem,
+    val progressHandler: ProgressHandler = ProgressHandler(block.material.hardness, Interpolation.linear, 0f, 1f)
+  ) {
     fun toBreakingProgress(zeroProgress: Boolean): Packets.BreakingBlock.BreakingProgress =
       breakingProgress {
         blockLocation = block.compactWorldLoc.toVector2i()
         progress = if (zeroProgress) 0f else progressHandler.progress
       }
+
+    private val modifier: Float = if (block.material.category in item.element.effectiveAgainst) item.element.effectiveEfficiency else item.element.notEffectiveEfficiency
+
+    fun update(delta: Float): Boolean = progressHandler.update(delta * modifier)
   }
 }

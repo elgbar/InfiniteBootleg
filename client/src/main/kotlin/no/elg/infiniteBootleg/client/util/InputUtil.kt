@@ -9,7 +9,6 @@ import no.elg.infiniteBootleg.client.input.MouseLocator
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.events.api.ThreadType
-import no.elg.infiniteBootleg.core.util.breakableLocs
 import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.dstd
 import no.elg.infiniteBootleg.core.util.placeableBlocks
@@ -57,7 +56,8 @@ fun breakBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean =
     if (element is Tool) {
       if (canNotInteract(worldEntity, blockX, blockY) || entity.locallyControlledComponentOrNull?.instantBreak == false) return false
       val locallyControlledComponent = entity.locallyControlledComponent
-      val breakableBlocks = entity.breakableLocs(world, blockX, blockY, locallyControlledComponent.brushSize, locallyControlledComponent.interactRadius).asIterable()
+      val breakableBlocks =
+        element.breakableLocs(entity, world, blockX, blockY, locallyControlledComponent.brushSize, locallyControlledComponent.interactRadius).asIterable()
       world.removeBlocks(breakableBlocks, entity)
     }
     return true

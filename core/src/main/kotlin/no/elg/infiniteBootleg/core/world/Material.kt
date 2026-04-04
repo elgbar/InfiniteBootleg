@@ -98,6 +98,8 @@ sealed interface Material : ContainerElement {
    */
   val canBeCreated: ((world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material) -> Boolean) get() = CAN_ALWAYS_BE_CREATED
 
+  val category: MaterialCategory?
+
   override val itemType: ItemType get() = ItemType.BLOCK
   override fun toItem(maxStock: UInt, stock: UInt): MaterialItem = MaterialItem(this, maxStock, stock)
 //  val textureName: String? get() = if (canBeHandled) if (customTextureName != null) customTextureName else this::class.simpleName. else null
@@ -109,32 +111,38 @@ sealed interface Material : ContainerElement {
     override val blocksLight get() = false
     override val invisibleBlock get() = true
     override val canBeHandled get() = false
+    override val category: MaterialCategory? get() = null
   }
 
   object Stone : Material, TexturedContainerElement {
     override val hardness get() = 1.5f
     override val textureName: String get() = "stone"
+    override val category: MaterialCategory get() = PLAIN_ROCK
   }
 
   object Brick : Material, TexturedContainerElement {
     override val hardness get() = 2f
     override val textureName: String get() = "brick"
+    override val category: MaterialCategory get() = PLAIN_ROCK
   }
 
   object Dirt : Material, TexturedContainerElement {
     override val hardness get() = 1f
     override val textureName: String get() = "dirt"
+    override val category: MaterialCategory get() = SOIL
   }
 
   object Grass : Material, TexturedContainerElement {
     override val hardness get() = 0.8f
     override val lightOpacity: Float get() = 0.15f
     override val textureName: String get() = "grass"
+    override val category: MaterialCategory get() = SOIL
   }
 
   object Tnt : Material, TexturedContainerElement {
     override val hardness get() = 0.5f
     override val textureName: String get() = "tnt"
+    override val category: MaterialCategory get() = CRAFTED
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createBlockEntity(world, worldX, worldY, material, arrayOf(explosiveBlockFamily to "explosiveBlockFamily")) {
         safeWith { ExplosiveComponent() }
@@ -149,6 +157,7 @@ sealed interface Material : ContainerElement {
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createGravityAffectedBlockEntity(world, worldX, worldY, material)
     }
+    override val category: MaterialCategory get() = SOIL
   }
 
   object Torch : Material, TexturedContainerElement {
@@ -158,6 +167,7 @@ sealed interface Material : ContainerElement {
     override val isCollidable get() = false
     override val blocksLight get() = false
     override val lightColor: Color = Color.valueOf("#FFE4CE") // 5000k ish
+    override val category: MaterialCategory get() = CRAFTED
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createGravityAffectedBlockEntity(world, worldX, worldY, material)
     }
@@ -170,6 +180,7 @@ sealed interface Material : ContainerElement {
     override val isCollidable get() = false
     override val blocksLight get() = false
     override val lightColor: Color get() = Color.RED
+    override val category: MaterialCategory get() = CRAFTED
   }
 
   object TorchStillGreen : Material, TexturedContainerElement {
@@ -179,6 +190,7 @@ sealed interface Material : ContainerElement {
     override val isCollidable get() = false
     override val blocksLight get() = false
     override val lightColor: Color get() = Color.GREEN
+    override val category: MaterialCategory get() = CRAFTED
   }
 
   object TorchStillBlue : Material, TexturedContainerElement {
@@ -188,6 +200,7 @@ sealed interface Material : ContainerElement {
     override val isCollidable get() = false
     override val blocksLight get() = false
     override val lightColor: Color get() = Color.BLUE
+    override val category: MaterialCategory get() = CRAFTED
   }
 
   object Glass : Material, TexturedContainerElement {
@@ -195,6 +208,7 @@ sealed interface Material : ContainerElement {
     override val textureName: String get() = "glass"
     override val hasTransparentTexture get() = true
     override val blocksLight get() = false
+    override val category: MaterialCategory get() = CRAFTED
   }
 
   object Door : Material, TexturedContainerElement {
@@ -204,6 +218,7 @@ sealed interface Material : ContainerElement {
     override val isCollidable get() = false
     override val blocksLight get() = false
     override val invisibleBlock get() = true
+    override val category: MaterialCategory get() = CRAFTED
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createDoorBlockEntity(world, worldX, worldY, material)
     }
@@ -229,6 +244,7 @@ sealed interface Material : ContainerElement {
     override val hasTransparentTexture get() = true
     override val isCollidable get() = false
     override val blocksLight get() = false
+    override val category: MaterialCategory get() = ORGANIC
   }
 
   object BirchLeaves : Material, TexturedContainerElement {
@@ -238,6 +254,7 @@ sealed interface Material : ContainerElement {
     override val isCollidable get() = false
     override val blocksLight get() = false
     override val lightOpacity get() = 0.1f
+    override val category: MaterialCategory get() = ORGANIC
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createLeafEntity(world, worldX, worldY, material)
     }
@@ -246,11 +263,13 @@ sealed interface Material : ContainerElement {
   object Sandstone : Material, TexturedContainerElement {
     override val hardness get() = 1f
     override val textureName: String get() = "sandstone"
+    override val category: MaterialCategory get() = PLAIN_ROCK
   }
 
   object Container : Material, TexturedContainerElement {
     override val hardness get() = 1f
     override val textureName: String get() = "container"
+    override val category: MaterialCategory get() = CRAFTED
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createContainerEntity(world, worldX, worldY, material)
     }
@@ -259,21 +278,25 @@ sealed interface Material : ContainerElement {
   object CoalOre : Material, TexturedContainerElement {
     override val hardness get() = 1.25f
     override val textureName: String get() = "coal_ore"
+    override val category: MaterialCategory get() = ORE
   }
 
   object CopperOre : Material, TexturedContainerElement {
     override val hardness get() = 2f
     override val textureName: String get() = "copper_ore"
+    override val category: MaterialCategory get() = ORE
   }
 
   object IronOre : Material, TexturedContainerElement {
     override val hardness get() = 3f
     override val textureName: String get() = "iron_ore"
+    override val category: MaterialCategory get() = ORE
   }
 
   object GoldOre : Material, TexturedContainerElement {
     override val hardness get() = 1f
     override val textureName: String get() = "gold_ore"
+    override val category: MaterialCategory get() = ORE
   }
 
   /**

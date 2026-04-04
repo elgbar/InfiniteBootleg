@@ -22,11 +22,11 @@ data class ChunkColumnUpdatedEvent(val chunkX: ChunkCoord, val localX: LocalCoor
    * All world locations from the old top coordinate to the new top coordinate, including the new changed coordinates
    */
   val calculatedDiffColumn: WorldCompactLocArray by lazy {
-    val worldX = chunkX.chunkToWorld(localX)
-    val minY = min(oldTopWorldY, newTopWorldY).toFloat()
-    val maxY = max(oldTopWorldY, newTopWorldY).toFloat()
+    val worldX = chunkX.chunkToWorld(localX).toDouble()
+    val minY = min(oldTopWorldY, newTopWorldY).toDouble()
+    val maxY = max(oldTopWorldY, newTopWorldY).toDouble()
     val offset = maxY - minY
-    World.getLocationsAABBFromCorner(worldX.toFloat(), maxY, 0f, offset)
+    World.getLocationsAABBFromCorner(worldX, maxY, 0.0, offset)
   }
   override val reason: String
     get() = "Chunk column updated with flag ${ChunkColumn.Companion.FeatureFlag.featureFlagToString(flag)}"

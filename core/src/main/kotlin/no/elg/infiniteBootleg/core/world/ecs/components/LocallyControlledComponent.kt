@@ -26,6 +26,9 @@ data class LocallyControlledComponent(
 ) : EntitySavableComponent,
   AuthoritativeOnlyComponent {
 
+  /**
+   * Bare minimum check if we are breaking a block
+   */
   fun isBreaking(entity: Entity) = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT) && entity.selectedItem?.element is Tool
 
   override fun hudDebug(): String = "brush size: $brushSize, interactRadius: $interactRadius, instantBreak: $instantBreak"

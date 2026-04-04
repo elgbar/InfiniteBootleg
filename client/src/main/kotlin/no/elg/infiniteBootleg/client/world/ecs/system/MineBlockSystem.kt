@@ -5,10 +5,10 @@ import com.badlogic.ashley.systems.IteratingSystem
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.util.inputMouseLocator
+import no.elg.infiniteBootleg.core.items.ToolItem
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.net.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.core.net.serverBoundBreakingBlock
-import no.elg.infiniteBootleg.core.util.breakableLocs
 import no.elg.infiniteBootleg.core.util.isValid
 import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.safeWith
@@ -46,16 +46,20 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
       return
     }
 
+    val breakingItem: ToolItem = entity.selectedItem as? ToolItem ?: return
+    val breakingTool: Tool = breakingItem.element
+
     val breakingComponent = entity.currentlyBreakingComponentOrNull ?: entity.safeWith { CurrentlyBreakingComponent() } ?: return
     val world = entity.world
-    val currentLocs = entity
-      .breakableLocs(world, inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
+    val currentLocs = breakingTool
+      .breakableLocs(entity, world, inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
 
     val evaluatedCurrentLocs = if (breakingComponent.breaking.isNotEmpty()) {
       // must be a set otherwise it kills the performance
       val currentLocsSet = LongOpenHashSet(currentLocs.iterator())
       breakingComponent.breaking.long2ObjectEntrySet().removeIf { (loc, breaking) ->
-        loc !in currentLocsSet || world.getMaterial(loc) != breaking.block.material
+        // remove progress if its no longer in range, no longer the same material, or the held item changed
+        loc !in currentLocsSet || world.getMaterial(loc) != breaking.block.material || breakingItem != breaking.item
       }
       // we might as well use the result of the forced set above to save some duplicate work
       currentLocsSet.asSequence()
@@ -67,33 +71,35 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
       .filterNot { breakingComponent.breaking.containsKey(it) }
       .mapNotNull { world.getBlock(it) }
       .forEach { block ->
-        breakingComponent.breaking.put(block.compactWorldLoc, CurrentlyBreakingComponent.CurrentlyBreaking(block))
+        breakingComponent.breaking.put(block.compactWorldLoc, CurrentlyBreakingComponent.CurrentlyBreaking(block, breakingItem))
       }
 
     val justMined = breakingComponent.breaking.values
       .asSequence()
-      .filter { breaking -> breaking.progressHandler.update(deltaTime) }
+      .filter { breaking -> breaking.update(deltaTime) }
       .mapTo(LongOpenHashSet()) { it.block.compactWorldLoc }
 
     breakingComponent.sendCurrentProgress()
 
     launchOnMultithreadedAsyncSuspendable {
       if (entity.isValid) {
-        val selectedItem = entity.selectedItem?.element as? Tool ?: return@launchOnMultithreadedAsyncSuspendable
-        val container = entity.containerOrNull ?: return@launchOnMultithreadedAsyncSuspendable
-        val justMinedSize = justMined.size
-        val justMinedBlockSizeU = justMinedSize.toUInt()
+        if (justMined.isNotEmpty()) {
+          val selectedItem = entity.selectedItem?.element as? Tool ?: return@launchOnMultithreadedAsyncSuspendable
+          val container = entity.containerOrNull ?: return@launchOnMultithreadedAsyncSuspendable
+          val justMinedSize = justMined.size
+          val justMinedBlockSizeU = justMinedSize.toUInt()
 
-        val toolCount = container.count(selectedItem)
-        val canBeRemoved = toolCount.coerceAtMost(justMinedBlockSizeU)
-        val validJustDone = if (toolCount >= justMinedBlockSizeU) {
-          justMined
-        } else {
-          // Just take the number the pickaxe can mine, not more
-          justMined.take(justMinedSize - canBeRemoved.toInt())
+          val toolCount = container.count(selectedItem)
+          val canBeRemoved = toolCount.coerceAtMost(justMinedBlockSizeU)
+          val validJustDone = if (toolCount >= justMinedBlockSizeU) {
+            justMined
+          } else {
+            // Just take the number the pickaxe can mine, not more
+            justMined.take(justMinedSize - canBeRemoved.toInt())
+          }
+          val removed = world.removeBlocks(validJustDone, giveTo = entity, prioritize = true)
+          container.remove(selectedItem, removed.size.toUInt())
         }
-        val removed = world.removeBlocks(validJustDone, giveTo = entity, prioritize = true)
-        container.remove(selectedItem, removed.size.toUInt())
       } else {
         // just in case
         breakingComponent.reset()

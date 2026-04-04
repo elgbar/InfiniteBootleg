@@ -22,15 +22,12 @@ class EntityRemoveListener(private val removeListener: (Entity) -> Unit) : Entit
   override fun entityRemoved(entity: Entity) = removeListener(entity)
 }
 
-fun Entity.interactableBlocks(
-  world: World,
-  centerBlockX: WorldCoord,
-  centerBlockY: WorldCoord,
-  radius: Float,
-  interactionRadius: Float
-): Sequence<WorldCompactLoc> {
+/**
+ * @param interactionRadius How far the entity can reach
+ */
+fun Entity.interactableBlocksWithinRadius(world: World, interactionRadius: Float, baseSeq: Sequence<WorldCompactLoc>): Sequence<WorldCompactLoc> {
   val (worldX, worldY) = positionComponent
-  return World.getLocationsWithin(centerBlockX, centerBlockY, radius).asSequence()
+  return baseSeq
     .filter { worldLoc: WorldCompactLoc -> world.isChunkLoaded(worldLoc.worldToChunk()) }
     .filter { (targetX, targetY) ->
       ignorePlaceableCheck ||
@@ -41,14 +38,6 @@ fun Entity.interactableBlocks(
     }
 }
 
-fun Entity.breakableLocs(
-  world: World,
-  centerBlockX: WorldCoord,
-  centerBlockY: WorldCoord,
-  radius: Float,
-  interactionRadius: Float
-): Sequence<WorldCompactLoc> = interactableBlocks(world, centerBlockX, centerBlockY, radius, interactionRadius).filterNot { world.isAirBlock(it, false) }
-
 fun Entity.placeableBlocks(
   world: World,
   centerBlockX: WorldCoord,
@@ -56,7 +45,7 @@ fun Entity.placeableBlocks(
   interactionRadius: Float,
   material: Material
 ): Sequence<WorldCompactLoc> =
-  interactableBlocks(world, centerBlockX, centerBlockY, 1f, interactionRadius)
+  interactableBlocksWithinRadius(world, interactionRadius, sequenceOf(compactInt(centerBlockX, centerBlockY)))
     .filter { (worldX: WorldCoord, worldY: WorldCoord) ->
       world.isAirBlock(worldX, worldY, loadChunk = false) && material.canBeCreated(world, worldX, worldY, material)
     }
@@ -75,9 +64,9 @@ val Entity.isValid: Boolean get() = !isInvalid
 
 fun Entity.removeSelf(reason: DespawnReason = DespawnReason.UNKNOWN_REASON) = this.world.removeEntity(this, reason)
 
-typealias EntityFlag = Int
-
 object EntityFlags {
+
+  typealias EntityFlag = Int
 
   /**
    * This entity is scheduled for removal, or has been removed.
