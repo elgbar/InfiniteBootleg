@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.world.render.ChunkRenderer
+import no.elg.infiniteBootleg.client.world.render.EntityRenderer.Companion.calcLightSubCell
 import no.elg.infiniteBootleg.client.world.textureRegion
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.Settings
@@ -16,7 +17,6 @@ import no.elg.infiniteBootleg.core.util.fastIntFormat
 import no.elg.infiniteBootleg.core.util.toComponentsString
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.materialOrAir
-import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.LIGHT_RESOLUTION
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.lightMapIndex
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag
@@ -44,17 +44,12 @@ object DebugText {
       .append(" | wtps: ").fastIntFormat(worldTps.toInt(), 2).append(" | ptps: ").fastIntFormat(physicsTps.toInt(), 2)
   }
 
-  fun calcSubCell(coord: Float): Int {
-    val fixedCoord = if (coord < 0f) 1f - (-coord % 1f) else coord % 1f
-    return ((fixedCoord % 1f) * LIGHT_RESOLUTION).toInt()
-  }
-
   fun lights(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
     val localX = mouseBlockX.chunkOffset()
     val localY = mouseBlockY.chunkOffset()
 
-    val rawX = calcSubCell(ClientMain.inst().mouseLocator.mouseWorldX)
-    val rawY = calcSubCell(ClientMain.inst().mouseLocator.mouseWorldY)
+    val rawX = calcLightSubCell(ClientMain.inst().mouseLocator.mouseWorldX)
+    val rawY = calcLightSubCell(ClientMain.inst().mouseLocator.mouseWorldY)
 
     val chunk = world.getChunk(compactInt(mouseBlockX.worldToChunk(), mouseBlockY.worldToChunk()), false)
     val blockLight = chunk?.getBlockLight(localX, localY)

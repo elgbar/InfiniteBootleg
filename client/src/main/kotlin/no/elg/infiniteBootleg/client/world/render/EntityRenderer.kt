@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
 import no.elg.infiniteBootleg.client.main.ClientMain
-import no.elg.infiniteBootleg.client.screens.hud.DebugText.calcSubCell
 import no.elg.infiniteBootleg.client.world.ecs.components.transients.LastServerPositionComponent.Companion.lastServerPositionComponentOrNull
 import no.elg.infiniteBootleg.client.world.ecs.components.transients.RotatableTextureRegionComponent.Companion.rotatableTextureRegion
 import no.elg.infiniteBootleg.client.world.ecs.system.FollowEntitySystem
@@ -26,6 +25,7 @@ import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.core.world.Staff
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.HALF_BLOCK_TEXTURE_SIZE_F
+import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.LIGHT_RESOLUTION
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.lightMapIndex
 import no.elg.infiniteBootleg.core.world.box2d.degrees
 import no.elg.infiniteBootleg.core.world.box2d.extensions.position
@@ -60,6 +60,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
   private val entityLightDebugColor: Color = Color()
   private var entityLightDebugXSubCell: Int = 0
+  private var entityLightDebugYSubCell: Int = 0
 
   private val shapeRenderer: ShapeRenderer = ShapeRenderer().also {
     it.color = Color.GREEN
@@ -95,7 +96,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     return textureRegion
   }
 
-  private fun setupEntityLight(centerPos: Vector2, box2d: Box2DBodyComponent) {
+  private fun setupEntityLight(centerPos: Vector2) {
     if (Settings.renderLight) {
       val blockX = centerPos.x.worldToBlock()
       val blockY = centerPos.y.worldToBlock()
@@ -112,8 +113,9 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
             batch.color = Color.WHITE
           } else if (blockLight.isLit) {
             val v = blockLight.lightMap
-            entityLightDebugXSubCell = calcSubCell(centerPos.x)
-            val lightIndex = lightMapIndex(entityLightDebugXSubCell, 0)
+            entityLightDebugXSubCell = calcLightSubCell(centerPos.x)
+            entityLightDebugYSubCell = calcLightSubCell(centerPos.y)
+            val lightIndex = lightMapIndex(entityLightDebugXSubCell, entityLightDebugYSubCell)
             batch.setColor(v.r[lightIndex], v.g[lightIndex], v.b[lightIndex], 1f)
           } else {
             batch.color = Color.BLACK
@@ -188,7 +190,8 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     if (Settings.debugEntityLight) {
       batch.color = entityLightDebugColor // Make sure we can see the debug light
       val xOffset = entityLightDebugXSubCell * HALF_BLOCK_TEXTURE_SIZE_F
-      batch.draw(ClientMain.inst().assets.whiteTexture.textureRegion, lightVector.x + xOffset, lightVector.y, HALF_BLOCK_TEXTURE_SIZE_F, HALF_BLOCK_TEXTURE_SIZE_F)
+      val yOffset = entityLightDebugYSubCell * HALF_BLOCK_TEXTURE_SIZE_F
+      batch.draw(ClientMain.inst().assets.whiteTexture.textureRegion, lightVector.x + xOffset, lightVector.y + yOffset, HALF_BLOCK_TEXTURE_SIZE_F, HALF_BLOCK_TEXTURE_SIZE_F)
     }
   }
 
@@ -233,7 +236,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       activeScreenY = (centerPos.y - box2d.halfBox2dHeight).worldToScreen()
     }
 
-    setupEntityLight(centerPos, box2d)
+    setupEntityLight(centerPos)
 
     // Draw with a tint if there is one
     entity.tintedComponentOrNull?.also {
@@ -275,5 +278,10 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     val ASHLEY_COLOR = Color(1f, 0f, 0f, 0.33f)
     val BOX2D_COLOR = Color(0f, 0f, 1f, 0.33f)
     val SERVER_COLOR = Color(0f, 1f, 0f, 0.33f)
+
+    fun calcLightSubCell(coord: Float): Int {
+      val fixedCoord = if (coord < 0f) 1f - (-coord % 1f) else coord % 1f
+      return ((fixedCoord % 1f) * LIGHT_RESOLUTION).toInt()
+    }
   }
 }
