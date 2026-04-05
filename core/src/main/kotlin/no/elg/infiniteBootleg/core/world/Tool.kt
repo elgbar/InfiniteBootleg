@@ -79,10 +79,10 @@ sealed interface Tool : TexturedContainerElement {
 
   object Broadaxe : Tool {
     override val textureName: String = "papp"
-    override val effectiveAgainst: Set<MaterialCategory> = setOf(MaterialCategory.PLAIN_ROCK)
+    override val effectiveAgainst: Set<MaterialCategory> = setOf(MaterialCategory.PLAIN_ROCK, MaterialCategory.SOIL, MaterialCategory.ORGANIC)
     override val destroyIneffectiveAgainst: Boolean get() = true
     override val effectiveEfficiency: Float get() = 2f
-    override val ineffectiveEfficiency: Float get() = 0.5f
+    override val ineffectiveEfficiency: Float get() = 0.25f
 
     private const val OFFSET_Y: Double = 3 - 1.0 // always 3 blocks high, to calculate offset we remove one
 
