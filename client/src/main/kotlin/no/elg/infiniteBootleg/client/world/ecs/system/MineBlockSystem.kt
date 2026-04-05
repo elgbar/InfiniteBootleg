@@ -104,7 +104,7 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
           } else {
             // Just take the number the tool can break, not more
             val canBeRemoved = toolCount.coerceAtMost(justMinedGiveSize)
-            justMinedGive.take((justMinedGiveSize - canBeRemoved).toInt())
+            justMinedGive.take(canBeRemoved.toInt())
           }
           val removedGiven = world.removeBlocks(validJustMinedGive, giveTo = entity, prioritize = true)
 
@@ -116,7 +116,7 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
           } else {
             // Just take the number the tool can break, not more
             val canBeRemoved = updatedToolCount.coerceAtMost(justMinedDiscardSize)
-            justMinedDiscard.take((justMinedDiscardSize - canBeRemoved).toInt())
+            justMinedDiscard.take((canBeRemoved).toInt())
           }
           val removedDiscard = world.removeBlocks(validJustDoneDiscard, prioritize = true)
 

@@ -47,8 +47,8 @@ class CurrentlyBreakingComponent : DebuggableComponent {
       val broken = progressHandler.update(delta * modifier)
       return when {
         !broken -> CONTINUE_BREAKING
-        broken && isEffective -> BROKEN_GIVE_BLOCK
-        broken && !item.element.destroyIneffectiveAgainst -> BROKEN_GIVE_BLOCK
+        isEffective -> BROKEN_GIVE_BLOCK
+        !item.element.destroyIneffectiveAgainst -> BROKEN_GIVE_BLOCK
         else -> BROKEN_DISCARD_BLOCK
       }
     }
