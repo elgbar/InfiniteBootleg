@@ -135,13 +135,12 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
    * @return attenuation in [0.0, 1.0] where 1.0 = no occlusion, 0.0 = fully blocked
    */
   private fun computeRayAttenuation(srcX: Double, srcY: Double, dstX: Double, dstY: Double): Float {
-    val cellSize = 1.0 / LIGHT_RESOLUTION
 
     // Convert to subcell grid coordinates
-    val srcCellX = floor(srcX / cellSize).toInt()
-    val srcCellY = floor(srcY / cellSize).toInt()
-    val dstCellX = floor(dstX / cellSize).toInt()
-    val dstCellY = floor(dstY / cellSize).toInt()
+    val srcCellX = floor(srcX / LIGHT_CELL_SIZE).toInt()
+    val srcCellY = floor(srcY / LIGHT_CELL_SIZE).toInt()
+    val dstCellX = floor(dstX / LIGHT_CELL_SIZE).toInt()
+    val dstCellY = floor(dstY / LIGHT_CELL_SIZE).toInt()
 
     if (srcCellX == dstCellX && srcCellY == dstCellY) return 1.0f
 
@@ -158,21 +157,21 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
     val stepX = if (dirX > 0) 1 else -1
     val stepY = if (dirY > 0) 1 else -1
 
-    val tDeltaX = if (dirX != 0.0) abs(cellSize / dirX) else Double.MAX_VALUE
-    val tDeltaY = if (dirY != 0.0) abs(cellSize / dirY) else Double.MAX_VALUE
+    val tDeltaX = if (dirX != 0.0) abs(LIGHT_CELL_SIZE / dirX) else Double.MAX_VALUE
+    val tDeltaY = if (dirY != 0.0) abs(LIGHT_CELL_SIZE / dirY) else Double.MAX_VALUE
 
     var tMaxX = if (dirX > 0) {
-      ((srcCellX + 1) * cellSize - srcX) / dirX
+      ((srcCellX + 1) * LIGHT_CELL_SIZE - srcX) / dirX
     } else if (dirX < 0) {
-      (srcX - srcCellX * cellSize) / -dirX
+      (srcX - srcCellX * LIGHT_CELL_SIZE) / -dirX
     } else {
       Double.MAX_VALUE
     }
 
     var tMaxY = if (dirY > 0) {
-      ((srcCellY + 1) * cellSize - srcY) / dirY
+      ((srcCellY + 1) * LIGHT_CELL_SIZE - srcY) / dirY
     } else if (dirY < 0) {
-      (srcY - srcCellY * cellSize) / -dirY
+      (srcY - srcCellY * LIGHT_CELL_SIZE) / -dirY
     } else {
       Double.MAX_VALUE
     }
@@ -461,6 +460,8 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
 
     const val LIGHT_RESOLUTION = 2
     const val LIGHT_RESOLUTION_SQUARE = LIGHT_RESOLUTION * LIGHT_RESOLUTION
+
+    private const val LIGHT_CELL_SIZE = 1.0 / LIGHT_RESOLUTION
 
     val EMITS_LIGHT_FILTER = { block: Block -> block.material.emitsLight }
 

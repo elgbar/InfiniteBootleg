@@ -931,6 +931,9 @@ abstract class World(
   @JvmName("removeLocs")
   fun removeBlocks(blocks: Iterable<WorldCompactLoc>, giveTo: Entity? = null, prioritize: Boolean = false): Set<Block> {
     assertNotDisposed()
+    if (!blocks.iterator().hasNext()) {
+      return emptySet()
+    }
     val toRemove = ObjectOpenHashSet<Block>()
     actionOnBlocks(blocks) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlocks

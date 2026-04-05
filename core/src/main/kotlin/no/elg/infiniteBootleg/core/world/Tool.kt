@@ -43,7 +43,7 @@ sealed interface Tool : TexturedContainerElement {
   /**
    * Should we just destroy the materials this tool is not effective against? I.e., not give it to the entity
    */
-  val destroyNotEffectiveAgainst: Boolean
+  val destroyIneffectiveAgainst: Boolean
 
   /**
    * How effective this tool is against blocks that is in [effectiveAgainst]
@@ -53,14 +53,14 @@ sealed interface Tool : TexturedContainerElement {
   /**
    * How effective this tool is against blocks that is NOT in [effectiveAgainst]
    */
-  val notEffectiveEfficiency: Float
+  val ineffectiveEfficiency: Float
 
   object Pickaxe : Tool {
     override val textureName: String = "pickaxe"
     override val effectiveAgainst: Set<MaterialCategory> = setOf(MaterialCategory.ORE)
-    override val destroyNotEffectiveAgainst: Boolean get() = false
+    override val destroyIneffectiveAgainst: Boolean get() = false
     override val effectiveEfficiency: Float get() = 1f
-    override val notEffectiveEfficiency: Float get() = 0.75f
+    override val ineffectiveEfficiency: Float get() = 0.75f
 
     override fun breakableLocs(
       entity: Entity,
@@ -80,11 +80,11 @@ sealed interface Tool : TexturedContainerElement {
   object Broadaxe : Tool {
     override val textureName: String = "papp"
     override val effectiveAgainst: Set<MaterialCategory> = setOf(MaterialCategory.PLAIN_ROCK)
-    override val destroyNotEffectiveAgainst: Boolean get() = false
+    override val destroyIneffectiveAgainst: Boolean get() = true
     override val effectiveEfficiency: Float get() = 2f
-    override val notEffectiveEfficiency: Float get() = 0.5f
+    override val ineffectiveEfficiency: Float get() = 0.5f
 
-    private const val OFFSET_Y: Double = 3 - 1.0 // 3 high, to calculate offset we remove one
+    private const val OFFSET_Y: Double = 3 - 1.0 // always 3 blocks high, to calculate offset we remove one
 
     override fun breakableLocs(
       entity: Entity,
@@ -115,9 +115,9 @@ sealed interface Tool : TexturedContainerElement {
   object Reclaimer : Tool {
     override val textureName: String = "hand"
     override val effectiveAgainst: Set<MaterialCategory> = setOf(MaterialCategory.CRAFTED)
-    override val destroyNotEffectiveAgainst: Boolean get() = true
-    override val effectiveEfficiency: Float get() = 1f
-    override val notEffectiveEfficiency: Float get() = 0.01f
+    override val destroyIneffectiveAgainst: Boolean get() = true
+    override val effectiveEfficiency: Float get() = 3f
+    override val ineffectiveEfficiency: Float get() = 0.01f
 
     override fun breakableLocs(
       entity: Entity,
