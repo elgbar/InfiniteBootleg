@@ -91,8 +91,8 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
   private fun setupEntityLight(centerPos: Vector2, box2d: Box2DBodyComponent) {
     if (Settings.renderLight) {
-      val blockX = (centerPos.x - box2d.halfBox2dWidth / 2).roundToInt()
-      val blockY = centerPos.y.roundToInt()
+      val blockX = centerPos.x.worldToBlock()
+      val blockY = centerPos.y.worldToBlock()
       val topX = world.getTopBlockWorldY(blockX, ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG)
       if (blockY > topX) {
         lightVector.set(blockX.worldToScreen(), (topX + 1).worldToScreen())
