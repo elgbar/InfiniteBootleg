@@ -100,10 +100,10 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     if (Settings.renderLight) {
       val blockX = centerPos.x.worldToBlock()
       val blockY = centerPos.y.worldToBlock()
-      val topX = world.getTopBlockWorldY(blockX, ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG)
-      if (blockY > topX) {
+      val topBlockY = world.getTopBlockWorldY(blockX, ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG)
+      if (blockY > topBlockY) {
         if (Settings.debugEntityLight) {
-          lightVector.set(blockX.worldToScreen(), (topX + 1).worldToScreen())
+          lightVector.set(blockX.worldToScreen(), (topBlockY + 1).worldToScreen())
         }
         batch.color = Color.WHITE
       } else {
