@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
 import no.elg.infiniteBootleg.client.main.ClientMain
+import no.elg.infiniteBootleg.client.screens.hud.DebugText.calcSubCell
 import no.elg.infiniteBootleg.client.world.ecs.components.transients.LastServerPositionComponent.Companion.lastServerPositionComponentOrNull
 import no.elg.infiniteBootleg.client.world.ecs.components.transients.RotatableTextureRegionComponent.Companion.rotatableTextureRegion
 import no.elg.infiniteBootleg.client.world.ecs.system.FollowEntitySystem
@@ -19,10 +20,13 @@ import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.Settings.renderEntityPosDifference
 import no.elg.infiniteBootleg.core.api.Renderer
 import no.elg.infiniteBootleg.core.util.safeUse
+import no.elg.infiniteBootleg.core.util.worldToBlock
 import no.elg.infiniteBootleg.core.util.worldToScreen
 import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.core.world.Staff
 import no.elg.infiniteBootleg.core.world.blocks.Block
+import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.HALF_BLOCK_TEXTURE_SIZE_F
+import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.lightMapIndex
 import no.elg.infiniteBootleg.core.world.box2d.degrees
 import no.elg.infiniteBootleg.core.world.box2d.extensions.position
 import no.elg.infiniteBootleg.core.world.box2d.extensions.rotation
@@ -47,13 +51,15 @@ import no.elg.infiniteBootleg.core.world.magic.SpellState.Companion.timeToCast
 import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import kotlin.math.abs
-import kotlin.math.roundToInt
 
 class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
   private val nameLayout = GlyphLayout()
   private val lightVector: Vector2 = Vector2()
   private val posVector: Vector2 = Vector2()
+
+  private val entityLightDebugColor: Color = Color()
+  private var entityLightDebugXSubCell: Int = 0
 
   private val shapeRenderer: ShapeRenderer = ShapeRenderer().also {
     it.color = Color.GREEN
@@ -95,7 +101,9 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       val blockY = centerPos.y.worldToBlock()
       val topX = world.getTopBlockWorldY(blockX, ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG)
       if (blockY > topX) {
-        lightVector.set(blockX.worldToScreen(), (topX + 1).worldToScreen())
+        if (Settings.debugEntityLight) {
+          lightVector.set(blockX.worldToScreen(), (topX + 1).worldToScreen())
+        }
         batch.color = Color.WHITE
       } else {
         val blockLight = world.getBlockLight(blockX, blockY, false)
@@ -103,20 +111,31 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
           if (blockLight.isSkylight) {
             batch.color = Color.WHITE
           } else if (blockLight.isLit) {
-            val v = blockLight.averageBrightness
-            batch.setColor(v, v, v, 1f)
+            val v = blockLight.lightMap
+            entityLightDebugXSubCell = calcSubCell(centerPos.x)
+            val lightIndex = lightMapIndex(entityLightDebugXSubCell, 0)
+            batch.setColor(v.r[lightIndex], v.g[lightIndex], v.b[lightIndex], 1f)
           } else {
             batch.color = Color.BLACK
           }
-          lightVector.set(blockX.worldToScreen(), blockY.worldToScreen())
+          if (Settings.debugEntityLight) {
+            lightVector.set(blockX.worldToScreen(), blockY.worldToScreen())
+          }
         } else {
-          lightVector.setZero()
+          if (Settings.debugEntityLight) {
+            lightVector.setZero()
+          }
           batch.color = Color.WHITE
         }
       }
     } else {
-      lightVector.setZero()
+      if (Settings.debugEntityLight) {
+        lightVector.setZero()
+      }
       batch.color = Color.WHITE
+    }
+    if (Settings.debugEntityLight) {
+      entityLightDebugColor.set(batch.color)
     }
   }
 
@@ -167,10 +186,9 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
   fun debugEntityLight() {
     if (Settings.debugEntityLight) {
-      batch.color = Color.WHITE // Make sure we can see the debug light
-      val size = Block.BLOCK_TEXTURE_SIZE / 4f // The size of the debug cube
-      val offset = Block.BLOCK_TEXTURE_SIZE / 2f - size / 2f
-      batch.draw(ClientMain.inst().assets.whiteTexture.textureRegion, lightVector.x + offset, lightVector.y + offset, size, size)
+      batch.color = entityLightDebugColor // Make sure we can see the debug light
+      val xOffset = entityLightDebugXSubCell * HALF_BLOCK_TEXTURE_SIZE_F
+      batch.draw(ClientMain.inst().assets.whiteTexture.textureRegion, lightVector.x + xOffset, lightVector.y, HALF_BLOCK_TEXTURE_SIZE_F, HALF_BLOCK_TEXTURE_SIZE_F)
     }
   }
 

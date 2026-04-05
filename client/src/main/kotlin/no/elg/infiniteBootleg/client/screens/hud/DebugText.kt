@@ -44,14 +44,14 @@ object DebugText {
       .append(" | wtps: ").fastIntFormat(worldTps.toInt(), 2).append(" | ptps: ").fastIntFormat(physicsTps.toInt(), 2)
   }
 
+  fun calcSubCell(coord: Float): Int {
+    val fixedCoord = if (coord < 0f) 1f - (-coord % 1f) else coord % 1f
+    return ((fixedCoord % 1f) * LIGHT_RESOLUTION).toInt()
+  }
+
   fun lights(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
     val localX = mouseBlockX.chunkOffset()
     val localY = mouseBlockY.chunkOffset()
-
-    fun calcSubCell(coord: Float): Int {
-      val fixedCoord = if (coord < 0f) 1f - (-coord % 1f) else coord % 1f
-      return ((fixedCoord % 1f) * LIGHT_RESOLUTION).toInt()
-    }
 
     val rawX = calcSubCell(ClientMain.inst().mouseLocator.mouseWorldX)
     val rawY = calcSubCell(ClientMain.inst().mouseLocator.mouseWorldY)
