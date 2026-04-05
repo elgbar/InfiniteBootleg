@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.core.world.blocks
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.box2d.structs.b2BodyId
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.api.HUDDebuggable
 import no.elg.infiniteBootleg.core.api.Savable
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
@@ -15,13 +16,15 @@ import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.Direction
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Material.Companion.asProto
-import no.elg.infiniteBootleg.core.world.Material.Companion.fromProto
+import no.elg.infiniteBootleg.core.world.Material.Companion.fromProtoOrNull
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.core.world.world.World.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.block
 import no.elg.infiniteBootleg.protobuf.entityOrNull
+
+private val logger = KotlinLogging.logger {}
 
 interface Block :
   CheckableDisposable,
@@ -155,7 +158,10 @@ interface Block :
       if (protoBlock == null) {
         return null
       }
-      val material = protoBlock.material.fromProto()
+      val material = protoBlock.material.fromProtoOrNull() ?: let {
+        logger.warn { "unknown material ${protoBlock.material.name}" }
+        return null
+      }
       if (material === Material.Air) {
         return null
       }
