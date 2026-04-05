@@ -15,8 +15,9 @@ import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameCompone
 import no.elg.infiniteBootleg.core.world.world.World
 import java.util.concurrent.CompletableFuture
 
-const val DOOR_WIDTH: BlockUnitF = 2f
-const val DOOR_HEIGHT: BlockUnitF = 4f
+const val DOOR_WIDTH: BlockUnitF = 1.5f
+const val DOOR_HEIGHT: BlockUnitF = 3f
+const val DOOR_X_OFFSET: BlockUnitF = 0.25f
 
 fun Engine.createDoorBlockEntity(world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material): CompletableFuture<Entity> =
   createBlockEntity(world, worldX, worldY, material) {

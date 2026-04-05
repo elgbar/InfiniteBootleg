@@ -94,7 +94,7 @@ fun EngineEntity.createDoorBodyComponent(world: World, worldX: WorldCoord, world
     serializationType = ProtoWorld.Entity.Box2D.BodyType.DOOR,
     entity = entity,
     world = world,
-    worldX = worldX.toFloat() + DOOR_WIDTH / 2f,
+    worldX = worldX.toFloat() + DOOR_WIDTH / 2f + DOOR_X_OFFSET,
     worldY = worldY.toFloat() + DOOR_HEIGHT / 2f,
     dx = 0f,
     dy = 0f,
