@@ -13,6 +13,8 @@ import no.elg.infiniteBootleg.core.util.toVector2i
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.DebuggableComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.transients.CurrentlyBreakingComponent.BreakingUpdateState.BROKEN_DISCARD_BLOCK
+import no.elg.infiniteBootleg.core.world.ecs.components.transients.CurrentlyBreakingComponent.BreakingUpdateState.CONTINUE_BREAKING
 import no.elg.infiniteBootleg.protobuf.BreakingBlockKt.breakingProgress
 import no.elg.infiniteBootleg.protobuf.Packets
 
@@ -38,8 +40,23 @@ class CurrentlyBreakingComponent : DebuggableComponent {
         progress = if (zeroProgress) 0f else progressHandler.progress
       }
 
-    private val modifier: Float = if (block.material.category in item.element.effectiveAgainst) item.element.effectiveEfficiency else item.element.notEffectiveEfficiency
+    private val isEffective: Boolean get() = block.material.category in item.element.effectiveAgainst
+    private val modifier: Float = if (isEffective) item.element.effectiveEfficiency else item.element.ineffectiveEfficiency
 
-    fun update(delta: Float): Boolean = progressHandler.update(delta * modifier)
+    fun update(delta: Float): BreakingUpdateState {
+      val broken = progressHandler.update(delta * modifier)
+      return when {
+        !broken -> CONTINUE_BREAKING
+        broken && isEffective -> BROKEN_GIVE_BLOCK
+        broken && !item.element.destroyIneffectiveAgainst -> BROKEN_GIVE_BLOCK
+        else -> BROKEN_DISCARD_BLOCK
+      }
+    }
+  }
+
+  enum class BreakingUpdateState {
+    CONTINUE_BREAKING,
+    BROKEN_GIVE_BLOCK,
+    BROKEN_DISCARD_BLOCK
   }
 }

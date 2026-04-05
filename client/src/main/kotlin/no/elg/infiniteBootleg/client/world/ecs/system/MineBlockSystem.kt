@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.core.net.ServerClient.Companion.sendServerBoundPac
 import no.elg.infiniteBootleg.core.net.serverBoundBreakingBlock
 import no.elg.infiniteBootleg.core.util.isValid
 import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsyncSuspendable
+import no.elg.infiniteBootleg.core.util.partitionMap
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.compactWorldLoc
@@ -20,6 +21,8 @@ import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerCompo
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.CurrentlyBreakingComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.transients.CurrentlyBreakingComponent.BreakingUpdateState.BROKEN_GIVE_BLOCK
+import no.elg.infiniteBootleg.core.world.ecs.components.transients.CurrentlyBreakingComponent.BreakingUpdateState.CONTINUE_BREAKING
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.CurrentlyBreakingComponent.Companion.currentlyBreakingComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.localPlayerFamily
 
@@ -74,31 +77,50 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
         breakingComponent.breaking.put(block.compactWorldLoc, CurrentlyBreakingComponent.CurrentlyBreaking(block, breakingItem))
       }
 
-    val justMined = breakingComponent.breaking.values
+    val (justMinedGive, justMinedDiscard) = breakingComponent.breaking.values
       .asSequence()
-      .filter { breaking -> breaking.update(deltaTime) }
-      .mapTo(LongOpenHashSet()) { it.block.compactWorldLoc }
+      .mapNotNull {
+        val breakState = it.update(deltaTime)
+        if (breakState == CONTINUE_BREAKING) {
+          null
+        } else {
+          it to breakState
+        }
+      }.partitionMap({ it.second == BROKEN_GIVE_BLOCK }, { it.first.block.compactWorldLoc })
 
     breakingComponent.sendCurrentProgress()
 
     launchOnMultithreadedAsyncSuspendable {
       if (entity.isValid) {
-        if (justMined.isNotEmpty()) {
+        if (justMinedGive.isNotEmpty() || justMinedDiscard.isNotEmpty()) {
           val selectedItem = entity.selectedItem?.element as? Tool ?: return@launchOnMultithreadedAsyncSuspendable
           val container = entity.containerOrNull ?: return@launchOnMultithreadedAsyncSuspendable
-          val justMinedSize = justMined.size
-          val justMinedBlockSizeU = justMinedSize.toUInt()
 
+          // first remove those blocks which the tool is effective against
+          val justMinedGiveSize = justMinedGive.size.toUInt()
           val toolCount = container.count(selectedItem)
-          val canBeRemoved = toolCount.coerceAtMost(justMinedBlockSizeU)
-          val validJustDone = if (toolCount >= justMinedBlockSizeU) {
-            justMined
+          val validJustMinedGive = if (toolCount >= justMinedGiveSize) {
+            justMinedGive
           } else {
-            // Just take the number the pickaxe can mine, not more
-            justMined.take(justMinedSize - canBeRemoved.toInt())
+            // Just take the number the tool can break, not more
+            val canBeRemoved = toolCount.coerceAtMost(justMinedGiveSize)
+            justMinedGive.take((justMinedGiveSize - canBeRemoved).toInt())
           }
-          val removed = world.removeBlocks(validJustDone, giveTo = entity, prioritize = true)
-          container.remove(selectedItem, removed.size.toUInt())
+          val removedGiven = world.removeBlocks(validJustMinedGive, giveTo = entity, prioritize = true)
+
+          // Then if the tool have any leftover we remove those blocks the tool is ineffective against
+          val justMinedDiscardSize = justMinedDiscard.size.toUInt()
+          val updatedToolCount = toolCount - removedGiven.size.toUInt()
+          val validJustDoneDiscard = if (updatedToolCount >= justMinedDiscardSize) {
+            justMinedDiscard
+          } else {
+            // Just take the number the tool can break, not more
+            val canBeRemoved = updatedToolCount.coerceAtMost(justMinedDiscardSize)
+            justMinedDiscard.take((justMinedDiscardSize - canBeRemoved).toInt())
+          }
+          val removedDiscard = world.removeBlocks(validJustDoneDiscard, prioritize = true)
+
+          container.remove(selectedItem, (removedGiven.size + removedDiscard.size).toUInt())
         }
       } else {
         // just in case
