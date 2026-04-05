@@ -29,6 +29,7 @@ import no.elg.infiniteBootleg.core.world.ecs.creation.createContainerEntity
 import no.elg.infiniteBootleg.core.world.ecs.creation.createDoorBlockEntity
 import no.elg.infiniteBootleg.core.world.ecs.creation.createGravityAffectedBlockEntity
 import no.elg.infiniteBootleg.core.world.ecs.creation.createLeafEntity
+import no.elg.infiniteBootleg.core.world.ecs.creation.createPhosphorusSpellEntity
 import no.elg.infiniteBootleg.core.world.ecs.explosiveBlockFamily
 import no.elg.infiniteBootleg.core.world.ecs.load
 import no.elg.infiniteBootleg.core.world.world.World
@@ -173,7 +174,7 @@ sealed interface Material : ContainerElement {
     }
   }
 
-  object TorchStill : Material, TexturedContainerElement {
+  object TorchStillRed : Material, TexturedContainerElement {
     override val hardness get() = 0.1f
     override val textureName: String get() = "torch"
     override val hasTransparentTexture get() = true
@@ -201,6 +202,19 @@ sealed interface Material : ContainerElement {
     override val blocksLight get() = false
     override val lightColor: Color get() = Color.BLUE
     override val category: MaterialCategory get() = CRAFTED
+  }
+
+  object PhosphorusSpell : Material, TexturedContainerElement {
+    override val hardness get() = Float.MAX_VALUE
+    override val textureName: String get() = "spell"
+    override val hasTransparentTexture get() = true
+    override val isCollidable get() = false
+    override val blocksLight get() = false
+    override val lightColor: Color get() = Color.YELLOW
+    override val category: MaterialCategory get() = MAGIC
+    override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+      world.engine.createPhosphorusSpellEntity(world, worldX, worldY, material)
+    }
   }
 
   object Glass : Material, TexturedContainerElement {
@@ -419,5 +433,6 @@ sealed interface Material : ContainerElement {
       }
 
     override fun ProtoWorld.Material.fromProto(): Material = valueOf(this@fromProto.name)
+    fun ProtoWorld.Material.fromProtoOrNull(): Material? = valueOfOrNull(this@fromProtoOrNull.name)
   }
 }

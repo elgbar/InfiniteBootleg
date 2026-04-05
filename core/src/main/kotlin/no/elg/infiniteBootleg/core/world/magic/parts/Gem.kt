@@ -3,7 +3,10 @@ package no.elg.infiniteBootleg.core.world.magic.parts
 import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.util.toTitleCase
+import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Tool
+import no.elg.infiniteBootleg.core.world.ecs.components.DecayingComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.DecayingComponent.Companion.decayComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.magic.Description
@@ -48,7 +51,7 @@ data object Diamond : GemType {
 
   override val displayName: String = "Diamond"
 
-  override val maxPower: Double = 5.0 // blocks radius
+  override val maxPower: Double = 4.0 // blocks radius
 
   override val description: String
     get() = "Destructive mining spell that breaks blocks in an area upon landing."
@@ -60,5 +63,31 @@ data object Diamond : GemType {
 
     val breakableBlocks = Tool.Pickaxe.breakableLocs(spellEntity, world, pos.blockX, pos.blockY, breakRadius.toFloat(), state.spellRange.toFloat()).asIterable()
     world.removeBlocks(breakableBlocks, state.caster)
+  }
+}
+
+data object SunGem : GemType {
+
+  override val displayName: String = "Sun Gem"
+
+  override val maxPower: Double = 300.0 // Duration in seconds before extinguishing the light
+
+  override val description: String
+    get() = "Impossible to break light where the spell lands"
+
+  override fun onSpellLand(state: SpellState, spellEntity: Entity, rating: GemRating) {
+    val lightDuration = (maxPower * state.gemPower * rating.powerPercent).coerceAtLeast(1.0)
+    val world = spellEntity.world
+    val pos = spellEntity.positionComponent
+
+    val block = world.setBlock(pos.blockX, pos.blockY, Material.PhosphorusSpell)
+    val entity = block?.entity ?: return
+    val decayComp = entity.decayComponentOrNull
+    if (decayComp == null) {
+      // should not really happen, but just in case
+      entity.addAndReturn(DecayingComponent(lightDuration))
+    } else {
+      decayComp.timeLeftSeconds = decayComp.timeLeftSeconds.coerceAtMost(lightDuration)
+    }
   }
 }

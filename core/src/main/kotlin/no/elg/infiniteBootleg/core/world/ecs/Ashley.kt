@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.core.util.removeSelf
 import no.elg.infiniteBootleg.core.util.toComponentsString
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.core.world.ecs.components.DecayingComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.ExplosiveComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent
@@ -100,6 +101,8 @@ val gravityAffectedBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, GravityAffec
 val gravityAffectedBlockFamilyActive: Family = allOf(*BASIC_BLOCK_ENTITY, GravityAffectedTag::class, ReactToEventTag::class).get()
 val explosiveBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ExplosiveComponent::class).get()
 val leafBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, LeafDecayTag::class).get()
+
+val decayingBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, DecayingComponent::class).get()
 
 val standaloneGridOccupyingBlocksFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, OccupyingBlocksComponent::class, MaterialComponent::class).get()
 

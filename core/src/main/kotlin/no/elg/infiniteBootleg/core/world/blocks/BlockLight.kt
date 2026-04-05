@@ -135,7 +135,6 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
    * @return attenuation in [0.0, 1.0] where 1.0 = no occlusion, 0.0 = fully blocked
    */
   private fun computeRayAttenuation(srcX: Double, srcY: Double, dstX: Double, dstY: Double): Float {
-
     // Convert to subcell grid coordinates
     val srcCellX = floor(srcX / LIGHT_CELL_SIZE).toInt()
     val srcCellY = floor(srcY / LIGHT_CELL_SIZE).toInt()

@@ -8,5 +8,6 @@ enum class MaterialCategory {
   PLAIN_ROCK,
   ORE,
   ORGANIC,
-  CRAFTED
+  CRAFTED,
+  MAGIC
 }

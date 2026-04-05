@@ -104,6 +104,7 @@ import no.elg.infiniteBootleg.core.world.ecs.system.OutOfBoundsSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.UpdateBox2DStateSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.ValidateGroundContactSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.BrokenBlockCleanupSystem
+import no.elg.infiniteBootleg.core.world.ecs.system.block.DecayingBlockSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.ExplosiveBlockSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.FallingBlockSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.LeavesDecaySystem
@@ -330,6 +331,7 @@ abstract class World(
     engine.addSystem(SpellRemovalSystem)
     engine.addSystem(ValidateGroundContactSystem)
     engine.addSystem(BrokenBlockCleanupSystem)
+    engine.addSystem(DecayingBlockSystem)
     additionalSystems().forEach(engine::addSystem)
 
     engine.systems.forEach(::configureSystem)

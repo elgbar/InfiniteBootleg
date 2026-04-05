@@ -156,6 +156,7 @@ message Entity {
   optional InputEvent inputEvent = 31;
   optional PhysicsEvent physicsEvent = 32;
   optional Tinted tinted = 33;
+  optional Decaying decaying = 34;
 
   enum EntityType {
     GENERIC_ENTITY = 0; // default
@@ -236,4 +237,9 @@ message Entity {
   message Door {}
   message InputEvent {}
   message PhysicsEvent {}
+
+  message Decaying {
+    // How many seconds until this entity will be removed
+    double timeLeftSeconds = 1;
+  }
 }

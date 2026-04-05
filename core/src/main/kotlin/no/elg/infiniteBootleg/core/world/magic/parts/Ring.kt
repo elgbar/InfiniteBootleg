@@ -132,7 +132,7 @@ data object SpellLightRing : RatelessRingType {
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating?) {
     state.entityModifications += { spell: Entity ->
-      spell.safeWith { MaterialComponent(Material.Torch) }
+      spell.safeWith { MaterialComponent(Material.PhosphorusSpell) }
       // Must be occupying blocks to emit light
       spell.safeWith { OccupyingBlocksComponent(hardLink = false) }
     }

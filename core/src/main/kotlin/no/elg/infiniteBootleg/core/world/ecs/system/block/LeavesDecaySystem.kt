@@ -8,7 +8,6 @@ import it.unimi.dsi.fastutil.longs.LongSet
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.events.LeafDecayCheckEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
-import no.elg.infiniteBootleg.core.util.chunkOffset
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.decompactLocX
@@ -23,6 +22,7 @@ import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.system.AuthoritativeSystem
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.core.world.ecs.components.tags.BrokenBlockTag.Companion.brokenBlock
 import no.elg.infiniteBootleg.core.world.ecs.leafBlockFamily
 import no.elg.infiniteBootleg.core.world.ecs.system.api.FamilyEntitySystem
 
@@ -68,8 +68,7 @@ class LeavesDecaySystem :
         }
       }
 
-      // If no trunks were found, remove the leaf block
-      chunk.removeBlock(srcLoc.decompactLocX().chunkOffset(), srcLoc.decompactLocY().chunkOffset())
+      entity.brokenBlock = true
     } finally {
       if (Settings.debug && Settings.renderLeafDecay) {
         EventManager.dispatchEvent(LeafDecayCheckEvent(srcLoc, seen))
