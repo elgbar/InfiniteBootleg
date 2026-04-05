@@ -279,9 +279,6 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     val BOX2D_COLOR = Color(0f, 0f, 1f, 0.33f)
     val SERVER_COLOR = Color(0f, 1f, 0f, 0.33f)
 
-    fun calcLightSubCell(coord: Float): Int {
-      val fixedCoord = if (coord < 0f) 1f - (-coord % 1f) else coord % 1f
-      return ((fixedCoord % 1f) * LIGHT_RESOLUTION).toInt()
-    }
+    fun calcLightSubCell(coord: Float): Int = ((coord - coord.worldToBlock()) * LIGHT_RESOLUTION).toInt()
   }
 }
