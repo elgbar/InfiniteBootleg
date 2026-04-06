@@ -85,9 +85,9 @@ data object SunGem : GemType {
     val decayComp = entity.decayComponentOrNull
     if (decayComp == null) {
       // should not really happen, but just in case
-      entity.addAndReturn(DecayingComponent(lightDuration))
+      entity.add(DecayingComponent(lightDuration))
     } else {
-      decayComp.timeLeftSeconds = decayComp.timeLeftSeconds.coerceAtMost(lightDuration)
+      decayComp.timeLeftSeconds = lightDuration
     }
   }
 }
