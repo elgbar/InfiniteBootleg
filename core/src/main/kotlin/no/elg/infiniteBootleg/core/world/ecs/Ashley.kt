@@ -36,6 +36,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionCompone
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.AuthoritativeOnlyTag
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.BrokenBlockTag
+import no.elg.infiniteBootleg.core.world.ecs.components.tags.CanBeOutOfBoundsTag
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FollowedByCameraTag
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.GravityAffectedTag
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.LeafDecayTag
@@ -89,6 +90,8 @@ val INVENTORY_COMPONENTS = arrayOf(ContainerComponent::class, HotbarComponent::c
 
 fun Family.Builder.getExcluding(vararg excluding: KClass<out Component>): Family = exclude(*excluding).get()
 fun KClass<out Component>.toFamily(): Family = allOf(this).get()
+
+val entityWithoutCanBeOutOfBoundsTagFamily: Family = allOf(*REQUIRED_COMPONENTS).getExcluding(CanBeOutOfBoundsTag::class)
 
 val entityContainerFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, ContainerComponent::class).get()
 val blockContainerFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ContainerComponent::class).get()
