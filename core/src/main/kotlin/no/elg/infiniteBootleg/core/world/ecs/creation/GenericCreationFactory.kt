@@ -18,6 +18,8 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.EntityTypeCompo
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.authoritativeOnly
+import no.elg.infiniteBootleg.core.world.ecs.components.tags.CanBeOutOfBoundsTag.Companion.canBeOutOfBounds
 import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -79,6 +81,8 @@ fun Engine.createBlockEntity(
   futureEntity { future ->
     withRequiredComponents(ProtoWorld.Entity.EntityType.BLOCK, world, worldX, worldY)
     safeWith { MaterialComponent(material) }
+    entity.canBeOutOfBounds = true
+    entity.authoritativeOnly = true
     additionalConfiguration()
     checkFamilies(entity, arrayOf(blockEntityFamily to "blockEntityFamily", *wantedFamilies))
 

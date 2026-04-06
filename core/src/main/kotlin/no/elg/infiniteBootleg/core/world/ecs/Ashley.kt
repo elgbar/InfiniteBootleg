@@ -66,7 +66,9 @@ val BASIC_STANDALONE_ENTITY = arrayOf(
 
 val BASIC_BLOCK_ENTITY = arrayOf(
   *REQUIRED_COMPONENTS,
-  MaterialComponent::class
+  MaterialComponent::class,
+  CanBeOutOfBoundsTag::class, // Block entities are cleaned up when removing the block
+  AuthoritativeOnlyTag::class // Clients should not care if a block has en entity at all!
 )
 
 val DYNAMIC_STANDALONE_ENTITY = arrayOf(

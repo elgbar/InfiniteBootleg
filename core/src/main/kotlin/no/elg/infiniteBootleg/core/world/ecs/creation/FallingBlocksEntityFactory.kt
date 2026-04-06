@@ -15,7 +15,6 @@ import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.authoritativeOnly
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.GravityAffectedTag.Companion.gravityAffected
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.ReactToEventTag.Companion.reactToEventTag
 import no.elg.infiniteBootleg.core.world.ecs.gravityAffectedBlockFamilyActive
@@ -72,6 +71,5 @@ fun Engine.createFallingBlockStandaloneEntity(
 fun Engine.createGravityAffectedBlockEntity(world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material) =
   createBlockEntity(world, worldX, worldY, material, arrayOf(gravityAffectedBlockFamilyActive to "gravityAffectedBlockFamilyActive")) {
     entity.gravityAffected = true
-    entity.authoritativeOnly = true
     entity.reactToEventTag = true
   }

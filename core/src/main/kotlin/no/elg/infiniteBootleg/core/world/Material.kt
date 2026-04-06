@@ -29,7 +29,7 @@ import no.elg.infiniteBootleg.core.world.ecs.creation.createContainerEntity
 import no.elg.infiniteBootleg.core.world.ecs.creation.createDoorBlockEntity
 import no.elg.infiniteBootleg.core.world.ecs.creation.createGravityAffectedBlockEntity
 import no.elg.infiniteBootleg.core.world.ecs.creation.createLeafEntity
-import no.elg.infiniteBootleg.core.world.ecs.creation.createPhosphorusSpellEntity
+import no.elg.infiniteBootleg.core.world.ecs.creation.createPhosphorusSpellBlockEntity
 import no.elg.infiniteBootleg.core.world.ecs.explosiveBlockFamily
 import no.elg.infiniteBootleg.core.world.ecs.load
 import no.elg.infiniteBootleg.core.world.world.World
@@ -213,7 +213,7 @@ sealed interface Material : ContainerElement {
     override val lightColor: Color get() = Color.YELLOW
     override val category: MaterialCategory get() = MAGIC
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
-      world.engine.createPhosphorusSpellEntity(world, worldX, worldY, material)
+      world.engine.createPhosphorusSpellBlockEntity(world, worldX, worldY, material)
     }
   }
 
