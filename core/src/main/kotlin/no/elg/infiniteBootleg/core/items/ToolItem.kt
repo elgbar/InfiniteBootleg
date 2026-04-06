@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.core.items
 import no.elg.infiniteBootleg.core.world.Tool
 
 /**
- * Represent something a player may possess or something that may be in the world
+ * Represent a tool the player can use on blocks in the world
  *
  * @property maxStock The maximum charge of this item
  * @property stock The current charge of this item, **not included in the equals method**

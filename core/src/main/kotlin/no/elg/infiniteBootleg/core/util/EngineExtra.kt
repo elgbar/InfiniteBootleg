@@ -39,7 +39,7 @@ inline fun <reified T : Component> EngineEntity.safeWith(component: () -> T): T?
  *
  * @param configure inlined function with the created [EngineEntity] as the receiver to allow further configuration of
  * the [Entity]. The [EngineEntity] holds the created [Entity] and this [Engine].
- * @param whenReady a [CompletableFuture] that when completed will add the entity to the engine. It has a timeout of 1 second. IT MUST BE COMPLETED!
+ * @param whenReady a [CompletableFuture] that when completed will add the entity to the engine. It has a timeout of 5 seconds. IT MUST BE COMPLETED!
  * @return the future created [Entity].
  */
 inline fun Engine.futureEntity(configure: EngineEntity.(whenReady: CompletableFuture<Unit>) -> Unit = {}): CompletableFuture<Entity> {
