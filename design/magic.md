@@ -66,15 +66,13 @@ When crafting to a staff the drying will stop.
 
 The drying rate is also affected by the wood type. Some wood types will dry faster than others.
 
-**Note:** The absolute power starts at 100% so that spells are balanced when freshly cut.
-
 | Wood rating | Absolute power | Relative power increase | Drying duration (real time) | Drying duration total | Description                                                                                         |
 |-------------|----------------|-------------------------|-----------------------------|-----------------------|-----------------------------------------------------------------------------------------------------|
-| Freshly cut | 100%           | N/A                     | 0 seconds                   | 0 seconds             | This wood is still green, it will not be very powerful                                              |
-| Dried       | 120%           | +20%                    | 1 hour                      | 1 hour                | This wood has been left to dry for a while, it will be more powerful                                |
-| Aged        | 140%           | +20%                    | 2 hours                     | 3 hours               | This wood has been left to dry for a long time, it will be powerful                                 |
-| Ancient     | 160%           | +20%                    | 5 hours                     | 8 hours               | This wood has been left to dry for a very long time, it will be very powerful                       |
-| Petrified   | 170%           | +10%                    | 4 hours                     | 12 hours              | This wood has been left to dry for a extremely long time, there is no point in drying it any longer |
+| Freshly cut | 30%            | N/A                     | 0 seconds                   | 0 seconds             | This wood is still green, it will not be very powerful                                              |
+| Dried       | 50%            | +20%                    | 1 hour                      | 1 hour                | This wood has been left to dry for a while, it will be more powerful                                |
+| Aged        | 70%            | +20%                    | 2 hours                     | 3 hours               | This wood has been left to dry for a long time, it will be powerful                                 |
+| Ancient     | 90%            | +20%                    | 5 hours                     | 8 hours               | This wood has been left to dry for a very long time, it will be very powerful                       |
+| Petrified   | 100%           | +10%                    | 4 hours                     | 12 hours              | This wood has been left to dry for a extremely long time, there is no point in drying it any longer |
 
 ## Gems
 
