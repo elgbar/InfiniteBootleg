@@ -56,7 +56,7 @@ Only the variable delay can be affected by rings
 | Aerowode    | 1         | 1          | 100%        | 750 ms             | Player gravity is lowered by up to 20% from normal. Imcompatible with `Lead` ring | A rare and lightweight wood that seems to almost float in the air                             |
 | Red wood    | 2         | 2          | 200%        | 500 ms             | Will start fires, at random, where the spell lands                                | The wood crackles and smokes, making it dry very quickly                                      |
 | driftwood   | 1         | 1          | 25%         | 900 ms             | Works while under water                                                           | Even when dried, drops of water forms around its base                                         |
-| Wisted wood | 2         | 1          | 100%        | 300 ms             | N/A                                                                               | A magical twisted and gnarled wood, known for its ring capacity and speed                     |
+| Wisted wood | 2         | 1          | 100%        | 300 ms             | N/A                                                                               | A magical twisted and gnarled wood, known for its gem capacity and speed                      |
 | Trekant     | 3         | 2          | 100%        | 300 ms             | N/A                                                                               | A legendary triangular cross-section wood, prized for its unique shape and magical properties |
 
 ### Wood rating

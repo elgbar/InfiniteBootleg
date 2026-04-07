@@ -66,7 +66,7 @@ data object Driftwood : WoodType(1u, 3u, 0.25, 900.milliseconds) {
 }
 
 data object WistedWood : WoodType(2u, 1u, 1.0, 300.milliseconds) {
-  override val description: String get() = "A magical twisted and gnarled wood, known for its ring capacity and speed"
+  override val description: String get() = "A magical twisted and gnarled wood, known for its gem capacity and speed"
   override val displayName: String get() = "Wistedwood"
 }
 

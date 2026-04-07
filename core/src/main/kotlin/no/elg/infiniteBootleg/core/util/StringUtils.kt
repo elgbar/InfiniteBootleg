@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.core.util
 
-val CAMELCASE_REGEX = "([A-Z][a-z]|[A-Z]+(?![a-z]))".toRegex()
+val CAMELCASE_REGEX = "[A-Z][a-z]|[A-Z]+(?![a-z])".toRegex()
 
 fun String.toTitleCase(): String = (lowercase() as CharSequence).toTitleCase()
 fun CharSequence.toTitleCase(): String {
