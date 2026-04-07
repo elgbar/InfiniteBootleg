@@ -3,6 +3,8 @@ package no.elg.infiniteBootleg.core.world.magic
 import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.world.Staff
+import no.elg.infiniteBootleg.core.world.magic.parts.GemRating
+import no.elg.infiniteBootleg.core.world.magic.parts.GemType
 import kotlin.contracts.contract
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -37,9 +39,9 @@ interface SpellState {
   /**
    * How powerful the spell is (the meaning of power is up to the gem).
    *
-   * This is normally in the range of [0, 1]
+   * The base power is derived from the [no.elg.infiniteBootleg.core.world.magic.parts.WoodRating]
    */
-  val gemPower: Double
+  val basePower: Double
 
   /**
    * Modifications to be done to the spell entity after it has been cast
@@ -68,6 +70,10 @@ interface SpellState {
      * @return How long until the spell can be cast again
      */
     fun SpellState.timeToCast(): Duration = castMark.elapsedNow().times(-1)
+
+    fun SpellState.gemPowers(): Map<Gem, Double> = staff.gems.associateWith { gem -> gemPower(gem) }
+    inline fun SpellState.gemPower(gem: Gem): Double = gemPower(gem.type, gem.rating)
+    fun SpellState.gemPower(gemType: GemType, gemRating: GemRating): Double = (gemType.maxPower * basePower * gemRating.powerPercent).coerceIn(1.0, gemType.maxPower)
   }
 }
 
@@ -80,7 +86,7 @@ data class MutableSpellState(
   val fixedCastDelay: Duration,
   // Variable part of the cast delay that can be modified with rings etc.
   var variableCastDelay: Duration,
-  override var gemPower: Double,
+  override var basePower: Double,
   override val entityModifications: MutableList<(Entity) -> Unit>,
   override var castMark: TimeMark = TimeSource.Monotonic.markNow() + Duration.INFINITE
 ) : SpellState {

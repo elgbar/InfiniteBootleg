@@ -41,7 +41,7 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
       spellRange = 32.0,
       fixedCastDelay = wood.type.castDelay * FIXED_DELAY_PERCENTAGE,
       variableCastDelay = wood.type.castDelay * VARIABLE_DELAY_PERCENTAGE,
-      gemPower = wood.rating.powerPercent,
+      basePower = wood.rating.powerPercent,
       // FIXME placeholder
       spellVelocity = 10.0,
       entityModifications = mutableListOf()

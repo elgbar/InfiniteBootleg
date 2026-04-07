@@ -57,7 +57,7 @@ data object Diamond : GemType {
     get() = "Destructive mining spell that breaks blocks in an area upon landing."
 
   override fun onSpellLand(state: SpellState, spellEntity: Entity, rating: GemRating) {
-    val breakRadius = (maxPower * state.gemPower * rating.powerPercent).coerceAtLeast(1.0)
+    val breakRadius = state.gemPower(this, rating)
     val world = spellEntity.world
     val pos = spellEntity.positionComponent
 
@@ -76,7 +76,7 @@ data object SunGem : GemType {
     get() = "Impossible to break light where the spell lands"
 
   override fun onSpellLand(state: SpellState, spellEntity: Entity, rating: GemRating) {
-    val lightDuration = (maxPower * state.gemPower * rating.powerPercent).coerceAtLeast(1.0)
+    val lightDuration = state.gemPower(this, rating)
     val world = spellEntity.world
     val pos = spellEntity.positionComponent
 

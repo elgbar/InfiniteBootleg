@@ -75,7 +75,7 @@ data object PowerRing : RatedRingType {
     get() = "Increases the power of the spell"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
-    state.gemPower *= rating.effectPercent
+    state.basePower *= rating.effectPercent
   }
 }
 
