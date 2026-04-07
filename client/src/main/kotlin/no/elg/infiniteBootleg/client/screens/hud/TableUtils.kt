@@ -156,7 +156,7 @@ fun KTable.suspendedFloatSpinner(
 inline fun <reified T : Enum<T>> KWidget<*>.enumSelector(
   onAnyElementChanged: MutableList<suspend () -> Unit>,
   initialElement: T,
-  name: String = T::class.java.simpleName.toTitleCase(),
+  name: String = T::class.java.simpleName.replace('_', ' ').toTitleCase(),
   noinline onChange: (T) -> Unit = {}
 ): IBVisSelectBox<T> {
   val items = enumValues<T>().toGdxArray()
@@ -167,7 +167,7 @@ inline fun <reified T : Enum<T>> KWidget<*>.enumSelector(
 inline fun <reified T : Any> KWidget<*>.sealedSelector(
   onAnyElementChanged: MutableList<suspend () -> Unit>,
   initialElement: T,
-  name: String = T::class.java.simpleName.toTitleCase(),
+  name: String = T::class.java.simpleName.replace('_', ' ').toTitleCase(),
   noinline onChange: (T) -> Unit = {}
 ): IBVisSelectBox<T> {
   val items = sealedSubclassObjectInstances<T>().toGdxArray()
