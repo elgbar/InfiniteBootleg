@@ -147,16 +147,17 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     return wasPrioritize
   }
 
-  @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
+  @Contract("_, _, !null, _, _, _, _ -> !null; _, _, null, _, _, _, _ -> null")
   override fun setBlock(
     localX: LocalCoord,
     localY: LocalCoord,
     material: Material?,
     updateTexture: Boolean,
     prioritize: Boolean,
-    sendUpdatePacket: Boolean
+    sendUpdatePacket: Boolean,
+    onBlockEntityAddedCallback: ((Block, Entity) -> Unit)?
   ): Block? {
-    val block = material?.createBlock(world, this, localX, localY) ?: return null
+    val block = material?.createBlock(world, this, localX, localY, onBlockEntityAddedCallback = onBlockEntityAddedCallback) ?: return null
     return setBlock(
       localX = localX,
       localY = localY,

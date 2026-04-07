@@ -724,11 +724,12 @@ abstract class World(
     material: Material,
     updateTexture: Boolean = true,
     prioritize: Boolean = false,
-    loadChunk: Boolean = true
+    loadChunk: Boolean = true,
+    onBlockEntityAddedCallback: ((Block, Entity) -> Unit)? = null
   ): Block? =
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock null
-      chunk.setBlock(localX, localY, material, updateTexture, prioritize)
+      chunk.setBlock(localX, localY, material, updateTexture, prioritize, onBlockEntityAddedCallback = onBlockEntityAddedCallback)
     }
 
   /**

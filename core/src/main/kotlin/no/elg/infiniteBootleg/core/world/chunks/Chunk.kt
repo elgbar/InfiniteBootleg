@@ -98,14 +98,15 @@ interface Chunk :
    * @param prioritize If an update should be sent when in multiplayer
    * @return The new block, only `null` if `material` parameter is `null`
    */
-  @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
+  @Contract("_, _, !null, _, _, _, _ -> !null; _, _, null, _, _, _, _ -> null")
   fun setBlock(
     localX: LocalCoord,
     localY: LocalCoord,
     material: Material?,
     updateTexture: Boolean = true,
     prioritize: Boolean = false,
-    sendUpdatePacket: Boolean = true
+    sendUpdatePacket: Boolean = true,
+    onBlockEntityAddedCallback: ((Block, Entity) -> Unit)? = null
   ): Block?
 
   /**

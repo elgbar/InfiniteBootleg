@@ -80,14 +80,14 @@ data object SunGem : GemType {
     val world = spellEntity.world
     val pos = spellEntity.positionComponent
 
-    val block = world.setBlock(pos.blockX, pos.blockY, Material.PhosphorusSpell)
-    val entity = block?.entity ?: return
-    val decayComp = entity.decayComponentOrNull
-    if (decayComp == null) {
-      // should not really happen, but just in case
+    world.setBlock(pos.blockX, pos.blockY, Material.PhosphorusSpell) { _, entity ->
+      val decayComp = entity.decayComponentOrNull
+      if (decayComp == null) {
+        // should not really happen, but just in case
       entity.add(DecayingComponent(lightDuration))
     } else {
       decayComp.timeLeftSeconds = lightDuration
     }
+  }
   }
 }

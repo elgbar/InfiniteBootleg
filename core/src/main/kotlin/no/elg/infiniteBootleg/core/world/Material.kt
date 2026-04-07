@@ -319,6 +319,7 @@ sealed interface Material : ContainerElement {
    * @param localX Relative x in the chunk
    * @param localY Relative y in the chunk
    * @param tryRevalidateChunk If the chunk is disposed, should it be fetched from the world?
+   * @param onBlockEntityAddedCallback If an entity is added to the block this block will execute
    * @return A block of this type
    */
   fun createBlock(
@@ -327,7 +328,8 @@ sealed interface Material : ContainerElement {
     localX: LocalCoord,
     localY: LocalCoord,
     protoEntity: ProtoWorld.Entity? = null,
-    tryRevalidateChunk: Boolean = true
+    tryRevalidateChunk: Boolean = true,
+    onBlockEntityAddedCallback: ((Block, Entity) -> Unit)? = null
   ): Block? {
     val validChunk = if (chunk.isDisposed && tryRevalidateChunk) world.getChunk(chunk.compactLocation) else chunk
     requireNotNull(validChunk) { "No valid chunk found" }
@@ -349,6 +351,7 @@ sealed interface Material : ContainerElement {
               }
             } else {
               block.entity = entity
+              onBlockEntityAddedCallback?.invoke(block, entity)
             }
           }
         }
