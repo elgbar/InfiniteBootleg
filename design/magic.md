@@ -1,6 +1,8 @@
 # The Magic System
 
-Main component is a wand that is configured differently to cast different spells.
+## Spell and casting
+
+A major component is a staff that is configured differently to cast different spells.
 These spells should be customizable by the player.
 
 Each staff is created by combining a type of wood and a gem. The wood will determine the power of the staff, the gem will determine the spell, Rings can be used to modify the
@@ -12,19 +14,19 @@ The spells are not "learned" by the player, but are "forged" into the staff. The
 
 The power of a staff is specific to each spell. Some attributes can be increased by rings for all staffs, such as casting speed
 
-## Staff
+### Staff
 
 ---
 
 Staff determines how powerful a spell can be combined into.
 
-### Removing gems and rings (not implemented)
+#### Removing gems and rings (not implemented)
 
-#### Rings
+##### Rings
 
 Rings can be removed at any time without any cost or degradation.
 
-#### Gems
+##### Gems
 
 There are two ways to remove gems from a staff.
 
@@ -36,7 +38,7 @@ There are two ways to remove gems from a staff.
 
 * The gem can be recovered intact, but the wood will be destroyed in the process.
 
-### Wood types
+#### Wood types
 
 All staff are made from wood, but can be made from different kind of wood.
 
@@ -49,17 +51,17 @@ Only the variable delay can be affected by rings
 
 **Note:** There is a hard minimum cast delay of 150ms to prevent "machine-gunning" (game-breaking speeds.)
 
-| Wood type   | Gem slots | Ring slots | drying rate | Cast delay at 100% | Special modifier                                                                  | Description                                                                                   |
-|-------------|-----------|------------|-------------|--------------------|-----------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
-| Birch       | 1         | 0          | 100%        | 1000 ms            | N/A                                                                               | A weakly magical, but common, wood type known for its light color.                            |
-| Birch       | 1         | 1          | 100%        | 1000 ms            | N/A                                                                               | A slightly more magical wood to the common birch                                              |
-| Aerowode    | 1         | 1          | 100%        | 750 ms             | Player gravity is lowered by up to 20% from normal. Imcompatible with `Lead` ring | A rare and lightweight wood that seems to almost float in the air                             |
-| Red wood    | 2         | 2          | 200%        | 500 ms             | Will start fires, at random, where the spell lands                                | The wood crackles and smokes, making it dry very quickly                                      |
-| driftwood   | 1         | 1          | 25%         | 900 ms             | Works while under water                                                           | Even when dried, drops of water forms around its base                                         |
-| Wisted wood | 2         | 1          | 100%        | 300 ms             | N/A                                                                               | A magical twisted and gnarled wood, known for its gem capacity and speed                      |
-| Trekant     | 3         | 2          | 100%        | 300 ms             | N/A                                                                               | A legendary triangular cross-section wood, prized for its unique shape and magical properties |
+| Wood type     | Gem slots | Ring slots | drying rate | Cast delay at 100% | Special modifier                                                                  | Description                                                                                   |
+|---------------|-----------|------------|-------------|--------------------|-----------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| Birch         | 1         | 0          | 100%        | 1000 ms            | N/A                                                                               | A weakly magical, but common, wood type known for its light color.                            |
+| Hanging Birch | 1         | 1          | 100%        | 1000 ms            | N/A                                                                               | A slightly more magical wood to the common birch                                              |
+| Aerowode      | 1         | 1          | 100%        | 750 ms             | Player gravity is lowered by up to 20% from normal. Imcompatible with `Lead` ring | A rare and lightweight wood that seems to almost float in the air                             |
+| Red wood      | 2         | 2          | 200%        | 500 ms             | Will start fires, at random, where the spell lands                                | The wood crackles and smokes, making it dry very quickly                                      |
+| driftwood     | 1         | 1          | 25%         | 900 ms             | Works while under water                                                           | Even when dried, drops of water forms around its base                                         |
+| Wisted wood   | 2         | 1          | 100%        | 300 ms             | N/A                                                                               | A magical twisted and gnarled wood, known for its gem capacity and speed                      |
+| Trekant       | 3         | 2          | 100%        | 300 ms             | N/A                                                                               | A legendary triangular cross-section wood, prized for its unique shape and magical properties |
 
-### Wood rating
+#### Wood rating
 
 The time from cut to use will determine the power of the wood. The longer the wood is left to dry, the more powerful it will be.
 When crafting to a staff the drying will stop.
@@ -74,7 +76,7 @@ The drying rate is also affected by the wood type. Some wood types will dry fast
 | Ancient     | 90%            | +20%                    | 5 hours                     | 8 hours               | This wood has been left to dry for a very long time, it will be very powerful                       |
 | Petrified   | 100%           | +10%                    | 4 hours                     | 12 hours              | This wood has been left to dry for a extremely long time, there is no point in drying it any longer |
 
-## Gems
+### Gems
 
 ---
 
@@ -82,7 +84,7 @@ Each gem will produce a different spell.
 The power of the spell is determined by the quality of the gem (flaw rating).
 Gems have names after precious stones
 
-### Types of gems
+#### Types of gems
 
 | Implemented | Gem type   | Power meaning                                     | Effect when power at 100% | Description                                                                                                                                           |
 |-------------|------------|---------------------------------------------------|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -95,7 +97,7 @@ Gems have names after precious stones
 |             | Obsidian   | More damage pr projectile                         | 90% of players health     | Spell which damages player                                                                                                                            |
 | Yes         | Sun Gem    | Light block duration                              | 5 minutes                 | Places a industructable (non-blocking) where the spell lands                                                                                          |
 
-### Gem flaw ratings - more flawed decrease the power of the gem
+#### Gem flaw ratings - more flawed decrease the power of the gem
 
 Note that the flaw rating will only affect the power of the gem, not the whole staff
 
@@ -108,7 +110,7 @@ Note that the flaw rating will only affect the power of the gem, not the whole s
 | Fractured   | 25%            | -25%                                   | At least its not ruined                                   |
 | Ruined      | 1%             | -24%                                   | This is useless                                           |
 
-## Rings
+### Rings
 
 ---
 
@@ -117,7 +119,7 @@ Rings can be used to modify the spell-entity and/or the holder of the staff.
 Each ring will have a different effect on the spell.
 Rings are named after elements of the periodic table, and should somewhat relate to what they are used for in the real world.
 
-### Special rings
+#### Special rings
 
 Some rings will have a special effect on the spell, these will not have a flaw rating.
 
@@ -127,7 +129,7 @@ Some rings will have a special effect on the spell, these will not have a flaw r
 | Lead              | the spell will be affected by gravity                                         | Is known to be heavy                      |
 | Phosphorus        | Adds a cone of light to each spell and will a halo of light around the player | Used in flares                            |
 
-### Normal rings
+#### Normal rings
 
 To give some meat here is the boring list of all the "normal" rings
 
@@ -152,7 +154,17 @@ If a ring had a negative effect, then no player would have equipped it.
 | Minor chip       | 140%         | 5%                | Someone got a matching small piece of this                      |
 | Major chip       | 135%         | 10%               | Someone got a matching big piece of this                        |
 | Large fragment   | 125%         | 10%               | Almost whole, just missing most of it                           |
-| Small fragment   | 115%         | 5%                | More than the pieces                                            |
+| Small fragment   | 115%         | 5%                | More than just pieces                                           |
 | Some pieces      | 110%         | 5%                | Pieces, nothing more                                            |
 | Small pieces     | 105%         | 4%                | At least its not _just_ dust                                    |
 | Dust             | 101%         | 1%                | This is almost useless                                          |
+
+## Warding
+
+Inspired by "the wheel of time", warding is a magical spell (or in this game a block) which has an area of effect.
+
+| Ward name      | effect                                                                                                |
+|----------------|-------------------------------------------------------------------------------------------------------|
+| Siuans spell   | Instantly replaces opened chests with TNT unless the player opening it is the one who placed the ward |
+| Two river song | When an entity enters the area of effect a signal is dispatched, along with good two rings birdsong   |
+| Invisible ward | Entities within the wards are invisible to those outside                                              |
