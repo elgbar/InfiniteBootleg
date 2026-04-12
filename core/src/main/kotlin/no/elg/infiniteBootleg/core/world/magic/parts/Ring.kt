@@ -72,6 +72,20 @@ data object GravityRing : RatelessRingType {
   }
 }
 
+data object BoronRing : RatelessRingType {
+
+  override val displayName: String = "Boron Damper"
+  override val serializedName: String = "Boron"
+  override val description: String
+    get() = "Causes spells to ignores the casters velocity"
+
+  override fun onSpellCreate(state: MutableSpellState, rating: RingRating?) {
+    val (casterDx, casterDy) = state.caster.velocityCompacted()
+    // entity velociy is added after normalized direction * speed,
+    state.spellVelocity.sub(casterDx, casterDy)
+  }
+}
+
 data object PowerRing : RatedRingType {
   override val displayName: String = "Iron power"
   override val serializedName: String = "Power"

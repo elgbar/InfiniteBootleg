@@ -123,11 +123,12 @@ Rings are named after elements of the periodic table, and should somewhat relate
 
 Some rings will have a special effect on the spell, these will not have a flaw rating.
 
-| Special Ring type | Effect                                                                        | Name Reason                               |
-|-------------------|-------------------------------------------------------------------------------|-------------------------------------------|
-| Scandium          | visualize where the spell will land/travel                                    | Name like it "scans" the surrounding area |
-| Lead              | the spell will be affected by gravity                                         | Is known to be heavy                      |
-| Phosphorus        | Adds a cone of light to each spell and will a halo of light around the player | Used in flares                            |
+| Special Ring type | Effect                                                                        | Name Reason                                                                      |
+|-------------------|-------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| Scandium          | visualize where the spell will land/travel                                    | Name like it "scans" the surrounding area                                        |
+| Lead              | the spell will be affected by gravity                                         | Is known to be heavy                                                             |
+| Phosphorus        | Adds a cone of light to each spell and will a halo of light around the player | Used in flares                                                                   |
+| Boron Dampener    | Ignores the entities velocity when casting the spell                          | Boron is a neutron absorber used in nuclear reactors. it "slows" the player down |
 
 #### Normal rings
 
