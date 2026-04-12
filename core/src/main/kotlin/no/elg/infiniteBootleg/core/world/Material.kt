@@ -212,6 +212,7 @@ sealed interface Material : ContainerElement {
     override val blocksLight get() = false
     override val lightColor: Color get() = Color.YELLOW
     override val category: MaterialCategory get() = MAGIC
+    override val canBeHandled: Boolean get() = false
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createPhosphorusSpellBlockEntity(world, worldX, worldY, material)
     }
