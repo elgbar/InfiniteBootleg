@@ -195,11 +195,11 @@ inline fun compactIntX(x: Int): Long = x.toLong() shl Integer.SIZE
 inline fun compactIntY(y: Int): Long = y.toLong() and 0xffffffffL
 
 /**
- * An int have 32 bits and long 64, we can store two ints inside a long
+ * A float have 32 bits and long 64, we can store two floats inside a long
  *
- * @param x The x coordinate of the location
- * @param y The y coordinate of the location
- * @return A long containing both the x and y int
+ * @param x The x coordinate of the location, use [decompactLocXf] to unpack
+ * @param y The y coordinate of the location, use [decompactLocYf] to unpack
+ * @return A long containing both the x and y float
  */
 @Contract(pure = true)
 inline fun compactFloat(x: Float, y: Float): Compacted2Float = compactInt(x.toRawBits(), y.toRawBits())
@@ -376,6 +376,15 @@ typealias Progress = Float
  * Use [decompactLocXf] and [decompactLocYf] to get the original float values
  */
 typealias Compacted2Float = Long
+
+object Compacted2FloatComponents {
+
+  @Contract(pure = true)
+  inline operator fun Compacted2Float.component1(): Float = this.decompactLocXf()
+
+  @Contract(pure = true)
+  inline operator fun Compacted2Float.component2(): Float = this.decompactLocYf()
+}
 
 /**
  * Indicate two int has been compacted into a long

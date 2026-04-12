@@ -6,8 +6,10 @@ import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.core.events.api.ThreadType
+import no.elg.infiniteBootleg.core.util.Compacted2Float
 import no.elg.infiniteBootleg.core.util.MAX_X_VEL
 import no.elg.infiniteBootleg.core.util.MAX_Y_VEL
+import no.elg.infiniteBootleg.core.util.compactFloat
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.ecs.api.EntityLoadableMapper
@@ -53,6 +55,11 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
 
   fun toVector2(target: Vector2 = Vector2()): Vector2 = target.set(dx, dy)
 
+  /**
+   * To unpack use [no.elg.infiniteBootleg.core.util.decompactLocXf] and [no.elg.infiniteBootleg.core.util.decompactLocYf]
+   */
+  fun toCompacted2Float(): Compacted2Float = compactFloat(dx, dy)
+
   override fun hudDebug(): String = stringifyCompactLoc(dx, dy)
 
   /**
@@ -70,9 +77,16 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
      */
     const val EFFECTIVE_ZERO = 0.01f
 
-    fun Entity.velocityOrNull(target: Vector2? = null): Vector2? = velocityComponentOrNull?.toVector2(target ?: Vector2())
+    fun Entity.velocityOrNull(target: Vector2 = Vector2()): Vector2? = velocityComponentOrNull?.toVector2(target)
     fun Entity.velocityOrZero(): Vector2 = velocityComponentOrNull?.toVector2(Vector2()) ?: Vector2.Zero
     fun Entity.velocityOrZero(target: Vector2 = Vector2()): Vector2 = velocityComponentOrNull?.toVector2(target) ?: target.set(0f, 0f)
+
+    /**
+     * The velocity of the entity compacted. or `0L` if there is no velocity component
+     *
+     * To unpack use [no.elg.infiniteBootleg.core.util.decompactLocXf] and [no.elg.infiniteBootleg.core.util.decompactLocYf]
+     */
+    fun Entity.velocityCompacted(): Compacted2Float = velocityComponentOrNull?.toCompacted2Float() ?: 0L
 
     var Entity.velocityComponent by propertyFor(mapper)
     var Entity.velocityComponentOrNull by optionalPropertyFor(mapper)
