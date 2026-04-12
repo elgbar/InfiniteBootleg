@@ -47,11 +47,10 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
     val state = MutableSpellState(
       caster = entity,
       staff = this,
-      // FIXME placeholder
-      spellRange = 32.0,
+      spellRange = DEFAULT_SPELL_RANGE,
       fixedCastDelay = wood.type.castDelay * FIXED_DELAY_PERCENTAGE,
       variableCastDelay = wood.type.castDelay * VARIABLE_DELAY_PERCENTAGE,
-      basePower = wood.rating.powerPercent,
+      power = wood.rating.powerPercent,
       spellVelocity = velocity,
       entityModifications = mutableListOf()
     )
@@ -91,6 +90,8 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
   companion object {
 
     const val DEFAULT_SPELL_SPEED = 10f
+    const val DEFAULT_SPELL_RANGE = 32.0
+
     //    val textureRegion: RotatableTextureRegion get() = ClientMain.inst().assets.staffTexture
     fun ProtoElement.Staff.fromProto(): Staff =
       Staff(

@@ -49,7 +49,7 @@ interface SpellState {
    *
    * The base power is derived from the [no.elg.infiniteBootleg.core.world.magic.parts.WoodRating]
    */
-  val basePower: Double
+  val power: Double
 
   /**
    * Modifications to be done to the spell entity after it has been cast
@@ -81,7 +81,7 @@ interface SpellState {
 
     fun SpellState.gemPowers(): Map<Gem, Double> = staff.gems.associateWith { gem -> gemPower(gem) }
     inline fun SpellState.gemPower(gem: Gem): Double = gemPower(gem.type, gem.rating)
-    fun SpellState.gemPower(gemType: GemType, gemRating: GemRating): Double = (gemType.maxPower * basePower * gemRating.powerPercent).coerceIn(1.0, gemType.maxPower)
+    fun SpellState.gemPower(gemType: GemType, gemRating: GemRating): Double = (gemType.maxPower * power * gemRating.powerPercent).coerceIn(1.0, gemType.maxPower)
   }
 }
 
@@ -94,7 +94,7 @@ data class MutableSpellState(
   val fixedCastDelay: Duration,
   // Variable part of the cast delay that can be modified with rings etc.
   var variableCastDelay: Duration,
-  override var basePower: Double,
+  override var power: Double,
   override val entityModifications: MutableList<(Entity) -> Unit>,
   override var castMark: TimeMark = TimeSource.Monotonic.markNow() + Duration.INFINITE
 ) : SpellState {
