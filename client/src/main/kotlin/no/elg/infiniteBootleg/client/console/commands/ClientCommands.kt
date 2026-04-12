@@ -89,6 +89,30 @@ class ClientCommands : CommonCommands() {
     (Tool.tools + Material.normalMaterials).forEach { give(it::class.simpleName!!, quantity) }
   }
 
+  @CmdArgNames("quantity")
+  @ConsoleDoc(description = "Take a number of elements from the players inventory", paramDescriptions = ["Quantity to give, default 100"])
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
+  fun takeAll(quantity: Int = Int.MAX_VALUE) {
+    val container = findPlayerContainer() ?: return
+    container.clear()
+    logger.info { "Took all items from the players inventory" }
+  }
+
+  private fun findPlayerContainer(): Container? {
+    val world = clientWorld ?: return null
+    val entities = world.controlledPlayerEntities
+    if (entities.isEmpty()) {
+      logger.error { "There is no local, controlled, player in this world" }
+      return null
+    }
+    val player = entities.first()
+    val container = player.containerOrNull ?: run {
+      logger.error { "Player has no container" }
+      return null
+    }
+    return container
+  }
+
   private fun takeOrGive(
     elementName: String,
     quantity: Int,
@@ -96,18 +120,7 @@ class ClientCommands : CommonCommands() {
     antiTask: String,
     func: (Container, ContainerElement) -> Unit
   ) {
-    val world = clientWorld ?: return
-    val entities = world.controlledPlayerEntities
-    if (entities.isEmpty()) {
-      logger.error { "There is no local, controlled, player in this world" }
-      return
-    }
-    val player = entities.first()
-    val container = player.containerOrNull ?: run {
-      logger.error { "Player has no container" }
-      return
-    }
-
+    val container = findPlayerContainer() ?: return
     val element: ContainerElement = ContainerElement.valueOfOrNull(elementName) ?: run {
       logger.error { "Unknown container element '$elementName'" }
       return
@@ -563,7 +576,7 @@ class ClientCommands : CommonCommands() {
     schedule(50f / 1000f) { ClientMain.inst().screen = MainMenuScreen }
   }
 
-  @ConsoleDoc(description = "Switch inventory of player", paramDescriptions = ["The inventory to use, can be 'creative', 'autosort' or 'container'"])
+  @ConsoleDoc(description = "Switch inventory of player", paramDescriptions = ["The inventory to use, can be 'autosort' or 'container'"])
   fun inv(invType: String) {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
