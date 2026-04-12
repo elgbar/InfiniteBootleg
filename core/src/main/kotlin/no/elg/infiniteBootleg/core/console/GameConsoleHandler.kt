@@ -51,11 +51,13 @@ abstract class GameConsoleHandler :
     console.draw()
   }
 
-  fun execCommand(command: String): Boolean {
+  fun execCommand(command: String, suppressCommandLogging: Boolean = false): Boolean {
     if (console.isDisabled) {
       return false
     }
-    logger.info { "> $command" }
+    if (!suppressCommandLogging) {
+      logger.info { "> $command" }
+    }
     val parts = command.trim().split(" ")
     if (parts.isEmpty()) {
       return false
@@ -103,7 +105,8 @@ abstract class GameConsoleHandler :
           // Call the function with all default parameters (i.e., they are omitted) and the instance as the first parameter
           callOnThreadyType.handle { func.callBy(mapOf(func.parameters[0] to exec)) }
         } else {
-          logger.error { "Multiple functions with the same name found, will not execute default" }
+          logger.error { "Command exists with multiple different arguments: " }
+          execCommand("help $commandPart", suppressCommandLogging = true)
         }
         return true
       } catch (e: Exception) {
