@@ -410,12 +410,11 @@ class ClientCommands : CommonCommands() {
 
   @CmdArgNames("x", "y")
   @ConsoleDoc(description = "Teleport the camera to given world coordinate", paramDescriptions = ["World x coordinate", "World y coordinate"])
+  @CallOnThreadyType(ExecutionThread.RENDER)
   fun lookAt(worldX: Float, worldY: Float) {
     val clientWorld = clientWorld ?: return
-    launchOnMain {
-      clientWorld.render.lookAt(worldX, worldY)
-      logger.info { "Teleported camera to ${stringifyCompactLoc(worldX, worldY)}" }
-    }
+    clientWorld.render.lookAt(worldX, worldY)
+    logger.info { "Teleported camera to ${stringifyCompactLoc(worldX, worldY)}" }
   }
 
   @CmdArgNames("mode")
@@ -446,6 +445,7 @@ class ClientCommands : CommonCommands() {
 
   @CmdArgNames("zoom level")
   @ConsoleDoc(description = "Change the zoom level of the world camera", paramDescriptions = ["The new zoom level must be between $MIN_ZOOM and $MAX_ZOOM"])
+  @CallOnThreadyType(ExecutionThread.RENDER)
   fun zoom(zoom: Float) = zoom(zoom, limit = false)
 
   @CmdArgNames("zoom level", "limit")
@@ -453,6 +453,7 @@ class ClientCommands : CommonCommands() {
     description = "Change the zoom level of the world camera",
     paramDescriptions = ["The new zoom level must be between $MIN_ZOOM and $MAX_ZOOM (if limited)", "Whether to limit the zoom level"]
   )
+  @CallOnThreadyType(ExecutionThread.RENDER)
   fun zoom(zoom: Float, limit: Boolean) {
     val clientWorld = clientWorld ?: return
     val render = clientWorld.render
@@ -662,8 +663,11 @@ class ClientCommands : CommonCommands() {
     entInChunk(mouseLocator.mouseBlockX.worldToChunk(), mouseLocator.mouseBlockY.worldToChunk())
   }
 
-  fun b2am() = b2AtMouse()
-  fun b2AtMouse() {
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
+  fun b2dam() = b2dAtMouse()
+
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
+  fun b2dAtMouse() {
     val world = clientWorld ?: return
     val mouseLocator = ClientMain.inst().mouseLocator
     mouseLocator.update(world)
