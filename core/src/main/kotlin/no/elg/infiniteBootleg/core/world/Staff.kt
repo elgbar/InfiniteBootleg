@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.core.world
 
 import com.badlogic.ashley.core.Entity
+import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.items.Item
 import no.elg.infiniteBootleg.core.items.ItemType
 import no.elg.infiniteBootleg.core.items.StaffItem
@@ -11,6 +12,7 @@ import no.elg.infiniteBootleg.core.world.magic.Gem
 import no.elg.infiniteBootleg.core.world.magic.MutableSpellState
 import no.elg.infiniteBootleg.core.world.magic.Ring
 import no.elg.infiniteBootleg.core.world.magic.SpellState
+import no.elg.infiniteBootleg.core.world.magic.SpellState.Companion.gemPower
 import no.elg.infiniteBootleg.core.world.magic.Wood
 import no.elg.infiniteBootleg.core.world.magic.Wood.Companion.FIXED_DELAY_PERCENTAGE
 import no.elg.infiniteBootleg.core.world.magic.Wood.Companion.VARIABLE_DELAY_PERCENTAGE
@@ -29,8 +31,15 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
   override val displayName: String
     get() = wood.displayName
 
+  private fun gemPowerExplained(gem: Gem): String {
+    val type = gem.type
+    val spellState = createSpellState(Entity(), Vector2.Zero)
+    val actualPower = spellState.gemPower(gem)
+    return "power=$actualPower ${type.powerDescription} of max=${type.maxPower} ${type.powerDescription}"
+  }
+
   override val description: String = wood.type.description +
-    gems.joinToString(separator = "\n", prefix = "\n") { "${it.displayName} ${it.type.description}" } +
+    gems.joinToString(separator = "\n", prefix = "\n") { gem -> "${gem.displayName} ${gem.type.description}\n\t\t${if (Settings.debug) gemPowerExplained(gem) else ""}" } +
     rings.joinToString(separator = "\n", prefix = if (rings.isNotEmpty()) "\n" else "") { "${it.displayName} ${it.type.description}" }
 
   fun createSpellState(entity: Entity): MutableSpellState {

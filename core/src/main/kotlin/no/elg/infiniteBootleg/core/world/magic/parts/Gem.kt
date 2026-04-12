@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.core.world.magic.Description
 import no.elg.infiniteBootleg.core.world.magic.MagicEffectsWithRating
 import no.elg.infiniteBootleg.core.world.magic.Named
 import no.elg.infiniteBootleg.core.world.magic.SpellState
+import no.elg.infiniteBootleg.core.world.magic.SpellState.Companion.gemPower
 
 private val logger = KotlinLogging.logger {}
 
@@ -32,7 +33,11 @@ sealed interface GemType :
   Description,
   MagicEffectsWithRating<GemRating> {
 
+  /**
+   * Absolute max power this gem can produce.
+   */
   val maxPower: Double
+  val powerDescription: String
 
   companion object {
     fun valueOf(serializedName: String): GemType? =
@@ -52,6 +57,8 @@ data object Diamond : GemType {
   override val displayName: String = "Diamond"
 
   override val maxPower: Double = 4.0 // blocks radius
+  override val powerDescription: String
+    get() = "mined radius"
 
   override val description: String
     get() = "Destructive mining spell that breaks blocks in an area upon landing."
@@ -71,9 +78,11 @@ data object SunGem : GemType {
   override val displayName: String = "Sun Gem"
 
   override val maxPower: Double = 300.0 // Duration in seconds before extinguishing the light
+  override val powerDescription: String
+    get() = "seconds lit"
 
   override val description: String
-    get() = "Impossible to break light where the spell lands"
+    get() = "Creates an impossible to break light where the spell lands"
 
   override fun onSpellLand(state: SpellState, spellEntity: Entity, rating: GemRating) {
     val lightDuration = state.gemPower(this, rating)
@@ -84,10 +93,10 @@ data object SunGem : GemType {
       val decayComp = entity.decayComponentOrNull
       if (decayComp == null) {
         // should not really happen, but just in case
-      entity.add(DecayingComponent(lightDuration))
-    } else {
-      decayComp.timeLeftSeconds = lightDuration
+        entity.add(DecayingComponent(lightDuration))
+      } else {
+        decayComp.timeLeftSeconds = lightDuration
+      }
     }
-  }
   }
 }
