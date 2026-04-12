@@ -10,9 +10,12 @@ import no.elg.infiniteBootleg.client.util.inputMouseLocator
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.net.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.core.net.serverBoundSpellSpawn
+import no.elg.infiniteBootleg.core.util.Compacted2FloatComponents.component1
+import no.elg.infiniteBootleg.core.util.Compacted2FloatComponents.component2
 import no.elg.infiniteBootleg.core.world.Staff
+import no.elg.infiniteBootleg.core.world.Staff.Companion.DEFAULT_SPELL_SPEED
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_DEFAULT
-import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityOrZero
+import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityCompacted
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
@@ -26,9 +29,7 @@ import kotlin.time.TimeSource
 
 object MagicSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFAULT) {
 
-  private val diffVector = Vector2()
-  private val posVector = Vector2()
-  private val velVector = Vector2()
+  private val tmp = Vector2()
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     if (ClientMain.inst().shouldIgnoreWorldInput()) {
@@ -43,23 +44,27 @@ object MagicSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFAULT)
       // TODO Increase (distance/speed) by holding right click?
 
       val (worldX, worldY) = entity.positionComponent
-      val newSpellState = heldStaff.createSpellState(entity)
-      entity.add(LastSpellCastComponent(newSpellState))
-      val velocityOrZero = entity.velocityOrZero(velVector)
+      val (velX, velY) = entity.velocityCompacted()
 
       inputMouseLocator.update(world)
-      diffVector
+
+      val velocity = tmp
         .set(inputMouseLocator.mouseWorldX, inputMouseLocator.mouseWorldY)
         .sub(worldX, worldY)
         .nor()
+        .scl(DEFAULT_SPELL_SPEED)
+        .add(velX, velY)
+
+      val newSpellState = heldStaff.createSpellState(entity, velocity)
+      entity.add(LastSpellCastComponent(newSpellState))
 
       entity.containerOrNull?.remove(selectedItem, 1u)
       world.engine.createSpellEntity(
         world,
         worldX,
         worldY,
-        diffVector.x * newSpellState.spellVelocity.toFloat() + velocityOrZero.x,
-        diffVector.y * newSpellState.spellVelocity.toFloat() + velocityOrZero.y,
+        velocity.x,
+        velocity.y,
         newSpellState
       ) {
         newSpellState.castMark = TimeSource.Monotonic.markNow() + newSpellState.castDelay

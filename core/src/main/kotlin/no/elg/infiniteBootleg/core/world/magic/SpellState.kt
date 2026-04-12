@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.core.world.magic
 
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.math.Vector2
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.world.Staff
 import no.elg.infiniteBootleg.core.world.magic.parts.GemRating
@@ -29,7 +30,14 @@ interface SpellState {
    */
   val spellRange: Double
 
-  val spellVelocity: Double
+  /**
+   * Velocity of the spell.
+   *
+   * Calculated by finding the normalized direction between the mouse and the caster,
+   * then scaled by [no.elg.infiniteBootleg.core.world.Staff.Companion.DEFAULT_SPELL_SPEED],
+   * then the entities velocity is added.
+   */
+  val spellVelocity: Vector2
 
   /**
    * How long until the next spell can be cast
@@ -81,7 +89,7 @@ data class MutableSpellState(
   override val caster: Entity,
   override val staff: Staff,
   override var spellRange: Double,
-  override var spellVelocity: Double,
+  override var spellVelocity: Vector2,
   // Fixed part of the cast delay that does not change with modifications
   val fixedCastDelay: Duration,
   // Variable part of the cast delay that can be modified with rings etc.

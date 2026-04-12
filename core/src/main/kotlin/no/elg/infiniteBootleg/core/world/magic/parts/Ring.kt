@@ -3,6 +3,8 @@
 package no.elg.infiniteBootleg.core.world.magic.parts
 
 import com.badlogic.ashley.core.Entity
+import no.elg.infiniteBootleg.core.util.Compacted2FloatComponents.component1
+import no.elg.infiniteBootleg.core.util.Compacted2FloatComponents.component2
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.util.sealedSubclassObjectInstances
 import no.elg.infiniteBootleg.core.util.toTitleCase
@@ -10,6 +12,8 @@ import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.setVelocity
+import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityCompacted
 import no.elg.infiniteBootleg.core.world.magic.Description
 import no.elg.infiniteBootleg.core.world.magic.Equippable
 import no.elg.infiniteBootleg.core.world.magic.MagicEffectsWithRating
@@ -108,7 +112,12 @@ data object SpellSpeedRing : RatedRingType {
     get() = "Increases the speed of the spell"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
-    state.spellVelocity *= rating.effectPercent
+    // must be done as an entity modification to make sure any resetting of velocity (looking at you Boron) does not interfere with this ring
+    state.entityModifications += { spell: Entity ->
+      val (casterDx, casterDy) = state.caster.velocityCompacted()
+      val effectPercentModifier = rating.effectPercent.toFloat()
+      spell.setVelocity(casterDx * effectPercentModifier, casterDy * effectPercentModifier)
+    }
   }
 }
 

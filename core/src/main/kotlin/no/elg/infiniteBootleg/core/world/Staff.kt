@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.core.world
 
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.items.Item
 import no.elg.infiniteBootleg.core.items.ItemType
@@ -42,7 +43,7 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
     gems.joinToString(separator = "\n", prefix = "\n") { gem -> "${gem.displayName} ${gem.type.description}\n\t\t${if (Settings.debug) gemPowerExplained(gem) else ""}" } +
     rings.joinToString(separator = "\n", prefix = if (rings.isNotEmpty()) "\n" else "") { "${it.displayName} ${it.type.description}" }
 
-  fun createSpellState(entity: Entity): MutableSpellState {
+  fun createSpellState(entity: Entity, velocity: Vector2): MutableSpellState {
     val state = MutableSpellState(
       caster = entity,
       staff = this,
@@ -51,8 +52,7 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
       fixedCastDelay = wood.type.castDelay * FIXED_DELAY_PERCENTAGE,
       variableCastDelay = wood.type.castDelay * VARIABLE_DELAY_PERCENTAGE,
       basePower = wood.rating.powerPercent,
-      // FIXME placeholder
-      spellVelocity = 10.0,
+      spellVelocity = velocity,
       entityModifications = mutableListOf()
     )
     wood.onSpellCreate(state)
@@ -90,6 +90,7 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
 
   companion object {
 
+    const val DEFAULT_SPELL_SPEED = 10f
     //    val textureRegion: RotatableTextureRegion get() = ClientMain.inst().assets.staffTexture
     fun ProtoElement.Staff.fromProto(): Staff =
       Staff(
