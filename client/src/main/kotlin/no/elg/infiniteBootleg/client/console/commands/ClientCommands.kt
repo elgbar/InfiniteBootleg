@@ -35,7 +35,6 @@ import no.elg.infiniteBootleg.core.util.asWorldSeed
 import no.elg.infiniteBootleg.core.util.chunkToWorld
 import no.elg.infiniteBootleg.core.util.getStaticField
 import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
-import no.elg.infiniteBootleg.core.util.launchOnMain
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.stringifyCompactLocWithChunk
@@ -78,6 +77,21 @@ class ClientCommands : CommonCommands() {
       null
     }
 
+  private fun localControlledPlayer(): Set<Entity>? {
+    val world = clientWorld ?: return null
+    return localControlledPlayer(world)
+  }
+
+  private fun localControlledPlayer(world: ClientWorld): Set<Entity>? {
+    val world = clientWorld ?: return null
+    val entities = world.controlledPlayerEntities
+    if (entities.isEmpty()) {
+      logger.error { "There is no local, controlled, player in this world" }
+      return null
+    }
+    return entities
+  }
+
   @HiddenCommand
   @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun ga() = giveAll()
@@ -99,12 +113,7 @@ class ClientCommands : CommonCommands() {
   }
 
   private fun findPlayerContainer(): Container? {
-    val world = clientWorld ?: return null
-    val entities = world.controlledPlayerEntities
-    if (entities.isEmpty()) {
-      logger.error { "There is no local, controlled, player in this world" }
-      return null
-    }
+    val entities = localControlledPlayer() ?: return null
     val player = entities.first()
     val container = player.containerOrNull ?: run {
       logger.error { "Player has no container" }
@@ -217,11 +226,7 @@ class ClientCommands : CommonCommands() {
   @ConsoleDoc(description = "Toggle flight for player")
   @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun fly() {
-    val world = clientWorld ?: return
-    val entities = world.controlledPlayerEntities
-    if (entities.isEmpty()) {
-      logger.info { "There is no local, controlled player in this world" }
-    }
+    val entities = localControlledPlayer() ?: return
     for (entity in entities) {
       val wasFlying: Boolean = entity.flying
       entity.flying = !wasFlying
@@ -389,16 +394,12 @@ class ClientCommands : CommonCommands() {
   @ConsoleDoc(description = "Teleport to given world coordinate", paramDescriptions = ["World x coordinate", "World y coordinate"])
   @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun tp(worldX: Float, worldY: Float) {
-    val clientWorld = clientWorld ?: return
-    ThreadType.PHYSICS.launchOrRun(clientWorld) {
-      val entities = clientWorld.controlledPlayerEntities
-      if (entities.isNotEmpty()) {
-        world?.loadChunk(worldX.worldToChunk(), worldY.worldToChunk())
-        clientWorld.render.lookAt(worldX, worldY) // Do not lerp when teleporting
-        entities.forEach { it.teleport(worldX, worldY, killVelocity = true) }
-        logger.info { "Teleported entity to ${stringifyCompactLoc(worldX, worldY)}" }
-      }
-    }
+    val world = clientWorld ?: return
+    val entities = localControlledPlayer(world) ?: return
+    world.loadChunk(worldX.worldToChunk(), worldY.worldToChunk())
+    world.render.lookAt(worldX, worldY) // Do not lerp when teleporting
+    entities.forEach { it.teleport(worldX, worldY, killVelocity = true) }
+    logger.info { "Teleported entity to ${stringifyCompactLoc(worldX, worldY)}" }
   }
 
   @ConsoleDoc(description = "Teleport the camera to the pointer location")
@@ -469,12 +470,8 @@ class ClientCommands : CommonCommands() {
   @ConsoleDoc(description = "Get the brush sizes")
   @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun brush() {
-    val world = clientWorld ?: return
-    val localPlayers = world.controlledPlayerEntities
-    if (localPlayers.isEmpty()) {
-      logger.info { "There is no local, controlled player in this world" }
-    }
-    for (entity in localPlayers) {
+    val entities = localControlledPlayer() ?: return
+    for (entity in entities) {
       logger.info { "Brush size for player ${entity.nameOrNull ?: "Unknown"} is ${entity.locallyControlledComponent.brushSize}" }
     }
   }
@@ -483,11 +480,7 @@ class ClientCommands : CommonCommands() {
   @ConsoleDoc(description = "Set the brush size of the mouse", paramDescriptions = ["New brush size, positive integer"])
   @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun brush(size: Float) {
-    val world = clientWorld ?: return
-    val entities = world.controlledPlayerEntities
-    if (entities.isEmpty()) {
-      logger.error { "There is no local, controlled player in this world" }
-    }
+    val entities = localControlledPlayer() ?: return
     if (size < 1) {
       logger.error { "Brush size must be at least 1" }
       return
@@ -502,11 +495,7 @@ class ClientCommands : CommonCommands() {
   @ConsoleDoc(description = "Set the interact radius from the player", paramDescriptions = ["New interact radius, positive integer"])
   @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun interactRadius(interactRadius: Float) {
-    val world = clientWorld ?: return
-    val entities = world.controlledPlayerEntities
-    if (entities.isEmpty()) {
-      logger.error { "There is no local, controlled player in this world" }
-    }
+    val entities = localControlledPlayer() ?: return
     if (interactRadius < 1) {
       logger.error { "Interact radius must be at least 1" }
       return
@@ -520,11 +509,7 @@ class ClientCommands : CommonCommands() {
   @ConsoleDoc(description = "Set the interact radius from the player")
   @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun instantBreak() {
-    val world = clientWorld ?: return
-    val entities = world.controlledPlayerEntities
-    if (entities.isEmpty()) {
-      logger.error { "There is no local, controlled player in this world" }
-    }
+    val entities = localControlledPlayer() ?: return
     for (entity in entities) {
       val locallyControlledComponent = entity.locallyControlledComponent
       locallyControlledComponent.instantBreak = !locallyControlledComponent.instantBreak
@@ -535,11 +520,7 @@ class ClientCommands : CommonCommands() {
   @ConsoleDoc(description = "Toggle whether a player can place blocks disconnected from other blocks")
   @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun placeCheck() {
-    val world = clientWorld ?: return
-    val entities = world.controlledPlayerEntities
-    if (entities.isEmpty()) {
-      logger.error { "There is no local, controlled player in this world" }
-    }
+    val entities = localControlledPlayer() ?: return
     for (entity in entities) {
       val wasIgnoring: Boolean = entity.ignorePlaceableCheck
       entity.ignorePlaceableCheck = !wasIgnoring
@@ -577,14 +558,9 @@ class ClientCommands : CommonCommands() {
   }
 
   @ConsoleDoc(description = "Switch inventory of player", paramDescriptions = ["The inventory to use, can be 'autosort' or 'container'"])
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun inv(invType: String) {
-    val world = clientWorld ?: return
-    val entities = world.controlledPlayerEntities
-    if (entities.isEmpty()) {
-      logger.error { "There is no local, controlled, player in this world" }
-      return
-    }
-
+    val entities = localControlledPlayer() ?: return
     val player = entities.first()
     val oldOwnedContainer = player.ownedContainerOrNull?.also { player.closeContainer() }
 
