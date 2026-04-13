@@ -3,11 +3,13 @@ package no.elg.infiniteBootleg.core.world.ecs.creation
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
+import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.ashley.EngineEntity
 import no.elg.infiniteBootleg.core.util.FamilyComponents.Companion.toFamilyComponents
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.WorldCoordNumber
 import no.elg.infiniteBootleg.core.util.futureEntity
+import no.elg.infiniteBootleg.core.util.removeSelf
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.util.toComponentsString
 import no.elg.infiniteBootleg.core.util.toProtoEntityRef
@@ -33,16 +35,24 @@ const val ESSENTIALLY_ZERO = 0.001f
 const val A_LITTLE_MORE_THAN_ESSENTIALLY_ZERO = 0.01f
 const val A_LITTLE_BIT = 0.1f
 
+private val logger = KotlinLogging.logger {}
+
 internal fun checkFamilies(entity: Entity, wantedFamilies: Array<Pair<Family, String>>) {
-  check(basicRequiredEntityFamily.matches(entity)) { "Finished entity does not match the required entity family" }
+  if (!basicRequiredEntityFamily.matches(entity)) {
+    entity.removeSelf()
+    logger.error { "Finished entity does not match the required entity family.\nCurrent entity components: ${entity.toComponentsString()}" }
+  }
   wantedFamilies.forEach { (family: Family, errorStr) ->
-    check(family.matches(entity)) {
-      val sb = StringBuilder("Finished entity ${entity.idAndName} does not match family '$errorStr'.\nCurrent entity components: ${entity.toComponentsString()}.\nFamily: ")
-      val familyComponents = family.toFamilyComponents()
-      familyComponents.buildString(sb)
-      sb.append(".\n")
-      familyComponents.matchesString(entity, sb)
-      sb.toString()
+    if (!family.matches(entity)) {
+      logger.warn {
+        val sb = StringBuilder("Finished entity ${entity.idAndName} does not match family '$errorStr'.\nCurrent entity components: ${entity.toComponentsString()}.\nFamily: ")
+        val familyComponents = family.toFamilyComponents()
+        familyComponents.buildString(sb)
+        sb.append(".\n")
+        familyComponents.matchesString(entity, sb)
+        sb.toString()
+      }
+      entity.removeSelf()
     }
   }
 }
