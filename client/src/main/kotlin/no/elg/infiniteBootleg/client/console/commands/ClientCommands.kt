@@ -31,6 +31,7 @@ import no.elg.infiniteBootleg.core.inventory.container.impl.ContainerImpl
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.net.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.core.net.serverBoundClientDisconnectPacket
+import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.asWorldSeed
 import no.elg.infiniteBootleg.core.util.chunkToWorld
 import no.elg.infiniteBootleg.core.util.getStaticField
@@ -663,10 +664,10 @@ class ClientCommands : CommonCommands() {
     entInChunk(mouseLocator.mouseBlockX.worldToChunk(), mouseLocator.mouseBlockY.worldToChunk())
   }
 
-  @CallOnThreadyType(ExecutionThread.PHYSICS)
+  @CallOnThreadyType(ExecutionThread.RENDER)
   fun b2dam() = b2dAtMouse()
 
-  @CallOnThreadyType(ExecutionThread.PHYSICS)
+  @CallOnThreadyType(ExecutionThread.RENDER)
   fun b2dAtMouse() {
     val world = clientWorld ?: return
     val mouseLocator = ClientMain.inst().mouseLocator
@@ -694,6 +695,46 @@ class ClientCommands : CommonCommands() {
           logger.info { "  body data: ${entityInfo(shapeId.body.userData)}" }
         }
       }
+    }
+  }
+
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
+  fun iam() {
+    actionOnHoveringBlockEntity { worldX, worldY, block ->
+      val entity = block.entity ?: let {
+        logger.info { "No block entity at ${stringifyCompactLoc(worldX, worldY)}" }
+        return@actionOnHoveringBlockEntity
+      }
+      inspect(entity)
+    }
+  }
+
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
+  fun iam(componentName: String) {
+    actionOnHoveringBlockEntity { worldX, worldY, block ->
+      val entity = block.entity ?: let {
+        logger.info { "No block entity at ${stringifyCompactLoc(worldX, worldY)}" }
+        return@actionOnHoveringBlockEntity
+      }
+      inspect(entity, componentName)
+    }
+  }
+
+  fun actionOnHoveringBlockEntity(action: (WorldCoord, WorldCoord, Block) -> Unit) {
+    val world = clientWorld ?: return
+    val mouseLocator = ClientMain.inst().mouseLocator
+    mouseLocator.update(world)
+
+    val worldX = mouseLocator.mouseBlockX
+    val worldY = mouseLocator.mouseBlockY
+
+    world.actionOnBlock(worldX, worldY, loadChunk = false) { lx, ly, maybeChunk ->
+      val chunk = maybeChunk ?: let {
+        logger.error { "Failed to get the chunk at ${stringifyCompactLoc(worldX, worldY)}" }
+        return
+      }
+      val block = chunk.getBlock(lx, ly)
+      action(worldX, worldY, block)
     }
   }
 }

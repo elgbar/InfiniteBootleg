@@ -8,7 +8,9 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.delay
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.console.AuthoritativeOnly
+import no.elg.infiniteBootleg.core.console.CallOnThreadyType
 import no.elg.infiniteBootleg.core.console.CmdArgNames
+import no.elg.infiniteBootleg.core.console.ExecutionThread
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.events.api.EventStatistics
 import no.elg.infiniteBootleg.core.events.api.EventsTracker
@@ -18,6 +20,7 @@ import no.elg.infiniteBootleg.core.net.clientBoundWorldSettings
 import no.elg.infiniteBootleg.core.net.serverBoundWorldSettings
 import no.elg.infiniteBootleg.core.util.ChunkCoord
 import no.elg.infiniteBootleg.core.util.IllegalAction
+import no.elg.infiniteBootleg.core.util.displayName
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.toAbled
@@ -362,7 +365,7 @@ open class CommonCommands : CommandExecutor() {
     } else {
       world.validEntities.filter {
         it.components.any { component ->
-          component != null && component.javaClass.simpleName.removeSuffix("Component").removeSuffix("Tag").equals(searchTerm, true)
+          component != null && component.displayName.equals(searchTerm, true)
         }
       }
     }
@@ -373,30 +376,23 @@ open class CommonCommands : CommandExecutor() {
 
   @CmdArgNames("entityId")
   @ConsoleDoc(description = "List components of an entity", paramDescriptions = ["Entity id or name"])
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun inspect(entityId: String) {
     val entity = findEntity(entityId) ?: return
-    logger.info { "===[ ${entity.idAndName} ]===" }
-    val (tags, nonTags) = entity.components.partition { it is TagComponent }
-    if (nonTags.isNotEmpty()) {
-      logger.info { "Components" }
-      for (component in nonTags) {
-        logger.info { "- ${component::class.simpleName}: ${component.debugString()}" }
-      }
-    }
-    if (tags.isNotEmpty()) {
-      logger.info { "Tags" }
-      for (component in tags) {
-        logger.info { "- ${component::class.simpleName}" }
-      }
-    }
+    inspect(entity)
   }
 
   @CmdArgNames("entityId", "component")
   @ConsoleDoc(description = "Inspect a component of an entity", paramDescriptions = ["Entity id or name", "The simple name of the component to inspect"])
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun inspect(entityId: String, componentName: String) {
     val entity = findEntity(entityId) ?: return
-    val searchTerm = componentName.removeSuffix("Component")
-    val component = entity.components.filterNotNull().find { it::class.simpleName?.removeSuffix("Component")?.removeSuffix("Tag").equals(searchTerm, true) } ?: run {
+    inspect(entity, componentName)
+  }
+
+  protected fun inspect(entity: Entity, componentName: String) {
+    val searchTerm = componentName.removeSuffix("Component").removeSuffix("Tag")
+    val component = entity.components.filterNotNull().find { it.displayName.equals(searchTerm, true) } ?: run {
       logger.error { "No component with name '$componentName' in entity ${entity.idAndName}" }
       return
     }
@@ -416,6 +412,23 @@ open class CommonCommands : CommandExecutor() {
     printInfo("Tag") { component is TagComponent }
 
     logger.info { component.debugString() }
+  }
+
+  protected fun inspect(entity: Entity) {
+    logger.info { "===[ ${entity.idAndName} ]===" }
+    val (tags, nonTags) = entity.components.partition { it is TagComponent }
+    if (nonTags.isNotEmpty()) {
+      logger.info { "Components" }
+      for (component in nonTags) {
+        logger.info { "- ${component::class.simpleName}: ${component.debugString()}" }
+      }
+    }
+    if (tags.isNotEmpty()) {
+      logger.info { "Tags" }
+      for (component in tags) {
+        logger.info { "- ${component::class.simpleName}" }
+      }
+    }
   }
 
   @ConsoleDoc(description = "Find entities in a chunk", paramDescriptions = ["The x component of the chunk coordinate", "The y component of the chunk coordinate"])
