@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import ktx.ashley.EngineEntity
+import no.elg.infiniteBootleg.core.util.FamilyComponents.Companion.toFamilyComponents
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.WorldCoordNumber
 import no.elg.infiniteBootleg.core.util.futureEntity
@@ -14,6 +15,7 @@ import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.ecs.basicRequiredEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.blockEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.MaterialComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.idAndName
 import no.elg.infiniteBootleg.core.world.ecs.components.required.EntityTypeComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent
@@ -34,7 +36,14 @@ const val A_LITTLE_BIT = 0.1f
 internal fun checkFamilies(entity: Entity, wantedFamilies: Array<Pair<Family, String>>) {
   check(basicRequiredEntityFamily.matches(entity)) { "Finished entity does not match the required entity family" }
   wantedFamilies.forEach { (family: Family, errorStr) ->
-    check(family.matches(entity)) { "Finished entity does not match $errorStr, current components: ${entity.toComponentsString()}" }
+    check(family.matches(entity)) {
+      val sb = StringBuilder("Finished entity ${entity.idAndName} does not match family '$errorStr'.\nCurrent entity components: ${entity.toComponentsString()}.\nFamily: ")
+      val familyComponents = family.toFamilyComponents()
+      familyComponents.buildString(sb)
+      sb.append(".\n")
+      familyComponents.matchesString(entity, sb)
+      sb.toString()
+    }
   }
 }
 
