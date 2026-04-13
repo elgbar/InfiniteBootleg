@@ -19,6 +19,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -335,7 +336,15 @@ public class ImprovedGUIConsole extends AbstractConsole {
     if (hidden) {
       return;
     }
-    stage.draw();
+    try {
+      stage.draw();
+    } finally {
+      // End drawing if drawing failed to end it (by throwing an exception)
+      Batch batch = stage.getBatch();
+      if (batch.isDrawing()) {
+        batch.end();
+      }
+    }
   }
 
   @Override
