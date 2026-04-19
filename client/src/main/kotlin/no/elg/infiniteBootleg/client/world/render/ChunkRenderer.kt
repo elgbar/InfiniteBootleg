@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import ktx.graphics.use
@@ -40,6 +41,11 @@ class ChunkRenderer(world: World) : Disposable {
   private val batch: SpriteBatch = SpriteBatch().also {
     it.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, Chunk.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat())
   }
+
+  private val checkerboardShader: ShaderProgram = ShaderProgram(CHECKERBOARD_VERT, CHECKERBOARD_FRAG).also {
+    require(it.isCompiled) { "Checkerboard shader failed to compile:\n${it.log}" }
+  }
+
   private val splitCache: MutableMap<TextureRegion, Array<Array<TextureRegion>>> = HashMap()
 
   private val rotationNoise: FastNoiseLite = FastNoiseLite(world.seed.toInt()).also {
@@ -95,6 +101,9 @@ class ChunkRenderer(world: World) : Disposable {
               }
             }
 
+            // Visible non-collidable blocks have their main texture deferred to pass 2 (checkerboard shader)
+            val deferMainTexture = !material.isCollidable && !material.invisibleBlock && !isMarker
+
             val blockLight = chunk.getBlockLight(localX, localY)
             if (Settings.renderLight) {
               if (blockLight.isLit && (!blockLight.isSkylight || texture.rotationAllowed)) {
@@ -102,14 +111,18 @@ class ChunkRenderer(world: World) : Disposable {
                 if (secondaryTexture != null) {
                   drawShadedBlock(secondaryTexture, blockLight.lightMap, dx, dy, rotation)
                 }
-                drawShadedBlock(texture, blockLight.lightMap, dx, dy, rotation)
+                if (!deferMainTexture) {
+                  drawShadedBlock(texture, blockLight.lightMap, dx, dy, rotation)
+                }
               } else {
                 if (blockLight.isLit) {
                   val rotation = calculateRotation(chunk, localX, localY)
                   if (secondaryTexture != null) {
                     drawRotatedTexture(secondaryTexture, dx, dy, rotation)
                   }
-                  drawRotatedTexture(texture, dx, dy, rotation)
+                  if (!deferMainTexture) {
+                    drawRotatedTexture(texture, dx, dy, rotation)
+                  }
                 } else {
                   // Optimization: the block is not lit or in the sky, the background is already cleared to black
                   continue
@@ -121,7 +134,73 @@ class ChunkRenderer(world: World) : Disposable {
               if (secondaryTexture != null) {
                 drawRotatedTexture(secondaryTexture, dx, dy, rotation)
               }
+              if (!deferMainTexture) {
+                drawRotatedTexture(texture, dx, dy, rotation)
+              }
+            }
+          }
+        }
+
+        // --- Pass 2: non-collidable block textures with checkerboard shader ---
+        batch.flush()
+        batch.shader = checkerboardShader
+        for (localX in 0 until Chunk.CHUNK_SIZE) {
+          for (localY in 0 until Chunk.CHUNK_SIZE) {
+            val block = chunk.getRawBlock(localX, localY) ?: continue
+            val material = block.materialOrAir()
+            if (material.isCollidable || material.invisibleBlock || block.isMarkerBlock()) continue
+
+            val texture = block.texture ?: continue
+            val blockLight = chunk.getBlockLight(localX, localY)
+
+            if (Settings.renderLight && !blockLight.isLit) continue
+
+            batch.color = Color.WHITE
+            val dx = localX * Block.BLOCK_TEXTURE_SIZE_F
+            val dy = localY * Block.BLOCK_TEXTURE_SIZE_F
+            val rotation = calculateRotation(chunk, localX, localY)
+
+            if (Settings.renderLight) {
+              if (!blockLight.isSkylight || texture.rotationAllowed) {
+                drawShadedBlock(texture, blockLight.lightMap, dx, dy, rotation)
+              } else {
+                drawRotatedTexture(texture, dx, dy, rotation)
+              }
+            } else {
               drawRotatedTexture(texture, dx, dy, rotation)
+            }
+          }
+        }
+        batch.flush()
+        batch.shader = null
+
+        // --- Pass 3: outlines on collidable block edges facing non-collidable blocks ---
+        val whiteRegion = assets.whiteTexture.textureRegion
+        for (localX in 0 until Chunk.CHUNK_SIZE) {
+          for (localY in 0 until Chunk.CHUNK_SIZE) {
+            val block = chunk.getRawBlock(localX, localY) ?: continue
+            if (!block.materialOrAir().isCollidable) continue
+
+            if (Settings.renderLight) {
+              val blockLight = chunk.getBlockLight(localX, localY)
+              if (!blockLight.isLit) continue
+            }
+
+            val dx = localX * Block.BLOCK_TEXTURE_SIZE_F
+            val dy = localY * Block.BLOCK_TEXTURE_SIZE_F
+
+            batch.setColor(0f, 0f, 0f, 1f)
+            for (direction in Direction.CARDINAL) {
+              val neighbor = block.getRawRelative(direction, false)
+              if (!neighbor.materialOrAir().isCollidable) {
+                when (direction) {
+                  Direction.NORTH -> batch.draw(whiteRegion, dx, dy + Block.BLOCK_TEXTURE_SIZE_F - 1f, Block.BLOCK_TEXTURE_SIZE_F, 1f)
+                  Direction.SOUTH -> batch.draw(whiteRegion, dx, dy, Block.BLOCK_TEXTURE_SIZE_F, 1f)
+                  Direction.EAST -> batch.draw(whiteRegion, dx + Block.BLOCK_TEXTURE_SIZE_F - 1f, dy, 1f, Block.BLOCK_TEXTURE_SIZE_F)
+                  Direction.WEST -> batch.draw(whiteRegion, dx, dy, 1f, Block.BLOCK_TEXTURE_SIZE_F)
+                  else -> {}
+                }
+              }
             }
           }
         }
@@ -230,6 +309,7 @@ class ChunkRenderer(world: World) : Disposable {
 
   override fun dispose() {
     batch.dispose()
+    checkerboardShader.dispose()
   }
 
   companion object {
@@ -237,5 +317,39 @@ class ChunkRenderer(world: World) : Disposable {
     const val HALF_LIGHT_SUBBLOCK_SIZE = LIGHT_SUBBLOCK_SIZE * 0.5f
 
     const val NO_ROTATION = 0
+
+    // @formatter:off
+    private const val CHECKERBOARD_VERT = "" +
+      "attribute vec4 a_position;\n" +
+      "attribute vec4 a_color;\n" +
+      "attribute vec2 a_texCoord0;\n" +
+      "uniform mat4 u_projTrans;\n" +
+      "varying vec4 v_color;\n" +
+      "varying vec2 v_texCoords;\n" +
+      "void main() {\n" +
+      "  v_color = a_color;\n" +
+      "  v_color.a = v_color.a * (255.0/254.0);\n" +
+      "  v_texCoords = a_texCoord0;\n" +
+      "  gl_Position = u_projTrans * a_position;\n" +
+      "}\n"
+
+    private const val CHECKERBOARD_FRAG = "" +
+      "#ifdef GL_ES\n" +
+      "#define LOWP lowp\n" +
+      "precision mediump float;\n" +
+      "#else\n" +
+      "#define LOWP\n" +
+      "#endif\n" +
+      "varying LOWP vec4 v_color;\n" +
+      "varying vec2 v_texCoords;\n" +
+      "uniform sampler2D u_texture;\n" +
+      "void main() {\n" +
+      "  vec4 color = v_color * texture2D(u_texture, v_texCoords);\n" +
+      "  if (mod(floor(gl_FragCoord.x) + floor(gl_FragCoord.y), 2.0) < 1.0) {\n" +
+      "    discard;\n" +
+      "  }\n" +
+      "  gl_FragColor = color;\n" +
+      "}\n"
+    // @formatter:on
   }
 }
