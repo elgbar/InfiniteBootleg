@@ -35,7 +35,7 @@ import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.asWorldSeed
 import no.elg.infiniteBootleg.core.util.chunkToWorld
 import no.elg.infiniteBootleg.core.util.getStaticField
-import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
+import no.elg.infiniteBootleg.core.util.launchOnBox2d
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.stringifyCompactLocWithChunk
@@ -594,7 +594,7 @@ class ClientCommands : CommonCommands() {
     val y = (world.render.chunksInView.verticalEnd - dy).chunkToWorld(0)
     launchOnMainSuspendable {
       for (x in chunkXs) {
-        launchOnAsyncSuspendable {
+        world.launchOnBox2d {
           world.setBlock(x, y + LIGHT_SOURCE_LOOK_BLOCKS, Material.Sand, prioritize = true)
           world.setBlock(x, y, Material.Torch, prioritize = true)
         }
@@ -612,7 +612,7 @@ class ClientCommands : CommonCommands() {
     launchOnMainSuspendable {
       for (x in chunkXs) {
         coroutineScope {
-          launchOnAsyncSuspendable { world.setBlock(x, y, Material.Sand, prioritize = true) }
+          world.launchOnBox2d { world.setBlock(x, y, Material.Sand, prioritize = true) }
         }
         delay(delayMillis)
       }
@@ -628,7 +628,7 @@ class ClientCommands : CommonCommands() {
     launchOnMainSuspendable {
       for (x in chunkXs) {
         coroutineScope {
-          launchOnAsyncSuspendable { world.removeBlock(x, y, prioritize = true) }
+          world.launchOnBox2d { world.removeBlock(x, y, prioritize = true) }
         }
         delay(delayMillis)
       }
