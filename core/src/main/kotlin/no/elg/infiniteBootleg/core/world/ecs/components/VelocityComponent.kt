@@ -79,7 +79,7 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
 
     fun Entity.velocityOrNull(target: Vector2 = Vector2()): Vector2? = velocityComponentOrNull?.toVector2(target)
     fun Entity.velocityOrZero(): Vector2 = velocityComponentOrNull?.toVector2(Vector2()) ?: Vector2.Zero
-    fun Entity.velocityOrZero(target: Vector2 = Vector2()): Vector2 = velocityComponentOrNull?.toVector2(target) ?: target.set(0f, 0f)
+    fun Entity.isMoving(): Boolean = velocityComponentOrNull?.isMoving() ?: false
 
     /**
      * The velocity of the entity compacted. or `0L` if there is no velocity component

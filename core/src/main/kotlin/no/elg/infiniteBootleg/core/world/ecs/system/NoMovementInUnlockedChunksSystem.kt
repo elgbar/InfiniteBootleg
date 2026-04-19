@@ -7,8 +7,8 @@ import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_EARLY
 import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.isMoving
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.setVelocity
-import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.compactChunkLoc
@@ -47,7 +47,7 @@ object NoMovementInUnlockedChunksSystem : AuthorizedEntitiesIteratingSystem(basi
             "Entity ${entity.id} is now in a loaded chunk ${stringifyCompactLoc(entity.compactBlockLoc)}, enabling gravity (if not flying)"
           }
         }
-      } else if (entity.velocityComponent.isMoving()) {
+      } else if (entity.isMoving()) {
         logger.debug { "Entity ${entity.id} is in unloaded chunk but was moving!" }
         stopMovement(entity)
       }
