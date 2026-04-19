@@ -13,7 +13,7 @@ interface TexturedChunk : Chunk {
   val texture: Texture?
 
   /**
-   * @return The backing [com.badlogic.gdx.graphics.glutils.FrameBuffer] which holds the texture of this chunk. Will be null if
+   * @return The backing [com.badlogic.gdx.graphics.glutils.FrameBuffer] which holds the texture of this chunk. Will be `null` if
    * the chunk is disposed, never null otherwise.
    */
   val frameBuffer: FrameBuffer?

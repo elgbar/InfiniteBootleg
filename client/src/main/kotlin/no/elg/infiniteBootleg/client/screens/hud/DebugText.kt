@@ -4,8 +4,8 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import no.elg.infiniteBootleg.client.main.ClientMain
-import no.elg.infiniteBootleg.client.world.render.ChunkRenderer
 import no.elg.infiniteBootleg.client.world.render.EntityRenderer.Companion.calcLightSubCell
+import no.elg.infiniteBootleg.client.world.render.QueuedChunkRenderer
 import no.elg.infiniteBootleg.client.world.textureRegion
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.Settings
@@ -208,7 +208,7 @@ object DebugText {
       .append(EventManager.activeListeners.get()).append(", added/removed ").append(EventManager.registeredListeners.get()).append(" / ")
       .append(EventManager.unregisteredListeners.get()).append(", active 1sh: ").append(EventManager.activeOneTimeRefListeners.get()).append(" | Dispatched events: ")
       .append(EventManager.dispatchedEvents.get()).append(" listened to: ").append(EventManager.listenerListenedToEvent.get()).appendLine().append(" > Chunk Rdr Q: ")
-      .append(ChunkRenderer.chunksInRenderQueue).append(" | Chunk size avg: ")
+      .append(QueuedChunkRenderer.chunksInRenderQueue).append(" | Chunk size avg: ")
       .append((World.CHUNK_ADDED_THREAD_LOCAL.get() - World.CHUNK_REMOVED_THREAD_LOCAL.get()) / World.CHUNK_THREAD_LOCAL.get())
   }
 

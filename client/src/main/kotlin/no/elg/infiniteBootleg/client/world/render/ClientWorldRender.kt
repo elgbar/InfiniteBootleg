@@ -97,7 +97,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     it.position.x = 0f
     it.position.y = 0f
   }
-  val chunkRenderer: ChunkRenderer = ChunkRenderer(this)
+  val chunkRenderer: QueuedChunkRenderer = QueuedChunkRenderer(this)
   val box2DDebugRenderer: Box2dDebugRenderer by lazy { Box2dDebugRenderer() }
 
   private val dad: DragAndDrop = DragAndDrop().apply {

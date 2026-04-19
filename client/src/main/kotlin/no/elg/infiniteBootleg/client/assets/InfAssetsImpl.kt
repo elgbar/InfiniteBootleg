@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.collections.plusAssign
 import no.elg.infiniteBootleg.client.main.ClientMain
-import no.elg.infiniteBootleg.client.world.render.ChunkRenderer
+import no.elg.infiniteBootleg.client.world.render.QueuedChunkRenderer
 import no.elg.infiniteBootleg.client.world.render.texture.TextureNeighbor
 import no.elg.infiniteBootleg.core.assets.InfAssets
 import no.elg.infiniteBootleg.core.util.rotatableTextureName
@@ -114,9 +114,9 @@ class InfAssetsImpl : InfAssets {
       ClientMain.CLEAR_COLOR_A
     )
     caveTexture = InfAssets.createTextureRegion(
-      ChunkRenderer.CAVE_CLEAR_COLOR_R,
-      ChunkRenderer.CAVE_CLEAR_COLOR_G,
-      ChunkRenderer.CAVE_CLEAR_COLOR_B,
+      QueuedChunkRenderer.CAVE_CLEAR_COLOR_R,
+      QueuedChunkRenderer.CAVE_CLEAR_COLOR_G,
+      QueuedChunkRenderer.CAVE_CLEAR_COLOR_B,
       ClientMain.CLEAR_COLOR_A
     )
     whiteTexture = InfAssets.createTextureRegion(Color.WHITE)
