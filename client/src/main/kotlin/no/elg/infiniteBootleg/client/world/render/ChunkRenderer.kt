@@ -83,12 +83,18 @@ class ChunkRenderer(world: World) : Disposable {
             val isMarker = block.isMarkerBlock()
             if (material.invisibleBlock || isMarker) {
               if (isMarker && topLightBlockHeight == worldY) {
+                val blockLight = chunk.getBlockLight(localX, localY)
                 // Draw half the texture as sky and lower half as cave.
                 // This will remove visual artifact when a marker block is falling and updating the top light block height
-                drawHalfwayTexture(assets.caveTexture, assets.skyTexture, dx, dy)
+                drawHalfwayTexture(assets.caveTexture, assets.skyTexture, blockLight.lightMap, dx, dy)
                 continue
+              } else if (topLightBlockHeight < worldY) {
+                // Fast path for air above top light. It should always be lit 100%
+                batch.draw(assets.skyTexture.textureRegion, dx, dy, Block.BLOCK_TEXTURE_SIZE_F, Block.BLOCK_TEXTURE_SIZE_F)
+                continue
+              } else {
+                texture = assets.caveTexture
               }
-              texture = if (topLightBlockHeight > worldY) assets.caveTexture else assets.skyTexture
               secondaryTexture = null
             } else {
               texture = block?.texture ?: continue
@@ -99,8 +105,8 @@ class ChunkRenderer(world: World) : Disposable {
               }
             }
 
-            val blockLight = chunk.getBlockLight(localX, localY)
             if (Settings.renderLight) {
+              val blockLight = chunk.getBlockLight(localX, localY)
               if (blockLight.isLit && (!blockLight.isSkylight || texture.rotationAllowed)) {
                 val rotation = calculateRotation(chunk, localX, localY)
                 if (secondaryTexture != null) {
@@ -176,15 +182,23 @@ class ChunkRenderer(world: World) : Disposable {
     return (noise * cardinalDirections).toInt() * cardinalDirectionDegrees
   }
 
-  private fun drawHalfwayTexture(lowerHalf: RotatableTextureRegion, upperHalf: RotatableTextureRegion, dx: Float, dy: Float) {
+  private fun drawHalfwayTexture(
+    caveTexture: RotatableTextureRegion,
+    skyTexture: RotatableTextureRegion,
+    lights: LightMap,
+    dx: Float,
+    dy: Float
+  ) {
+    // Lower half is shaded as it would normally be, otherwise it's a bit too bright
+    drawShadedBlock(caveTexture, lights, dx, dy, NO_ROTATION)
+    // Overdraw the top half as it should always be lit 100%
     batch.draw(
-      upperHalf.textureRegion,
+      skyTexture.textureRegion,
       dx,
       dy + Block.HALF_BLOCK_TEXTURE_SIZE_F,
       Block.BLOCK_TEXTURE_SIZE_F,
       Block.HALF_BLOCK_TEXTURE_SIZE_F
     )
-    batch.draw(lowerHalf.textureRegion, dx, dy, Block.BLOCK_TEXTURE_SIZE_F, Block.HALF_BLOCK_TEXTURE_SIZE_F)
   }
 
   private fun drawRotatedTexture(texture: RotatableTextureRegion, dx: Float, dy: Float, rotation: Int) {
