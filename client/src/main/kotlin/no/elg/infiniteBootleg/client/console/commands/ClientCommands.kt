@@ -18,6 +18,7 @@ import no.elg.infiniteBootleg.client.screens.SelectWorldScreen.loadSingleplayerW
 import no.elg.infiniteBootleg.client.screens.WorldScreen
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.Settings
+import no.elg.infiniteBootleg.core.console.AuthoritativeOnly
 import no.elg.infiniteBootleg.core.console.CallOnThreadyType
 import no.elg.infiniteBootleg.core.console.CmdArgNames
 import no.elg.infiniteBootleg.core.console.ExecutionThread
@@ -46,8 +47,11 @@ import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.box2d.ChunkBody
+import no.elg.infiniteBootleg.core.world.box2d.WorldBody.Companion.Y_WORLD_GRAVITY
 import no.elg.infiniteBootleg.core.world.box2d.extensions.body
+import no.elg.infiniteBootleg.core.world.box2d.extensions.gravity
 import no.elg.infiniteBootleg.core.world.box2d.extensions.isValid
+import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2Vec2
 import no.elg.infiniteBootleg.core.world.box2d.extensions.position
 import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE
@@ -736,5 +740,18 @@ class ClientCommands : CommonCommands() {
       val block = chunk.getBlock(lx, ly)
       action(worldX, worldY, block)
     }
+  }
+
+  @AuthoritativeOnly
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
+  @ConsoleDoc(
+    description = "Set the vertical gravity of the world",
+    paramDescriptions = ["The gravity to set, defaults to $Y_WORLD_GRAVITY"]
+  )
+  @CmdArgNames("gravityY")
+  fun gravity(gravityY: Float = Y_WORLD_GRAVITY) {
+    val world = clientWorld ?: return
+    world.worldBody.box2dWorld.gravity = makeB2Vec2(0, gravityY)
+    logger.info { "World Y gravity changed to $gravityY" }
   }
 }
