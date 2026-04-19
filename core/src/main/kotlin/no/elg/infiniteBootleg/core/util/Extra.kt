@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import com.fasterxml.uuid.Generators
 import ktx.assets.dispose
-import ktx.graphics.begin
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.EntityMarkerBlock
@@ -130,11 +129,12 @@ inline fun Batch.withColor(
   g: Float = this.color.g,
   b: Float = this.color.b,
   a: Float = this.color.a,
+  tmp: Color? = null,
   crossinline action: (Batch) -> Unit
 ) {
   contract { callsInPlace(action, InvocationKind.EXACTLY_ONCE) }
   if (r != this.color.r || g != this.color.g || b != this.color.b || a != this.color.a) {
-    val oldColor = this.color.cpy()
+    val oldColor = tmp?.set(this.color) ?: this.color.cpy()
     this.setColor(r, g, b, a)
     action(this)
     this.color = oldColor
