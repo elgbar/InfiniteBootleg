@@ -65,7 +65,8 @@ class ChunkRenderer(world: World) : Disposable {
       batch.safeUse { _ ->
         for (localX in 0 until Chunk.CHUNK_SIZE) {
           val topLightBlockHeight = chunkColumn.topBlockHeight(
-            localX, ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
+            localX,
+            ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
           )
           for (localY in 0 until Chunk.CHUNK_SIZE) {
             batch.color = Color.WHITE
@@ -176,7 +177,11 @@ class ChunkRenderer(world: World) : Disposable {
 
   private fun drawHalfwayTexture(lowerHalf: RotatableTextureRegion, upperHalf: RotatableTextureRegion, dx: Float, dy: Float) {
     batch.draw(
-      upperHalf.textureRegion, dx, dy + Block.HALF_BLOCK_TEXTURE_SIZE_F, Block.BLOCK_TEXTURE_SIZE_F, Block.HALF_BLOCK_TEXTURE_SIZE_F
+      upperHalf.textureRegion,
+      dx,
+      dy + Block.HALF_BLOCK_TEXTURE_SIZE_F,
+      Block.BLOCK_TEXTURE_SIZE_F,
+      Block.HALF_BLOCK_TEXTURE_SIZE_F
     )
     batch.draw(lowerHalf.textureRegion, dx, dy, Block.BLOCK_TEXTURE_SIZE_F, Block.HALF_BLOCK_TEXTURE_SIZE_F)
   }
@@ -201,7 +206,11 @@ class ChunkRenderer(world: World) : Disposable {
   }
 
   private fun drawShadedBlock(
-    textureRegion: RotatableTextureRegion, lights: LightMap, dx: Float, dy: Float, rotation: Int
+    textureRegion: RotatableTextureRegion,
+    lights: LightMap,
+    dx: Float,
+    dy: Float,
+    rotation: Int
   ) {
     val texture = textureRegion.textureRegion
     val tileWidth = texture.regionWidth / BlockLight.LIGHT_RESOLUTION
@@ -235,7 +244,11 @@ class ChunkRenderer(world: World) : Disposable {
           )
         } else {
           batch.draw(
-            region, dx + rx * LIGHT_SUBBLOCK_SIZE, dy + ry * LIGHT_SUBBLOCK_SIZE, LIGHT_SUBBLOCK_SIZE, LIGHT_SUBBLOCK_SIZE
+            region,
+            dx + rx * LIGHT_SUBBLOCK_SIZE,
+            dy + ry * LIGHT_SUBBLOCK_SIZE,
+            LIGHT_SUBBLOCK_SIZE,
+            LIGHT_SUBBLOCK_SIZE
           )
         }
         rx++
