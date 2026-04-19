@@ -138,7 +138,7 @@ class ChunkRenderer(world: World) : Disposable {
           for (localX in 0 until Chunk.CHUNK_SIZE) {
             for (localY in 0 until Chunk.CHUNK_SIZE) {
               val block = chunk.getRawBlock(localX, localY) ?: continue
-              if (block.isMarkerBlock() || !block.material.isCollidable) continue
+              if (block.isCollidable()) continue
 
               if (Settings.renderLight) {
                 val blockLight = chunk.getBlockLight(localX, localY)
@@ -150,7 +150,7 @@ class ChunkRenderer(world: World) : Disposable {
 
               for (direction in Direction.CARDINAL) {
                 val neighbor = block.getRawRelative(direction, false)
-                if (neighbor.isMarkerBlock() || !neighbor.materialOrAir().isCollidable) {
+                if (neighbor.isCollidable()) {
                   when (direction) {
                     Direction.NORTH -> batch.draw(whiteRegion, dx, dy + Block.BLOCK_TEXTURE_SIZE_F - 1f, Block.BLOCK_TEXTURE_SIZE_F, 1f)
                     Direction.SOUTH -> batch.draw(whiteRegion, dx, dy, Block.BLOCK_TEXTURE_SIZE_F, 1f)
