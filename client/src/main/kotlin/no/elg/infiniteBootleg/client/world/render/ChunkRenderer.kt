@@ -244,7 +244,15 @@ class ChunkRenderer(world: World) : Disposable {
         val brightnessG: Brightness = lights.g[lightMapIndex]
         val brightnessB: Brightness = lights.b[lightMapIndex]
         batch.withColor(brightnessR, brightnessG, brightnessB, 1f, tmpColor) {
-          if (textureRegion.rotationAllowed && rotation != 0) {
+          if (rotation == NO_ROTATION || !textureRegion.rotationAllowed) {
+            batch.draw(
+              region,
+              dx + rx * LIGHT_SUBBLOCK_SIZE,
+              dy + ry * LIGHT_SUBBLOCK_SIZE,
+              LIGHT_SUBBLOCK_SIZE,
+              LIGHT_SUBBLOCK_SIZE
+            )
+          } else {
             batch.draw(
               region,
               dx + rx * LIGHT_SUBBLOCK_SIZE,
@@ -256,14 +264,6 @@ class ChunkRenderer(world: World) : Disposable {
               1f,
               1f,
               rotation.toFloat()
-            )
-          } else {
-            batch.draw(
-              region,
-              dx + rx * LIGHT_SUBBLOCK_SIZE,
-              dy + ry * LIGHT_SUBBLOCK_SIZE,
-              LIGHT_SUBBLOCK_SIZE,
-              LIGHT_SUBBLOCK_SIZE
             )
           }
         }
