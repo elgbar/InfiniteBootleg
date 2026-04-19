@@ -15,15 +15,13 @@ import no.elg.infiniteBootleg.core.events.chunks.ChunkTextureChangeRejectedEvent
 import no.elg.infiniteBootleg.core.events.chunks.ChunkTextureChangedEvent
 import no.elg.infiniteBootleg.core.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsyncSuspendable
-import no.elg.infiniteBootleg.core.world.blocks.Block
-import no.elg.infiniteBootleg.core.world.blocks.BlockLight
 import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
 import no.elg.infiniteBootleg.core.world.render.WorldRender
 
 typealias SystemTimeMillis = Long
 
 /**
- * Queue and perform validity check on the chunks to render. Delegates the actual rendering to [[ChunkRenderer]]
+ * Queue and perform validity check on the chunks to render. Delegates the actual rendering to [ChunkRenderer]
  *
  * @author Elg
  */
@@ -180,16 +178,6 @@ class QueuedChunkRenderer(private val worldRender: WorldRender) :
   }
 
   companion object {
-
-    const val LIGHT_SUBBLOCK_SIZE = Block.BLOCK_TEXTURE_SIZE_F / BlockLight.LIGHT_RESOLUTION
-    const val HALF_LIGHT_SUBBLOCK_SIZE = LIGHT_SUBBLOCK_SIZE * 0.5f
-
-    const val CAVE_CLEAR_COLOR_R = 0.408824f
-    const val CAVE_CLEAR_COLOR_G = 0.202941f
-    const val CAVE_CLEAR_COLOR_B = 0.055882f
-
-    const val NO_ROTATION = 0
-
     private val QUEUE_LOCK = Any()
 
     private const val PRIORITIZATION_ADVANTAGE_ADD_TIME = 1000L

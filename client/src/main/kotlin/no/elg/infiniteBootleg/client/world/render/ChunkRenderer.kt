@@ -9,9 +9,6 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import ktx.graphics.use
 import no.elg.infiniteBootleg.client.main.ClientMain
-import no.elg.infiniteBootleg.client.world.render.QueuedChunkRenderer.Companion.HALF_LIGHT_SUBBLOCK_SIZE
-import no.elg.infiniteBootleg.client.world.render.QueuedChunkRenderer.Companion.LIGHT_SUBBLOCK_SIZE
-import no.elg.infiniteBootleg.client.world.render.QueuedChunkRenderer.Companion.NO_ROTATION
 import no.elg.infiniteBootleg.client.world.render.texture.TextureNeighbor
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.util.LocalCoord
@@ -233,5 +230,12 @@ class ChunkRenderer(world: World) : Disposable {
 
   override fun dispose() {
     batch.dispose()
+  }
+
+  companion object {
+    const val LIGHT_SUBBLOCK_SIZE = Block.BLOCK_TEXTURE_SIZE_F / BlockLight.LIGHT_RESOLUTION
+    const val HALF_LIGHT_SUBBLOCK_SIZE = LIGHT_SUBBLOCK_SIZE * 0.5f
+
+    const val NO_ROTATION = 0
   }
 }

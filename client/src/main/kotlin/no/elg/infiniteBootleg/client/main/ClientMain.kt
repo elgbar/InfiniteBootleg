@@ -7,6 +7,10 @@ import com.badlogic.gdx.graphics.GL20
 import com.kotcrab.vis.ui.VisUI
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.client.assets.InfAssetsImpl
+import no.elg.infiniteBootleg.client.assets.InfAssetsImpl.Companion.CLEAR_COLOR_A
+import no.elg.infiniteBootleg.client.assets.InfAssetsImpl.Companion.CLEAR_COLOR_B
+import no.elg.infiniteBootleg.client.assets.InfAssetsImpl.Companion.CLEAR_COLOR_G
+import no.elg.infiniteBootleg.client.assets.InfAssetsImpl.Companion.CLEAR_COLOR_R
 import no.elg.infiniteBootleg.client.console.InGameConsoleHandler
 import no.elg.infiniteBootleg.client.console.commands.ClientCommands
 import no.elg.infiniteBootleg.client.input.GlobalInputListener
@@ -172,10 +176,6 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<InGameC
   companion object {
     /** Only use this when a server is present  */
     val scale = if (Toolkit.getDefaultToolkit().screenSize.width > 2560) 2 else 1
-    const val CLEAR_COLOR_R = 0.2f
-    const val CLEAR_COLOR_G = (68.0 / 255.0).toFloat()
-    const val CLEAR_COLOR_B = 1f
-    const val CLEAR_COLOR_A = 1f
 
     fun inst(): ClientMain = Main.inst() as? ClientMain ?: throw IllegalStateException("Cannot get client main as a server")
   }

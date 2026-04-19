@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.collections.plusAssign
 import no.elg.infiniteBootleg.client.main.ClientMain
-import no.elg.infiniteBootleg.client.world.render.QueuedChunkRenderer
 import no.elg.infiniteBootleg.client.world.render.texture.TextureNeighbor
 import no.elg.infiniteBootleg.core.assets.InfAssets
 import no.elg.infiniteBootleg.core.util.rotatableTextureName
@@ -108,16 +107,16 @@ class InfAssetsImpl : InfAssets {
     playerWalkingTextures = findAnimation(InfAssets.PLAYER_WALKING_PREFIX, 2, 0.2f, startIndex = 0)
 
     skyTexture = InfAssets.createTextureRegion(
-      ClientMain.CLEAR_COLOR_R,
-      ClientMain.CLEAR_COLOR_G,
-      ClientMain.CLEAR_COLOR_B,
-      ClientMain.CLEAR_COLOR_A
+      CLEAR_COLOR_R,
+      CLEAR_COLOR_G,
+      CLEAR_COLOR_B,
+      CLEAR_COLOR_A
     )
     caveTexture = InfAssets.createTextureRegion(
-      QueuedChunkRenderer.CAVE_CLEAR_COLOR_R,
-      QueuedChunkRenderer.CAVE_CLEAR_COLOR_G,
-      QueuedChunkRenderer.CAVE_CLEAR_COLOR_B,
-      ClientMain.CLEAR_COLOR_A
+      CAVE_CLEAR_COLOR_R,
+      CAVE_CLEAR_COLOR_G,
+      CAVE_CLEAR_COLOR_B,
+      CLEAR_COLOR_A
     )
     whiteTexture = InfAssets.createTextureRegion(Color.WHITE)
     skylightDebugTexture = InfAssets.createTextureRegion(Color.YELLOW, 0.5f)
@@ -128,5 +127,16 @@ class InfAssetsImpl : InfAssets {
     TextureNeighbor.generateNeighborMap(safeTextureAtlas.regions)
 
     loadInfBootSkin()
+  }
+
+  companion object {
+    const val CLEAR_COLOR_R = 0.2f
+    const val CLEAR_COLOR_G = (68.0 / 255.0).toFloat()
+    const val CLEAR_COLOR_B = 1f
+    const val CLEAR_COLOR_A = 1f
+
+    const val CAVE_CLEAR_COLOR_R = 0.408824f
+    const val CAVE_CLEAR_COLOR_G = 0.202941f
+    const val CAVE_CLEAR_COLOR_B = 0.055882f
   }
 }
