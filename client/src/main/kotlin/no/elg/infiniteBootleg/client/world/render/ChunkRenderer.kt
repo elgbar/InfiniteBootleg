@@ -49,6 +49,8 @@ class ChunkRenderer(world: World) : Disposable {
     it.setFrequency(1.0)
   }
 
+  private val tmpColor = Color()
+
   /**
    * Render a [TexturedChunk] to its [TexturedChunk.texture]
    */
@@ -64,12 +66,11 @@ class ChunkRenderer(world: World) : Disposable {
       batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
       batch.safeUse { _ ->
         for (localX in 0 until Chunk.CHUNK_SIZE) {
-          val topLightBlockHeight = chunkColumn.topBlockHeight(
-            localX,
-            ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
-          )
+          val topLightBlockHeight = chunkColumn.topBlockHeight(localX, ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG)
           for (localY in 0 until Chunk.CHUNK_SIZE) {
-            batch.color = Color.WHITE
+            if (batch.packedColor != Color.WHITE_FLOAT_BITS) {
+              batch.color = Color.WHITE
+            }
             val block = chunk.getRawBlock(localX, localY)
             val material = block.materialOrAir()
             val texture: RotatableTextureRegion
@@ -133,7 +134,7 @@ class ChunkRenderer(world: World) : Disposable {
         batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ZERO)
         val whiteRegion = assets.whiteTexture.textureRegion
 
-        batch.withColor(0.5f, 0.5f, 0.5f, 1f) {
+        batch.withColor(0.5f, 0.5f, 0.5f, 1f, tmpColor) {
           for (localX in 0 until Chunk.CHUNK_SIZE) {
             for (localY in 0 until Chunk.CHUNK_SIZE) {
               val block = chunk.getRawBlock(localX, localY) ?: continue
@@ -228,28 +229,29 @@ class ChunkRenderer(world: World) : Disposable {
         val brightnessR: Brightness = lights.r[lightMapIndex]
         val brightnessG: Brightness = lights.g[lightMapIndex]
         val brightnessB: Brightness = lights.b[lightMapIndex]
-        batch.setColor(brightnessR, brightnessG, brightnessB, 1f)
-        if (textureRegion.rotationAllowed || rotation == 0) {
-          batch.draw(
-            region,
-            dx + rx * LIGHT_SUBBLOCK_SIZE,
-            dy + ry * LIGHT_SUBBLOCK_SIZE,
-            HALF_LIGHT_SUBBLOCK_SIZE,
-            HALF_LIGHT_SUBBLOCK_SIZE,
-            LIGHT_SUBBLOCK_SIZE,
-            LIGHT_SUBBLOCK_SIZE,
-            1f,
-            1f,
-            rotation.toFloat()
-          )
-        } else {
-          batch.draw(
-            region,
-            dx + rx * LIGHT_SUBBLOCK_SIZE,
-            dy + ry * LIGHT_SUBBLOCK_SIZE,
-            LIGHT_SUBBLOCK_SIZE,
-            LIGHT_SUBBLOCK_SIZE
-          )
+        batch.withColor(brightnessR, brightnessG, brightnessB, 1f, tmpColor) {
+          if (textureRegion.rotationAllowed || rotation == 0) {
+            batch.draw(
+              region,
+              dx + rx * LIGHT_SUBBLOCK_SIZE,
+              dy + ry * LIGHT_SUBBLOCK_SIZE,
+              HALF_LIGHT_SUBBLOCK_SIZE,
+              HALF_LIGHT_SUBBLOCK_SIZE,
+              LIGHT_SUBBLOCK_SIZE,
+              LIGHT_SUBBLOCK_SIZE,
+              1f,
+              1f,
+              rotation.toFloat()
+            )
+          } else {
+            batch.draw(
+              region,
+              dx + rx * LIGHT_SUBBLOCK_SIZE,
+              dy + ry * LIGHT_SUBBLOCK_SIZE,
+              LIGHT_SUBBLOCK_SIZE,
+              LIGHT_SUBBLOCK_SIZE
+            )
+          }
         }
         rx++
       }
