@@ -230,7 +230,7 @@ class ChunkRenderer(world: World) : Disposable {
         val brightnessG: Brightness = lights.g[lightMapIndex]
         val brightnessB: Brightness = lights.b[lightMapIndex]
         batch.withColor(brightnessR, brightnessG, brightnessB, 1f, tmpColor) {
-          if (textureRegion.rotationAllowed || rotation == 0) {
+          if (textureRegion.rotationAllowed && rotation != 0) {
             batch.draw(
               region,
               dx + rx * LIGHT_SUBBLOCK_SIZE,
