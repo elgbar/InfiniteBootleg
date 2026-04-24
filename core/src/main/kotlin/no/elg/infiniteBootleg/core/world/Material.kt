@@ -285,6 +285,7 @@ sealed interface Material : ContainerElement {
     override val hardness get() = 1f
     override val textureName: String get() = "container"
     override val category: MaterialCategory get() = CRAFTED
+    override val isCollidable get() = false
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createContainerEntity(world, worldX, worldY, material)
     }
