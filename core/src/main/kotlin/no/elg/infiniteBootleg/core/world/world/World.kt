@@ -849,7 +849,7 @@ abstract class World(
     actionOnBlock(worldX, worldY, false) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock false
       val rawBlock = chunk.getRawBlock(localX, localY)
-      rawBlock !is EntityMarkerBlock && rawBlock.materialOrAir().isCollidable && !isAnyEntityAt(worldX, worldY)
+      rawBlock !is EntityMarkerBlock && rawBlock.isNotAir() && !isAnyEntityAt(worldX, worldY)
     }
 
   /**
