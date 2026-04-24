@@ -75,6 +75,19 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) :
         }
       }
 
+      Input.Keys.F4 -> {
+        launchOnMain {
+          if (isControlPressed()) {
+            val entries = Settings.GlFunc.entries
+            val nextOrdinal = (Settings.outlineFunc.ordinal + if (isShiftPressed()) -1 else 1).mod(entries.size)
+            Settings.outlineFunc = entries[nextOrdinal]
+          } else {
+            Settings.outlineHighlightPercent = (Settings.outlineHighlightPercent + ((if (isShiftPressed()) -1f else 1f) * 0.05f)).coerceIn(0f, 1f)
+          }
+          world.redraw()
+        }
+      }
+
       Input.Keys.F12 -> {
         val ticker: Ticker = world.worldTicker
         if (ticker.isPaused) {

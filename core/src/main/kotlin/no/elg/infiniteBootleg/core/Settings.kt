@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.core
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.util.IllegalAction
 import no.elg.infiniteBootleg.core.util.asWorldSeed
@@ -62,6 +63,17 @@ object Settings {
     LINEAR,
     SMOOTH_FALLOFF_LINEAR_SPACE,
     SMOOTH_FALLOFF_SQUARED_SPACE
+  }
+
+  var outlineFunc: GlFunc = GlFunc.FUNC_SUBTRACT
+  var outlineHighlightPercent: Float = 0.1f
+
+  enum class GlFunc(val gl: Int) {
+    FUNC_ADD(GL20.GL_FUNC_ADD),
+    FUNC_SUBTRACT(GL20.GL_FUNC_SUBTRACT),
+    FUNC_REVERSE_SUBTRACT(GL20.GL_FUNC_REVERSE_SUBTRACT),
+    FUNC_MIN(0x8007),
+    FUNC_MAX(0x8008)
   }
 
   var lightIntensityMultiplier: Float = 1.0f

@@ -104,4 +104,10 @@ abstract class ClientWorld : World {
       readableChunks.values().forEach(Chunk::updateAllBlockLights)
     }
   }
+
+  fun redraw() {
+    readChunks { readableChunks ->
+      readableChunks.values().forEach(Chunk::dirty)
+    }
+  }
 }

@@ -11,6 +11,7 @@ import ktx.graphics.use
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.world.render.texture.TextureNeighbor
 import no.elg.infiniteBootleg.core.Settings
+import no.elg.infiniteBootleg.core.Settings.outlineFunc
 import no.elg.infiniteBootleg.core.util.LocalCoord
 import no.elg.infiniteBootleg.core.util.chunkToWorld
 import no.elg.infiniteBootleg.core.util.getNoisePositive
@@ -137,37 +138,45 @@ class ChunkRenderer(world: World) : Disposable {
         }
 
         // --- Outline pass: darken collidable block edges facing non-collidable blocks by 50% ---
-        batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ZERO)
-        val whiteRegion = assets.whiteTexture.textureRegion
+        batch.flush()
+        Gdx.gl.glBlendEquation(outlineFunc.gl)
+        try {
+          batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE)
+          val whiteRegion = assets.caveTexture.textureRegion
+          val highlightPercent = Settings.outlineHighlightPercent
+          batch.withColor(highlightPercent, highlightPercent, highlightPercent, 0f, tmpColor) {
+            for (localX in 0 until Chunk.CHUNK_SIZE) {
+              for (localY in 0 until Chunk.CHUNK_SIZE) {
+                val block = chunk.getRawBlock(localX, localY) ?: continue
+                if (block.isCollidable()) continue
 
-        batch.withColor(0.5f, 0.5f, 0.5f, 1f, tmpColor) {
-          for (localX in 0 until Chunk.CHUNK_SIZE) {
-            for (localY in 0 until Chunk.CHUNK_SIZE) {
-              val block = chunk.getRawBlock(localX, localY) ?: continue
-              if (block.isCollidable()) continue
+                if (Settings.renderLight) {
+                  val blockLight = chunk.getBlockLight(localX, localY)
+                  if (!blockLight.isLit) continue
+                }
 
-              if (Settings.renderLight) {
-                val blockLight = chunk.getBlockLight(localX, localY)
-                if (!blockLight.isLit) continue
-              }
+                val dx = localX * Block.BLOCK_TEXTURE_SIZE_F
+                val dy = localY * Block.BLOCK_TEXTURE_SIZE_F
 
-              val dx = localX * Block.BLOCK_TEXTURE_SIZE_F
-              val dy = localY * Block.BLOCK_TEXTURE_SIZE_F
-
-              for (direction in Direction.CARDINAL) {
-                val neighbor = block.getRawRelative(direction, false)
-                if (neighbor.isCollidable()) {
-                  when (direction) {
-                    Direction.NORTH -> batch.draw(whiteRegion, dx, dy + Block.BLOCK_TEXTURE_SIZE_F - 1f, Block.BLOCK_TEXTURE_SIZE_F, 1f)
-                    Direction.SOUTH -> batch.draw(whiteRegion, dx, dy, Block.BLOCK_TEXTURE_SIZE_F, 1f)
-                    Direction.EAST -> batch.draw(whiteRegion, dx + Block.BLOCK_TEXTURE_SIZE_F - 1f, dy, 1f, Block.BLOCK_TEXTURE_SIZE_F)
-                    Direction.WEST -> batch.draw(whiteRegion, dx, dy, 1f, Block.BLOCK_TEXTURE_SIZE_F)
-                    else -> {}
+                for (direction in Direction.CARDINAL) {
+                  val neighbor = block.getRawRelative(direction, false)
+                  if (neighbor.isCollidable()) {
+                    val size = 1f
+                    when (direction) {
+                      Direction.NORTH -> batch.draw(whiteRegion, dx, dy + Block.BLOCK_TEXTURE_SIZE_F - size, Block.BLOCK_TEXTURE_SIZE_F, size)
+                      Direction.SOUTH -> batch.draw(whiteRegion, dx, dy, Block.BLOCK_TEXTURE_SIZE_F, size)
+                      Direction.EAST -> batch.draw(whiteRegion, dx + Block.BLOCK_TEXTURE_SIZE_F - size, dy, size, Block.BLOCK_TEXTURE_SIZE_F)
+                      Direction.WEST -> batch.draw(whiteRegion, dx, dy, size, Block.BLOCK_TEXTURE_SIZE_F)
+                      else -> {}
+                    }
                   }
                 }
               }
             }
           }
+        } finally {
+          batch.flush()
+          Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD)
         }
       }
     }
