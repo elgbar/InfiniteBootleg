@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.core.world.ecs.system.block
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import io.github.oshai.kotlinlogging.KotlinLogging
-import ktx.ashley.has
+import ktx.ashley.hasNot
 import ktx.collections.isNotEmpty
 import ktx.collections.plusAssign
 import ktx.collections.removeAll
@@ -27,22 +27,23 @@ private val logger = KotlinLogging.logger {}
 object UpdateGridBlockSystem : IteratingSystem(standaloneGridOccupyingBlocksFamily, UPDATE_PRIORITY_DEFAULT) {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
-    val world = entity.world
-    val pos = entity.positionComponent
-    val box2d = entity.box2d
     val occupyingBlocksComponent = entity.occupyingBlocksComponent
 
-    if (!entity.has(VelocityComponent.mapper) && occupyingBlocksComponent.occupying.isNotEmpty()) {
+    if (entity.hasNot(VelocityComponent.mapper) && occupyingBlocksComponent.occupying.isNotEmpty()) {
       // The entity will not move, so only update it only once
       return
     }
+
+    val world = entity.world
+    val pos = entity.positionComponent
+    val box2d = entity.box2d
 
     // Note: raw must be false to properly update the lights while lights are falling
     // Note 2: loadChunk must be false as the entity should then be handled as out of bounds
     val offsetX = (box2d.box2dWidth - 1f).coerceAtLeast(0f)
     val offsetY = (box2d.box2dHeight - 1f).coerceAtLeast(0f)
     val currentOccupations =
-      world.getBlocksAABB(pos.blockX.toFloat(), pos.blockY.toFloat(), offsetX, offsetY, raw = false, loadChunk = false, includeAir = true)
+      world.getBlocksAABB(pos.x, pos.y, offsetX, offsetY, raw = false, loadChunk = false, includeAir = true)
 
     // Remove markers that are no longer occupied
     val noLongerOccupied = occupyingBlocksComponent.occupying.filter { it !in currentOccupations }
