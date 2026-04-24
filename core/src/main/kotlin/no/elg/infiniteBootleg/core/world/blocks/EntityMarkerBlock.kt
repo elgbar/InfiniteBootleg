@@ -4,12 +4,14 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntityListener
 import no.elg.infiniteBootleg.core.util.EntityRemoveListener
 import no.elg.infiniteBootleg.core.util.LocalCoord
+import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.remove
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.valid
 import no.elg.infiniteBootleg.core.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.core.world.ecs.components.MaterialComponent.Companion.material
+import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.BrokenBlockTag.Companion.brokenBlock
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
@@ -37,6 +39,8 @@ class EntityMarkerBlock(override val chunk: Chunk, override val localX: LocalCoo
   }
 
   override val material: Material get() = entity.material
+
+  override fun hudDebug(): String = "EntityMarkerBlock hardLink? $hardLink ent@${stringifyCompactLoc(entity.compactBlockLoc)}, pos ${stringifyCompactLoc(this)} "
 
   override fun dispose() {
     removeEntityListener?.also {

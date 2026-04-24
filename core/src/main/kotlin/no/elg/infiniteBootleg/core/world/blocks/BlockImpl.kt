@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.core.world.blocks
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.util.LocalCoord
+import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Material.Companion.asProto
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldX
@@ -27,6 +28,8 @@ class BlockImpl(override val chunk: Chunk, override val localX: LocalCoord, over
       this.material = this@BlockImpl.material.asProto()
       this@BlockImpl.entity?.save(toAuthoritative = true)?.also { entity = it }
     }
+
+  override fun hudDebug(): String = "BlockImpl ${material.displayName}, pos ${stringifyCompactLoc(this)}"
 
   override fun dispose() {
     entity?.also { entityToDispose ->

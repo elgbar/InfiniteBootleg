@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Vector2
 import ktx.ashley.EngineEntity
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.core.events.api.ThreadType
+import no.elg.infiniteBootleg.core.util.ChunkCompactLoc
+import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.WorldCoordFloat
 import no.elg.infiniteBootleg.core.util.WorldCoordNumber
@@ -75,8 +77,8 @@ class PositionComponent(x: WorldCoordFloat, y: WorldCoordFloat) : EntitySavableC
   companion object : EntityLoadableMapper<PositionComponent>() {
     fun Entity.position(vec: Vector2 = Vector2()): Vector2 = positionComponent.toVector2(vec)
 
-    val Entity.compactBlockLoc: Long get() = positionComponent.run { compactInt(blockX, blockY) }
-    val Entity.compactChunkLoc: Long get() = positionComponent.run { compactInt(chunkX, chunkY) }
+    val Entity.compactBlockLoc: WorldCompactLoc get() = positionComponent.run { compactInt(blockX, blockY) }
+    val Entity.compactChunkLoc: ChunkCompactLoc get() = positionComponent.run { compactInt(chunkX, chunkY) }
     val Entity.positionComponent by propertyFor(mapper)
 
     /**

@@ -12,7 +12,6 @@ import no.elg.infiniteBootleg.core.util.chunkToWorld
 import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.isInsideChunk
 import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
-import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.Direction
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Material.Companion.asProto
@@ -54,8 +53,6 @@ interface Block :
   val valid: Boolean get() = chunk.isValid && !isDisposed
 
   override val isDisposed: Boolean get() = chunk.getRawBlock(localX, localY) !== this
-
-  override fun hudDebug(): String = "Block ${material.displayName}, pos ${stringifyCompactLoc(this)}"
 
   companion object {
 
