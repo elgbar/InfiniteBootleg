@@ -16,11 +16,8 @@ import no.elg.infiniteBootleg.core.util.launchOnBox2dSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnMain
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsyncSuspendable
-import no.elg.infiniteBootleg.core.util.launchOnWorldTicker
-import no.elg.infiniteBootleg.core.util.launchOnWorldTickerSuspendable
 import no.elg.infiniteBootleg.core.util.sealedSubclassObjectInstances
 import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker.Companion.BOX2D_TICKER_TAG_PREFIX
-import no.elg.infiniteBootleg.core.world.ticker.WorldTicker
 import no.elg.infiniteBootleg.core.world.world.World
 
 private val logger = KotlinLogging.logger {}
@@ -76,35 +73,6 @@ sealed interface ThreadType {
     fun launchOrRunSuspended(world: World, start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend () -> Unit) = world.launchOnBox2dSuspendable(start, block = { block() })
 
     override fun isThreadType(thread: Thread): Boolean = thread.name.startsWith(BOX2D_TICKER_TAG_PREFIX, false)
-  }
-
-  /**
-   * The event was dispatched from a world thread, exactly which world is unknown. These kind of events are triggered by the world ticking
-   */
-  data object TICKER : ThreadType {
-
-    /**
-     * Run the task directly if already on the world's ticker thread, otherwise launch on the world ticker thread.
-     *
-     * @param world The world whose ticker to launch the task on
-     *
-     * @see WorldTicker
-     */
-    fun launchOrRun(world: World, block: () -> Unit) = if (isThreadType()) block() else world.launchOnWorldTicker(block)
-
-    /**
-     * Run the task directly if already on the world's ticker thread, otherwise launch on the world ticker thread.
-     *
-     * @param world The world whose ticker to launch the task on
-     *
-     * @implSpec There is no thread check here because the [World.worldTickCoroutineDispatcher] already does that internally
-     *
-     * @see WorldTicker
-     */
-    fun launchOrRunSuspended(world: World, start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend () -> Unit) =
-      world.launchOnWorldTickerSuspendable(start, block = { block() })
-
-    override fun isThreadType(thread: Thread): Boolean = thread.name.startsWith(WorldTicker.WORLD_TICKER_TAG_PREFIX, false)
   }
 
   /**

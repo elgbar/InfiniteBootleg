@@ -99,11 +99,14 @@ import no.elg.infiniteBootleg.core.world.ecs.components.tags.IgnorePlaceableChec
 import no.elg.infiniteBootleg.core.world.ecs.disposeBox2dOnRemoval
 import no.elg.infiniteBootleg.core.world.ecs.ensureUniquenessListener
 import no.elg.infiniteBootleg.core.world.ecs.playerFamily
+import no.elg.infiniteBootleg.core.world.ecs.system.ChunkUnloadSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.MaxVelocitySystem
 import no.elg.infiniteBootleg.core.world.ecs.system.NoMovementInUnlockedChunksSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.OutOfBoundsSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.UpdateBox2DStateSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.ValidateGroundContactSystem
+import no.elg.infiniteBootleg.core.world.ecs.system.WorldTickSystem
+import no.elg.infiniteBootleg.core.world.ecs.system.WorldTimeAdvanceSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.BrokenBlockCleanupSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.DecayingBlockSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.ExplosiveBlockSystem
@@ -191,13 +194,6 @@ abstract class World(
       }
 
       override fun isDispatchNeeded(context: CoroutineContext): Boolean = !ThreadType.PHYSICS.isThreadType()
-    },
-    worldTickCoroutineDispatcher = object : CoroutineDispatcher() {
-      override fun dispatch(context: CoroutineContext, block: Runnable) {
-        postWorldTickerRunnable(block::run)
-      }
-
-      override fun isDispatchNeeded(context: CoroutineContext): Boolean = !ThreadType.TICKER.isThreadType()
     }
   )
 
@@ -266,7 +262,6 @@ abstract class World(
   val chunkReads get() = metadata.chunkReads
   val chunkWrites get() = metadata.chunkWrites
   val box2dCoroutineDispatcher: CoroutineDispatcher get() = metadata.box2dCoroutineDispatcher
-  val worldTickCoroutineDispatcher: CoroutineDispatcher get() = metadata.worldTickCoroutineDispatcher
 
   val hasDisposeBegun: Boolean get() = metadata.worldDisposeState > 0
   val isValid: Boolean get() = metadata.worldDisposeState == 0 && isLoaded
@@ -335,6 +330,9 @@ abstract class World(
     engine.addSystem(ValidateGroundContactSystem)
     engine.addSystem(BrokenBlockCleanupSystem)
     engine.addSystem(DecayingBlockSystem)
+    engine.addSystem(ChunkUnloadSystem(this))
+    engine.addSystem(WorldTimeAdvanceSystem(this))
+    engine.addSystem(WorldTickSystem(this))
     additionalSystems().forEach(engine::addSystem)
 
     engine.systems.forEach(::configureSystem)
@@ -1312,11 +1310,6 @@ abstract class World(
   fun postBox2dRunnable(runnable: () -> Unit) {
     assertNotDisposed()
     worldBody.postBox2dRunnable(runnable)
-  }
-
-  fun postWorldTickerRunnable(runnable: () -> Unit) {
-    assertNotDisposed()
-    worldTicker.postRunnable(runnable)
   }
 
   override fun hashCode(): Int = uuid.hashCode()

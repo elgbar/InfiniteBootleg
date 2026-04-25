@@ -22,8 +22,7 @@ data class WorldMetadata(
    * 0 = not disposed, 1 = disposing, 2 = disposed
    */
   var worldDisposeState: Int = 0,
-  val box2dCoroutineDispatcher: CoroutineDispatcher,
-  val worldTickCoroutineDispatcher: CoroutineDispatcher
+  val box2dCoroutineDispatcher: CoroutineDispatcher
 ) : Disposable {
 
   val uuid: String = generateUUIDFromLong(seed).toString()

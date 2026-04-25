@@ -46,13 +46,6 @@ fun launchOnEventsSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, bl
 fun launchOnMultithreadedAsyncSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(Dispatchers.Default, start = start, block = block)
 
-fun World.launchOnWorldTicker(block: () -> Unit) = launchOnWorldTickerSuspendable(block = { block() })
-fun World.launchOnWorldTickerSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
-  KtxAsync.launch(worldTickCoroutineDispatcher, start = start, block = block)
-
-fun <T> World.asyncOnWorldTickerSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> T) =
-  KtxAsync.async(worldTickCoroutineDispatcher, start = start, block = block)
-
 fun World.launchOnBox2dSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(box2dCoroutineDispatcher, start = start, block = block)
 

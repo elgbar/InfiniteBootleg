@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.core.world.blocks.Block
  * This event will not be triggered when a non-existing block becomes an air block or the other way around
  */
 data class BlockChangedEvent(val oldBlock: Block?, val newBlock: Block?) :
-  AsyncEvent(ThreadType.TICKER, ThreadType.ASYNC, ThreadType.PHYSICS),
+  AsyncEvent(ThreadType.ASYNC, ThreadType.PHYSICS),
   ReasonedEvent {
 
   val oldOrNewBlock get() = oldBlock ?: newBlock
