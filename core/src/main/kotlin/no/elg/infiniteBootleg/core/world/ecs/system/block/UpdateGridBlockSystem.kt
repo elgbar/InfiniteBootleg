@@ -18,6 +18,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.standaloneGridOccupyingBlocksFamily
+import kotlin.math.round
 
 private val logger = KotlinLogging.logger {}
 
@@ -40,8 +41,8 @@ object UpdateGridBlockSystem : IteratingSystem(standaloneGridOccupyingBlocksFami
 
     // Note: raw must be false to properly update the lights while lights are falling
     // Note 2: loadChunk must be false as the entity should then be handled as out of bounds
-    val offsetX = (box2d.box2dWidth - 1f).coerceAtLeast(0f)
-    val offsetY = (box2d.box2dHeight - 1f).coerceAtLeast(0f)
+    val offsetX = (round(box2d.box2dWidth) - 1f).coerceAtLeast(0f)
+    val offsetY = (round(box2d.box2dHeight) - 1f).coerceAtLeast(0f)
     val currentOccupations =
       world.getBlocksAABB(pos.x, pos.y, offsetX, offsetY, raw = false, loadChunk = false, includeAir = true)
 
