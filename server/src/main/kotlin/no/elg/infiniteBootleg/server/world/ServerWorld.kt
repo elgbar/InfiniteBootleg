@@ -66,11 +66,13 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
   }
 
   fun disconnectPlayer(entityId: String, kicked: Boolean) {
-    val player = getEntity(entityId)
-    if (player != null) {
-      removeEntity(player, if (kicked) Packets.DespawnEntity.DespawnReason.PLAYER_KICKED else Packets.DespawnEntity.DespawnReason.PLAYER_QUIT)
-    } else {
-      logger.warn { "Failed to find player $entityId to remove" }
+    postBox2dRunnable {
+      val player = getEntity(entityId)
+      if (player != null) {
+        removeEntity(player, if (kicked) Packets.DespawnEntity.DespawnReason.PLAYER_KICKED else Packets.DespawnEntity.DespawnReason.PLAYER_QUIT)
+      } else {
+        logger.warn { "Failed to find player $entityId to remove" }
+      }
     }
   }
 
