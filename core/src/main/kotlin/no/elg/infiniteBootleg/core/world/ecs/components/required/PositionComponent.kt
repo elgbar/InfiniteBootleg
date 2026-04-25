@@ -75,7 +75,7 @@ class PositionComponent(x: WorldCoordFloat, y: WorldCoordFloat) : EntitySavableC
   override fun hudDebug(): String = stringifyCompactLoc(x, y)
 
   companion object : EntityLoadableMapper<PositionComponent>() {
-    fun Entity.position(vec: Vector2 = Vector2()): Vector2 = positionComponent.toVector2(vec)
+    fun Entity.position(vec: Vector2): Vector2 = positionComponent.toVector2(vec)
 
     val Entity.compactBlockLoc: WorldCompactLoc get() = positionComponent.run { compactInt(blockX, blockY) }
     val Entity.compactChunkLoc: ChunkCompactLoc get() = positionComponent.run { compactInt(chunkX, chunkY) }

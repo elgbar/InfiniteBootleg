@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.server.net
 
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.math.Vector2
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.console.logPacket
 import no.elg.infiniteBootleg.core.console.serverSideServerBoundMarker
@@ -49,7 +50,6 @@ import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponen
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.hotbarComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
-import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
@@ -264,13 +264,13 @@ private fun physicsHandleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntit
   }
 
   val velocity = player.velocityOrZero()
-  val position = player.position()
+  val (posX, posY) = player.positionComponent
   val nextX = moveEntity.position.x
   val nextY = moveEntity.position.y
 
   val lastUpdated = player.lastPositionUpdatedComponent
   val elapsedSeconds = lastUpdated.getAndUpdateElapsedSeconds()
-  val deltaPos = position.dst2(nextX, nextY)
+  val deltaPos = Vector2.dst2(posX, posY, nextX, nextY)
   val isFalling = velocity.y < NEG_Y_VEL_TO_BE_FALLING
   val maxMovement = if (isFalling) MAX_BLOCKS_PER_SECOND_FALLING_SQUARED else MAX_BLOCKS_PER_SECOND_SQUARED
   logger.debug {
@@ -282,7 +282,7 @@ private fun physicsHandleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntit
     logger.warn { "Player ${player.nameOrNull} moved too fast, delta: $deltaPos, maxDistance: $maxDistance" }
     // ignore update packet, will force client backwards next update
     ctx.writeAndFlushPacket(clientBoundMoveEntity(player))
-    player.teleport(position)
+    player.teleport(posX, posY)
     player.setVelocity(velocity)
   } else {
     player.teleport(nextX, nextY)
