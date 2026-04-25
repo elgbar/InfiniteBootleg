@@ -8,6 +8,9 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
 abstract class LoadableMapper<C : Component, P : Message, S> : Mapper<C>() {
 
+  /**
+   * Loads, but do not adds the component to the entity
+   */
   fun load(engineEntity: EngineEntity, protoEntity: P, stateFunction: () -> S): C? {
     if (protoEntity.checkShouldLoad(stateFunction)) {
       return engineEntity.loadInternal(protoEntity, stateFunction())
@@ -15,20 +18,35 @@ abstract class LoadableMapper<C : Component, P : Message, S> : Mapper<C>() {
     return null
   }
 
+  /**
+   * Loads, but do not adds the component to the entity
+   */
   protected abstract fun EngineEntity.loadInternal(protoEntity: P, state: S): C?
 
+  /**
+   * @return Whether this component should/can be loaded
+   */
   abstract fun P.checkShouldLoad(state: () -> S): Boolean
 }
 
 abstract class StatelessLoadableMapper<C : Component, P : Message> : LoadableMapper<C, P, Unit>() {
 
+  /**
+   * Loads, but do not adds the component to the entity
+   */
   fun load(engineEntity: EngineEntity, protoEntity: P): C? = load(engineEntity, protoEntity) { }
 
   @Deprecated("Do not use stateful loading in this class", ReplaceWith("loadInternal(protoEntity)"))
   final override fun EngineEntity.loadInternal(protoEntity: P, state: Unit): C? = loadInternal(protoEntity)
 
+  /**
+   * Loads, but do not add the component to the entity
+   */
   protected abstract fun EngineEntity.loadInternal(protoEntity: P): C?
 
+  /**
+   * @return Whether this component should/can be loaded
+   */
   abstract fun P.checkShouldLoad(): Boolean
 
   final override fun P.checkShouldLoad(state: () -> Unit): Boolean = checkShouldLoad()

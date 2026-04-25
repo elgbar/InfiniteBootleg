@@ -32,7 +32,7 @@ inline fun <reified T : Component> Entity.safeWith(component: () -> T?): T? {
  * @throws [CreateComponentException] if the engine was unable to create the component
  * @see [create]
  */
-inline fun <reified T : Component> EngineEntity.safeWith(component: () -> T): T? = entity.safeWith(component)
+inline fun <reified T : Component> EngineEntity.safeWith(component: () -> T?): T? = entity.safeWith(component)
 
 /**
  * Create and add an [Entity] to the [Engine].
