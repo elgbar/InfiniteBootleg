@@ -157,6 +157,7 @@ message Entity {
   optional PhysicsEvent physicsEvent = 32;
   optional Tinted tinted = 33;
   optional Decaying decaying = 34;
+  optional Vector2f offsetPosition = 35;
 
   enum EntityType {
     GENERIC_ENTITY = 0; // default

@@ -3,17 +3,16 @@ package no.elg.infiniteBootleg.client.world.render.debug
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
-import ktx.ashley.has
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.api.render.OverlayRenderer
+import no.elg.infiniteBootleg.core.util.Compacted2FloatComponents.component1
+import no.elg.infiniteBootleg.core.util.Compacted2FloatComponents.component2
 import no.elg.infiniteBootleg.core.util.safeUse
 import no.elg.infiniteBootleg.core.util.worldToScreen
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dOrNull
-import no.elg.infiniteBootleg.core.world.ecs.components.DoorComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
-import no.elg.infiniteBootleg.core.world.ecs.creation.DOOR_X_OFFSET
+import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.compactLocWithOffset
 import kotlin.math.round
 
 class EntityPositionDebugRenderer(private val worldRender: ClientWorldRender) :
@@ -37,18 +36,7 @@ class EntityPositionDebugRenderer(private val worldRender: ClientWorldRender) :
 
       shapeRenderer.color = Color.BLACK
       for ((entity, box2d) in hoveringEntities) {
-        val (rawX, rawY) = entity.positionComponent
-        val isDoor = entity.has(DoorComponent.mapper)
-        val x = if (isDoor) {
-          rawX + DOOR_X_OFFSET + box2d.halfBox2dWidth
-        } else {
-          rawX
-        }
-        val y = if (isDoor) {
-          rawY + box2d.halfBox2dHeight
-        } else {
-          rawY
-        }
+        val (x, y) = entity.compactLocWithOffset
 
         // Note sync these vars with World.mapEntitiesAt
         val lowerX = round(x - box2d.halfBox2dWidth).worldToScreen()

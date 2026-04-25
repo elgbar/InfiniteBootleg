@@ -24,6 +24,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledCompone
 import no.elg.infiniteBootleg.core.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.OffsetPositionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent
@@ -100,7 +101,7 @@ val blockContainerFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ContainerComponent
 
 val blockEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY).get()
 val brokenBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, BrokenBlockTag::class).get()
-val doorEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, DoorComponent::class).get()
+val doorEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, DoorComponent::class, OffsetPositionComponent::class).get()
 
 val gravityAffectedBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, GravityAffectedTag::class).get()
 val gravityAffectedBlockFamilyActive: Family = allOf(*BASIC_BLOCK_ENTITY, GravityAffectedTag::class, ReactToEventTag::class).get()

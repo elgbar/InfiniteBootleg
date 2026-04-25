@@ -31,6 +31,8 @@ import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent.Companion.occupyingBlocksComponentOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.OffsetPositionComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.OffsetPositionComponent.Companion.offsetPositionComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent.Companion.physicsEventQueueOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent
@@ -128,6 +130,7 @@ fun Entity.save(toAuthoritative: Boolean, ignoreTransient: Boolean = false): Pro
     trySave(this@save.textureRegionNameComponentOrNull)
     trySave(this@save.tintedComponentOrNull)
     trySave(this@save.velocityComponentOrNull)
+    trySave(this@save.offsetPositionComponentOrNull)
   }
 }
 
@@ -179,6 +182,7 @@ fun World.load(protoEntity: ProtoWorld.Entity, chunk: Chunk? = null, configure: 
     TextureRegionNameComponent.load(this, protoEntity)
     TintedComponent.load(this, protoEntity)
     VelocityComponent.load(this, protoEntity)
+    OffsetPositionComponent.load(this, protoEntity)
 
     // Load box2d body last, as it depends on other components
     val futureCompleter: () -> (Entity) -> Unit = {

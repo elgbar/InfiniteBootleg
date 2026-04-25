@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.OffsetPositionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent
 import no.elg.infiniteBootleg.core.world.world.World
@@ -26,6 +27,7 @@ fun Engine.createDoorBlockEntity(world: World, worldX: WorldCoord, worldY: World
     with<DoorComponent>()
     with<PhysicsEventQueueComponent>()
     safeWith { OccupyingBlocksComponent(hardLink = true) }
+    safeWith { OffsetPositionComponent(offsetX = DOOR_X_OFFSET + DOOR_WIDTH / 2f, offsetY = DOOR_HEIGHT / 2f) }
 
     createDoorBodyComponent(world, worldX, worldY)
   }

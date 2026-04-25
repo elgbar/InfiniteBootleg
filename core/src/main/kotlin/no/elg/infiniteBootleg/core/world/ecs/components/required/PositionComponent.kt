@@ -7,10 +7,14 @@ import ktx.ashley.EngineEntity
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.util.ChunkCompactLoc
+import no.elg.infiniteBootleg.core.util.Compacted2FloatComponents.component1
+import no.elg.infiniteBootleg.core.util.Compacted2FloatComponents.component2
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
+import no.elg.infiniteBootleg.core.util.WorldCompactLocF
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.WorldCoordFloat
 import no.elg.infiniteBootleg.core.util.WorldCoordNumber
+import no.elg.infiniteBootleg.core.util.compactFloat
 import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
@@ -19,6 +23,7 @@ import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.core.world.ecs.api.EntitySavableComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.OffsetPositionComponent.Companion.compactOffset
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
@@ -77,6 +82,11 @@ class PositionComponent(x: WorldCoordFloat, y: WorldCoordFloat) : EntitySavableC
   companion object : EntityLoadableMapper<PositionComponent>() {
     fun Entity.position(vec: Vector2): Vector2 = positionComponent.toVector2(vec)
 
+    val Entity.compactLocWithOffset: WorldCompactLocF
+      get() = positionComponent.run {
+        val (offsetX, offsetY) = compactOffset
+        compactFloat(x + offsetX, y + offsetY)
+      }
     val Entity.compactBlockLoc: WorldCompactLoc get() = positionComponent.run { compactInt(blockX, blockY) }
     val Entity.compactChunkLoc: ChunkCompactLoc get() = positionComponent.run { compactInt(chunkX, chunkY) }
     val Entity.positionComponent by propertyFor(mapper)

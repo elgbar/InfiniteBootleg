@@ -19,7 +19,6 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import ktx.ashley.has
 import ktx.async.interval
 import ktx.collections.GdxArray
 import ktx.collections.GdxLongArray
@@ -52,7 +51,9 @@ import no.elg.infiniteBootleg.core.util.compactLongY
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.decompactLocX
+import no.elg.infiniteBootleg.core.util.decompactLocXf
 import no.elg.infiniteBootleg.core.util.decompactLocY
+import no.elg.infiniteBootleg.core.util.decompactLocYf
 import no.elg.infiniteBootleg.core.util.isAir
 import no.elg.infiniteBootleg.core.util.isBlockInsideRadius
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
@@ -90,13 +91,11 @@ import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEntitySet
 import no.elg.infiniteBootleg.core.world.ecs.basicRequiredEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.core.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrToString
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
-import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.compactLocWithOffset
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
-import no.elg.infiniteBootleg.core.world.ecs.creation.DOOR_X_OFFSET
 import no.elg.infiniteBootleg.core.world.ecs.disposeBox2dOnRemoval
 import no.elg.infiniteBootleg.core.world.ecs.ensureUniquenessListener
 import no.elg.infiniteBootleg.core.world.ecs.playerFamily
@@ -993,18 +992,10 @@ abstract class World(
     return iterator {
       for (entity in standaloneEntities) {
         val box2d = entity.box2d
-        val (rawX, rawY) = entity.positionComponent
-        val isDoor = entity.has(DoorComponent.mapper)
-        val x = if (isDoor) {
-          rawX + DOOR_X_OFFSET + box2d.halfBox2dWidth
-        } else {
-          rawX
-        }
-        val y = if (isDoor) {
-          rawY + box2d.halfBox2dHeight
-        } else {
-          rawY
-        }
+        // conflicting imports, must do the decomposition manually
+        val compactLocWithOffset = entity.compactLocWithOffset
+        val x = compactLocWithOffset.decompactLocXf()
+        val y = compactLocWithOffset.decompactLocYf()
 
         // Note sync these vars with EntityPositionDebugRenderer
         val lowerX = round(x - box2d.halfBox2dWidth)
