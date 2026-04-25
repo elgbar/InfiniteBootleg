@@ -40,8 +40,8 @@ import no.elg.infiniteBootleg.protobuf.vector2i
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
-const val PLAYER_WIDTH = 1.5f - 0.2f
-const val PLAYER_HEIGHT = 3f - 0.2f
+const val PLAYER_WIDTH = 1.51f // must be more than 1.5 to round up to 2 blocks. makes it less likely for players to place blocks onto player aabb
+const val PLAYER_HEIGHT = 2.99f // must be less than 3 blocks to fit in 3 block high caves
 const val PLAYERS_FOOT_USER_DATA = "A bloody foot!"
 const val HOLE_DETECTOR_USER_DATA = "down the drain"
 const val PLAYERS_EAST_ARM_USER_DATA = "Righty"
