@@ -18,7 +18,6 @@ import no.elg.infiniteBootleg.server.world.ServerWorld
 class ServerWorldTicker(world: ServerWorld) : WorldTicker {
 
   private val ticker = CommonWorldTicker(world)
-  private val serverRendererTicker: ServerRendererTicker = ServerRendererTicker(world)
 
   private val logger = KotlinLogging.logger(WORLD_TICKER_TAG_PREFIX + world.name)
   override val box2DTicker: WorldBox2DTicker get() = ticker.box2DTicker
@@ -26,10 +25,6 @@ class ServerWorldTicker(world: ServerWorld) : WorldTicker {
   override fun start() {
     check(!ticker.isStarted) { "Server world has already been started" }
     ticker.start()
-    serverRendererTicker.ticker.start()
-    while (serverRendererTicker.ticker.tickId <= 0) {
-      Thread.onSpinWait()
-    }
     logger.info { "Started server world ticker" }
   }
 
@@ -41,7 +36,6 @@ class ServerWorldTicker(world: ServerWorld) : WorldTicker {
    */
   override fun pause() {
     ticker.pause()
-    serverRendererTicker.ticker.pause()
   }
 
   /**
@@ -52,14 +46,12 @@ class ServerWorldTicker(world: ServerWorld) : WorldTicker {
    */
   override fun resume() {
     ticker.resume()
-    serverRendererTicker.ticker.resume()
   }
 
   override fun postRunnable(runnable: () -> Unit) = ticker.postRunnable(runnable)
 
   override fun dispose() {
     ticker.dispose()
-    serverRendererTicker.ticker.dispose()
   }
 
   override val tps: Long get() = ticker.tps
