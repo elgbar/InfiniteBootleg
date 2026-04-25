@@ -108,6 +108,8 @@ object Settings {
 
   var renderEntityPosDifference = false
 
+  var debugEntityAtMouseInputEvent = true
+
   var renderGroundedTouchingBlocks = false
 
   var assertThreadType = true

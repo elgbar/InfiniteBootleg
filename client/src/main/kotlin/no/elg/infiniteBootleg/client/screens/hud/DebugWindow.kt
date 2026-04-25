@@ -274,9 +274,15 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           world.recalculateLights()
         }
       }
-//      section {
-//       Room for four more buttons
-//      }
+      section {
+        toggleableDebugButton(
+          "Render entities at mouse AABB",
+          "Render an outline of the Axis Aligned Bounding Box of where an entity is considered to be at.",
+          onAnyElementChanged = onAnyElementChanged,
+          property = Settings::debugEntityAtMouseInputEvent
+        )
+//       Room for three more buttons
+      }
 
       sep()
       // Future positions renderers

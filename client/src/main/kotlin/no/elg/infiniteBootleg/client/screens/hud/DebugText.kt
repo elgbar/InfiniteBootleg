@@ -216,7 +216,7 @@ object DebugText {
 
   fun ents(sb: StringBuilder, world: ClientWorld, mouseWorldX: WorldCoord, mouseWorldY: WorldCoord) {
     sb.append("E = \n")
-    for (entity in world.getEntities(mouseWorldX, mouseWorldY)) {
+    for (entity in world.mapEntitiesAt(mouseWorldX, mouseWorldY)) {
       sb.append(ent(entity)).appendLine()
     }
   }

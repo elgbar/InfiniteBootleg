@@ -48,15 +48,14 @@ fun Entity.placeableBlocks(
   interactionRadius: Float,
   material: Material
 ): Sequence<WorldCompactLoc> =
-  interactableBlocksWithinRadius(world, interactionRadius, sequenceOf(compactInt(centerBlockX, centerBlockY))).filter { (worldX: WorldCoord, worldY: WorldCoord) ->
-    world.isAirBlock(worldX, worldY, loadChunk = false) && material.canBeCreated(world, worldX, worldY, material)
-  }.let { seq ->
-    if (seq.any { (worldX, worldY) -> world.canEntityPlaceBlock(worldX, worldY, this) }) {
-      seq
-    } else {
-      emptySequence()
+  interactableBlocksWithinRadius(world, interactionRadius, sequenceOf(compactInt(centerBlockX, centerBlockY)))
+    .let { seq ->
+      if (seq.any { (worldX, worldY) -> world.canEntityPlaceMaterial(this, worldX, worldY, material) }) {
+        seq
+      } else {
+        emptySequence()
+      }
     }
-  }
 
 val Class<out Component>.displayName: String get() = simpleName.removeSuffix("Component").removeSuffix("Tag")
 val Component.displayName: String get() = javaClass.displayName

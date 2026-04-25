@@ -2,11 +2,13 @@ package no.elg.infiniteBootleg.core.world
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.math.MathUtils
 import io.github.oshai.kotlinlogging.KotlinLogging
 import it.unimi.dsi.fastutil.longs.LongIterators
 import no.elg.infiniteBootleg.core.items.ItemType
 import no.elg.infiniteBootleg.core.items.MaterialItem
 import no.elg.infiniteBootleg.core.main.Main
+import no.elg.infiniteBootleg.core.util.BlockUnit
 import no.elg.infiniteBootleg.core.util.LocalCoord
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.util.WorldCoord
@@ -36,6 +38,7 @@ import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.material
 import java.util.concurrent.CompletableFuture
+import kotlin.math.ceil
 import it.unimi.dsi.fastutil.longs.LongIterator as FastUtilLongIterator
 
 private val logger = KotlinLogging.logger {}
@@ -97,7 +100,7 @@ sealed interface Material : ContainerElement {
    *
    * Must be called before loading or creating a block.
    */
-  val canBeCreated: ((world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material) -> Boolean) get() = CAN_ALWAYS_BE_CREATED
+  val canBeCreated: ((world: World, worldX: WorldCoord, worldY: WorldCoord) -> Boolean) get() = CAN_ALWAYS_BE_CREATED
 
   val category: MaterialCategory?
 
@@ -237,13 +240,13 @@ sealed interface Material : ContainerElement {
     override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createDoorBlockEntity(world, worldX, worldY, material)
     }
-    override val canBeCreated = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+    override val canBeCreated = { world: World, worldX: WorldCoord, worldY: WorldCoord ->
       val blocks =
         world.getBlocksAABB(
           worldX.toFloat(),
           worldY.toFloat(),
-          DOOR_WIDTH - 1,
-          DOOR_HEIGHT - 1,
+          ceil(DOOR_WIDTH) - 1f,
+          ceil(DOOR_HEIGHT) - 1f,
           raw = true,
           loadChunk = false,
           includeAir = false,
@@ -338,7 +341,7 @@ sealed interface Material : ContainerElement {
     require(validChunk.isNotDisposed) { "Chunk has been disposed" }
     val worldX: WorldCoord = validChunk.worldX + localX
     val worldY: WorldCoord = validChunk.worldY + localY
-    if (canBeCreated(world, worldX, worldY, this)) {
+    if (canBeCreated(world, worldX, worldY)) {
       return BlockImpl(validChunk, localX, localY, this).also { block ->
         if (Main.isAuthoritative) {
           // Blocks client side should not have any entity in them
@@ -408,7 +411,7 @@ sealed interface Material : ContainerElement {
     /**
      * Mark a block as always able to be created.
      */
-    private val CAN_ALWAYS_BE_CREATED: ((World, WorldCoord, WorldCoord, Material) -> Boolean) = { _, _, _, _ -> true }
+    private val CAN_ALWAYS_BE_CREATED: ((World, WorldCoord, WorldCoord) -> Boolean) = { _, _, _ -> true }
 
     val materials: List<Material> = sealedSubclassObjectInstances<Material>()
 

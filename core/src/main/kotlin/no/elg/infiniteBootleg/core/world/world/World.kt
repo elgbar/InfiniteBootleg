@@ -19,6 +19,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import ktx.ashley.has
 import ktx.async.interval
 import ktx.collections.GdxArray
 import ktx.collections.GdxLongArray
@@ -77,7 +78,6 @@ import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.remove
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight
-import no.elg.infiniteBootleg.core.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.core.world.box2d.VoidPointerManager
 import no.elg.infiniteBootleg.core.world.box2d.WorldBody
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
@@ -90,11 +90,13 @@ import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEntitySet
 import no.elg.infiniteBootleg.core.world.ecs.basicRequiredEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.core.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrToString
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
+import no.elg.infiniteBootleg.core.world.ecs.creation.DOOR_X_OFFSET
 import no.elg.infiniteBootleg.core.world.ecs.disposeBox2dOnRemoval
 import no.elg.infiniteBootleg.core.world.ecs.ensureUniquenessListener
 import no.elg.infiniteBootleg.core.world.ecs.playerFamily
@@ -139,6 +141,7 @@ import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.round
 import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
@@ -214,6 +217,7 @@ abstract class World(
   private lateinit var playersEntitiesSet: ThreadSafeEntitySet
   private lateinit var validEntitiesSet: ThreadSafeEntitySet
 
+  val standaloneEntities: Set<Entity> get() = standaloneEntitySet.entities
   val playersEntities: Set<Entity> get() = playersEntitiesSet.entities
   val validEntities: Set<Entity> get() = validEntitiesSet.entities
 
@@ -830,26 +834,37 @@ abstract class World(
   /**
    * Check whether a block can be placed at the given location
    */
-  fun canEntityPlaceBlock(blockX: WorldCoord, blockY: WorldCoord, entity: Entity): Boolean {
-    if (entity.ignorePlaceableCheck) {
-      return true
-    }
-    if (canPlaceBlock(blockX, blockY)) {
-      return true
-    }
-    for (direction in Direction.CARDINAL) {
-      if (canPlaceBlock(blockX + direction.dx, blockY + direction.dy)) {
+  fun canEntityPlaceMaterial(entity: Entity, blockX: WorldCoord, blockY: WorldCoord, material: Material): Boolean {
+    if (canPlaceBlock(blockX, blockY, material)) {
+      if (entity.ignorePlaceableCheck) {
         return true
+      }
+      for (direction in Direction.CARDINAL) {
+        if (isValidNeighborToPlaceBlock(blockX + direction.dx, blockY + direction.dy)) {
+          return true
+        }
       }
     }
     return false
   }
 
-  private fun canPlaceBlock(worldX: WorldCoord, worldY: WorldCoord): Boolean =
+  /**
+   * If a block of the given material can placed here. It does not care if there are valid adjacent blocks (see [isValidNeighborToPlaceBlock] for neighbor check)
+   */
+  private fun canPlaceBlock(worldX: WorldCoord, worldY: WorldCoord, material: Material): Boolean {
+    if (isAnyEntityAt(worldX, worldY)) {
+      return false
+    } else if (!material.canBeCreated(this, worldX, worldY)) {
+      return false
+    }
+    return isAirBlock(worldX, worldY, loadChunk = false, markerIsAir = false)
+  }
+
+  private fun isValidNeighborToPlaceBlock(worldX: WorldCoord, worldY: WorldCoord): Boolean =
     actionOnBlock(worldX, worldY, false) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock false
       val rawBlock = chunk.getRawBlock(localX, localY)
-      rawBlock !is EntityMarkerBlock && rawBlock.isNotAir() && !isAnyEntityAt(worldX, worldY)
+      rawBlock.isNotAir(markerIsAir = false)
     }
 
   /**
@@ -973,34 +988,37 @@ abstract class World(
     }
   }
 
-  fun getEntities(worldX: WorldCoord, worldY: WorldCoord): GdxArray<Entity> {
+  fun mapEntitiesAt(worldX: WorldCoord, worldY: WorldCoord): Iterator<Entity> {
     assertNotDisposed()
-    val foundEntities = GdxArray<Entity>(false, 0)
-    for (entity in standaloneEntitySet.entities) {
-      val (x, y) = entity.positionComponent
-      val size = entity.box2d
-      if (worldX in MathUtils.floor(x - size.halfBox2dWidth) until MathUtils.ceil(x + size.halfBox2dWidth) &&
-        worldY in MathUtils.floor(y - size.halfBox2dHeight) until MathUtils.ceil(y + size.halfBox2dHeight)
-      ) {
-        foundEntities.add(entity)
+    return iterator {
+      for (entity in standaloneEntities) {
+        val box2d = entity.box2d
+        val (rawX, rawY) = entity.positionComponent
+        val isDoor = entity.has(DoorComponent.mapper)
+        val x = if (isDoor) {
+          rawX + DOOR_X_OFFSET + box2d.halfBox2dWidth
+        } else {
+          rawX
+        }
+        val y = if (isDoor) {
+          rawY + box2d.halfBox2dHeight
+        } else {
+          rawY
+        }
+
+        // Note sync these vars with EntityPositionDebugRenderer
+        val lowerX = round(x - box2d.halfBox2dWidth)
+        val upperX = round(x + box2d.halfBox2dWidth)
+        val lowerY = round(y - box2d.halfBox2dHeight)
+        val upperY = round(y + box2d.halfBox2dHeight)
+        if (worldX.toFloat() in lowerX..<upperX && worldY.toFloat() in lowerY..<upperY) {
+          yield(entity)
+        }
       }
     }
-    return foundEntities
   }
 
-  fun isAnyEntityAt(worldX: WorldCoord, worldY: WorldCoord): Boolean {
-    assertNotDisposed()
-    for (entity in standaloneEntitySet.entities) {
-      val (x, y) = entity.positionComponent
-      val box2d = entity.box2d
-      if (worldX in MathUtils.floor(x - box2d.halfBox2dWidth) until MathUtils.ceil(x + box2d.halfBox2dWidth) &&
-        worldY in MathUtils.floor(y - box2d.halfBox2dHeight) until MathUtils.ceil(y + box2d.halfBox2dHeight)
-      ) {
-        return true
-      }
-    }
-    return false
-  }
+  fun isAnyEntityAt(worldX: WorldCoord, worldY: WorldCoord): Boolean = mapEntitiesAt(worldX, worldY).hasNext()
 
   /**
    * @param compactWorldLoc The coordinates from world view in a compact form
