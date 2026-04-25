@@ -108,7 +108,7 @@ object Settings {
 
   var renderEntityPosDifference = false
 
-  var debugEntityAtMouseInputEvent = true
+  var debugEntityAtMouseInputEvent = false
 
   var renderGroundedTouchingBlocks = false
 
