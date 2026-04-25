@@ -94,9 +94,9 @@ abstract class ClientWorld : World {
 
   override fun dispose() {
     super.dispose()
-    input.dispose()
+    input.dispose(Exception::printStackTrace)
     // Must be done on GL thread
-    Gdx.app.postRunnable { render.dispose { it.printStackTrace() } }
+    Gdx.app.postRunnable { render.dispose(Exception::printStackTrace) }
   }
 
   fun recalculateLights() {

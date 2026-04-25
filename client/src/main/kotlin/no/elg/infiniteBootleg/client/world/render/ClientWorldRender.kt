@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.utils.Disposable
 import io.github.oshai.kotlinlogging.KotlinLogging
+import ktx.assets.dispose
 import no.elg.infiniteBootleg.client.inventory.ui.SlotSource.Companion.DRAG_ICON_SIZE
 import no.elg.infiniteBootleg.client.inventory.ui.createContainerActor
 import no.elg.infiniteBootleg.client.main.ClientMain
@@ -192,11 +193,11 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   }
 
   override fun dispose() {
-    batch.dispose()
-    chunkRenderer.dispose()
-    box2DDebugRenderer.dispose()
+    batch.dispose(Exception::printStackTrace)
+    chunkRenderer.dispose(Exception::printStackTrace)
+    box2DDebugRenderer.dispose(Exception::printStackTrace)
     for (renderer in renderers.filterIsInstance<Disposable>()) {
-      renderer.dispose()
+      renderer.dispose(Exception::printStackTrace)
     }
   }
 
