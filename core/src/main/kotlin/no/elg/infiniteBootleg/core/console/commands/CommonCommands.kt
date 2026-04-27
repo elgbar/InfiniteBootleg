@@ -209,6 +209,13 @@ open class CommonCommands : CommandExecutor() {
     logger.info { "Sky color changed to $skylight" }
   }
 
+
+  @ConsoleDoc(description = "Get the current time and time scale")
+  fun time() {
+    val world = world ?: return
+    logger.info { "Current time is %.4f with a scale of %.3f".format(world.worldTime.time, world.worldTime.timeScale) }
+  }
+
   @CmdArgNames("scale")
   @ConsoleDoc(description = "How fast the time flows. Default is $DEFAULT_TIME_SCALE", paramDescriptions = ["The new scale of time. Default is $DEFAULT_TIME_SCALE"])
   fun timescale(scale: Double) {
