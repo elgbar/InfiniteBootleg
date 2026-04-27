@@ -95,7 +95,7 @@ abstract class GameConsoleHandler :
       try {
         // Try to execute with default params if no args are given
         val validFuncs = exec.javaClass.kotlin.memberFunctions.filter { func ->
-          func.name.startsWith(commandPart, ignoreCase = true) &&
+          func.name.equals(commandPart, ignoreCase = true) &&
             // Find the function with the same name
             func.parameters.filter { param -> param.kind == Kind.VALUE }.all { param -> param.isOptional && !param.isVararg } // All parameters must be optional and not vararg
         }
