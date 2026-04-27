@@ -105,11 +105,11 @@ object Util {
    * @param orgDir The original direction
    * @return The direction normalized within 0 (inclusive) to 360 (exclusive)
    */
-  fun normalizedDir(orgDir: Float): Float {
+  fun normalizedDir(orgDir: Double): Double {
     if (orgDir >= CIRCLE_DEG) {
       return orgDir % CIRCLE_DEG
     } else if (orgDir < 0) {
-      val mult = (-orgDir / CIRCLE_DEG).toInt() + 1
+      val mult = (-orgDir / CIRCLE_DEG).toInt() + 1.0
       return mult * CIRCLE_DEG + orgDir
     }
     return orgDir // is within [0,360)

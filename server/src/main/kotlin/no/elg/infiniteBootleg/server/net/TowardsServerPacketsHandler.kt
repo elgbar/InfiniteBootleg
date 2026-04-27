@@ -188,8 +188,8 @@ private fun handleWorldSettings(ctx: ChannelHandlerContextWrapper, worldSettings
   logger.info { "handleWorldSettings: spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}" }
   val world = ServerMain.inst().serverWorld
   var spawn: Long? = null
-  var time: Float? = null
-  var timeScale: Float? = null
+  var time: Double? = null
+  var timeScale: Double? = null
 
   if (worldSettings.hasSpawn()) {
     world.spawn = worldSettings.spawn.toCompact()

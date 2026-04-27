@@ -157,7 +157,7 @@ fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packet =
     .setMoveEntity(entityMovePacket(entity))
     .build()
 
-fun ServerClient.serverBoundWorldSettings(spawn: Long?, time: Float?, timeScale: Float?): Packet =
+fun ServerClient.serverBoundWorldSettings(spawn: Long?, time: Double?, timeScale: Double?): Packet =
   worldSettingsPacketBuilder(serverBoundPacketBuilder(DX_WORLD_SETTINGS), spawn, time, timeScale)
 
 fun ServerClient.serverBoundHeartbeat(): Packet = heartbeatPacketBuilder(serverBoundPacketBuilder(DX_HEARTBEAT))
@@ -252,7 +252,7 @@ fun clientBoundSecretExchange(sharedInformation: SharedInformation): Packet =
       .setRef(sharedInformation.entityId.toProtoEntityRef())
   ).build()
 
-fun clientBoundWorldSettings(spawn: Long?, time: Float?, timeScale: Float?): Packet =
+fun clientBoundWorldSettings(spawn: Long?, time: Double?, timeScale: Double?): Packet =
   worldSettingsPacketBuilder(clientBoundPacketBuilder(DX_WORLD_SETTINGS), spawn, time, timeScale)
 
 fun clientBoundHeartbeat(): Packet = heartbeatPacketBuilder(clientBoundPacketBuilder(DX_HEARTBEAT))
@@ -271,7 +271,7 @@ fun clientBoundInterfaceUpdate(interfaceId: String, updateType: InterfaceUpdate.
 //   DUAL Builders   //
 // /////////////////////
 
-private fun worldSettingsPacketBuilder(packet: Packet.Builder, spawn: Long?, time: Float?, timeScale: Float?): Packet =
+private fun worldSettingsPacketBuilder(packet: Packet.Builder, spawn: Long?, time: Double?, timeScale: Double?): Packet =
   packet.setWorldSettings(
     WorldSettings.newBuilder()?.also {
       if (spawn != null) {

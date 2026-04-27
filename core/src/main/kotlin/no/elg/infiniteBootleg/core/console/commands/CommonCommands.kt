@@ -27,6 +27,7 @@ import no.elg.infiniteBootleg.core.util.toAbled
 import no.elg.infiniteBootleg.core.util.toTitleCase
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.WorldTime
+import no.elg.infiniteBootleg.core.world.WorldTime.Companion.DEFAULT_TIME_SCALE
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.ClientComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.DebuggableComponent.Companion.debugString
@@ -209,8 +210,8 @@ open class CommonCommands : CommandExecutor() {
   }
 
   @CmdArgNames("scale")
-  @ConsoleDoc(description = "How fast the time flows", paramDescriptions = ["The new scale of time"])
-  fun timescale(scale: Float) {
+  @ConsoleDoc(description = "How fast the time flows. Default is $DEFAULT_TIME_SCALE", paramDescriptions = ["The new scale of time. Default is $DEFAULT_TIME_SCALE"])
+  fun timescale(scale: Double) {
     val world = world ?: return
     val worldTime = world.worldTime
     val old = worldTime.timeScale
@@ -226,16 +227,16 @@ open class CommonCommands : CommandExecutor() {
     Settings.dayTicking = !Settings.dayTicking
     logger.info { "Time is now " + (if (Settings.dayTicking) "" else "not ") + "ticking" }
     Main.inst().packetSender.sendDuplexPacket(
-      { clientBoundWorldSettings(null, null, if (Settings.dayTicking) 1f else 0f) }
-    ) { serverBoundWorldSettings(null, null, if (Settings.dayTicking) 1f else 0f) }
+      { clientBoundWorldSettings(null, null, if (Settings.dayTicking) 1.0 else 0.0) }
+    ) { serverBoundWorldSettings(null, null, if (Settings.dayTicking) 1.0 else 0.0) }
   }
 
   @CmdArgNames("time of day")
   @ConsoleDoc(description = "Set the current time", paramDescriptions = ["Time of day such as day, noon, dusk, night"])
   fun time(timeOfDay: String) {
-    val time: Float = try {
+    val time: Double = try {
       // There is a chance this method is selected before  the other time method
-      timeOfDay.toFloat()
+      timeOfDay.toDouble()
     } catch (ignored: NumberFormatException) {
       when (timeOfDay.lowercase(Locale.getDefault())) {
         "dawn" -> WorldTime.DAWN_TIME
@@ -250,7 +251,7 @@ open class CommonCommands : CommandExecutor() {
 
         "midnight", "night" -> WorldTime.MIDNIGHT_TIME
 
-        "end" -> Int.MAX_VALUE.toFloat()
+        "end" -> Double.MAX_VALUE
 
         else -> {
           logger.error { "Unknown time of day, try sunrise, midday, sunset or midnight" }
@@ -265,7 +266,7 @@ open class CommonCommands : CommandExecutor() {
 
   @CmdArgNames("time")
   @ConsoleDoc(description = "Set the current time", paramDescriptions = ["The new time as a number with sunrise as 0, noon as 90, dusk as 180 etc"])
-  fun time(time: Float) {
+  fun time(time: Double) {
     val world = world ?: return
     val worldTime = world.worldTime
     val old = worldTime.time

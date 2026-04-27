@@ -11,7 +11,7 @@ class WorldTime(val world: World) {
   var time = SUNRISE_TIME
 
   @Volatile
-  var timeScale = 1f
+  var timeScale = DEFAULT_TIME_SCALE
 
   /**
    * Calculate how bright the sky should be. During the night the value will always be `0`,
@@ -23,7 +23,7 @@ class WorldTime(val world: World) {
    *
    * @return A brightness value between 0 and 1 (both inclusive)
    */
-  val skyBrightness: Float
+  val skyBrightness: Double
     get() = getSkyBrightness(time)
 
   /**
@@ -34,16 +34,16 @@ class WorldTime(val world: World) {
    * @param time The time to calculate
    * @return A brightness value between 0 and 1 (both inclusive)
    */
-  fun getSkyBrightness(time: Float = this.time): Float =
+  fun getSkyBrightness(time: Double = this.time): Double =
     atTime(
       time = time,
-      day = { 1f },
-      dusk = { 1f - (it - SUNSET_TIME) / (DUSK_TIME - SUNSET_TIME) },
-      night = { 0f },
+      day = { 1.0 },
+      dusk = { 1.0 - (it - SUNSET_TIME) / (DUSK_TIME - SUNSET_TIME) },
+      night = { 0.0 },
       dawn = { (it - DAWN_TIME) / (SUNRISE_TIME - DAWN_TIME) }
     )
 
-  fun timeOfDay(time: Float = this.time): String =
+  fun timeOfDay(time: Double = this.time): String =
     atTime(
       time = time,
       day = { "Day" },
@@ -53,11 +53,11 @@ class WorldTime(val world: World) {
     )
 
   inline fun <T> atTime(
-    time: Float = this.time,
-    day: (Float) -> T,
-    dusk: (Float) -> T,
-    night: (Float) -> T,
-    dawn: (Float) -> T
+    time: Double = this.time,
+    day: (Double) -> T,
+    dusk: (Double) -> T,
+    night: (Double) -> T,
+    dawn: (Double) -> T
   ): T {
     val dir = Util.normalizedDir(time)
     return when {
@@ -78,19 +78,21 @@ class WorldTime(val world: World) {
     }
   }
 
-  fun normalizedTime(): Float = Util.normalizedDir(time)
+  fun normalizedTime(): Double = Util.normalizedDir(time)
 
   companion object {
+    const val DEFAULT_TIME_SCALE = 0.033 // roughly 1/30
+
     /**
      * How many degrees the time light should have before triggering sunset/sunrise. This will happen
      * from `-TWILIGHT_DEGREES` to `+TWILIGHT_DEGREES`
      */
-    const val TWILIGHT_DEGREES = 18f
+    const val TWILIGHT_DEGREES = 18.0
 
     /**
      * The moment the sun is parallel to the horizon and is rising
      */
-    const val SUNRISE_TIME = 180 - TWILIGHT_DEGREES
+    const val SUNRISE_TIME = 180.0 - TWILIGHT_DEGREES
 
     /**
      * When the world begins to lighten up
@@ -100,7 +102,7 @@ class WorldTime(val world: World) {
     /**
      * The moment the sun is parallel to the horizon and is sinking
      */
-    const val SUNSET_TIME = 0 + TWILIGHT_DEGREES
+    const val SUNSET_TIME = 0.0 + TWILIGHT_DEGREES
 
     /**
      * When there is no more ambient light from the sun
@@ -110,11 +112,11 @@ class WorldTime(val world: World) {
     /**
      * Middle of the day
      */
-    const val MIDDAY_TIME = 270f
+    const val MIDDAY_TIME = 270.0
 
     /**
      * Middle of the night
      */
-    const val MIDNIGHT_TIME = 90f
+    const val MIDNIGHT_TIME = 90.0
   }
 }

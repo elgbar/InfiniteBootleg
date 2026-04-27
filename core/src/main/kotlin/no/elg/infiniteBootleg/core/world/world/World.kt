@@ -488,7 +488,7 @@ abstract class World(
   fun save() = save(false)
 
   /**
-   * Allow for saving when disposeing
+   * Allow for saving when disposing
    */
   protected open fun save(overrideDispose: Boolean) {
     if ((!overrideDispose && hasDisposeBegun) || isTransient) {

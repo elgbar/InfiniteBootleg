@@ -22,9 +22,9 @@ message Material {
 message World {
   int64 seed = 1;
   string name = 2;
-  float time = 3;
+  double time = 3;
   Vector2i spawn = 4;
-  float timeScale = 5;
+  double timeScale = 5;
   repeated ChunkColumn chunkColumns = 6;
 
   Generator generator = 16;

@@ -108,8 +108,8 @@ message SecretExchange{
 
 //if not present, do not update setting
 message WorldSettings {
-  optional float time = 1;
-  optional float timeScale = 2;
+  optional double time = 1;
+  optional double timeScale = 2;
   optional .persistence.Vector2i spawn = 3;
 }
 
