@@ -4,6 +4,8 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.Settings
+import no.elg.infiniteBootleg.core.util.EntityFlags.INVALID_FLAG
+import no.elg.infiniteBootleg.core.util.EntityFlags.hasFlag
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_EARLY
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
@@ -17,6 +19,10 @@ private val logger = KotlinLogging.logger {}
 
 object OutOfBoundsSystem : IteratingSystem(entityWithoutCanBeOutOfBoundsTagFamily, UPDATE_PRIORITY_EARLY) {
   override fun processEntity(entity: Entity, deltaTime: Float) {
+    if (entity.hasFlag(INVALID_FLAG)) {
+      // Make sure we don't spam trying to remove the same entity multiple times
+      return
+    }
     val world = entity.world
     val compactedChunkLoc = entity.compactChunkLoc
     if (world.render.isOutOfView(compactedChunkLoc) && !world.isChunkLoaded(compactedChunkLoc)) {
