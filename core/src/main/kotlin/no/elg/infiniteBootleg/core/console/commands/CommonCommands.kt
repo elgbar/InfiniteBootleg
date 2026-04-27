@@ -277,47 +277,6 @@ open class CommonCommands : CommandExecutor() {
     logger.info { "Changed time from $old to $time" }
   }
 
-//  @HiddenCommand
-//  @ConsoleDoc(description = "check dangling entities")
-//  fun cde() {
-//    val world = world ?: return
-//    world.postBox2dRunnable {
-//      val worldBox2dWorld = world.worldBody.box2dWorld
-//      val bodies = Array<b2BodyId>(worldBox2dWorld.bodyCount)
-//      worldBox2dWorld.getBodies(bodies)
-//      var invalid = 0
-//      var nullUserData = 0
-//      for (body in bodies) {
-//        val userData = body.userData
-//        if (userData is Entity) {
-//          val id: String = userData.id
-//          if (world.containsEntity(id)) {
-//            continue
-//          }
-//          invalid++
-//          logger.error { "Found entity not added to the world! $id" }
-//        } else if (userData is ChunkBody) {
-//          val chunk = userData.chunk
-//          val worldChunk = world.getChunk(chunk.compactLocation, load = false)
-//          if (chunk !== worldChunk) {
-//            invalid++
-//            logger.error { "Found chunk body that is not the same as the world's chunk. chunk userdata: $chunk, world chunk: $worldChunk" }
-//          }
-//        } else if (userData == null) {
-//          nullUserData++
-//        } else {
-//          logger.warn { "Found body with non-entity userdata: $userData" }
-//        }
-//      }
-//      if (nullUserData > 0) {
-//        logger.warn { "Found bodies $nullUserData with null as userdata" }
-//      }
-//      if (invalid == 0) {
-//        logger.info { "No invalid bodies found!" }
-//      }
-//    }
-//  }
-
   @HiddenCommand
   @CmdArgNames("action")
   @ConsoleDoc(description = "Do something illegal")
