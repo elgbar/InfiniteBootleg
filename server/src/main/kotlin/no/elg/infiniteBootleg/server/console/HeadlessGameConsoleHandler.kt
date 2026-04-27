@@ -7,8 +7,7 @@ import no.elg.infiniteBootleg.core.console.commands.CommonCommands
 import no.elg.infiniteBootleg.core.console.consoles.StdConsole
 
 class HeadlessGameConsoleHandler : GameConsoleHandler() {
-  override val exec: CommandExecutor
-    get() = CommonCommands()
+  override val exec: CommandExecutor = CommonCommands()
 
   override val console: Console = StdConsole().apply {
     setConsoleStackTrace(true)
