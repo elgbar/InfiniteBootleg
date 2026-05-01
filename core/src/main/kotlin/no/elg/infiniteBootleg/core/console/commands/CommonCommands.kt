@@ -140,6 +140,9 @@ open class CommonCommands : CommandExecutor() {
 // OPEN COMMANDS //
 // /////////////////
 
+  @ConsoleDoc(description = "Exits the application.")
+  fun exit() = exitApp()
+
   @ConsoleDoc(description = "Run command delayed")
   @CmdArgNames("delayMs", "command")
   fun delayed(delayMs: Long, command: String) {
@@ -209,6 +212,8 @@ open class CommonCommands : CommandExecutor() {
     logger.info { "Sky color changed to $skylight" }
   }
 
+  @ConsoleDoc(description = "Get the current time and time scale")
+  fun timescale() = time()
 
   @ConsoleDoc(description = "Get the current time and time scale")
   fun time() {
