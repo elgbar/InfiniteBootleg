@@ -548,12 +548,13 @@ class ClientCommands : CommonCommands() {
     logger.info { "Max foreground fps is now $fps" }
   }
 
-  @ConsoleDoc(description = "Disconnect from the server")
-  fun quit() {
-    disconnect()
-  }
+  @ConsoleDoc(description = "Go back to the main menu")
+  fun logout() = disconnect()
 
-  @ConsoleDoc(description = "Disconnect from the server")
+  @ConsoleDoc(description = "Go back to the main menu")
+  fun quit() = disconnect()
+
+  @ConsoleDoc(description = "Go back to the main menu")
   fun disconnect() {
     ClientMain.inst().serverClient?.sendServerBoundPacket { serverBoundClientDisconnectPacket("Disconnect command") }
     if (Main.isAuthoritative) {
