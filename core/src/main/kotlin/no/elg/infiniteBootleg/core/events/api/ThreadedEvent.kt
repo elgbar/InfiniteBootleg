@@ -2,7 +2,10 @@ package no.elg.infiniteBootleg.core.events.api
 
 import no.elg.infiniteBootleg.core.Settings
 
-open class AsyncEvent(vararg expectedThreadType: ThreadType) : Event {
+/**
+ * An event which is expected to run one of the thread types specified in [expectedThreadType]
+ */
+open class ThreadedEvent(vararg expectedThreadType: ThreadType) : Event {
 
   val dispatchedThreadType: ThreadType = ThreadType.currentThreadType()
 

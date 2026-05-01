@@ -395,7 +395,7 @@ private fun physicsHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
     ctx.flush()
     logger.debug { "Initial entities sent to player ${player.name}" }
   } else {
-    logger.debug { "No entities to send to player ${player.name}" }
+    logger.debug { "No other entities to send to player ${player.name}" }
   }
 
   ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(Packets.ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))

@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.core.events
 
-import no.elg.infiniteBootleg.core.events.api.AsyncEvent
+import no.elg.infiniteBootleg.core.events.api.ThreadedEvent
 import no.elg.infiniteBootleg.core.events.api.ReasonedEvent
 import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.util.ChunkColumnFeatureFlag
@@ -15,7 +15,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 data class ChunkColumnUpdatedEvent(val chunkX: ChunkCoord, val localX: LocalCoord, val newTopWorldY: WorldCoord, val oldTopWorldY: WorldCoord, val flag: ChunkColumnFeatureFlag) :
-  AsyncEvent(ThreadType.ASYNC),
+  ThreadedEvent(ThreadType.ASYNC),
   ReasonedEvent {
 
   /**

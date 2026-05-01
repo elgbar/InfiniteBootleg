@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.core.events
 
-import no.elg.infiniteBootleg.core.events.api.AsyncEvent
+import no.elg.infiniteBootleg.core.events.api.ThreadedEvent
 import no.elg.infiniteBootleg.core.events.api.ReasonedEvent
 import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.world.blocks.Block
@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.core.world.blocks.Block
  * This event will not be triggered when a non-existing block becomes an air block or the other way around
  */
 data class BlockChangedEvent(val oldBlock: Block?, val newBlock: Block?) :
-  AsyncEvent(ThreadType.ASYNC, ThreadType.PHYSICS),
+  ThreadedEvent(ThreadType.ASYNC, ThreadType.PHYSICS),
   ReasonedEvent {
 
   val oldOrNewBlock get() = oldBlock ?: newBlock
