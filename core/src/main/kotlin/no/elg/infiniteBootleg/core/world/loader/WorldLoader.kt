@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.core.world.generator.chunk.EmptyChunkGenerator
 import no.elg.infiniteBootleg.core.world.generator.chunk.FlatChunkGenerator
 import no.elg.infiniteBootleg.core.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import java.io.File.separatorChar
 
 private val logger = KotlinLogging.logger {}
 
@@ -22,7 +23,11 @@ object WorldLoader {
   private val WORLD_LOCK_LOCK = Any()
   const val WORLD_INFO_PATH = "world.dat"
 
-  fun getWorldFolder(uuid: String): FileHandle = Gdx.files.external(Main.WORLD_FOLDER + uuid)
+  private val EXTERNAL_FOLDER = ".infiniteBootleg$separatorChar"
+  private val clientTypeSubfolder = if (Main.isServer) "server" else "client"
+  private val worldFolder get() = "${EXTERNAL_FOLDER}worlds${separatorChar}$clientTypeSubfolder$separatorChar"
+
+  fun getWorldFolder(uuid: String): FileHandle = Gdx.files.external(worldFolder + uuid)
 
   fun getWorldLockFile(uuid: String): FileHandle = getWorldFolder(uuid).child(LOCK_FILE_NAME)
 

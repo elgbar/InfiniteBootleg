@@ -94,9 +94,6 @@ interface Main : ApplicationListener {
      */
     val isNotAuthoritative: Boolean
       get() = isServerClient
-
-    private val EXTERNAL_FOLDER = ".infiniteBootleg" + File.separatorChar
-    val WORLD_FOLDER = EXTERNAL_FOLDER + "worlds" + File.separatorChar
     const val VERSION_FILE = "version"
   }
 }
