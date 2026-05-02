@@ -5,12 +5,15 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.ashley.EngineEntity
+import no.elg.infiniteBootleg.core.util.EntityFlags.INITIALIZED_COMPLETELY
+import no.elg.infiniteBootleg.core.util.EntityFlags.enableFlag
 import no.elg.infiniteBootleg.core.util.FamilyComponents.Companion.toFamilyComponents
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.WorldCoordNumber
 import no.elg.infiniteBootleg.core.util.futureEntity
 import no.elg.infiniteBootleg.core.util.removeSelf
 import no.elg.infiniteBootleg.core.util.safeWith
+import no.elg.infiniteBootleg.core.util.stringifyCompactLocF
 import no.elg.infiniteBootleg.core.util.toComponentsString
 import no.elg.infiniteBootleg.core.util.toProtoEntityRef
 import no.elg.infiniteBootleg.core.world.Material
@@ -21,11 +24,13 @@ import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.
 import no.elg.infiniteBootleg.core.world.ecs.components.required.EntityTypeComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.compactLocWithOffset
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.authoritativeOnly
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.CanBeOutOfBoundsTag.Companion.canBeOutOfBounds
 import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.EntityKt
+import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
 import java.util.UUID
@@ -39,22 +44,28 @@ private val logger = KotlinLogging.logger {}
 
 internal fun checkFamilies(entity: Entity, wantedFamilies: Array<Pair<Family, String>>) {
   if (!basicRequiredEntityFamily.matches(entity)) {
-    entity.removeSelf()
+    entity.removeSelf(DespawnReason.UNKNOWN_ENTITY)
     logger.error { "Finished entity does not match the required entity family.\nCurrent entity components: ${entity.toComponentsString()}" }
+    return
   }
   wantedFamilies.forEach { (family: Family, errorStr) ->
     if (!family.matches(entity)) {
       logger.warn {
-        val sb = StringBuilder("Finished entity ${entity.idAndName} does not match family '$errorStr'.\nCurrent entity components: ${entity.toComponentsString()}.\nFamily: ")
+        val entLoc = stringifyCompactLocF(entity.compactLocWithOffset)
+        val sb =
+          StringBuilder("Finished entity ${entity.idAndName} @ $entLoc does not match family '$errorStr'.\nCurrent entity components: ${entity.toComponentsString()}.\nFamily: ")
         val familyComponents = family.toFamilyComponents()
         familyComponents.buildString(sb)
         sb.append(".\n")
         familyComponents.matchesString(entity, sb)
         sb.toString()
       }
-      entity.removeSelf()
+      entity.removeSelf(DespawnReason.UNKNOWN_ENTITY)
+      return
     }
   }
+
+  entity.enableFlag(INITIALIZED_COMPLETELY)
 }
 
 fun EngineEntity.withRequiredComponents(

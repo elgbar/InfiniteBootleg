@@ -274,6 +274,7 @@ inline fun stringifyCompactLoc(x: Number, y: Number): String = "($x,$y)"
 
 @Contract(pure = true)
 inline fun stringifyCompactLoc(compactLoc: Compacted2Int): String = stringifyCompactLoc(compactLoc.decompactLocX(), compactLoc.decompactLocY())
+inline fun stringifyCompactLocF(compactLocF: Compacted2Float): String = stringifyCompactLoc(compactLocF.decompactLocXf(), compactLocF.decompactLocYf())
 
 @Contract(pure = true)
 inline fun stringifyCompactLoc(posComp: PositionComponent): String = stringifyCompactLoc(posComp.blockX, posComp.blockY)

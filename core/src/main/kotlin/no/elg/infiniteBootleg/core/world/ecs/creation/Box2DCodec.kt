@@ -14,7 +14,7 @@ import com.badlogic.gdx.math.Vector2
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.ashley.EngineEntity
 import ktx.ashley.plusAssign
-import no.elg.infiniteBootleg.core.Settings
+import no.elg.infiniteBootleg.core.util.EntityFlags.enableFlag
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.isInvalid
 import no.elg.infiniteBootleg.core.util.toRadians
@@ -29,7 +29,6 @@ import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2Vec2
 import no.elg.infiniteBootleg.core.world.box2d.extensions.set
 import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
-import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.blockEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
@@ -247,10 +246,7 @@ internal fun createBody2DBodyComponent(
     beforeBodyComponentAdded(it)
     entity += Box2DBodyComponent(it, serializationType, width, height, fixedRotation)
     afterBodyComponentAdded(entity)
-    if (Settings.debug) {
-      check(basicStandaloneEntityFamily.matches(entity)) { "Finished entity does not match the basic entity family" }
-      checkFamilies(entity, wantedFamilies)
-    }
+    checkFamilies(entity, wantedFamilies)
   }
 }
 

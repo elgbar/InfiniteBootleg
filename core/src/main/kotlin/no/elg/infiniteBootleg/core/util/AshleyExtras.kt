@@ -76,7 +76,12 @@ object EntityFlags {
    *
    * Marks the entity as not valid anymore
    */
-  const val INVALID_FLAG: EntityFlag = Int.MIN_VALUE
+  const val INVALID_FLAG: EntityFlag = 0x1
+
+  /**
+   * This entity has passed the family checks and thus is fully initialized and ready to be used.
+   */
+  const val INITIALIZED_COMPLETELY: EntityFlag = 0x2
 
   fun Entity.hasFlag(flag: EntityFlag): Boolean = flags and flag != 0
   fun Entity.enableFlag(flag: EntityFlag) {

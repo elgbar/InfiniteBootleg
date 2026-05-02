@@ -5,11 +5,11 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_EARLY
-import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
+import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.idAndName
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.isMoving
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.setVelocity
-import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.compactChunkLoc
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
@@ -19,7 +19,7 @@ import no.elg.infiniteBootleg.core.world.ecs.system.api.AuthorizedEntitiesIterat
 
 private val logger = KotlinLogging.logger {}
 
-object NoMovementInUnlockedChunksSystem : AuthorizedEntitiesIteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_EARLY) {
+object NoMovementInUnlockedChunksSystem : AuthorizedEntitiesIteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_EARLY) {
 
   fun stopMovement(entity: Entity) {
     entity.setVelocity(0f, 0f)
@@ -33,7 +33,7 @@ object NoMovementInUnlockedChunksSystem : AuthorizedEntitiesIteratingSystem(basi
     if (!hasTag && !isChunkLoaded) {
       if (Settings.debug) {
         logger.info {
-          "Entity ${entity.id} is in unloaded chunk ${stringifyCompactLoc(entity.compactBlockLoc)}, disabling gravity"
+          "Entity ${entity.idAndName} is in unloaded chunk ${stringifyCompactLoc(entity.compactBlockLoc)}, disabling gravity"
         }
       }
       entity.isInUnloadedChunk = true
@@ -44,11 +44,11 @@ object NoMovementInUnlockedChunksSystem : AuthorizedEntitiesIteratingSystem(basi
         entity.ensureFlyingStatus()
         if (Settings.debug) {
           logger.info {
-            "Entity ${entity.id} is now in a loaded chunk ${stringifyCompactLoc(entity.compactBlockLoc)}, enabling gravity (if not flying)"
+            "Entity ${entity.idAndName} is now in a loaded chunk ${stringifyCompactLoc(entity.compactBlockLoc)}, enabling gravity (if not flying)"
           }
         }
       } else if (entity.isMoving()) {
-        logger.debug { "Entity ${entity.id} is in unloaded chunk but was moving!" }
+        logger.debug { "Entity ${entity.idAndName} is in unloaded chunk but was moving!" }
         stopMovement(entity)
       }
     }

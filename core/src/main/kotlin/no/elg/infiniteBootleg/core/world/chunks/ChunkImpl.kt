@@ -195,7 +195,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
   ): Block? {
     if (isDisposed || world.hasDisposeBegun) {
       Settings.handleChangingBlockInDeposedChunk.handle {
-        "Changed block in disposed chunk ${stringifyChunkToWorld(this, localX, localY)}, block: $block"
+        "Changed block in chunk ${stringifyChunkToWorld(this, localX, localY)}, chunk disposed? $isDisposed, world hasDisposeBegun? ${world.hasDisposeBegun}. block: $block"
       }
       return null
     }
