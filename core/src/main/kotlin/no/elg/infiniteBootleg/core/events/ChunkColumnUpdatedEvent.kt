@@ -1,8 +1,8 @@
 package no.elg.infiniteBootleg.core.events
 
-import no.elg.infiniteBootleg.core.events.api.ThreadedEvent
 import no.elg.infiniteBootleg.core.events.api.ReasonedEvent
 import no.elg.infiniteBootleg.core.events.api.ThreadType
+import no.elg.infiniteBootleg.core.events.api.ThreadedEvent
 import no.elg.infiniteBootleg.core.util.ChunkColumnFeatureFlag
 import no.elg.infiniteBootleg.core.util.ChunkCoord
 import no.elg.infiniteBootleg.core.util.LocalCoord
