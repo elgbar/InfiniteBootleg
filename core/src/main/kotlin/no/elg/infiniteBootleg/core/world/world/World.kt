@@ -239,12 +239,14 @@ abstract class World(
     get() = metadata.spawn
     set(value) {
       assertNotDisposed()
-      val old = metadata.spawn
-      if (value != old) {
-        metadata.spawn = value
-        getChunk(old.worldToChunk(), load = false)?.allowedToUnload = true
-        getChunk(value.worldToChunk())?.allowedToUnload = false
-        EventManager.dispatchEvent(WorldSpawnUpdatedEvent(this, old, value))
+      synchronized(metadata) {
+        val old = metadata.spawn
+        if (value != old) {
+          metadata.spawn = value
+          getChunk(old.worldToChunk(), load = false)?.allowedToUnload = true
+          getChunk(value.worldToChunk())?.allowedToUnload = false
+          EventManager.dispatchEvent(WorldSpawnUpdatedEvent(this, old, value))
+        }
       }
     }
 
@@ -487,11 +489,12 @@ abstract class World(
     if (Settings.debug && Settings.logPersistence) {
       logger.debug { singleLinePrinter.printToString(protoWorld) }
     }
-    spawn = protoWorld.spawn.toCompact()
+    launchOnBox2d {
+      spawn = protoWorld.spawn.toCompact()
+    }
     worldTime.timeScale = protoWorld.timeScale
     worldTime.time = protoWorld.time
     chunkColumnsManager.fromProtobuf(protoWorld.chunkColumnsList)
-
     return false
   }
 

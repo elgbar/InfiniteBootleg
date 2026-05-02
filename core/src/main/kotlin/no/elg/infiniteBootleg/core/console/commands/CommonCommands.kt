@@ -20,6 +20,8 @@ import no.elg.infiniteBootleg.core.net.clientBoundWorldSettings
 import no.elg.infiniteBootleg.core.net.serverBoundWorldSettings
 import no.elg.infiniteBootleg.core.util.ChunkCoord
 import no.elg.infiniteBootleg.core.util.IllegalAction
+import no.elg.infiniteBootleg.core.util.WorldCoord
+import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.displayName
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
@@ -443,5 +445,23 @@ open class CommonCommands : CommandExecutor() {
   @HiddenCommand
   fun gc() {
     System.gc()
+  }
+
+  @AuthoritativeOnly
+  @ConsoleDoc(description = "Change the current world spawn position")
+  @CmdArgNames("worldX", "worldY")
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
+  fun setSpawn(worldX: WorldCoord, worldY: WorldCoord) {
+    val world = world ?: return
+    val oldSpawn = world.spawn
+    world.spawn = compactInt(worldX, worldY)
+    logger.info { "Changed world spawn from ${stringifyCompactLoc(oldSpawn)} to ${stringifyCompactLoc(world.spawn)}" }
+  }
+
+  @ConsoleDoc(description = "Fetch the current world spawn position")
+  fun spawn() {
+    val world = world ?: return
+    val currSpawn = world.spawn
+    logger.info { "Changed world spawn is ${stringifyCompactLoc(currSpawn)}" }
   }
 }
