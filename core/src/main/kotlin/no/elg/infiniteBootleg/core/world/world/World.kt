@@ -379,7 +379,13 @@ abstract class World(
     if (!willDispatchChunksLoadedEvent) {
       render.update()
       launchOnBox2d {
-        render.chunkLocationsInView.forEach(::loadChunk)
+        render.chunkLocationsAlwaysInView
+          .mapNotNull(::loadChunk)
+          .mapTo(mutableListOf()) {
+            // Save the initial chunks, these will be generated on startup anyway
+            chunkLoader.save(it)
+          }
+
         EventManager.dispatchEvent(InitialChunksOfWorldLoadedEvent(this@World))
       }
     }
