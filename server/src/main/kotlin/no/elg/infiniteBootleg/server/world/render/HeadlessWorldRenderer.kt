@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.util.worldToChunkX
 import no.elg.infiniteBootleg.core.util.worldToChunkY
 import no.elg.infiniteBootleg.core.world.render.ChunksInView.Companion.chunkColumnsInView
+import no.elg.infiniteBootleg.core.world.render.ChunksInView.Companion.forEach
 import no.elg.infiniteBootleg.core.world.render.ChunksInView.Companion.sequence
 import no.elg.infiniteBootleg.core.world.render.ServerClientChunksInView
 import no.elg.infiniteBootleg.core.world.render.WorldRender
@@ -32,7 +33,9 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
     val newChunkX = event.newSpawn.worldToChunkX()
     val newChunkY = event.newSpawn.worldToChunkY()
     if (spawnChunksInView.centerX != newChunkX || spawnChunksInView.centerY != newChunkY) {
+      spawnChunksInView.forEach(world) { it.allowedToUnload = true }
       spawnChunksInView.setCenter(newChunkX, newChunkY)
+      spawnChunksInView.forEach(world) { it.allowedToUnload = false }
       logger.debug {
         "Updating spawn chunks in view, new center and world chunk spawn at ${stringifyCompactLoc(newChunkX, newChunkY)}"
       }

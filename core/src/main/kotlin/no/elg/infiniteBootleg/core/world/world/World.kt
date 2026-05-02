@@ -241,8 +241,10 @@ abstract class World(
       assertNotDisposed()
       val old = metadata.spawn
       if (value != old) {
-        EventManager.dispatchEvent(WorldSpawnUpdatedEvent(this, old, value))
         metadata.spawn = value
+        getChunk(old.worldToChunk(), load = false)?.allowedToUnload = true
+        getChunk(value.worldToChunk())?.allowedToUnload = false
+        EventManager.dispatchEvent(WorldSpawnUpdatedEvent(this, old, value))
       }
     }
 
@@ -382,6 +384,8 @@ abstract class World(
         render.chunkLocationsAlwaysInView
           .mapNotNull(::loadChunk)
           .mapTo(mutableListOf()) {
+            // Spawn chunks should not unload
+            it.allowedToUnload = false
             // Save the initial chunks, these will be generated on startup anyway
             chunkLoader.save(it)
           }
@@ -620,7 +624,7 @@ abstract class World(
    *
    * @return A valid chunk
    */
-  fun getChunk(chunkLoc: Long, load: Boolean = true): Chunk? {
+  fun getChunk(chunkLoc: ChunkCompactLoc, load: Boolean = true): Chunk? {
     assertNotDisposed()
     val cache = threadLocalChunkCache.get()
 
