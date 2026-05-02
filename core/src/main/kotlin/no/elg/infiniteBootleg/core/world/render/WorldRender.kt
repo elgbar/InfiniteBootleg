@@ -35,6 +35,11 @@ interface WorldRender :
   val chunkLocationsInView: Sequence<Long>
 
   /**
+   * Chunks which should always be in view, e.g. spawn chunks
+   */
+  val chunkLocationsAlwaysInView: Sequence<Long>
+
+  /**
    * List of chunk columns coordinates that are in view
    */
   val chunkColumnsInView: Set<ChunkCoord>

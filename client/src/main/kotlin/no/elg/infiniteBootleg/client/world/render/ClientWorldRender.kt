@@ -43,6 +43,7 @@ import no.elg.infiniteBootleg.core.util.WorldCoordNumber
 import no.elg.infiniteBootleg.core.util.decompactLocX
 import no.elg.infiniteBootleg.core.util.decompactLocY
 import no.elg.infiniteBootleg.core.util.safeUse
+import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
@@ -205,5 +206,6 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   override fun isInView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = chunksInView.isInView(chunkX, chunkY)
 
   override val chunkLocationsInView get() = chunksInView.sequence()
+  override val chunkLocationsAlwaysInView: Sequence<Long> get() = sequenceOf(world.spawn.worldToChunk())
   override val chunkColumnsInView get() = chunksInView.chunkColumnsInView()
 }

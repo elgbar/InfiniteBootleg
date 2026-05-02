@@ -68,6 +68,8 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
 
   private fun allChunksInView(): Sequence<ServerClientChunksInView> = sequenceOf(spawnChunksInView) + world.inViewEntities.map { it.chunksInView }.asSequence()
 
+  override val chunkLocationsAlwaysInView: Sequence<Long> get() = spawnChunksInView.sequence()
+
   override val chunkLocationsInView: Sequence<Long>
     get() = allChunksInView().flatMap { it.sequence() }.distinct()
 
