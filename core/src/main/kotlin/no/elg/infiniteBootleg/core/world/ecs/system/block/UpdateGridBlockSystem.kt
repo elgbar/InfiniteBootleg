@@ -3,10 +3,10 @@ package no.elg.infiniteBootleg.core.world.ecs.system.block
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import io.github.oshai.kotlinlogging.KotlinLogging
-import ktx.ashley.hasNot
 import ktx.collections.isNotEmpty
 import ktx.collections.plusAssign
 import ktx.collections.removeAll
+import no.elg.infiniteBootleg.core.util.compactFloat
 import no.elg.infiniteBootleg.core.util.stringifyCompactLocWithChunk
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.validChunkOrLoad
@@ -14,7 +14,6 @@ import no.elg.infiniteBootleg.core.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent.Companion.occupyingBlocksComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.standaloneGridOccupyingBlocksFamily
@@ -30,13 +29,15 @@ object UpdateGridBlockSystem : IteratingSystem(standaloneGridOccupyingBlocksFami
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val occupyingBlocksComponent = entity.occupyingBlocksComponent
 
-    if (entity.hasNot(VelocityComponent.mapper) && occupyingBlocksComponent.occupying.isNotEmpty()) {
-      // The entity will not move, so only update it only once
+    val pos = entity.positionComponent
+    val currentWorldPos = compactFloat(pos.x, pos.y)
+    if (occupyingBlocksComponent.occupying.isNotEmpty() && occupyingBlocksComponent.lastOccupyPos == currentWorldPos) {
+      // The entity has not moved, so skip updating it
       return
     }
+    occupyingBlocksComponent.lastOccupyPos = currentWorldPos
 
     val world = entity.world
-    val pos = entity.positionComponent
     val box2d = entity.box2d
 
     // Note: raw must be false to properly update the lights while lights are falling

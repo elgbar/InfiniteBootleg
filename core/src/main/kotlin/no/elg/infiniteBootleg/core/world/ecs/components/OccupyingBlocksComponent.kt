@@ -5,6 +5,7 @@ import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import ktx.collections.GdxArray
+import no.elg.infiniteBootleg.core.util.Compacted2Float
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.core.world.ecs.api.EntityLoadableMapper
@@ -21,6 +22,7 @@ class OccupyingBlocksComponent(val hardLink: Boolean) : EntitySavableComponent {
    * List of locations that this entity is occupying
    */
   val occupying: GdxArray<EntityMarkerBlock> = GdxArray(false, 1)
+  var lastOccupyPos: Compacted2Float? = null
 
   override fun hudDebug(): String = "Hard link? $hardLink occupying ${occupying.map { it.hudDebug() }}"
 
