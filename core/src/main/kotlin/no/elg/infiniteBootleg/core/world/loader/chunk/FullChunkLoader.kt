@@ -72,7 +72,7 @@ class FullChunkLoader(override val world: World, generator: ChunkGenerator) : Ch
     if (!world.isTransient && chunk.shouldSave()) {
       // only save if valid and changed
       val fh = getChunkFile(world, chunk.chunkX, chunk.chunkY) ?: return
-      chunk.save().thenApply {
+      chunk.toProto().thenApply {
         fh.writeBytes(it.toByteArray(), false)
       }
     }

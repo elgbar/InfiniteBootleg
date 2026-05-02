@@ -193,9 +193,17 @@ interface Chunk :
    */
   fun shouldSave(): Boolean
 
-  fun load(protoChunk: ProtoWorld.Chunk): Boolean
+  /**
+   * Overwrite the state of this chunk with the given proto chunk.
+   */
+  fun fromProto(protoChunk: ProtoWorld.Chunk): Boolean
 
-  fun save(): CompletableFuture<ProtoWorld.Chunk>
+  /**
+   * Save the current state to a protofile.
+   *
+   * To actually save, use [no.elg.infiniteBootleg.core.world.loader.chunk.ChunkLoader.save]
+   */
+  fun toProto(): CompletableFuture<ProtoWorld.Chunk>
 
   fun saveBlocksOnly(): ProtoWorld.Chunk
 

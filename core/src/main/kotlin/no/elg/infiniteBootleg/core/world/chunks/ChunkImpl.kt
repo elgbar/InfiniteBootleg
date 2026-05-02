@@ -460,7 +460,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     )
   }
 
-  override fun save(): CompletableFuture<ProtoWorld.Chunk> {
+  override fun toProto(): CompletableFuture<ProtoWorld.Chunk> {
     val future = CompletableFuture<ProtoWorld.Chunk>()
     val protoChunkWithoutEntities = saveBlocksOnly()
     queryAllEntities { entities ->
@@ -493,7 +493,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
       }
     }
 
-  override fun load(protoChunk: ProtoWorld.Chunk): Boolean {
+  override fun fromProto(protoChunk: ProtoWorld.Chunk): Boolean {
     check(initializing) { "Cannot load from proto chunk after chunk has been initialized" }
     if (Settings.debug && Settings.logPersistence) {
       logger.debug { singleLinePrinter.printToString(protoChunk) }

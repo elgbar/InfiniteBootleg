@@ -53,7 +53,7 @@ abstract class ChunkLoader(val generator: ChunkGenerator) : Disposable {
   }
 
   private fun fullyLoadChunk(chunk: ChunkImpl, protoChunk: ProtoWorld.Chunk): Boolean {
-    if (chunk.load(protoChunk)) {
+    if (chunk.fromProto(protoChunk)) {
       chunk.finishLoading()
       return chunk.isValid
     }
