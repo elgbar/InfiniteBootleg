@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.ObjectSet
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import it.unimi.dsi.fastutil.Hash.FAST_LOAD_FACTOR
+import it.unimi.dsi.fastutil.Hash.VERY_FAST_LOAD_FACTOR
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
@@ -612,7 +613,7 @@ abstract class World(
   private class ThreadLocalChunkCache {
     var lastLoc: Long = Long.MIN_VALUE
     var lastChunk: Chunk? = null
-    val chunks = Long2ObjectOpenHashMap<WeakReference<Chunk>>(32)
+    val chunks = Long2ObjectOpenHashMap<WeakReference<Chunk>>(32, VERY_FAST_LOAD_FACTOR)
   }
 
   private val threadLocalChunkCache = ThreadLocal.withInitial {
