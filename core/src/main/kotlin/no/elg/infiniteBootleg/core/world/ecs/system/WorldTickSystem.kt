@@ -10,11 +10,11 @@ import no.elg.infiniteBootleg.core.world.world.World
 /**
  * Temp solution to dive [WorldTickedEvent]
  */
-class WorldTickSystem(world: World) : IntervalSystem(1f / Settings.tps, UPDATE_PRIORITY_EVENT_HANDLING - 1) {
+class WorldTickSystem(val world: World) : IntervalSystem(1f / Settings.tps, UPDATE_PRIORITY_EVENT_HANDLING - 1) {
 
-  private val worldTickedEvent = WorldTickedEvent(world)
+//  private val worldTickedEvent = WorldTickedEvent(world)
 
   override fun updateInterval() {
-    EventManager.dispatchEvent(worldTickedEvent)
+    EventManager.dispatchEvent(WorldTickedEvent(world))
   }
 }

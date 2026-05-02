@@ -58,8 +58,8 @@ import no.elg.infiniteBootleg.core.util.isAir
 import no.elg.infiniteBootleg.core.util.isBlockInsideRadius
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
 import no.elg.infiniteBootleg.core.util.isNotAir
-import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnBox2d
+import no.elg.infiniteBootleg.core.util.launchOnBox2dSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.partitionCount
 import no.elg.infiniteBootleg.core.util.singleLinePrinter
@@ -281,7 +281,7 @@ abstract class World(
         }
         if (Main.isAuthoritative) {
           // Add a delay to make sure the light is calculated
-          launchOnAsyncSuspendable {
+          launchOnBox2dSuspendable {
             delay(200L)
             // World must be set to loaded before dispatching WorldLoadedEvent
             metadata.isLoaded = true
