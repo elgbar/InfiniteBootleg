@@ -6,7 +6,7 @@ import no.elg.infiniteBootleg.core.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.core.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.events.api.EventManager.dispatchEvent
-import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
+import no.elg.infiniteBootleg.core.util.launchOnBox2dSuspendable
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.ensureFlyingStatus
@@ -51,7 +51,7 @@ class SinglePlayerWorld(generator: ChunkGenerator, seed: Long, worldName: String
       logger.debug { "Singleplayer player created" }
     }
 
-    launchOnAsyncSuspendable {
+    launchOnBox2dSuspendable {
       // blocking, will prevent InitialChunksOfWorldLoadedEvent from being dispatched until all chunks are loaded
       render.chunkLocationsInView.forEach(::loadChunk)
       logger.debug { "Loaded initial chunks" }
