@@ -2,13 +2,11 @@ package no.elg.infiniteBootleg.core.world
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.math.MathUtils
 import io.github.oshai.kotlinlogging.KotlinLogging
 import it.unimi.dsi.fastutil.longs.LongIterators
 import no.elg.infiniteBootleg.core.items.ItemType
 import no.elg.infiniteBootleg.core.items.MaterialItem
 import no.elg.infiniteBootleg.core.main.Main
-import no.elg.infiniteBootleg.core.util.BlockUnit
 import no.elg.infiniteBootleg.core.util.LocalCoord
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.util.WorldCoord
@@ -347,6 +345,7 @@ sealed interface Material : ContainerElement {
           // Blocks client side should not have any entity in them
           val futureEntity = protoEntity?.let { world.load(it, validChunk) } ?: createNew?.invoke(world, worldX, worldY, this)
           futureEntity?.thenApply { entity: Entity ->
+
             if (block.isDisposed || validChunk.isDisposed) {
               world.removeEntity(entity)
               // This will fire when generating features in the world (i.e., trees next to other trees)
