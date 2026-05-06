@@ -12,9 +12,9 @@ import no.elg.infiniteBootleg.core.world.world.World
  */
 class WorldTickSystem(val world: World) : IntervalSystem(1f / Settings.tps, UPDATE_PRIORITY_EVENT_HANDLING - 1) {
 
-//  private val worldTickedEvent = WorldTickedEvent(world)
+  private val worldTickedEvent by lazy { WorldTickedEvent(world) }
 
   override fun updateInterval() {
-    EventManager.dispatchEvent(WorldTickedEvent(world))
+    EventManager.dispatchEvent(worldTickedEvent)
   }
 }
