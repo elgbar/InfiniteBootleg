@@ -36,8 +36,7 @@ import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.asWorldSeed
 import no.elg.infiniteBootleg.core.util.chunkToWorld
 import no.elg.infiniteBootleg.core.util.getStaticField
-import no.elg.infiniteBootleg.core.util.launchOnBox2d
-import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
+import no.elg.infiniteBootleg.core.util.launchOnBox2dSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.stringifyCompactLocWithChunk
 import no.elg.infiniteBootleg.core.util.toAbled
@@ -591,54 +590,38 @@ class ClientCommands : CommonCommands() {
     logger.info { "New inventory '${newContainer.name}' is ${newContainer::class.simpleName}" }
   }
 
-  fun torchTest(delayMillis: Long = 50) {
+  private fun matTest(delayMillis: Long, action: (world: ClientWorld, x: WorldCoord, y: WorldCoord) -> Unit) {
     val world = clientWorld ?: return
     val dx = 2
-    val dy = 1
+    val dy = -1
     val chunkXs = world.render.chunksInView.run { (horizontalStart + dx).chunkToWorld(0) until (horizontalEnd - dx).chunkToWorld(CHUNK_SIZE) }
-    val y = (world.render.chunksInView.verticalEnd - dy).chunkToWorld(0)
-    launchOnMainSuspendable {
+    //This is the very top y coord of the loaded in chunks, do not add material above it, unless you want to load chunks
+    val y = (world.render.chunksInView.verticalEnd + dy).chunkToWorld(CHUNK_SIZE - 1)
+    world.launchOnBox2dSuspendable {
       for (x in chunkXs) {
-        world.launchOnBox2d {
-          world.setBlock(x, y + LIGHT_SOURCE_LOOK_BLOCKS, Material.Sand, prioritize = true)
-          world.setBlock(x, y, Material.Torch, prioritize = true)
+        coroutineScope {
+          action(world, x, y)
         }
         delay(delayMillis)
       }
     }
   }
 
-  fun sandTest(delayMillis: Long = 50) {
-    val world = clientWorld ?: return
-    val dx = 2
-    val dy = 1
-    val chunkXs = world.render.chunksInView.run { (horizontalStart + dx).chunkToWorld(0) until (horizontalEnd - dx).chunkToWorld(CHUNK_SIZE) }
-    val y = (world.render.chunksInView.verticalEnd + dy).chunkToWorld(0)
-    launchOnMainSuspendable {
-      for (x in chunkXs) {
-        coroutineScope {
-          world.launchOnBox2d { world.setBlock(x, y, Material.Sand, prioritize = true) }
-        }
-        delay(delayMillis)
-      }
+  fun torchTest(delayMillis: Long = 50) =
+    matTest(delayMillis) { world, x, y ->
+      world.setBlock(x, y, Material.Sand, prioritize = true)
+      world.setBlock(x, y - LIGHT_SOURCE_LOOK_BLOCKS, Material.Torch, prioritize = true)
     }
-  }
 
-  fun airTest(delayMillis: Long = 50) {
-    val world = clientWorld ?: return
-    val dx = 2
-    val dy = 2
-    val chunkXs = world.render.chunksInView.run { (horizontalStart + dx).chunkToWorld(0) until (horizontalEnd - dx).chunkToWorld(CHUNK_SIZE) }
-    val y = (world.render.chunksInView.verticalStart + dy).chunkToWorld(0)
-    launchOnMainSuspendable {
-      for (x in chunkXs) {
-        coroutineScope {
-          world.launchOnBox2d { world.removeBlock(x, y, prioritize = true) }
-        }
-        delay(delayMillis)
-      }
+  fun sandTest(delayMillis: Long = 50) =
+    matTest(delayMillis) { world, x, y ->
+      world.setBlock(x, y, Material.Sand, prioritize = true)
     }
-  }
+
+  fun airTest(delayMillis: Long = 50) =
+    matTest(delayMillis) { world, x, y ->
+      world.removeBlock(x, y, prioritize = true)
+    }
 
   @ConsoleDoc(
     description = "Load the given world, this will load a non-transient world",
