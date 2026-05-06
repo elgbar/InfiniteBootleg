@@ -74,8 +74,9 @@ class ThreadSafeEngine :
   override fun removeEntity(entity: Entity) {
     assertOnPhysicsThread()
     // even if it is an invalid entity, we want all invalid entities to be uniformly marked
+    val invalid = entity.isInvalid
     entity.enableFlag(INVALID_FLAG)
-    if (entity.isInvalid) {
+    if (invalid) {
       return
     }
     super.removeEntity(entity)
