@@ -97,6 +97,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerCompo
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.compactLocWithOffset
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
+import no.elg.infiniteBootleg.core.world.ecs.creation.PLAYER_HEIGHT
 import no.elg.infiniteBootleg.core.world.ecs.disposeBox2dOnRemoval
 import no.elg.infiniteBootleg.core.world.ecs.ensureUniquenessListener
 import no.elg.infiniteBootleg.core.world.ecs.playerFamily
@@ -141,6 +142,7 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
+import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
@@ -187,7 +189,7 @@ abstract class World(
   protected val metadata: WorldMetadata = WorldMetadata(
     name = name,
     seed = seed,
-    spawn = compactInt(0, generator.getHeight(0)),
+    spawn = compactInt(0, generator.getHeight(0) + ceil(PLAYER_HEIGHT).toInt()),
     isTransient = forceTransient || !Settings.loadWorldFromDisk || Main.isServerClient,
     box2dCoroutineDispatcher = object : CoroutineDispatcher() {
       override fun dispatch(context: CoroutineContext, block: Runnable) {
