@@ -31,6 +31,8 @@ class InfAssetsImpl : InfAssets {
   override lateinit var doorOpenTexture: RotatableTextureRegion
   override lateinit var doorClosedTexture: RotatableTextureRegion
   override lateinit var pickaxeTexture: RotatableTextureRegion
+  override lateinit var reclaimerTexture: RotatableTextureRegion
+  override lateinit var broadaxeTexture: RotatableTextureRegion
   override lateinit var staffTexture: RotatableTextureRegion
   override lateinit var spellTexture: RotatableTextureRegion
 
@@ -96,6 +98,8 @@ class InfAssetsImpl : InfAssets {
     canNotPlaceTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.CROSS_TEXTURE, false).textureRegion
     canNotBreakTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.CROSS_INVERTED_TEXTURE, false).textureRegion
     pickaxeTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.PICKAXE_TEXTURE, false)
+    broadaxeTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.BROADAXE_TEXTURE, false)
+    reclaimerTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.RECLAIMER_TEXTURE, false)
     staffTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.STICK_TEXTURE, false)
     spellTexture = safeTextureAtlas.findRotationAwareRegion(InfAssets.SPELL_TEXTURE, false)
 

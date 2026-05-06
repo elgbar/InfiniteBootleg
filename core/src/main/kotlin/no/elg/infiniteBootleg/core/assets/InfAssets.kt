@@ -24,6 +24,8 @@ interface InfAssets {
   val doorOpenTexture: RotatableTextureRegion
   val doorClosedTexture: RotatableTextureRegion
   val pickaxeTexture: RotatableTextureRegion
+  val reclaimerTexture: RotatableTextureRegion
+  val broadaxeTexture: RotatableTextureRegion
   val staffTexture: RotatableTextureRegion
   val spellTexture: RotatableTextureRegion
 
@@ -66,6 +68,8 @@ interface InfAssets {
     const val CROSS_TEXTURE = "cross"
     const val CROSS_INVERTED_TEXTURE = "cross_inverted"
     const val PICKAXE_TEXTURE = "pickaxe"
+    const val BROADAXE_TEXTURE = "broadaxe"
+    const val RECLAIMER_TEXTURE = "reclaimer"
     const val STICK_TEXTURE = "stick"
     const val SPELL_TEXTURE = "spell"
 

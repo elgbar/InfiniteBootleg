@@ -78,7 +78,7 @@ sealed interface Tool : TexturedContainerElement {
   }
 
   object Broadaxe : Tool {
-    override val textureName: String = "papp"
+    override val textureName: String = "broadaxe"
     override val effectiveAgainst: Set<MaterialCategory> = setOf(MaterialCategory.PLAIN_ROCK, MaterialCategory.SOIL, MaterialCategory.ORGANIC)
     override val destroyIneffectiveAgainst: Boolean get() = true
     override val effectiveEfficiency: Float get() = 2f
@@ -113,7 +113,7 @@ sealed interface Tool : TexturedContainerElement {
   }
 
   object Reclaimer : Tool {
-    override val textureName: String = "hand"
+    override val textureName: String = "reclaimer"
     override val effectiveAgainst: Set<MaterialCategory> = setOf(MaterialCategory.CRAFTED)
     override val destroyIneffectiveAgainst: Boolean get() = true
     override val effectiveEfficiency: Float get() = 3f
