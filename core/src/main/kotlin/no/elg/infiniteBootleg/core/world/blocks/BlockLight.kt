@@ -243,7 +243,7 @@ class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoor
   /**
    * @return If any changes was made to the lighting
    */
-  internal suspend fun recalculateLighting(): Boolean {
+  suspend fun recalculateLighting(): Boolean {
     if (!Settings.renderLight || chunk.isInvalid) {
       return false
     }

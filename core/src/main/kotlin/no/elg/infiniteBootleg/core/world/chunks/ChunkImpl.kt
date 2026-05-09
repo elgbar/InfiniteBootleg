@@ -4,13 +4,9 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.box2d.structs.b2BodyId
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.events.BlockChangedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
-import no.elg.infiniteBootleg.core.events.chunks.ChunkLightChangedEvent
 import no.elg.infiniteBootleg.core.events.chunks.ChunkUnloadedEvent
 import no.elg.infiniteBootleg.core.exceptions.checkChunkCorrupt
 import no.elg.infiniteBootleg.core.main.Main
@@ -19,25 +15,18 @@ import no.elg.infiniteBootleg.core.net.serverBoundBlockUpdate
 import no.elg.infiniteBootleg.core.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.core.util.ChunkCoord
 import no.elg.infiniteBootleg.core.util.LocalCoord
-import no.elg.infiniteBootleg.core.util.WorldCompactLocArray
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.chunkOffset
 import no.elg.infiniteBootleg.core.util.chunkToWorld
 import no.elg.infiniteBootleg.core.util.compactInt
-import no.elg.infiniteBootleg.core.util.component1
-import no.elg.infiniteBootleg.core.util.component2
-import no.elg.infiniteBootleg.core.util.dst2
 import no.elg.infiniteBootleg.core.util.isAir
 import no.elg.infiniteBootleg.core.util.isInsideChunk
 import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
-import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.singleLinePrinter
 import no.elg.infiniteBootleg.core.util.stringifyChunkToWorld
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.Material
-import no.elg.infiniteBootleg.core.world.Material.Companion.emitsLight
 import no.elg.infiniteBootleg.core.world.blocks.Block
-import no.elg.infiniteBootleg.core.world.blocks.BlockLight
 import no.elg.infiniteBootleg.core.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.core.world.ecs.load
 import no.elg.infiniteBootleg.core.world.ecs.save
@@ -47,22 +36,12 @@ import no.elg.infiniteBootleg.protobuf.chunk
 import no.elg.infiniteBootleg.protobuf.vector2i
 import org.jetbrains.annotations.Contract
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.atomic.AtomicBoolean
 
 private val logger = KotlinLogging.logger {}
 
 open class ChunkImpl(final override val world: World, final override val chunkX: ChunkCoord, final override val chunkY: ChunkCoord) : Chunk {
 
   val blocks: Array<Array<Block?>> = Array(Chunk.CHUNK_SIZE) { arrayOfNulls(Chunk.CHUNK_SIZE) }
-
-  /**Single 1d array stored in a row major order*/
-  private val blockLights = Array(Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE) { i ->
-    BlockLight(
-      this,
-      i / Chunk.CHUNK_SIZE,
-      i % Chunk.CHUNK_SIZE
-    )
-  }
 
   override val chunkBody: ChunkBody = ChunkBody(this)
 
@@ -234,16 +213,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
 
         // Only dispatch events when there is a real change and the chunk is initialized
         EventManager.dispatchEventAsync(BlockChangedEvent(currBlock, block))
-
-        if (Settings.renderLight) {
-          // Optimized to check blockLight last, ok to do it twice (it should be cached for the second lookup anyway(?))
-          fun affectedByLight(block: Block?): Boolean =
-            block != null && (block.material.emitsLight || (Settings.lightOcclusion && block.material.lightOpacity > 0f && getBlockLight(localX, localY).isLit))
-
-          if (affectedByLight(block) || affectedByLight(currBlock)) {
-            EventManager.dispatchEventAsync(ChunkLightChangedEvent(compactLocation, localX, localY))
-          }
-        }
+        onRealBlockChange(localX, localY, currBlock, block)
 
         if (sendUpdatePacket && Main.isMultiplayer) {
           val worldX = chunkX.chunkToWorld(localX)
@@ -259,67 +229,8 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     return block
   }
 
-  private fun isNoneWithinDistance(sources: WorldCompactLocArray, worldX: WorldCoord, worldY: WorldCoord): Boolean {
-    for ((srcX: WorldCoord, srcY: WorldCoord) in sources) {
-      val dstFromChange2blk = dst2(worldX, worldY, srcX, srcY)
-      if (dstFromChange2blk <= World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW) {
-        return false
-      }
-    }
-    return true
-  }
-
-  internal fun doUpdateLightMultipleSources(sources: WorldCompactLocArray, checkDistance: Boolean) {
-    if (Settings.renderLight && isValid && world.isLoaded) {
-      synchronized(this) {
-        // TODO synchronize on something else
-        if (!checkDistance) {
-          // Safe to cancel when doing a full update
-          // Note to self, DO NOT CANCEL when updating from sources,
-          // as it might cancel updates to blocks that will not be updated in the next update
-          recalculateLightJob?.cancel()
-        }
-        recalculateLightJob = launchOnMultithreadedAsyncSuspendable {
-          doUpdateLightMultipleSources0(sources, checkDistance)
-        }
-      }
-    }
-  }
-
-  /**
-   * @return if any block was recalculated
-   */
-  protected open suspend fun doUpdateLightMultipleSources0(sources: WorldCompactLocArray, checkDistance: Boolean): Boolean {
-    if (Settings.renderLight) {
-      val anyRecalculated = AtomicBoolean(false)
-      coroutineScope {
-        for (localX in 0 until Chunk.CHUNK_SIZE) {
-          val worldX = this@ChunkImpl.chunkX.chunkToWorld(localX)
-          for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
-            if (checkDistance && isNoneWithinDistance(
-                sources,
-                worldX,
-                this@ChunkImpl.chunkY.chunkToWorld(localY)
-              )
-            ) {
-              continue
-            }
-            launch {
-              // TODO allow canceling of individual blocks
-              val recalculated = getBlockLight(localX, localY).recalculateLighting()
-              if (recalculated) {
-                anyRecalculated.compareAndSet(false, true)
-              }
-            }
-          }
-        }
-      }
-      return anyRecalculated.get()
-    }
-    return false
-  }
-
-  override fun getBlockLight(localX: LocalCoord, localY: LocalCoord): BlockLight = blockLights[blockMapIndex(localX, localY)]
+  // FIXME can this be listed to with an BlockChangedEvent?
+  protected open fun onRealBlockChange(localX: LocalCoord, localY: LocalCoord, oldBlock: Block?, newBlock: Block?) = Unit
 
   override fun getRawBlock(localX: LocalCoord, localY: LocalCoord): Block? = blocks[localX][localY]
 
@@ -416,16 +327,12 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     this.prioritize = this.prioritize or prioritize
   }
 
-  override fun updateAllBlockLights() {
-    doUpdateLightMultipleSources(NOT_CHECKING_DISTANCE, checkDistance = false)
-  }
-
   /**
    * Internal loading of blocks have been completed, finish setting up the internal state but before
    * the chunks have been added to the world
    */
   @Synchronized
-  fun finishLoading() {
+  open fun finishLoading() {
     if (initialized) {
       return
     }
@@ -433,10 +340,6 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     dirty()
     chunkBody.update()
     chunkListeners.registerListeners()
-    launchOnAsyncSuspendable {
-      delay(200L)
-      updateAllBlockLights()
-    }
   }
 
   override fun queryEachEntities(callback: ((b2BodyId, Entity) -> Unit)) {
@@ -572,7 +475,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
 
     @Suppress("NOTHING_TO_INLINE")
     @Contract(pure = true)
-    private inline fun blockMapIndex(localX: LocalCoord, localY: LocalCoord): Int = localX * Chunk.CHUNK_SIZE + localY
+    inline fun blockMapIndex(localX: LocalCoord, localY: LocalCoord): Int = localX * Chunk.CHUNK_SIZE + localY
 
     /**
      * @return true if both blocks are air or null. Marker blocks are not considered air

@@ -87,6 +87,7 @@ import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.invalid
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.valid
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumnsManager
+import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
 import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEngine
 import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEntitySet
 import no.elg.infiniteBootleg.core.world.ecs.basicRequiredEntityFamily
@@ -101,13 +102,12 @@ import no.elg.infiniteBootleg.core.world.ecs.creation.PLAYER_HEIGHT
 import no.elg.infiniteBootleg.core.world.ecs.disposeBox2dOnRemoval
 import no.elg.infiniteBootleg.core.world.ecs.ensureUniquenessListener
 import no.elg.infiniteBootleg.core.world.ecs.playerFamily
-import no.elg.infiniteBootleg.core.world.ecs.system.ChunkUnloadSystem
+import no.elg.infiniteBootleg.core.world.ecs.system.ChunkTickSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.MaxVelocitySystem
 import no.elg.infiniteBootleg.core.world.ecs.system.NoMovementInUnlockedChunksSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.OutOfBoundsSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.UpdateBox2DStateSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.ValidateGroundContactSystem
-import no.elg.infiniteBootleg.core.world.ecs.system.WorldTickSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.WorldTimeAdvanceSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.BrokenBlockCleanupSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.DecayingBlockSystem
@@ -284,7 +284,7 @@ abstract class World(
     EventManager.oneShotListener<InitialChunksOfWorldLoadedEvent> {
       launchOnMainSuspendable {
         readChunks { readableChunks ->
-          readableChunks.values().forEach(Chunk::updateAllBlockLights)
+          readableChunks.values().filterIsInstance<TexturedChunk>().forEach(TexturedChunk::updateAllBlockLights)
         }
         if (Main.isAuthoritative) {
           // Add a delay to make sure the light is calculated
@@ -337,9 +337,8 @@ abstract class World(
     engine.addSystem(ValidateGroundContactSystem)
     engine.addSystem(BrokenBlockCleanupSystem)
     engine.addSystem(DecayingBlockSystem)
-    engine.addSystem(ChunkUnloadSystem(this))
+    engine.addSystem(ChunkTickSystem(this))
     engine.addSystem(WorldTimeAdvanceSystem(this))
-    engine.addSystem(WorldTickSystem(this))
     additionalSystems().forEach(engine::addSystem)
 
     engine.systems.forEach(::configureSystem)
@@ -1044,8 +1043,11 @@ abstract class World(
       return chunk.getRawBlock(localX, localY)
     }
 
+  /**
+   * Get light of the chunk at the given coordinates. Will never return anything for headless instances
+   */
   fun getBlockLight(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true): BlockLight? {
-    val chunk = getChunkFromWorld(worldX, worldY, loadChunk) ?: return null
+    val chunk = getChunkFromWorld(worldX, worldY, loadChunk) as? TexturedChunk ?: return null
     return chunk.getBlockLight(worldX.chunkOffset(), worldY.chunkOffset())
   }
 
@@ -1121,7 +1123,7 @@ abstract class World(
       }
       if (isDisposed) {
         // Check dispose state as we don't want to save a disposed chunk,
-        // we can get here if the ChunkUnloadSystem sees a disposed chunk.
+        // we can get here if the ChunkTickSystem sees a disposed chunk.
         logger.debug { "Unloaded already disposed chunk ${stringifyCompactLoc(chunk)}" }
       } else {
         if (save) {

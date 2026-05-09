@@ -7,13 +7,14 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
+import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
 import no.elg.infiniteBootleg.core.world.chunks.ViewableChunk
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_LAST
 import no.elg.infiniteBootleg.core.world.world.World
 
 private val logger = KotlinLogging.logger {}
 
-class ChunkUnloadSystem(private val world: World) : EntitySystem(UPDATE_PRIORITY_LAST) {
+class ChunkTickSystem(private val world: World) : EntitySystem(UPDATE_PRIORITY_LAST) {
 
   @GuardedBy("world.chunksLock")
   private val chunkIterator: LongMap.Entries<Chunk> = world.createChunkIterator()
@@ -40,11 +41,16 @@ class ChunkUnloadSystem(private val world: World) : EntitySystem(UPDATE_PRIORITY
             world.unloadChunk(chunk, force = true)
           }
           unloadQuota--
-        } else if (unloadQuota > 0 && shouldUnloadChunk(chunk)) {
-          unloadQuota--
-          launchOnAsyncSuspendable {
-            if (shouldUnloadChunk(chunk)) {
-              world.unloadChunk(chunk)
+        } else {
+          if (chunk is TexturedChunk) {
+            chunk.flushPendingLightUpdates()
+          }
+          if (unloadQuota > 0 && shouldUnloadChunk(chunk)) {
+            unloadQuota--
+            launchOnAsyncSuspendable {
+              if (shouldUnloadChunk(chunk)) {
+                world.unloadChunk(chunk)
+              }
             }
           }
         }

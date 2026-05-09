@@ -17,6 +17,7 @@ import no.elg.infiniteBootleg.client.world.ecs.system.event.ContinuousInputSyste
 import no.elg.infiniteBootleg.client.world.ecs.system.event.InputEventSystem
 import no.elg.infiniteBootleg.client.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
+import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
 import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEntitySet
 import no.elg.infiniteBootleg.core.world.ecs.drawableMaterialEntitiesFamily
 import no.elg.infiniteBootleg.core.world.ecs.drawableNonMaterialEntitiesFamily
@@ -103,7 +104,7 @@ abstract class ClientWorld : World {
 
   fun recalculateLights() {
     readChunks { readableChunks ->
-      readableChunks.values().forEach(Chunk::updateAllBlockLights)
+      readableChunks.values().filterIsInstance<TexturedChunk>().forEach(TexturedChunk::updateAllBlockLights)
     }
   }
 

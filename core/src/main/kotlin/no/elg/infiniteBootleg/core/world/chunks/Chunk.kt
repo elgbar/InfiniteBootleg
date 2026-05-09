@@ -11,7 +11,6 @@ import no.elg.infiniteBootleg.core.util.LocalCoord
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.blocks.Block
-import no.elg.infiniteBootleg.core.world.blocks.BlockLight
 import no.elg.infiniteBootleg.core.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.core.world.world.World
@@ -143,11 +142,6 @@ interface Chunk :
     prioritize: Boolean = false,
     sendUpdatePacket: Boolean = true
   )
-
-  /** Update the light of the chunk  */
-  fun updateAllBlockLights()
-
-  fun getBlockLight(localX: LocalCoord, localY: LocalCoord): BlockLight
 
   fun getRawBlock(localX: LocalCoord, localY: LocalCoord): Block?
 
