@@ -14,8 +14,8 @@ import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.screens.ScreenRenderer
 import no.elg.infiniteBootleg.client.world.textureRegion
 import no.elg.infiniteBootleg.core.api.Renderer
+import no.elg.infiniteBootleg.core.api.Ticking
 import no.elg.infiniteBootleg.core.events.ContainerEvent
-import no.elg.infiniteBootleg.core.events.WorldTickedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.inventory.container.Container
 import no.elg.infiniteBootleg.core.items.Item
@@ -32,7 +32,8 @@ import kotlin.math.absoluteValue
 
 class ContainerChangeRenderer :
   Renderer,
-  Disposable {
+  Disposable,
+  Ticking {
 
   private val screenRenderer: ScreenRenderer get() = ClientMain.inst().screenRenderer
 
@@ -81,8 +82,8 @@ class ContainerChangeRenderer :
     }
   }
 
-  private val onWorldTick = EventManager.registerListener { e: WorldTickedEvent ->
-    if (changeHandlersToProcessed.isNotEmpty() && (changeHandlers.isEmpty || e.tickId % (e.world.worldTicker.tps / LINES_PER_SECONDS) == 0L)) {
+  override fun tick() {
+    if (changeHandlersToProcessed.isNotEmpty()) {
       lock.withLock {
         // note: the partition might be incorrect in the future! We must update this when there are more info to partition on
         val data = changeHandlersToProcessed.partitionMap { it.item.element.displayName + it.item.maxStock }.mapNotNull { (_, items) ->
@@ -121,7 +122,7 @@ class ContainerChangeRenderer :
   }
 
   override fun render() {
-    if (changeHandlers.isEmpty()) return
+    if (changeHandlers.isEmpty) return
     lock.withLock {
       val iterator = changeHandlers.iterator()
       while (iterator.hasNext()) {
@@ -141,7 +142,6 @@ class ContainerChangeRenderer :
 
   override fun dispose() {
     onContentChanged.removeListener()
-    onWorldTick.removeListener()
   }
 
   fun getData(item: Item, remove: Boolean, xOffset: Int): ItemDisplayData {
@@ -166,8 +166,8 @@ class ContainerChangeRenderer :
     const val DISPLAY_DURATION_SECONDS = 5f
 
     /**
-     * How many lines to be created each second
+     * Delay between each line
      */
-    const val LINES_PER_SECONDS = 3
+    const val SECONDS_PER_LINE = 1f / 3f
   }
 }

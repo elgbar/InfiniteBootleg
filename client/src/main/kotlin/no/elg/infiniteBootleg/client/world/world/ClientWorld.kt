@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.client.input.ECSInputListener
 import no.elg.infiniteBootleg.client.input.WorldInputHandler
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.world.box2d.service.DoorService
+import no.elg.infiniteBootleg.client.world.ecs.system.ContainerChangedSystem
 import no.elg.infiniteBootleg.client.world.ecs.system.FollowEntitySystem
 import no.elg.infiniteBootleg.client.world.ecs.system.MagicSystem
 import no.elg.infiniteBootleg.client.world.ecs.system.MineBlockSystem
@@ -83,7 +84,8 @@ abstract class ClientWorld : World {
       MineBlockSystem,
       FollowEntitySystem,
       InputEventSystem,
-      MagicSystem
+      MagicSystem,
+      ContainerChangedSystem
     )
 
   override fun configureSystem(system: EntitySystem) {

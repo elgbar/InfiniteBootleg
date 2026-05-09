@@ -28,7 +28,7 @@ class HUDRenderer :
   Disposable {
   private var modus = DISPLAY_CURRENT_BLOCK or DISPLAY_CONTAINER_CHANGE
   private val builder = StringBuilder()
-  private val containerChangeRenderer = ContainerChangeRenderer()
+  val containerChangeRenderer = ContainerChangeRenderer()
 
   init {
     modus = modus or if (Settings.debug) DISPLAY_DEBUG else DISPLAY_NOTHING

@@ -595,7 +595,7 @@ class ClientCommands : CommonCommands() {
     val dx = 2
     val dy = -1
     val chunkXs = world.render.chunksInView.run { (horizontalStart + dx).chunkToWorld(0) until (horizontalEnd - dx).chunkToWorld(CHUNK_SIZE) }
-    //This is the very top y coord of the loaded in chunks, do not add material above it, unless you want to load chunks
+    // This is the very top y coord of the loaded in chunks, do not add material above it, unless you want to load chunks
     val y = (world.render.chunksInView.verticalEnd + dy).chunkToWorld(CHUNK_SIZE - 1)
     world.launchOnBox2dSuspendable {
       for (x in chunkXs) {
