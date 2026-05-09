@@ -294,10 +294,11 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
       val anyRecalculated = AtomicBoolean(false)
       coroutineScope {
         for (localX in 0 until Chunk.CHUNK_SIZE) {
+          val worldX = this@ChunkImpl.chunkX.chunkToWorld(localX)
           for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
             if (checkDistance && isNoneWithinDistance(
                 sources,
-                this@ChunkImpl.chunkX.chunkToWorld(localX),
+                worldX,
                 this@ChunkImpl.chunkY.chunkToWorld(localY)
               )
             ) {
