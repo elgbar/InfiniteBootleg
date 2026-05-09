@@ -222,14 +222,14 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
       currBlock
     }
     if (isRealChange) {
-      modified = true
-      if (updateTexture) {
-        dirty(prioritize)
-      }
       // Note chunkBody must be called after the body is inserted into the chunk
       chunkBody.replaceBlock(currBlock, block)
 
       if (initialized) {
+        modified = true
+        if (updateTexture) {
+          dirty(prioritize)
+        }
         launchOnAsyncSuspendable { chunkColumn.updateTopBlock(localX, chunkY.chunkToWorld(localY)) }
 
         // Only dispatch events when there is a real change and the chunk is initialized
