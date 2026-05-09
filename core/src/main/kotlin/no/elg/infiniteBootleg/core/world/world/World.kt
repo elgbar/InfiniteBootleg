@@ -1110,9 +1110,6 @@ abstract class World(
    * @return If the unloading was successful
    */
   fun unloadChunk(chunk: Chunk?, force: Boolean = false, save: Boolean = true): Boolean {
-    if (isDisposed) {
-      return false
-    }
     if (chunk != null && (force || chunk.allowedToUnload)) {
       if (chunk.world !== this) {
         logger.warn { "Tried to unload chunk from different world" }
@@ -1122,11 +1119,17 @@ abstract class World(
       val removedChunk: Chunk? = writeChunks { writableChunks ->
         writableChunks.remove(chunk.compactLocation)
       }
-      if (save) {
-        chunkLoader.save(chunk)
+      if (isDisposed) {
+        // Check dispose state as we don't want to save a disposed chunk,
+        // we can get here if the ChunkUnloadSystem sees a disposed chunk.
+        logger.debug { "Unloaded already disposed chunk ${stringifyCompactLoc(chunk)}" }
+      } else {
+        if (save) {
+          chunkLoader.save(chunk)
+        }
+        chunk.dispose()
+        logger.trace { "Unloaded chunk ${stringifyCompactLoc(chunk)}" }
       }
-      chunk.dispose()
-      logger.trace { "Unloaded chunk ${stringifyCompactLoc(chunk)}" }
       if (removedChunk != null && chunk !== removedChunk) {
         logger.warn {
           "Removed unloaded chunk ${stringifyCompactLoc(chunk)} was different from chunk in list of loaded chunks: ${stringifyCompactLoc(removedChunk)}"
