@@ -152,3 +152,4 @@ tests/
 /client/build/
 /server/build/
 /libgdx-box2d/
+*.stackdump
