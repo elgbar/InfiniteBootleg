@@ -171,6 +171,11 @@ class ChunkRenderer(world: World) : Disposable {
                 val dx = localX * Block.BLOCK_TEXTURE_SIZE_F
                 val dy = localY * Block.BLOCK_TEXTURE_SIZE_F
 
+                if (block.shape.isStair) {
+                  drawStairOutline(block, block.shape, whiteRegion, dx, dy)
+                  continue
+                }
+
                 for (direction in Direction.CARDINAL) {
                   val neighbor = block.getRawRelative(direction, false)
                   if (neighbor.isCollidable()) {
@@ -297,6 +302,75 @@ class ChunkRenderer(world: World) : Disposable {
         rx++
       }
       ry++
+    }
+  }
+
+  /**
+   * Draw outlines that follow a stair block's L-shape: the half of each cardinal edge on the
+   * solid L-shape (only when the corresponding neighbor is non-collidable), plus the two
+   * interior edges of the cut quadrant (always — they're a solid/internal-air boundary).
+   */
+  private fun drawStairOutline(
+    block: Block,
+    shape: BlockShape,
+    whiteRegion: TextureRegion,
+    dx: Float,
+    dy: Float
+  ) {
+    val full = Block.BLOCK_TEXTURE_SIZE_F
+    val half = Block.HALF_BLOCK_TEXTURE_SIZE_F
+    val px = 1f
+
+    fun ifAir(
+      direction: Direction,
+      x: Float,
+      y: Float,
+      w: Float,
+      h: Float
+    ) {
+      if (block.getRawRelative(direction, false).isCollidable()) {
+        batch.draw(whiteRegion, x, y, w, h)
+      }
+    }
+
+    when (shape) {
+      BlockShape.STAIR_NE -> { // air quadrant: top-right
+        ifAir(Direction.SOUTH, dx, dy, full, px)
+        ifAir(Direction.WEST, dx, dy, px, full)
+        ifAir(Direction.NORTH, dx, dy + full - px, half, px) // left half of top
+        ifAir(Direction.EAST, dx + full - px, dy, px, half) // bottom half of right
+        batch.draw(whiteRegion, dx + half, dy + half - px, half, px) // top of solid below cut
+        batch.draw(whiteRegion, dx + half - px, dy + half, px, half) // right of solid left of cut
+      }
+
+      BlockShape.STAIR_NW -> { // air quadrant: top-left
+        ifAir(Direction.SOUTH, dx, dy, full, px)
+        ifAir(Direction.EAST, dx + full - px, dy, px, full)
+        ifAir(Direction.NORTH, dx + half, dy + full - px, half, px) // right half of top
+        ifAir(Direction.WEST, dx, dy, px, half) // bottom half of left
+        batch.draw(whiteRegion, dx, dy + half - px, half, px) // top of solid below cut
+        batch.draw(whiteRegion, dx + half, dy + half, px, half) // left of solid right of cut
+      }
+
+      BlockShape.STAIR_SE -> { // air quadrant: bottom-right
+        ifAir(Direction.NORTH, dx, dy + full - px, full, px)
+        ifAir(Direction.WEST, dx, dy, px, full)
+        ifAir(Direction.SOUTH, dx, dy, half, px) // left half of bottom
+        ifAir(Direction.EAST, dx + full - px, dy + half, px, half) // top half of right
+        batch.draw(whiteRegion, dx + half, dy + half, half, px) // bottom of solid above cut
+        batch.draw(whiteRegion, dx + half - px, dy, px, half) // right of solid left of cut
+      }
+
+      BlockShape.STAIR_SW -> { // air quadrant: bottom-left
+        ifAir(Direction.NORTH, dx, dy + full - px, full, px)
+        ifAir(Direction.EAST, dx + full - px, dy, px, full)
+        ifAir(Direction.SOUTH, dx + half, dy, half, px) // right half of bottom
+        ifAir(Direction.WEST, dx, dy + half, px, half) // top half of left
+        batch.draw(whiteRegion, dx, dy + half, half, px) // bottom of solid above cut
+        batch.draw(whiteRegion, dx + half, dy, px, half) // left of solid right of cut
+      }
+
+      BlockShape.FULL -> {} // not a stair; outline pass uses the cardinal-direction loop
     }
   }
 
