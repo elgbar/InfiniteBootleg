@@ -5,7 +5,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 /**
  * The geometric shape of a block within its 1x1 cell.
  *
- * [FULL] occupies the entire cell. The four [STAIR] variants occupy 3/4 of the cell with one
+ * [FULL] occupies the entire cell. The four `STAIR_*` variants occupy 3/4 of the cell with one
  * 0.5x0.5 quadrant cut out as air; the cut quadrant renders the sky/cave background, and the
  * collision shape is a right triangle that approximates the cut as a smooth slope.
  */
@@ -43,22 +43,24 @@ enum class BlockShape {
     }
   }
 
-  fun toProto(): ProtoWorld.BlockShape = when (this) {
-    FULL -> ProtoWorld.BlockShape.FULL
-    STAIR_NE -> ProtoWorld.BlockShape.STAIR_NE
-    STAIR_NW -> ProtoWorld.BlockShape.STAIR_NW
-    STAIR_SE -> ProtoWorld.BlockShape.STAIR_SE
-    STAIR_SW -> ProtoWorld.BlockShape.STAIR_SW
-  }
+  fun toProto(): ProtoWorld.BlockShape =
+    when (this) {
+      FULL -> ProtoWorld.BlockShape.FULL
+      STAIR_NE -> ProtoWorld.BlockShape.STAIR_NE
+      STAIR_NW -> ProtoWorld.BlockShape.STAIR_NW
+      STAIR_SE -> ProtoWorld.BlockShape.STAIR_SE
+      STAIR_SW -> ProtoWorld.BlockShape.STAIR_SW
+    }
 
   companion object {
-    fun fromProto(proto: ProtoWorld.BlockShape): BlockShape = when (proto) {
-      ProtoWorld.BlockShape.FULL -> FULL
-      ProtoWorld.BlockShape.STAIR_NE -> STAIR_NE
-      ProtoWorld.BlockShape.STAIR_NW -> STAIR_NW
-      ProtoWorld.BlockShape.STAIR_SE -> STAIR_SE
-      ProtoWorld.BlockShape.STAIR_SW -> STAIR_SW
-      ProtoWorld.BlockShape.UNRECOGNIZED -> FULL
-    }
+    fun fromProto(proto: ProtoWorld.BlockShape): BlockShape =
+      when (proto) {
+        ProtoWorld.BlockShape.FULL -> FULL
+        ProtoWorld.BlockShape.STAIR_NE -> STAIR_NE
+        ProtoWorld.BlockShape.STAIR_NW -> STAIR_NW
+        ProtoWorld.BlockShape.STAIR_SE -> STAIR_SE
+        ProtoWorld.BlockShape.STAIR_SW -> STAIR_SW
+        ProtoWorld.BlockShape.UNRECOGNIZED -> FULL
+      }
   }
 }

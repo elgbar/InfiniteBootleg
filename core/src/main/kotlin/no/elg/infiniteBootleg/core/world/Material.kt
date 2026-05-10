@@ -349,7 +349,12 @@ sealed interface Material : ContainerElement {
     require(validChunk.isNotDisposed) { "Chunk has been disposed" }
     val worldX: WorldCoord = validChunk.worldX + localX
     val worldY: WorldCoord = validChunk.worldY + localY
-    val effectiveShape = if (shape.isStair && !canFormStair) BlockShape.FULL else shape
+    val effectiveShape = if (shape.isStair && !canFormStair) {
+      logger.warn { "Tried to use shape $shape on material $this, which cannot form stairs" }
+      BlockShape.FULL
+    } else {
+      shape
+    }
     if (canBeCreated(world, worldX, worldY)) {
       return BlockImpl(validChunk, localX, localY, this, shape = effectiveShape).also { block ->
         if (Main.isAuthoritative) {

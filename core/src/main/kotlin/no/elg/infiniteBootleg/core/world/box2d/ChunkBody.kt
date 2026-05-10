@@ -167,7 +167,11 @@ class ChunkBody(val chunk: Chunk) :
       def.filter = filter
       def.enableSensorEvents(true)
     }
-    val polygon = Box2d.b2MakeOffsetBox(0.5f, 0.5f, makeB2Vec2(block.localX, block.localY), NO_ROTATION)
+    val polygon = if (block.shape.isStair) {
+      makeStairTrianglePolygon(block.localX, block.localY, block.shape)
+    } else {
+      Box2d.b2MakeOffsetBox(0.5f, 0.5f, makeB2Vec2(block.localX, block.localY), NO_ROTATION)
+    }
     val shapeId = bodyId.createPolygonShape(shapeDef, polygon, block)
 
     updateShape(block, shapeId)

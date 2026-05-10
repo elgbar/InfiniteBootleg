@@ -45,6 +45,7 @@ import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.blocks.Block
+import no.elg.infiniteBootleg.core.world.blocks.BlockShape
 import no.elg.infiniteBootleg.core.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.core.world.box2d.WorldBody.Companion.Y_WORLD_GRAVITY
 import no.elg.infiniteBootleg.core.world.box2d.extensions.body
@@ -737,5 +738,50 @@ class ClientCommands : CommonCommands() {
     val world = clientWorld ?: return
     world.worldBody.box2dWorld.gravity = makeB2Vec2(0, gravityY)
     logger.info { "World Y gravity changed to $gravityY" }
+  }
+
+  @AuthoritativeOnly
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
+  @ConsoleDoc(
+    description = "Place a stair-shaped block at the given world coords",
+    paramDescriptions = [
+      "Material name (e.g. stone, brick, dirt)",
+      "Stair orientation: NE, NW, SE, SW (the cut quadrant), or FULL for a normal block",
+      "World x coordinate",
+      "World y coordinate"
+    ]
+  )
+  @CmdArgNames("material", "shape", "x", "y")
+  fun placeStair(materialName: String, shapeName: String, x: WorldCoord, y: WorldCoord) {
+    val world = clientWorld ?: return
+    val material = Material.valueOfOrNull(materialName) ?: run {
+      logger.error { "Unknown material '$materialName'" }
+      return
+    }
+    val rawShape = runCatching { BlockShape.valueOf(shapeName.uppercase(Locale.ROOT)) }
+      .getOrElse {
+        runCatching { BlockShape.valueOf("STAIR_${shapeName.uppercase(Locale.ROOT)}") }.getOrNull()
+      } ?: run {
+      logger.error { "Unknown stair shape '$shapeName'. Use FULL, NE, NW, SE, SW (or STAIR_NE etc.)" }
+      return
+    }
+    if (rawShape.isStair && !material.canFormStair) {
+      logger.error { "Material '$materialName' cannot form a stair" }
+      return
+    }
+    val chunkX = x.worldToChunk()
+    val chunkY = y.worldToChunk()
+    val chunk = world.getChunk(chunkX, chunkY, load = true) ?: run {
+      logger.error { "Failed to load chunk at ${stringifyCompactLoc(chunkX, chunkY)}" }
+      return
+    }
+    val localX = x - chunkX.chunkToWorld()
+    val localY = y - chunkY.chunkToWorld()
+    val block = material.createBlock(world, chunk, localX, localY, shape = rawShape) ?: run {
+      logger.error { "Failed to create $material block at ${stringifyCompactLoc(x, y)}" }
+      return
+    }
+    chunk.setBlock(localX, localY, block, updateTexture = true, prioritize = true, sendUpdatePacket = true)
+    logger.info { "Placed $material with shape $rawShape at ${stringifyCompactLoc(x, y)}" }
   }
 }

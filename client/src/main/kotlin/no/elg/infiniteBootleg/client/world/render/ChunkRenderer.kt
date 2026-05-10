@@ -24,6 +24,7 @@ import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.getRawRelative
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight
+import no.elg.infiniteBootleg.core.world.blocks.BlockShape
 import no.elg.infiniteBootleg.core.world.blocks.LightMap
 import no.elg.infiniteBootleg.core.world.blocks.LightMap.Companion.Brightness
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
@@ -44,6 +45,7 @@ class ChunkRenderer(world: World) : Disposable {
   }
 
   private val splitCache: MutableMap<TextureRegion, Array<Array<TextureRegion>>> = HashMap()
+  private val stairSplitCache: MutableMap<TextureRegion, Array<Array<TextureRegion>>> = HashMap()
 
   private val rotationNoise: FastNoiseLite = FastNoiseLite(world.seed.toInt()).also {
     it.setNoiseType(FastNoiseLite.NoiseType.OpenSimplex2)
@@ -74,6 +76,8 @@ class ChunkRenderer(world: World) : Disposable {
             }
             val block = chunk.getRawBlock(localX, localY)
             val material = block.materialOrAir()
+            val shape = block?.shape ?: BlockShape.FULL
+            val isStair = shape.isStair
             val texture: RotatableTextureRegion
             val secondaryTexture: RotatableTextureRegion?
 
@@ -99,7 +103,8 @@ class ChunkRenderer(world: World) : Disposable {
               secondaryTexture = null
             } else {
               texture = block?.texture ?: continue
-              secondaryTexture = if (material.hasTransparentTexture) {
+              // Stair blocks have a transparent quadrant; draw sky/cave behind them so the cutout shows through.
+              secondaryTexture = if (material.hasTransparentTexture || isStair) {
                 if (topLightBlockHeight > worldY) assets.caveTexture else assets.skyTexture
               } else {
                 null
@@ -109,18 +114,22 @@ class ChunkRenderer(world: World) : Disposable {
             if (Settings.renderLight) {
               val blockLight = chunk.getBlockLight(localX, localY)
               if (blockLight.isLit && (!blockLight.isSkylight || texture.rotationAllowed)) {
-                val rotation = calculateRotation(chunk, localX, localY)
+                val rotation = if (isStair) NO_ROTATION else calculateRotation(chunk, localX, localY)
                 if (secondaryTexture != null) {
-                  drawShadedBlock(secondaryTexture, blockLight.lightMap, dx, dy, rotation)
+                  drawShadedBlock(secondaryTexture, blockLight.lightMap, dx, dy, rotation, BlockShape.FULL)
                 }
-                drawShadedBlock(texture, blockLight.lightMap, dx, dy, rotation)
+                drawShadedBlock(texture, blockLight.lightMap, dx, dy, rotation, shape)
               } else {
                 if (blockLight.isLit) {
-                  val rotation = calculateRotation(chunk, localX, localY)
+                  val rotation = if (isStair) NO_ROTATION else calculateRotation(chunk, localX, localY)
                   if (secondaryTexture != null) {
                     drawRotatedTexture(secondaryTexture, dx, dy, rotation)
                   }
-                  drawRotatedTexture(texture, dx, dy, rotation)
+                  if (isStair) {
+                    drawStairForeground(texture, dx, dy, shape)
+                  } else {
+                    drawRotatedTexture(texture, dx, dy, rotation)
+                  }
                 } else {
                   // Optimization: the block is not lit or in the sky, the background is already cleared to black
                   continue
@@ -128,11 +137,15 @@ class ChunkRenderer(world: World) : Disposable {
               }
             } else {
               // No light, no problem
-              val rotation = calculateRotation(chunk, localX, localY)
+              val rotation = if (isStair) NO_ROTATION else calculateRotation(chunk, localX, localY)
               if (secondaryTexture != null) {
                 drawRotatedTexture(secondaryTexture, dx, dy, rotation)
               }
-              drawRotatedTexture(texture, dx, dy, rotation)
+              if (isStair) {
+                drawStairForeground(texture, dx, dy, shape)
+              } else {
+                drawRotatedTexture(texture, dx, dy, rotation)
+              }
             }
           }
         }
@@ -234,7 +247,8 @@ class ChunkRenderer(world: World) : Disposable {
     lights: LightMap,
     dx: Float,
     dy: Float,
-    rotation: Int
+    rotation: Int,
+    shape: BlockShape = BlockShape.FULL
   ) {
     val texture = textureRegion.textureRegion
     val tileWidth = texture.regionWidth / BlockLight.LIGHT_RESOLUTION
@@ -247,6 +261,10 @@ class ChunkRenderer(world: World) : Disposable {
       var rx = 0
       val regionsLength = regions.size
       while (rx < regionsLength) {
+        if (shape.isStair && shape.isInAirQuadrant(rx, ry, BlockLight.LIGHT_RESOLUTION)) {
+          rx++
+          continue
+        }
         val region = regions[rx]
         val lightMapIndex = BlockLight.lightMapIndex(rx, ry)
         val brightnessR: Brightness = lights.r[lightMapIndex]
@@ -279,6 +297,31 @@ class ChunkRenderer(world: World) : Disposable {
         rx++
       }
       ry++
+    }
+  }
+
+  /**
+   * Unlit foreground draw for a stair block: split the texture into a 2x2 grid and draw the
+   * 3 quadrants that are NOT cut away. Mirrors [drawRotatedTexture] but with a stair cutout.
+   */
+  private fun drawStairForeground(textureRegion: RotatableTextureRegion, dx: Float, dy: Float, shape: BlockShape) {
+    val texture = textureRegion.textureRegion
+    val halfW = texture.regionWidth / 2
+    val halfH = texture.regionHeight / 2
+    val split = stairSplitCache.computeIfAbsent(texture) { t: TextureRegion -> t.split(halfW, halfH) }
+    // split[0] is the TOP row (libGDX TextureRegion.split convention), split[1] is the bottom.
+    for (qy in 0..1) {
+      val regions = split[1 - qy] // qy=0 (bottom) -> split[1], qy=1 (top) -> split[0]
+      for (qx in 0..1) {
+        if (shape.isInAirQuadrant(qx * 2, qy * 2, 4)) continue
+        batch.draw(
+          regions[qx],
+          dx + qx * Block.HALF_BLOCK_TEXTURE_SIZE_F,
+          dy + qy * Block.HALF_BLOCK_TEXTURE_SIZE_F,
+          Block.HALF_BLOCK_TEXTURE_SIZE_F,
+          Block.HALF_BLOCK_TEXTURE_SIZE_F
+        )
+      }
     }
   }
 

@@ -26,7 +26,7 @@ class BlockImpl(
   override val localY: LocalCoord,
   override val material: Material,
   override var entity: Entity? = null,
-  override val shape: BlockShape = BlockShape.FULL
+  override val shape: BlockShape
 ) : Block {
 
   override fun save(): ProtoWorld.Block =
