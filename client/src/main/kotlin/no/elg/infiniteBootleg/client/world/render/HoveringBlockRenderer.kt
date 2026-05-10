@@ -94,7 +94,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
   private fun renderPlaceableBlock(world: World, texture: TextureRegion, blockWorldLoc: WorldCompactLoc, overrideAlpha: Float? = null) {
     val (blockWorldX, blockWorldY) = blockWorldLoc
     val averageBrightness = if (Settings.renderLight) {
-      val blockBrightness = world.getBlockLight(blockWorldX, blockWorldY)?.averageBrightness ?: BlockLight.FULL_BRIGHTNESS
+      val blockBrightness = world.getBlockLight(blockWorldX, blockWorldY, loadChunk = false)?.averageBrightness ?: BlockLight.FULL_BRIGHTNESS
       if (blockBrightness == BlockLight.COMPLETE_DARKNESS) {
         // no need to render a black block
         return
