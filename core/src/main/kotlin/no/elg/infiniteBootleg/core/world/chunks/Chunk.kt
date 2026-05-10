@@ -28,7 +28,8 @@ import kotlin.math.ln
 interface Chunk :
   Iterable<Block?>,
   CheckableDisposable,
-  Comparable<Chunk> {
+  Comparable<Chunk>,
+  LitChunk {
 
   /**
    *

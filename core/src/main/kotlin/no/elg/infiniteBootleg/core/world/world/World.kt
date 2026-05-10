@@ -284,7 +284,7 @@ abstract class World(
     EventManager.oneShotListener<InitialChunksOfWorldLoadedEvent> {
       launchOnMainSuspendable {
         readChunks { readableChunks ->
-          readableChunks.values().filterIsInstance<TexturedChunk>().forEach(TexturedChunk::updateAllBlockLights)
+          readableChunks.values().forEach(Chunk::updateAllBlockLights)
         }
         if (Main.isAuthoritative) {
           // Add a delay to make sure the light is calculated
@@ -1043,11 +1043,8 @@ abstract class World(
       return chunk.getRawBlock(localX, localY)
     }
 
-  /**
-   * Get light of the chunk at the given coordinates. Will never return anything for headless instances
-   */
   fun getBlockLight(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true): BlockLight? {
-    val chunk = getChunkFromWorld(worldX, worldY, loadChunk) as? TexturedChunk ?: return null
+    val chunk = getChunkFromWorld(worldX, worldY, loadChunk) ?: return null
     return chunk.getBlockLight(worldX.chunkOffset(), worldY.chunkOffset())
   }
 
@@ -1112,7 +1109,7 @@ abstract class World(
    * @return If the unloading was successful
    */
   fun unloadChunk(chunk: Chunk?, force: Boolean = false, save: Boolean = true): Boolean {
-    if (chunk != null && (force || chunk.allowedToUnload)) {
+    if (chunk != null && !hasDisposeBegun && (force || chunk.allowedToUnload)) {
       if (chunk.world !== this) {
         logger.warn { "Tried to unload chunk from different world" }
         return false

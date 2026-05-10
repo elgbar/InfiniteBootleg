@@ -18,8 +18,6 @@ import no.elg.infiniteBootleg.core.util.toComponentsString
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.lightMapIndex
-import no.elg.infiniteBootleg.core.world.blocks.LightMap.Companion.NO_LIGHTS_LIGHT_MAP
-import no.elg.infiniteBootleg.core.world.blocks.LightMap.Companion.SKYLIGHT_LIGHT_MAP
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag
 import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
@@ -54,7 +52,7 @@ object DebugText {
     val rawY = calcLightSubCell(ClientMain.inst().mouseLocator.mouseWorldY)
 
     val chunk = world.getChunk(compactInt(mouseBlockX.worldToChunk(), mouseBlockY.worldToChunk()), false)
-    val blockLight = (chunk as? TexturedChunk)?.getBlockLight(localX, localY)
+    val blockLight = chunk?.getBlockLight(localX, localY)
 
     val isLit = blockLight?.isLit ?: "maybe"
     val skylight = blockLight?.isSkylight ?: "maybe"

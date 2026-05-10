@@ -54,7 +54,6 @@ import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2Vec2
 import no.elg.infiniteBootleg.core.world.box2d.extensions.position
 import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE
-import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.idAndName
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
@@ -216,7 +215,7 @@ class ClientCommands : CommonCommands() {
     val world = world ?: return
 
     world.readChunks { readableChunks ->
-      readableChunks.values().filterIsInstance<TexturedChunk>().forEach {
+      readableChunks.values().forEach {
         if (Settings.renderLight) {
           it.updateAllBlockLights()
         }

@@ -55,18 +55,18 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
       /*
        * Register a location to be updated on the next chunk tick
        */
-      registerListenerConditionally(chunk is TexturedChunk) { (chunkLoc, originLocalX, originLocalY): ChunkLightChangedEvent ->
+      registerListenerConditionally { (chunkLoc, originLocalX, originLocalY): ChunkLightChangedEvent ->
         if (Settings.renderLight && (chunk.compactLocation == chunkLoc || chunk.isNeighbor(chunkLoc))) {
-          (chunk as TexturedChunk).queueLightSource(compactChunkToWorld(chunkLoc, originLocalX, originLocalY))
+          chunk.queueLightSource(compactChunkToWorld(chunkLoc, originLocalX, originLocalY))
         }
       },
 
       /*
        * Update chunk light when a chunk column is updated
        */
-      registerListenerConditionally(chunk is TexturedChunk) { event: ChunkColumnUpdatedEvent ->
+      registerListenerConditionally { event: ChunkColumnUpdatedEvent ->
         if (Settings.renderLight && event.flag.isBlocksLightFlag() && event.chunkX in chunkLookRange) {
-          (chunk as TexturedChunk).queueLightSources(event.calculatedDiffColumn)
+          chunk.queueLightSources(event.calculatedDiffColumn)
         }
       },
 
@@ -74,9 +74,9 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
        * When a neighbor chunk is loaded we might have to update the lights or the textures of this chunk since it might contain lights that
        * affect this chunk or the blocks that change the texture of this chunk
        */
-      registerListenerConditionally(chunk is TexturedChunk) { (eventChunk, _): ChunkLoadedEvent ->
+      registerListenerConditionally { (eventChunk, _): ChunkLoadedEvent ->
         if (eventChunk.isNeighbor(chunk)) {
-          (chunk as TexturedChunk).updateAllBlockLights()
+          chunk.updateAllBlockLights()
         }
       }
     )
