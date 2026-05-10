@@ -56,7 +56,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
        * Register a location to be updated on the next chunk tick
        */
       registerListenerConditionally(chunk is TexturedChunk) { (chunkLoc, originLocalX, originLocalY): ChunkLightChangedEvent ->
-        if (Settings.renderLight && chunk.isNeighbor(chunkLoc)) {
+        if (Settings.renderLight && (chunk.compactLocation == chunkLoc || chunk.isNeighbor(chunkLoc))) {
           (chunk as TexturedChunk).queueLightSource(compactChunkToWorld(chunkLoc, originLocalX, originLocalY))
         }
       },
