@@ -18,6 +18,7 @@ import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.stringifyCompactLocWithChunk
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.BlockImpl
+import no.elg.infiniteBootleg.core.world.blocks.BlockShape
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.ecs.api.ProtoConverter
 import no.elg.infiniteBootleg.core.world.ecs.components.ExplosiveComponent
@@ -78,6 +79,14 @@ sealed interface Material : ContainerElement {
    * @return If this material has no texture
    */
   val invisibleBlock: Boolean get() = false
+
+  /**
+   * Whether this material can be placed as a [BlockShape.STAIR_*][BlockShape] (smooth slope) variant.
+   *
+   * Defaults to true for any normally collidable, visible material; materials that aren't drawn
+   * as a square block (Air, Door, non-collidable Torches/Container/PhosphorusSpell) opt out.
+   */
+  val canFormStair: Boolean get() = isCollidable && !invisibleBlock
 
   /**
    *
@@ -332,15 +341,17 @@ sealed interface Material : ContainerElement {
     localY: LocalCoord,
     protoEntity: ProtoWorld.Entity? = null,
     tryRevalidateChunk: Boolean = true,
-    onBlockEntityAddedCallback: ((Block, Entity) -> Unit)? = null
+    onBlockEntityAddedCallback: ((Block, Entity) -> Unit)? = null,
+    shape: BlockShape = BlockShape.FULL
   ): Block? {
     val validChunk = if (chunk.isDisposed && tryRevalidateChunk) world.getChunk(chunk.compactLocation) else chunk
     requireNotNull(validChunk) { "No valid chunk found" }
     require(validChunk.isNotDisposed) { "Chunk has been disposed" }
     val worldX: WorldCoord = validChunk.worldX + localX
     val worldY: WorldCoord = validChunk.worldY + localY
+    val effectiveShape = if (shape.isStair && !canFormStair) BlockShape.FULL else shape
     if (canBeCreated(world, worldX, worldY)) {
-      return BlockImpl(validChunk, localX, localY, this).also { block ->
+      return BlockImpl(validChunk, localX, localY, this, shape = effectiveShape).also { block ->
         if (Main.isAuthoritative) {
           // Blocks client side should not have any entity in them
           val futureEntity = protoEntity?.let { world.load(it, validChunk) } ?: createNew?.invoke(world, worldX, worldY, this)

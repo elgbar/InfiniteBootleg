@@ -20,12 +20,19 @@ import no.elg.infiniteBootleg.protobuf.block
  *
  * @author Elg
  */
-class BlockImpl(override val chunk: Chunk, override val localX: LocalCoord, override val localY: LocalCoord, override val material: Material, override var entity: Entity? = null) :
-  Block {
+class BlockImpl(
+  override val chunk: Chunk,
+  override val localX: LocalCoord,
+  override val localY: LocalCoord,
+  override val material: Material,
+  override var entity: Entity? = null,
+  override val shape: BlockShape = BlockShape.FULL
+) : Block {
 
   override fun save(): ProtoWorld.Block =
     block {
       this.material = this@BlockImpl.material.asProto()
+      this.shape = this@BlockImpl.shape.toProto()
       this@BlockImpl.entity?.save(toAuthoritative = true)?.also { entity = it }
     }
 
@@ -45,6 +52,7 @@ class BlockImpl(override val chunk: Chunk, override val localX: LocalCoord, over
     result = 31 * result + chunk.hashCode()
     result = 31 * result + localX
     result = 31 * result + localY
+    result = 31 * result + shape.hashCode()
     return result
   }
 
@@ -60,6 +68,9 @@ class BlockImpl(override val chunk: Chunk, override val localX: LocalCoord, over
       return false
     }
     if (localY != block.localY) {
+      return false
+    }
+    if (shape != block.shape) {
       return false
     }
     return if (material !== block.material) {

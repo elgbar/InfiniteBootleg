@@ -44,6 +44,11 @@ interface Block :
   val localY: LocalCoord
 
   /**
+   * The geometric shape of this block within its cell. Defaults to [BlockShape.FULL].
+   */
+  val shape: BlockShape get() = BlockShape.FULL
+
+  /**
    * Connected blocks to ashley engine
    */
   val entity: Entity?
@@ -162,12 +167,14 @@ interface Block :
       if (material === Material.Air) {
         return null
       }
-      return material.createBlock(world, chunk, localX, localY, protoBlock.entityOrNull)
+      val shape = BlockShape.fromProto(protoBlock.shape)
+      return material.createBlock(world, chunk, localX, localY, protoBlock.entityOrNull, shape = shape)
     }
 
-    fun save(material: Material): ProtoWorld.Block.Builder =
+    fun save(material: Material, shape: BlockShape = BlockShape.FULL): ProtoWorld.Block.Builder =
       block {
         this.material = material.asProto()
+        this.shape = shape.toProto()
       }.toBuilder()
   }
 }

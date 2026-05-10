@@ -40,6 +40,15 @@ message World {
 message Block {
   Material material = 1;
   optional Entity entity = 2;
+  BlockShape shape = 3;
+}
+
+enum BlockShape {
+  FULL = 0;
+  STAIR_NE = 1;
+  STAIR_NW = 2;
+  STAIR_SE = 3;
+  STAIR_SW = 4;
 }
 
 message Chunk {
