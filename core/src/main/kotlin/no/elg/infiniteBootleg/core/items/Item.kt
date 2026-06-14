@@ -9,6 +9,9 @@ import no.elg.infiniteBootleg.protobuf.ContainerKt.item
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import kotlin.math.absoluteValue
 
+/**
+ * A quantity of an [ItemType]
+ */
 sealed interface Item {
 
   val element: ContainerElement

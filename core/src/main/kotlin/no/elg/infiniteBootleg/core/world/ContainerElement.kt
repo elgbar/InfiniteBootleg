@@ -16,6 +16,9 @@ sealed interface TexturedContainerElement : ContainerElement {
   val textureName: String
 }
 
+/**
+ * Something that can be held in a container/inventory by a player or creature
+ */
 sealed interface ContainerElement {
 
   val itemType: ItemType

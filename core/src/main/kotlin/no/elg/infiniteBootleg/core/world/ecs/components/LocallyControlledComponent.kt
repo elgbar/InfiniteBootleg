@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
+import no.elg.infiniteBootleg.core.util.BlockUnitF
 import no.elg.infiniteBootleg.core.util.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.core.util.INITIAL_INSTANT_BREAK
 import no.elg.infiniteBootleg.core.util.INITIAL_INTERACT_RADIUS
@@ -20,8 +21,8 @@ import no.elg.infiniteBootleg.protobuf.EntityKt.locallyControlled
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
 data class LocallyControlledComponent(
-  var brushSize: Float = INITIAL_BRUSH_SIZE,
-  var interactRadius: Float = INITIAL_INTERACT_RADIUS,
+  var brushSize: BlockUnitF = INITIAL_BRUSH_SIZE,
+  var interactRadius: BlockUnitF = INITIAL_INTERACT_RADIUS,
   var instantBreak: Boolean = INITIAL_INSTANT_BREAK
 ) : EntitySavableComponent,
   AuthoritativeOnlyComponent {

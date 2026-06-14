@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.core.world
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.core.items.ItemType
 import no.elg.infiniteBootleg.core.items.ToolItem
+import no.elg.infiniteBootleg.core.util.BlockUnitF
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.centerOfBlock
@@ -23,7 +24,7 @@ sealed interface Tool : TexturedContainerElement {
    * @param world In which world are this entity using the tool
    * @param blockX Origin of the breaking. Typically, where the mouse is pointing
    * @param blockY Origin of the breaking. Typically, where the mouse is pointing
-   * @param size How large the breaking is
+   * @param brushSize How large the breaking is
    * @param interactionRadius Max size of interaction from the entities position
    */
   fun breakableLocs(
@@ -31,8 +32,8 @@ sealed interface Tool : TexturedContainerElement {
     world: World,
     blockX: WorldCoord,
     blockY: WorldCoord,
-    size: Float,
-    interactionRadius: Float
+    brushSize: BlockUnitF,
+    interactionRadius: BlockUnitF
   ): Sequence<WorldCompactLoc>
 
   /**
@@ -67,10 +68,10 @@ sealed interface Tool : TexturedContainerElement {
       world: World,
       blockX: WorldCoord,
       blockY: WorldCoord,
-      size: Float,
-      interactionRadius: Float
+      brushSize: BlockUnitF,
+      interactionRadius: BlockUnitF
     ): Sequence<WorldCompactLoc> {
-      val baseSeq = World.getLocationsWithin(blockX, blockY, size).asSequence()
+      val baseSeq = World.getLocationsWithin(blockX, blockY, brushSize).asSequence()
       return entity
         .interactableBlocksWithinRadius(world, interactionRadius, baseSeq)
         .filterNotAirBlock(world)
@@ -91,15 +92,15 @@ sealed interface Tool : TexturedContainerElement {
       world: World,
       blockX: WorldCoord,
       blockY: WorldCoord,
-      size: Float,
-      interactionRadius: Float
+      brushSize: BlockUnitF,
+      interactionRadius: BlockUnitF
     ): Sequence<WorldCompactLoc> {
       val ifLeftOfEntity = entity.positionComponent.x <= blockX.centerOfBlock()
       val leftWorldX = blockX.toDouble()
       val offsetX = when {
-        size == 1f -> 0.0
-        ifLeftOfEntity -> floor(size) - 1.0
-        else -> -floor(size) + 1.0
+        brushSize == 1f -> 0.0
+        ifLeftOfEntity -> floor(brushSize) - 1.0
+        else -> -floor(brushSize) + 1.0
       }
 
       val locationsAABBFromCorner = getLocationsAABBFromLowerLeftCorner(
@@ -124,10 +125,10 @@ sealed interface Tool : TexturedContainerElement {
       world: World,
       blockX: WorldCoord,
       blockY: WorldCoord,
-      size: Float,
-      interactionRadius: Float
+      brushSize: BlockUnitF,
+      interactionRadius: BlockUnitF
     ): Sequence<WorldCompactLoc> {
-      val baseSeq = World.getLocationsWithin(blockX, blockY, size).asSequence()
+      val baseSeq = World.getLocationsWithin(blockX, blockY, brushSize).asSequence()
       return entity
         .interactableBlocksWithinRadius(world, interactionRadius, baseSeq)
         .filterNotAirBlock(world)
