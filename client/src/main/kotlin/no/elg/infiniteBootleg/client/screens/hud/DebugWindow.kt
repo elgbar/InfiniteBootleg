@@ -345,7 +345,7 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           onChange = ClientMain.inst().console.exec::brush,
           srcValueGetter = {
             withContext(world.box2dCoroutineDispatcher) {
-              ClientMain.inst().console.exec.brush()
+              ClientMain.inst().console.exec.brush().coerceAtLeast(1f)
             }
           }
         )
@@ -359,7 +359,7 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           onChange = ClientMain.inst().console.exec::interactionRadius,
           srcValueGetter = {
             withContext(world.box2dCoroutineDispatcher) {
-              ClientMain.inst().console.exec.interactionRadius()
+              ClientMain.inst().console.exec.interactionRadius().coerceAtLeast(1f)
             }
           }
         )
