@@ -520,9 +520,9 @@ class ClientCommands : CommonCommands() {
   @CmdArgNames("size")
   @ConsoleDoc(description = "Set the brush size of the mouse", paramDescriptions = ["New brush size, positive integer"])
   @CallOnThreadyType(ExecutionThread.PHYSICS)
-  fun brush(size: BlockUnitF) {
+  fun brush(newBrushSize: BlockUnitF) {
     val entities = localControlledPlayer() ?: return
-    if (size < 1) {
+    if (newBrushSize < 1) {
       logger.error { "Brush size must be at least 1" }
       return
     }
@@ -534,12 +534,12 @@ class ClientCommands : CommonCommands() {
 
       @Suppress("UNCHECKED_CAST")
       val toolData = when (val data = item.data) {
-        is PickaxeToolData -> (item as ToolItem<PickaxeToolData>).copy(data = data.copy(brushRadius = size))
-        is ReclaimerToolData -> (item as ToolItem<ReclaimerToolData>).copy(data = data.copy(brushRadius = size))
-        is BroadaxeToolData -> (item as ToolItem<BroadaxeToolData>).copy(data = data.copy(brushMajorAxisSize = size))
+        is PickaxeToolData -> data.brushRadius = newBrushSize
+        is ReclaimerToolData -> data.brushRadius = newBrushSize
+        is BroadaxeToolData -> data.brushMajorAxisSize = newBrushSize
       }
 
-      logger.info { "New brush size is now $size" }
+      logger.info { "New brush size is now $newBrushSize" }
     }
   }
 
@@ -561,9 +561,9 @@ class ClientCommands : CommonCommands() {
 
       @Suppress("UNCHECKED_CAST")
       val toolData = when (val data = item.data) {
-        is PickaxeToolData -> (item as ToolItem<PickaxeToolData>).copy(data = data.copy(interactionRadius = interactionRadius))
-        is ReclaimerToolData -> (item as ToolItem<ReclaimerToolData>).copy(data = data.copy(interactionRadius = interactionRadius))
-        is BroadaxeToolData -> (item as ToolItem<BroadaxeToolData>).copy(data = data.copy(interactionRadius = interactionRadius))
+        is PickaxeToolData -> data.interactionRadius = interactionRadius
+        is ReclaimerToolData -> data.interactionRadius = interactionRadius
+        is BroadaxeToolData -> data.interactionRadius = interactionRadius
       }
 
       logger.info { "New interaction radius is now $interactionRadius" }

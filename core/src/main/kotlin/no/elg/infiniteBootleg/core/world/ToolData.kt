@@ -34,7 +34,7 @@ sealed interface ToolData {
   fun toItem(maxStock: UInt, stock: UInt): ToolItem<*>
 }
 
-data class PickaxeToolData(override val interactionRadius: BlockUnitF = INITIAL_INTERACT_RADIUS, val brushRadius: BlockUnitF = INITIAL_BRUSH_SIZE) : ToolData {
+data class PickaxeToolData(override var interactionRadius: BlockUnitF = INITIAL_INTERACT_RADIUS, var brushRadius: BlockUnitF = INITIAL_BRUSH_SIZE) : ToolData {
 
   override fun breakableLocs(entity: Entity, world: World, blockX: WorldCoord, blockY: WorldCoord): Sequence<WorldCompactLoc> {
     val baseSeq = World.getLocationsWithin(blockX, blockY, brushRadius).asSequence()
@@ -58,7 +58,7 @@ data class PickaxeToolData(override val interactionRadius: BlockUnitF = INITIAL_
   }
 }
 
-data class ReclaimerToolData(override val interactionRadius: BlockUnitF = INITIAL_INTERACT_RADIUS, val brushRadius: BlockUnitF = INITIAL_BRUSH_SIZE) : ToolData {
+data class ReclaimerToolData(override var interactionRadius: BlockUnitF = INITIAL_INTERACT_RADIUS, var brushRadius: BlockUnitF = INITIAL_BRUSH_SIZE) : ToolData {
 
   override fun breakableLocs(entity: Entity, world: World, blockX: WorldCoord, blockY: WorldCoord): Sequence<WorldCompactLoc> {
     val baseSeq = World.getLocationsWithin(blockX, blockY, brushRadius).asSequence()
@@ -83,9 +83,9 @@ data class ReclaimerToolData(override val interactionRadius: BlockUnitF = INITIA
 }
 
 data class BroadaxeToolData(
-  override val interactionRadius: BlockUnitF = INITIAL_INTERACT_RADIUS,
-  val brushMajorAxisSize: BlockUnitF = INITIAL_BRUSH_SIZE,
-  val horizontalIsMajorAxis: Boolean = INITIAL_MAJOR_AXIS
+  override var interactionRadius: BlockUnitF = INITIAL_INTERACT_RADIUS,
+  var brushMajorAxisSize: BlockUnitF = INITIAL_BRUSH_SIZE,
+  var horizontalIsMajorAxis: Boolean = INITIAL_MAJOR_AXIS
 ) : ToolData {
 
   override fun breakableLocs(entity: Entity, world: World, blockX: WorldCoord, blockY: WorldCoord): Sequence<WorldCompactLoc> {
