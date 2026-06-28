@@ -9,12 +9,12 @@ import no.elg.infiniteBootleg.client.input.MouseLocator
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.events.api.ThreadType
+import no.elg.infiniteBootleg.core.items.ToolItem
 import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.dstd
 import no.elg.infiniteBootleg.core.util.placeableBlocks
 import no.elg.infiniteBootleg.core.util.worldToBlock
 import no.elg.infiniteBootleg.core.world.Material
-import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.box2d.extensions.velocity
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
@@ -52,12 +52,10 @@ private var lastCreateBlockTick: Long = 0
 
 fun breakBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean =
   with(worldEntity) {
-    val element = (entity.selectedItem ?: return false).element
-    if (element is Tool) {
+    val item = (entity.selectedItem ?: return false)
+    if (item is ToolItem<*>) {
       if (canNotInteract(worldEntity, blockX, blockY) || entity.locallyControlledComponentOrNull?.instantBreak == false) return false
-      val locallyControlledComponent = entity.locallyControlledComponent
-      val breakableBlocks =
-        element.breakableLocs(entity, world, blockX, blockY, locallyControlledComponent.brushSize, locallyControlledComponent.interactRadius).asIterable()
+      val breakableBlocks = item.data.breakableLocs(entity, world, blockX, blockY).asIterable()
       world.removeBlocks(breakableBlocks, entity)
     }
     return true
@@ -72,7 +70,7 @@ fun placeBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean =
     if (element is Material) {
       val world = entity.world
       val locallyControlledComponent = entity.locallyControlledComponent
-      val placeableBlock = entity.placeableBlocks(world, blockX, blockY, locallyControlledComponent.interactRadius, element).toSet()
+      val placeableBlock = entity.placeableBlocks(world, blockX, blockY, locallyControlledComponent.placeRadius, element).toSet()
       val usages = placeableBlock.size.toUInt()
       val container = entity.containerOrNull ?: return false
       val notRemoved = container.remove(element, usages)

@@ -5,14 +5,14 @@ import no.elg.infiniteBootleg.core.inventory.container.Container
 import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.core.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.core.inventory.container.OwnedContainer.Companion.asProto
+import no.elg.infiniteBootleg.core.items.Item
+import no.elg.infiniteBootleg.core.items.Item.Companion.asProto
 import no.elg.infiniteBootleg.core.util.ChunkCoord
 import no.elg.infiniteBootleg.core.util.Util
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.toComponentsString
 import no.elg.infiniteBootleg.core.util.toProtoEntityRef
 import no.elg.infiniteBootleg.core.util.toVector2i
-import no.elg.infiniteBootleg.core.world.ContainerElement
-import no.elg.infiniteBootleg.core.world.ContainerElement.Companion.asProto
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.ChunkImpl.Companion.AIR_BLOCK_PROTO
@@ -197,11 +197,11 @@ fun clientBoundMoveEntity(entity: Entity): Packet =
     .setMoveEntity(entityMovePacket(entity))
     .build()
 
-fun clientBoundHoldingItem(entity: Entity, element: ContainerElement): Packet =
+fun clientBoundHoldingItem(entity: Entity, item: Item): Packet =
   clientBoundPacketBuilder(CB_HOLDING_ITEM)
     .setHoldingItem(
       holdingItem {
-        this.element = element.asProto()
+        this.item = item.asProto()
         this.entityRef = entity.toProtoEntityRef()
       }
     )

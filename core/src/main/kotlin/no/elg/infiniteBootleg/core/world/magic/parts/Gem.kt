@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.util.toTitleCase
 import no.elg.infiniteBootleg.core.world.Material
-import no.elg.infiniteBootleg.core.world.Tool
+import no.elg.infiniteBootleg.core.world.PickaxeToolData
 import no.elg.infiniteBootleg.core.world.ecs.components.DecayingComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.DecayingComponent.Companion.decayComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
@@ -68,7 +68,8 @@ data object Diamond : GemType {
     val world = spellEntity.world
     val pos = spellEntity.positionComponent
 
-    val breakableBlocks = Tool.Pickaxe.breakableLocs(spellEntity, world, pos.blockX, pos.blockY, breakRadius.toFloat(), state.spellRange.toFloat()).asIterable()
+    val breakableBlocks =
+      PickaxeToolData(interactionRadius = breakRadius.toFloat(), brushRadius = state.spellRange.toFloat()).breakableLocs(spellEntity, world, pos.blockX, pos.blockY).asIterable()
     world.removeBlocks(breakableBlocks, state.caster)
   }
 }

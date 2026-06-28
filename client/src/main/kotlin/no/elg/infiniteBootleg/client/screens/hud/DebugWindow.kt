@@ -15,9 +15,7 @@ import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.events.api.EventsTracker
-import no.elg.infiniteBootleg.core.util.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.core.util.INITIAL_INSTANT_BREAK
-import no.elg.infiniteBootleg.core.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
@@ -347,7 +345,7 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           onChange = ClientMain.inst().console.exec::brush,
           srcValueGetter = {
             withContext(world.box2dCoroutineDispatcher) {
-              world.controlledPlayerEntities.map { it.locallyControlledComponentOrNull }.firstOrNull()?.brushSize ?: INITIAL_BRUSH_SIZE
+              ClientMain.inst().console.exec.brush()
             }
           }
         )
@@ -358,10 +356,10 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           step = 1f,
           decimals = 0,
           onAnyElementChanged = onAnyElementChanged,
-          onChange = ClientMain.inst().console.exec::interactRadius,
+          onChange = ClientMain.inst().console.exec::interactionRadius,
           srcValueGetter = {
             withContext(world.box2dCoroutineDispatcher) {
-              world.controlledPlayerEntities.map { it.locallyControlledComponentOrNull }.firstOrNull()?.interactRadius ?: INITIAL_INTERACT_RADIUS
+              ClientMain.inst().console.exec.interactionRadius()
             }
           }
         )

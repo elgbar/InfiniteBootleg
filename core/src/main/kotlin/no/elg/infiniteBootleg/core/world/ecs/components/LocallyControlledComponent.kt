@@ -7,9 +7,8 @@ import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.core.util.BlockUnitF
-import no.elg.infiniteBootleg.core.util.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.core.util.INITIAL_INSTANT_BREAK
-import no.elg.infiniteBootleg.core.util.INITIAL_INTERACT_RADIUS
+import no.elg.infiniteBootleg.core.util.INITIAL_PLACE_RADIUS
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.ecs.api.EntityLoadableMapper
@@ -20,19 +19,16 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.locallyControlled
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
-data class LocallyControlledComponent(
-  var brushSize: BlockUnitF = INITIAL_BRUSH_SIZE,
-  var interactRadius: BlockUnitF = INITIAL_INTERACT_RADIUS,
-  var instantBreak: Boolean = INITIAL_INSTANT_BREAK
-) : EntitySavableComponent,
+data class LocallyControlledComponent(var instantBreak: Boolean = INITIAL_INSTANT_BREAK, var placeRadius: BlockUnitF = INITIAL_PLACE_RADIUS) :
+  EntitySavableComponent,
   AuthoritativeOnlyComponent {
 
   /**
    * Bare minimum check if we are breaking a block
    */
-  fun isBreaking(entity: Entity) = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT) && entity.selectedItem?.element is Tool
+  fun isBreaking(entity: Entity) = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT) && entity.selectedItem?.element is Tool<*>
 
-  override fun hudDebug(): String = "brush size: $brushSize, interactRadius: $interactRadius, instantBreak: $instantBreak"
+  override fun hudDebug(): String = "instantBreak: $instantBreak"
 
   companion object : EntityLoadableMapper<LocallyControlledComponent>() {
     var Entity.locallyControlledComponent by propertyFor(mapper)
@@ -42,8 +38,7 @@ data class LocallyControlledComponent(
       return safeWith {
         LocallyControlledComponent(
           instantBreak = state.instantBreak,
-          brushSize = state.brushRadius,
-          interactRadius = state.interactRadius
+          placeRadius = state.placeRadius
         )
       }
     }
@@ -54,8 +49,7 @@ data class LocallyControlledComponent(
   override fun EntityKt.Dsl.save() {
     locallyControlled = locallyControlled {
       instantBreak = this@LocallyControlledComponent.instantBreak
-      brushRadius = this@LocallyControlledComponent.brushSize
-      interactRadius = this@LocallyControlledComponent.interactRadius
+      placeRadius = this@LocallyControlledComponent.placeRadius
     }
   }
 }

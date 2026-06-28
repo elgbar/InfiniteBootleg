@@ -189,7 +189,7 @@ message InterfaceUpdate {
 
 message HoldingItem {
   .persistence.EntityRef entityRef = 1;
-  .persistence.Element element = 2;
+  .persistence.Container.Item item = 2;
 }
 
 //////////////////

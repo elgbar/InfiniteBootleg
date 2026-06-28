@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.core.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.core.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
-import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityHoldingElement.Companion.remoteEntityHoldingElementOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityHoldingItem.Companion.remoteEntityHoldingItemOrNull
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.hotbar
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -65,14 +65,14 @@ data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: Object2Int
       }
 
     /**
-     * @return The selected item in the entity container or `null` if there is no selected item (or the index is invalid)
+     * @return The selected item in the entity container or `null` if there is no selected item (or the index is invalid)  or the [remoteEntityHoldingItemOrNull]
      */
-    val Entity.selectedItem: Item? get() = hotbarComponentOrNull?.selectedItem(this)
+    val Entity.selectedItem: Item? get() = hotbarComponentOrNull?.selectedItem(this) ?: remoteEntityHoldingItemOrNull
 
     /**
-     * @return The selected element in the entity container or the [remoteEntityHoldingElementOrNull]
+     * @return The selected element in the entity container or the [remoteEntityHoldingItemOrNull]
      */
-    val Entity.selectedElement: ContainerElement? get() = selectedItem?.element ?: remoteEntityHoldingElementOrNull
+    val Entity.selectedElement: ContainerElement? get() = selectedItem?.element
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) =
       safeWith {

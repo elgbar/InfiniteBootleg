@@ -29,9 +29,13 @@ import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.core.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.core.inventory.container.impl.AutoSortedContainer
 import no.elg.infiniteBootleg.core.inventory.container.impl.ContainerImpl
+import no.elg.infiniteBootleg.core.items.ToolItem
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.net.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.core.net.serverBoundClientDisconnectPacket
+import no.elg.infiniteBootleg.core.util.BlockUnitF
+import no.elg.infiniteBootleg.core.util.INITIAL_BRUSH_SIZE
+import no.elg.infiniteBootleg.core.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.asWorldSeed
 import no.elg.infiniteBootleg.core.util.chunkToWorld
@@ -41,8 +45,11 @@ import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.stringifyCompactLocWithChunk
 import no.elg.infiniteBootleg.core.util.toAbled
 import no.elg.infiniteBootleg.core.util.worldToChunk
+import no.elg.infiniteBootleg.core.world.BroadaxeToolData
 import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.core.world.Material
+import no.elg.infiniteBootleg.core.world.PickaxeToolData
+import no.elg.infiniteBootleg.core.world.ReclaimerToolData
 import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.BlockShape
@@ -62,6 +69,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerCompo
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.ownedContainerOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.ensureFlyingStatus
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.flying
@@ -473,42 +481,92 @@ class ClientCommands : CommonCommands() {
     logger.info { "Zoom level is now ${render.camera.zoom}" }
   }
 
+  @ConsoleDoc(description = "Get the interaction radius for the held tool")
+  @CallOnThreadyType(ExecutionThread.PHYSICS)
+  fun interactionRadius(): BlockUnitF {
+    val entities = localControlledPlayer() ?: return INITIAL_INTERACT_RADIUS
+    for (entity in entities) {
+      val value = entity.selectedItem as? ToolItem<*> ?: run {
+        logger.info { "Player ${entity.nameOrNull ?: "Unknown"} is not holding a tool" }
+        continue
+      }
+      val interactionRadius = value.data.interactionRadius
+      logger.info { "Interaction size for player ${entity.nameOrNull ?: "Unknown"} is $interactionRadius" }
+      return interactionRadius
+    }
+    return INITIAL_INTERACT_RADIUS
+  }
+
   @ConsoleDoc(description = "Get the brush sizes")
   @CallOnThreadyType(ExecutionThread.PHYSICS)
-  fun brush() {
-    val entities = localControlledPlayer() ?: return
+  fun brush(): BlockUnitF {
+    val entities = localControlledPlayer() ?: return INITIAL_BRUSH_SIZE
     for (entity in entities) {
-      logger.info { "Brush size for player ${entity.nameOrNull ?: "Unknown"} is ${entity.locallyControlledComponent.brushSize}" }
+      val value = entity.selectedItem as? ToolItem<*> ?: run {
+        logger.info { "Player ${entity.nameOrNull ?: "Unknown"} is not holding a tool" }
+        continue
+      }
+      val brushSize = when (val data = value.data) {
+        is PickaxeToolData -> data.brushRadius
+        is ReclaimerToolData -> data.brushRadius
+        is BroadaxeToolData -> data.brushMajorAxisSize
+      }
+      logger.info { "Brush size for player ${entity.nameOrNull ?: "Unknown"} is $brushSize" }
+      return brushSize
     }
+    return INITIAL_BRUSH_SIZE
   }
 
   @CmdArgNames("size")
   @ConsoleDoc(description = "Set the brush size of the mouse", paramDescriptions = ["New brush size, positive integer"])
   @CallOnThreadyType(ExecutionThread.PHYSICS)
-  fun brush(size: Float) {
+  fun brush(size: BlockUnitF) {
     val entities = localControlledPlayer() ?: return
     if (size < 1) {
       logger.error { "Brush size must be at least 1" }
       return
     }
     for (entity in entities) {
-      entity.locallyControlledComponent.brushSize = size
+      val item = entity.selectedItem as? ToolItem<*> ?: run {
+        logger.info { "Player ${entity.nameOrNull ?: "Unknown"} is not holding a tool" }
+        continue
+      }
+
+      @Suppress("UNCHECKED_CAST")
+      val toolData = when (val data = item.data) {
+        is PickaxeToolData -> (item as ToolItem<PickaxeToolData>).copy(data = data.copy(brushRadius = size))
+        is ReclaimerToolData -> (item as ToolItem<ReclaimerToolData>).copy(data = data.copy(brushRadius = size))
+        is BroadaxeToolData -> (item as ToolItem<BroadaxeToolData>).copy(data = data.copy(brushMajorAxisSize = size))
+      }
+
       logger.info { "New brush size is now $size" }
     }
   }
 
-  @CmdArgNames("interactRadius")
+  @CmdArgNames("interactionRadius")
   @ConsoleDoc(description = "Set the interact radius from the player", paramDescriptions = ["New interact radius, positive integer"])
   @CallOnThreadyType(ExecutionThread.PHYSICS)
-  fun interactRadius(interactRadius: Float) {
+  fun interactionRadius(interactionRadius: BlockUnitF) {
     val entities = localControlledPlayer() ?: return
-    if (interactRadius < 1) {
+    if (interactionRadius < 1) {
       logger.error { "Interact radius must be at least 1" }
       return
     }
+
     for (entity in entities) {
-      entity.locallyControlledComponent.interactRadius = interactRadius
-      logger.info { "New interact radius is now $interactRadius" }
+      val item = entity.selectedItem as? ToolItem<*> ?: run {
+        logger.info { "Player ${entity.nameOrNull ?: "Unknown"} is not holding a tool" }
+        continue
+      }
+
+      @Suppress("UNCHECKED_CAST")
+      val toolData = when (val data = item.data) {
+        is PickaxeToolData -> (item as ToolItem<PickaxeToolData>).copy(data = data.copy(interactionRadius = interactionRadius))
+        is ReclaimerToolData -> (item as ToolItem<ReclaimerToolData>).copy(data = data.copy(interactionRadius = interactionRadius))
+        is BroadaxeToolData -> (item as ToolItem<BroadaxeToolData>).copy(data = data.copy(interactionRadius = interactionRadius))
+      }
+
+      logger.info { "New interaction radius is now $interactionRadius" }
     }
   }
 

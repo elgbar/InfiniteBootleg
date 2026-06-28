@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.core.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.core.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.core.inventory.container.OwnedContainer.Companion.fromProto
+import no.elg.infiniteBootleg.core.items.Item.Companion.fromProto
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.net.ServerClient
 import no.elg.infiniteBootleg.core.net.SharedInformation
@@ -31,7 +32,6 @@ import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.util.toCompact
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.util.worldXYtoChunkCompactLoc
-import no.elg.infiniteBootleg.core.world.ContainerElement.Companion.fromProto
 import no.elg.infiniteBootleg.core.world.Direction
 import no.elg.infiniteBootleg.core.world.blocks.BlockImpl
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
@@ -39,8 +39,8 @@ import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.C
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.teleport
-import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityHoldingElement
-import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityHoldingElement.Companion.remoteEntityHoldingElementComponentOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityHoldingItem
+import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityHoldingItem.Companion.remoteEntityHoldingItemComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.creation.createFallingBlockStandaloneEntity
 import no.elg.infiniteBootleg.core.world.ecs.load
 import no.elg.infiniteBootleg.protobuf.Packets
@@ -417,12 +417,12 @@ private fun ServerClient.asyncHandleContainerUpdate(containerUpdate: ContainerUp
 
 private fun ServerClient.asyncHandleHoldingItem(holdingItem: Packets.HoldingItem) {
   val entity = world.getEntity(holdingItem.entityRef.id) ?: return
-  val element = holdingItem.element.fromProto()
+  val item = holdingItem.item.fromProto()
 
-  val remoteEntityHoldingElementComponent = entity.remoteEntityHoldingElementComponentOrNull
+  val remoteEntityHoldingElementComponent = entity.remoteEntityHoldingItemComponentOrNull
   if (remoteEntityHoldingElementComponent == null) {
-    entity.safeWith { RemoteEntityHoldingElement(element) }
+    entity.safeWith { RemoteEntityHoldingItem(item) }
   } else {
-    remoteEntityHoldingElementComponent.element = element
+    remoteEntityHoldingElementComponent.item = item
   }
 }

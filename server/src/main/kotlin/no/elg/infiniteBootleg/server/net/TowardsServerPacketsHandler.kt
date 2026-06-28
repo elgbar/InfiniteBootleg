@@ -442,7 +442,7 @@ private fun physicsHandleUpdateSelectedSlot(ctx: ChannelHandlerContextWrapper, u
     return
   }
   hotbarComponent.selected = slot
-  val selectedElement = hotbarComponent.selectedItem(entity)?.element ?: Material.Air
+  val selectedElement = hotbarComponent.selectedItem(entity) ?: Material.Air.toItem()
   ServerMain.inst().packetSender.broadcast(clientBoundHoldingItem(entity, selectedElement)) { c -> c != ctx.channel() }
 }
 

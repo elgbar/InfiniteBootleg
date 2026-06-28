@@ -69,8 +69,37 @@ message Element {
 
   oneof itemType {
     NamedElement material = 1;
-    NamedElement tool = 2;
+    ToolElement tool = 2;
     Staff staff = 3;
+  }
+
+  message ToolElement {
+
+    float interactionRadius = 1;
+
+    oneof SpecificData {
+      PickaxeData pickaxe = 2;
+      ReclaimerData reclaimer = 3;
+      BroadaxeData broadaxe = 4;
+    }
+
+    message PickaxeData {
+      float brushRadius = 1;
+    }
+
+    message ReclaimerData {
+      float brushRadius = 1;
+    }
+
+    message BroadaxeData {
+      MajorAxis axis = 1;
+      float brushRadiusInMajorAxis = 2;
+
+      enum MajorAxis {
+        HORIZONTAL = 0;
+        VERTICAL = 1;
+      }
+    }
   }
 
   message NamedElement {
@@ -133,7 +162,6 @@ message OwnedContainer {
   Container container = 1;
   ContainerOwner owner = 2;
 }
-
 
 message EntityRef {
   string id = 1;
@@ -228,8 +256,7 @@ message Entity {
 
   message LocallyControlled {
     bool instantBreak = 1;
-    float brushRadius = 2;
-    float interactRadius = 3;
+    float placeRadius = 2;
   }
 
   message Tinted {

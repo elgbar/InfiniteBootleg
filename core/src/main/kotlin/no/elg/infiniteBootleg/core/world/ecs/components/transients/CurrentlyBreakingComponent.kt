@@ -31,7 +31,7 @@ class CurrentlyBreakingComponent : DebuggableComponent {
 
   data class CurrentlyBreaking(
     val block: Block,
-    val item: ToolItem,
+    val item: ToolItem<*>,
     val progressHandler: ProgressHandler = ProgressHandler(block.material.hardness, Interpolation.linear, 0f, 1f)
   ) {
     fun toBreakingProgress(zeroProgress: Boolean): Packets.BreakingBlock.BreakingProgress =

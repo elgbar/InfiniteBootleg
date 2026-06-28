@@ -49,13 +49,11 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
       return
     }
 
-    val breakingItem: ToolItem = entity.selectedItem as? ToolItem ?: return
-    val breakingTool: Tool = breakingItem.element
+    val breakingItem: ToolItem<*> = entity.selectedItem as? ToolItem<*> ?: return
 
     val breakingComponent = entity.currentlyBreakingComponentOrNull ?: entity.safeWith { CurrentlyBreakingComponent() } ?: return
     val world = entity.world
-    val currentLocs = breakingTool
-      .breakableLocs(entity, world, inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
+    val currentLocs = breakingItem.data.breakableLocs(entity, world, inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY)
 
     val evaluatedCurrentLocs = if (breakingComponent.breaking.isNotEmpty()) {
       // must be a set otherwise it kills the performance
@@ -93,7 +91,7 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
     launchOnMultithreadedAsyncSuspendable {
       if (entity.isValid) {
         if (justMinedGive.isNotEmpty() || justMinedDiscard.isNotEmpty()) {
-          val selectedItem = entity.selectedItem?.element as? Tool ?: return@launchOnMultithreadedAsyncSuspendable
+          val selectedItem = entity.selectedItem?.element as? Tool<*> ?: return@launchOnMultithreadedAsyncSuspendable
           val container = entity.containerOrNull ?: return@launchOnMultithreadedAsyncSuspendable
 
           // first remove those blocks which the tool is effective against

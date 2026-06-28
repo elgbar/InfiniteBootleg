@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.client.util.setVel
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner
+import no.elg.infiniteBootleg.core.items.ToolItem
 import no.elg.infiniteBootleg.core.net.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.core.net.serverBoundUpdateSelectedSlot
 import no.elg.infiniteBootleg.core.util.FLY_VEL
@@ -23,14 +24,12 @@ import no.elg.infiniteBootleg.core.util.JUMP_VERTICAL_VEL
 import no.elg.infiniteBootleg.core.util.MAX_X_VEL
 import no.elg.infiniteBootleg.core.world.HorizontalDirection
 import no.elg.infiniteBootleg.core.world.Material
-import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.box2d.extensions.mass
 import no.elg.infiniteBootleg.core.world.box2d.extensions.set
 import no.elg.infiniteBootleg.core.world.box2d.extensions.velocity
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.InputEventQueueComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent
@@ -120,11 +119,11 @@ object InputEventSystem : EventSystem<InputEvent, InputEventQueueComponent>(
     val hotbarComponent = entity.hotbarComponentOrNull ?: return
     val direction = sign(amountY).toInt()
     if (isAltPressed()) {
-      val locallyControlledComponent = entity.locallyControlledComponentOrNull ?: return
       val selectedItem = hotbarComponent.selectedItem(entity) ?: return
-      if (selectedItem.element is Tool) {
-        val newBrushSize = locallyControlledComponent.brushSize + direction * 0.25f
-        locallyControlledComponent.brushSize = newBrushSize.coerceAtLeast(1f)
+      if (selectedItem is ToolItem<*>) {
+        val oldBrushSize = ClientMain.inst().console.exec.brush()
+        val newBrushSize = oldBrushSize + direction * 0.25f
+        ClientMain.inst().console.exec.brush(newBrushSize)
       }
     } else {
       val newOrdinal = (HotbarSlot.entries.size + hotbarComponent.selected.ordinal + direction) % HotbarSlot.entries.size

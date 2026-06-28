@@ -1,40 +1,16 @@
 package no.elg.infiniteBootleg.core.world
 
-import com.badlogic.ashley.core.Entity
+import no.elg.infiniteBootleg.core.items.Item
 import no.elg.infiniteBootleg.core.items.ItemType
 import no.elg.infiniteBootleg.core.items.ToolItem
-import no.elg.infiniteBootleg.core.util.BlockUnitF
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
-import no.elg.infiniteBootleg.core.util.WorldCoord
-import no.elg.infiniteBootleg.core.util.centerOfBlock
-import no.elg.infiniteBootleg.core.util.interactableBlocksWithinRadius
 import no.elg.infiniteBootleg.core.util.sealedSubclassObjectInstances
-import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.world.World
-import no.elg.infiniteBootleg.core.world.world.World.Companion.getLocationsAABBFromLowerLeftCorner
-import kotlin.math.floor
+import no.elg.infiniteBootleg.protobuf.ProtoWorld.Element.ToolElement as ProtoToolElement
 
 @Suppress("unused")
-sealed interface Tool : TexturedContainerElement {
+sealed interface Tool<DATA : ToolData> : TexturedContainerElement {
   override val itemType: ItemType get() = ItemType.TOOL
-  override fun toItem(maxStock: UInt, stock: UInt): ToolItem = ToolItem(this, maxStock, stock)
-
-  /**
-   * @param entity Which entity is using this tool
-   * @param world In which world are this entity using the tool
-   * @param blockX Origin of the breaking. Typically, where the mouse is pointing
-   * @param blockY Origin of the breaking. Typically, where the mouse is pointing
-   * @param brushSize How large the breaking is
-   * @param interactionRadius Max size of interaction from the entities position
-   */
-  fun breakableLocs(
-    entity: Entity,
-    world: World,
-    blockX: WorldCoord,
-    blockY: WorldCoord,
-    brushSize: BlockUnitF,
-    interactionRadius: BlockUnitF
-  ): Sequence<WorldCompactLoc>
 
   /**
    * The categories this tool works better on
@@ -56,97 +32,70 @@ sealed interface Tool : TexturedContainerElement {
    */
   val ineffectiveEfficiency: Float
 
-  object Pickaxe : Tool {
+  @Deprecated("Use the toItem function with data exposed", replaceWith = ReplaceWith("toItem(maxStock, stock, data)"))
+  override fun toItem(maxStock: UInt, stock: UInt): Item
+
+  fun toItem(maxStock: UInt, stock: UInt, data: DATA): ToolItem<DATA>
+
+  object Pickaxe : Tool<PickaxeToolData> {
     override val textureName: String = "pickaxe"
     override val effectiveAgainst: Set<MaterialCategory> = setOf(MaterialCategory.ORE)
     override val destroyIneffectiveAgainst: Boolean get() = false
     override val effectiveEfficiency: Float get() = 1f
     override val ineffectiveEfficiency: Float get() = 0.75f
 
-    override fun breakableLocs(
-      entity: Entity,
-      world: World,
-      blockX: WorldCoord,
-      blockY: WorldCoord,
-      brushSize: BlockUnitF,
-      interactionRadius: BlockUnitF
-    ): Sequence<WorldCompactLoc> {
-      val baseSeq = World.getLocationsWithin(blockX, blockY, brushSize).asSequence()
-      return entity
-        .interactableBlocksWithinRadius(world, interactionRadius, baseSeq)
-        .filterNotAirBlock(world)
-    }
+    @Deprecated("Use the toItem function with data exposed", replaceWith = ReplaceWith("toItem(maxStock, stock, PickaxeToolData())"))
+    override fun toItem(maxStock: UInt, stock: UInt): ToolItem<PickaxeToolData> = toItem(maxStock, stock, PickaxeToolData())
+
+    override fun toItem(maxStock: UInt, stock: UInt, data: PickaxeToolData): ToolItem<PickaxeToolData> = ToolItem(this, maxStock, stock, data)
   }
 
-  object Broadaxe : Tool {
+  object Broadaxe : Tool<BroadaxeToolData> {
     override val textureName: String = "broadaxe"
     override val effectiveAgainst: Set<MaterialCategory> = setOf(MaterialCategory.PLAIN_ROCK, MaterialCategory.SOIL, MaterialCategory.ORGANIC)
     override val destroyIneffectiveAgainst: Boolean get() = true
     override val effectiveEfficiency: Float get() = 2f
     override val ineffectiveEfficiency: Float get() = 0.25f
 
-    private const val OFFSET_Y: Double = 3 - 1.0 // always 3 blocks high, to calculate offset we remove one
+    @Deprecated("Use the toItem function with data exposed", replaceWith = ReplaceWith("toItem(maxStock, stock, BroadaxeToolData())"))
+    override fun toItem(maxStock: UInt, stock: UInt): ToolItem<BroadaxeToolData> = toItem(maxStock, stock, BroadaxeToolData())
 
-    override fun breakableLocs(
-      entity: Entity,
-      world: World,
-      blockX: WorldCoord,
-      blockY: WorldCoord,
-      brushSize: BlockUnitF,
-      interactionRadius: BlockUnitF
-    ): Sequence<WorldCompactLoc> {
-      val ifLeftOfEntity = entity.positionComponent.x <= blockX.centerOfBlock()
-      val leftWorldX = blockX.toDouble()
-      val offsetX = when {
-        brushSize == 1f -> 0.0
-        ifLeftOfEntity -> floor(brushSize) - 1.0
-        else -> -floor(brushSize) + 1.0
-      }
-
-      val locationsAABBFromCorner = getLocationsAABBFromLowerLeftCorner(
-        leftWorldX,
-        blockY.toDouble() - (OFFSET_Y / 2.0),
-        offsetX,
-        OFFSET_Y
-      )
-      return locationsAABBFromCorner.asSequence().filterNotAirBlock(world)
-    }
+    override fun toItem(maxStock: UInt, stock: UInt, data: BroadaxeToolData): ToolItem<BroadaxeToolData> = ToolItem(this, maxStock, stock, data)
   }
 
-  object Reclaimer : Tool {
+  object Reclaimer : Tool<ReclaimerToolData> {
     override val textureName: String = "reclaimer"
     override val effectiveAgainst: Set<MaterialCategory> = setOf(MaterialCategory.CRAFTED)
     override val destroyIneffectiveAgainst: Boolean get() = true
     override val effectiveEfficiency: Float get() = 3f
     override val ineffectiveEfficiency: Float get() = 0.01f
 
-    override fun breakableLocs(
-      entity: Entity,
-      world: World,
-      blockX: WorldCoord,
-      blockY: WorldCoord,
-      brushSize: BlockUnitF,
-      interactionRadius: BlockUnitF
-    ): Sequence<WorldCompactLoc> {
-      val baseSeq = World.getLocationsWithin(blockX, blockY, brushSize).asSequence()
-      return entity
-        .interactableBlocksWithinRadius(world, interactionRadius, baseSeq)
-        .filterNotAirBlock(world)
-    }
+    @Deprecated("Use the toItem function with data exposed", replaceWith = ReplaceWith("toItem(maxStock, stock, ReclaimerToolData())"))
+    override fun toItem(maxStock: UInt, stock: UInt): ToolItem<ReclaimerToolData> = toItem(maxStock, stock, ReclaimerToolData())
+
+    override fun toItem(maxStock: UInt, stock: UInt, data: ReclaimerToolData): ToolItem<ReclaimerToolData> = ToolItem(this, maxStock, stock, data)
   }
 
   companion object {
-    val tools: List<Tool> = sealedSubclassObjectInstances<Tool>()
+    val tools: List<Tool<*>> = sealedSubclassObjectInstances<Tool<*>>()
 
-    private val nameToTool: Map<String, Tool> = tools.associateBy { it.javaClass.simpleName.lowercase() }
-    private val toolToName: Map<Tool, String> = tools.associateWith { it.javaClass.simpleName.lowercase() }
+    private val nameToTool: Map<String, Tool<*>> = tools.associateBy { it.javaClass.simpleName.lowercase() }
+    private val toolToName: Map<Tool<*>, String> = tools.associateWith { it.javaClass.simpleName.lowercase() }
 
-    fun nameOf(tool: Tool): String = toolToName[tool] ?: error("Failed to find name for tool $tool")
+    fun nameOf(tool: Tool<*>): String = toolToName[tool] ?: error("Failed to find name for tool $tool")
 
-    fun valueOfOrNull(name: String): Tool? = nameToTool[name.lowercase()]
+    fun valueOfOrNull(name: String): Tool<*>? = nameToTool[name.lowercase()]
 
-    fun valueOf(name: String): Tool = valueOfOrNull(name) ?: error("Unknown tool with name '$name'")
+    fun valueOf(name: String): Tool<*> = valueOfOrNull(name) ?: error("Unknown tool with name '$name'")
 
-    private fun Sequence<WorldCompactLoc>.filterNotAirBlock(world: World): Sequence<WorldCompactLoc> = filterNot { world.isAirBlock(it, false) }
+    fun Sequence<WorldCompactLoc>.filterNotAirBlock(world: World): Sequence<WorldCompactLoc> = filterNot { world.isAirBlock(it, false) }
+
+    fun ProtoToolElement.fromProto(): ToolData =
+      when {
+        hasPickaxe() -> PickaxeToolData.fromProto(this)
+        hasReclaimer() -> ReclaimerToolData.fromProto(this)
+        hasBroadaxe() -> BroadaxeToolData.fromProto(this)
+        else -> error("Unknown toolData type: $this")
+      }
   }
 }

@@ -2,12 +2,17 @@ package no.elg.infiniteBootleg.core.items
 
 import no.elg.infiniteBootleg.core.util.toTitleCase
 import no.elg.infiniteBootleg.core.world.ContainerElement
-import no.elg.infiniteBootleg.core.world.ContainerElement.Companion.asProto
-import no.elg.infiniteBootleg.core.world.ContainerElement.Companion.fromProto
+import no.elg.infiniteBootleg.core.world.Material
+import no.elg.infiniteBootleg.core.world.Staff.Companion.fromProto
+import no.elg.infiniteBootleg.core.world.Staff.Companion.toProto
+import no.elg.infiniteBootleg.core.world.Tool.Companion.fromProto
 import no.elg.infiniteBootleg.core.world.ecs.api.ProtoConverter
 import no.elg.infiniteBootleg.protobuf.ContainerKt.item
-import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.protobuf.ElementKt.namedElement
+import no.elg.infiniteBootleg.protobuf.element
 import kotlin.math.absoluteValue
+import no.elg.infiniteBootleg.protobuf.ProtoWorld.Container.Item as ProtoItem
+import no.elg.infiniteBootleg.protobuf.ProtoWorld.Element as ProtoElement
 
 /**
  * A quantity of an [ItemType]
@@ -99,7 +104,7 @@ sealed interface Item {
 
   override fun hashCode(): Int
 
-  companion object : ProtoConverter<Item, ProtoWorld.Container.Item> {
+  companion object : ProtoConverter<Item, ProtoItem> {
     const val DEFAULT_MAX_STOCK = 65_536u
 
     val Item?.stockText: String get() = this?.run { "$stock / $maxStock" } ?: "??? / ???"
@@ -127,13 +132,33 @@ sealed interface Item {
       }
     }
 
-    override fun ProtoWorld.Container.Item.fromProto(): Item = element.fromProto().toItem(maxStock.toUInt(), stock.toUInt())
+    override fun ProtoItem.fromProto(): Item =
+      when {
+        element.hasMaterial() -> Material.valueOf(element.material.name).toItem(maxStock.toUInt(), stock.toUInt())
+        element.hasTool() -> element.tool.fromProto().toItem(maxStock.toUInt(), stock.toUInt())
+        element.hasStaff() -> element.staff.fromProto().toItem(maxStock.toUInt(), stock.toUInt())
+        else -> error("Unknown item type: $this")
+      }
 
-    override fun Item.asProto(): ProtoWorld.Container.Item =
+    override fun Item.asProto(): ProtoItem =
       item {
         stock = this@asProto.stock.toInt()
         maxStock = this@asProto.maxStock.toInt()
-        element = this@asProto.element.asProto()
+        element = this@asProto.elementAsProto()
+      }
+
+    private fun Item.elementAsProto(): ProtoElement =
+      element {
+        val item = this@elementAsProto
+        when (item) {
+          is MaterialItem -> material = namedElement {
+            name = Material.nameOf(item.element)
+          }
+
+          is ToolItem<*> -> tool = item.data.asProto()
+
+          is StaffItem -> staff = item.element.toProto()
+        }
       }
   }
 }

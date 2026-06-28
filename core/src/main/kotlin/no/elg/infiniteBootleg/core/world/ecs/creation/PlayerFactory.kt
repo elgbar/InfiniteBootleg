@@ -4,9 +4,8 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import no.elg.infiniteBootleg.core.assets.InfAssets
 import no.elg.infiniteBootleg.core.main.Main
-import no.elg.infiniteBootleg.core.util.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.core.util.INITIAL_INSTANT_BREAK
-import no.elg.infiniteBootleg.core.util.INITIAL_INTERACT_RADIUS
+import no.elg.infiniteBootleg.core.util.INITIAL_PLACE_RADIUS
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
@@ -111,8 +110,7 @@ private fun EntityKt.Dsl.addCommonClientPlayerComponentsProto(controlled: Boolea
     inputEvent = InputEventQueueComponent.PROTO_INPUT_EVENT
     locallyControlled = locallyControlled {
       instantBreak = INITIAL_INSTANT_BREAK
-      brushRadius = INITIAL_BRUSH_SIZE
-      interactRadius = INITIAL_INTERACT_RADIUS
+      placeRadius = INITIAL_PLACE_RADIUS
     }
   }
   physicsEvent = PhysicsEventQueueComponent.PROTO_PHYSICS_EVENT

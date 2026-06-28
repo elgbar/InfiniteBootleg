@@ -5,6 +5,7 @@ import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.world.textureRegion
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.api.Renderer
+import no.elg.infiniteBootleg.core.items.ToolItem
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.util.Progress
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
@@ -13,7 +14,6 @@ import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.placeableBlocks
 import no.elg.infiniteBootleg.core.util.withColor
 import no.elg.infiniteBootleg.core.world.Material
-import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
@@ -39,12 +39,13 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
 
     for (entity in worldRender.world.selectedMaterialEntities) {
       val controls = entity.locallyControlledComponentOrNull ?: continue
-      val element = entity.selectedItem?.element ?: continue
+      val selectedItem = entity.selectedItem
+      val element = selectedItem?.element ?: continue
       val isBreaking = controls.isBreaking(entity)
       val breakingComponent = entity.currentlyBreakingComponentOrNull
 
-      if (element is Tool) {
-        val breakableBlocks = element.breakableLocs(entity, world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
+      if (selectedItem is ToolItem<*>) {
+        val breakableBlocks = selectedItem.data.breakableLocs(entity, world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY)
         if (breakableBlocks.none()) {
           renderPlaceableBlock(world, ClientMain.inst().assets.canNotBreakTexture, mouseLocator.mouseBlockCompactLoc)
         } else {
@@ -68,7 +69,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
         }
       } else if (element is Material && !isBreaking) {
         val texture = element.textureRegion?.textureRegionOrNull ?: continue
-        val placeableBlocks = entity.placeableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.interactRadius, element)
+        val placeableBlocks = entity.placeableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.placeRadius, element)
         if (placeableBlocks.none()) {
           renderPlaceableBlock(world, ClientMain.inst().assets.canNotPlaceTexture, mouseLocator.mouseBlockCompactLoc)
         } else {
