@@ -42,7 +42,7 @@ class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer
       val horizontalEnd = chunksInView.horizontalEnd
       for (chunkX in horizontalStart until horizontalEnd) {
         val world = worldRender.world
-        val maybeLoadedChunk = world.getChunk(chunkX, chunkY, false)
+        val maybeLoadedChunk = world.getChunk(chunkX, chunkY, load = false)
         if (maybeLoadedChunk == null) {
           world.launchOnBox2d { world.loadChunk(chunkX, chunkY) }
           continue

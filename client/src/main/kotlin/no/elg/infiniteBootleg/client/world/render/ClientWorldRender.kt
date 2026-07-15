@@ -206,6 +206,6 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   override fun isInView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = chunksInView.isInView(chunkX, chunkY)
 
   override val chunkLocationsInView get() = chunkLocationsAlwaysInView + chunksInView.sequence()
-  override val chunkLocationsAlwaysInView: Sequence<Long> get() = sequenceOf(world.spawn.worldToChunk())
+  override val chunkLocationsAlwaysInView get() = sequenceOf(world.spawn.worldToChunk())
   override val chunkColumnsInView get() = chunksInView.chunkColumnsInView()
 }

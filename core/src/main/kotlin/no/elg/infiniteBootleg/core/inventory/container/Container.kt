@@ -133,7 +133,7 @@ interface Container : Iterable<IndexedItem> {
   fun remove(item: Item)
 
   /**
-   * Remove item at index
+   * Remove the item at [index]
    *
    * @throws IndexOutOfBoundsException if the index is less than 0 or greater than or equal to [size]
    */
@@ -168,15 +168,18 @@ interface Container : Iterable<IndexedItem> {
   operator fun get(index: Int): Item?
 
   /**
-   * Overwrite the given `Item` at `index`. If the given tile validate is `null`
-   * it is the same as calling [remove].
+   * Overwrite the given [item] at [index]
    *
    * @param index The index to place the `Item` at
    * @param item The Item to put at `index`
-   * @throws IndexOutOfBoundsException if the index is less than 0 or greater than or equal to [size]
+   * @throws IndexOutOfBoundsException if the index is less than `0` or greater than or equal to [size]
    */
   operator fun set(index: Int, item: Item?)
 
+  /**
+   * Swap the item at [index1] with item at [index2]
+   * @throws IndexOutOfBoundsException if either indices is less than `0` or greater than or equal to [size]
+   */
   fun swap(index1: Int, index2: Int)
 
   /**

@@ -336,7 +336,7 @@ private fun ServerClient.asyncHandleSpawnEntity(spawnEntity: Packets.SpawnEntity
 private fun ServerClient.asyncHandleUpdateChunk(updateChunk: UpdateChunk) {
   val entities = updateChunk.chunk.entitiesCount
   if (entities > 0) {
-    logger.warn { "Got $entities entities in chunk update" }
+    logger.warn { "Got $entities entities in chunk update (cant handle those yet)" }
   }
   val chunk = world.chunkLoader.loadChunkFromProto(updateChunk.chunk)
   if (chunk == null) {

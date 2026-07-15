@@ -87,7 +87,6 @@ import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.invalid
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.valid
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumnsManager
-import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
 import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEngine
 import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEntitySet
 import no.elg.infiniteBootleg.core.world.ecs.basicRequiredEntityFamily
@@ -548,7 +547,7 @@ abstract class World(
   /**
    * @param features What kind of top block to return
    * @return The block (including Air!) at the given local x, if `null` the chunk failed to load.
-   * @see no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag
+   * @see ChunkColumnFeatureFlag
    */
   fun getTopBlock(worldX: WorldCoord, features: ChunkColumnFeatureFlag): Block? = getChunkColumn(worldX.worldToChunk()).topBlock(worldX.chunkOffset(), features)
 
@@ -556,7 +555,7 @@ abstract class World(
    * @param worldX   The block column to query for the worldX for
    * @param features What kind of top block to return
    * @return The worldY coordinate of the top block of the given worldX
-   * @see no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag
+   * @see ChunkColumnFeatureFlag
    */
   fun getTopBlockWorldY(worldX: WorldCoord, features: ChunkColumnFeatureFlag): WorldCoord = getChunkColumn(worldX.worldToChunk()).topBlockHeight(worldX.chunkOffset(), features)
 
@@ -597,9 +596,9 @@ abstract class World(
     chunkToDispose?.dispose()
 
     if (chunkToDispose === chunk) {
-      logger.warn { "Unexpected chunk when updating chunk, will not write chunk. Given chunk will be disposed" }
+      logger.warn { "Unexpected chunk when updating chunk, will not write chunk. Given chunk was disposed" }
     } else if (chunkToDispose != null) {
-      logger.trace { "Swapping chunk at ${toReturn.compactLocation}" }
+      logger.trace { "Swapping chunk at ${stringifyCompactLoc(toReturn)}" }
     } else {
       // No old chunk to dispose, so this is a new chunk
       EventManager.dispatchEventAsync(ChunkLoadedEvent(toReturn, newlyGenerated))
@@ -679,7 +678,6 @@ abstract class World(
 
   /**
    * Load a chunk into memory, either from disk or generate the chunk from its position.
-   *
    *
    * A chunk will not be loaded if there exists a valid chunk at the chunk position.
    *
@@ -794,7 +792,7 @@ abstract class World(
    *
    * **note** this does not if there are entities at this location
    *
-   * @param worldLoc The world location to check
+   * @param compactWorldLoc The world location to check
    * @return If the block at the given location is air.
    */
   fun isAirBlock(compactWorldLoc: Long, loadChunk: Boolean = true, markerIsAir: Boolean? = null): Boolean =
@@ -1065,12 +1063,11 @@ abstract class World(
    * Note an air block will be created if the chunk is loaded and there is no other block at the
    * given location
    *
-   * @param worldX    The x coordinate from world view
-   * @param worldY    The y coordinate from world view
+   * @param worldCompactLoc    The compact coordinate from world view
    * @param loadChunk
    * @return The block at the given x and y
    */
-  fun getBlock(worldX: WorldCompactLoc, loadChunk: Boolean = true): Block? = getBlock(worldX.decompactLocX(), worldX.decompactLocY(), loadChunk)
+  fun getBlock(worldCompactLoc: WorldCompactLoc, loadChunk: Boolean = true): Block? = getBlock(worldCompactLoc.decompactLocX(), worldCompactLoc.decompactLocY(), loadChunk)
 
   /**
    * @return If the given chunk is loaded in memory

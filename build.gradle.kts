@@ -114,7 +114,7 @@ subprojects {
       freeCompilerArgs.add("-Xannotation-target-all")
       // https://kotlinlang.org/docs/whatsnew22.html#new-defaulting-rules-for-use-site-annotation-targets (experimental in 2.2)
       freeCompilerArgs.add("-Xannotation-default-target=param-property")
-      // kotlinlang.org/docs/whatsnew2220.html#support-for-reified-types-in-catch-clauses (experimental in 2.2.20)
+      // https://kotlinlang.org/docs/whatsnew2220.html#support-for-reified-types-in-catch-clauses (experimental in 2.2.20)
       freeCompilerArgs.add("-Xallow-reified-type-in-catch")
     }
   }

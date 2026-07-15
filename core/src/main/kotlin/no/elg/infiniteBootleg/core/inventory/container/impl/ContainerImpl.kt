@@ -245,8 +245,8 @@ open class ContainerImpl(override val name: String, final override val size: Int
   }
 
   override fun swap(index1: Int, index2: Int) {
-    require(index1 in 0 until size) { "Index out of bounds: $index1" }
-    require(index2 in 0 until size) { "Index out of bounds: $index2" }
+    require(index1 in 0 until size) { "Index 1 out of bounds: $index1" }
+    require(index2 in 0 until size) { "Index 2 out of bounds: $index2" }
     val item1 = content[index1]
     val item2 = content[index2]
     if (item1 != null || item2 != null) {
