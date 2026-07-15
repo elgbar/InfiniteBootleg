@@ -188,10 +188,6 @@ interface Container : Iterable<IndexedItem> {
     add(item)
   }
 
-  operator fun minusAssign(item: Item) {
-    remove(item)
-  }
-
   val type: ProtoContainer.Type
 
   companion object : ProtoConverter<Container, ProtoContainer> {
