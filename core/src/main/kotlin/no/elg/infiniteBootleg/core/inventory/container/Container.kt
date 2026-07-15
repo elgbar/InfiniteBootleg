@@ -92,27 +92,7 @@ interface Container : Iterable<IndexedItem> {
    * @return A list of all elements not added, the returned stack might not be valid.
    * @throws IllegalArgumentException if one of the `Item`s is `null`
    */
-  fun add(items: List<Item>): List<Item> {
-    if (items.isEmpty()) return emptyList()
-    val collector: MutableMap<ContainerElement, UInt> = HashMap()
-
-    // tally up how many we got of each type
-    for (stack in items) {
-      collector[stack.element] = collector.getOrDefault(stack.element, 0u) + stack.stock
-    }
-
-    val notAdded = mutableListOf<Item>()
-
-    // then add them all type by type
-    for ((element, stock) in collector) {
-      val failedToAdd = add(element, stock)
-      // if any elements failed to be added, add them here
-      if (failedToAdd > 0u) {
-        notAdded += element.toItem(stock = failedToAdd)
-      }
-    }
-    return notAdded
-  }
+  fun add(items: List<Item>): List<Item>
 
   /**
    * Check if there exists at least `amount` of the given element type in the container

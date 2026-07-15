@@ -5,8 +5,10 @@ import no.elg.infiniteBootleg.core.events.ContainerEvent
 import no.elg.infiniteBootleg.core.events.ItemChangeType
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.inventory.container.Container
+import no.elg.infiniteBootleg.core.inventory.container.Container.Companion.NOT_FOUND
 import no.elg.infiniteBootleg.core.inventory.container.IndexedItem
 import no.elg.infiniteBootleg.core.items.Item
+import no.elg.infiniteBootleg.core.util.IllegalAction
 import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
@@ -77,12 +79,56 @@ open class ContainerImpl(override val name: String, final override val size: Int
     }
   }
 
-  override fun removeAll(element: ContainerElement) = remove(element.toItem(UInt.MAX_VALUE, UInt.MAX_VALUE))
+  override fun add(items: List<Item>): List<Item> {
+    if (items.isEmpty()) return emptyList()
+    val (stateless, stateful) = items.partition { it.element.stateless }
+    val collector: MutableMap<ContainerElement, UInt> = HashMap()
+
+    // tally up how many we got of each type
+    for (stack in stateless) {
+      collector[stack.element] = collector.getOrDefault(stack.element, 0u) + stack.stock
+    }
+
+    val notAdded = mutableListOf<Item>()
+
+    // then add them all type by type
+    for ((element, stock) in collector) {
+      val failedToAdd = add(element, stock)
+      // if any elements failed to be added, add them here
+      if (failedToAdd > 0u) {
+        notAdded += element.toItem(stock = failedToAdd)
+      }
+    }
+    for (item in stateful) {
+      val indexOfFirstEmpty = indexOfFirstEmpty()
+      if (indexOfFirstEmpty == NOT_FOUND) {
+        notAdded += item
+      } else {
+        set(indexOfFirstEmpty, item)
+      }
+    }
+    return notAdded
+  }
+
+  override fun removeAll(element: ContainerElement) {
+    var removedStock = 0u
+    try {
+      for (i in content.indices) {
+        val item = content[i]
+        if (item?.element == element) {
+          removedStock += item.stock
+          content[i] = null
+        }
+      }
+    } finally {
+      updateContainer(removedItem = element.toItem(maxStock = UInt.MAX_VALUE, stock = removedStock))
+    }
+  }
 
   override fun remove(item: Item, amount: UInt): UInt {
     if (amount == 0u) return 0u
     val index = indexOfFirst { it === item }
-    if (item.isValid() && index != -1) {
+    if (item.isValid() && index != NOT_FOUND) {
       if (item.canBeUsed(amount)) {
         val newItem = item.remove(amount)
         set(index, newItem)
@@ -90,16 +136,28 @@ open class ContainerImpl(override val name: String, final override val size: Int
       } else {
         // we remove more than the item has, so we remove the item and then call the generic remove to remove the rest
         set(index, null)
-        return remove(item.element, amount - item.stock)
+        return if (item.element.stateless) {
+          remove(item.element, amount - item.stock)
+        } else {
+          amount - item.stock
+        }
       }
     } else {
       return remove(item.element, amount)
     }
   }
 
-  override fun remove(element: ContainerElement, amount: UInt): UInt {
+  override fun remove(element: ContainerElement, amount: UInt, allowStatefulRemoval: Boolean): UInt {
     if (amount == 0u) return 0u
     logger.debug { "Removing $amount of ${element.displayName}" }
+    if (!element.stateless) {
+      if (allowStatefulRemoval) {
+        logger.debug { "Element is stateful, but allowStatefulRemoval=true so it is allowed" }
+      } else {
+        IllegalAction.STACKTRACE.handle { "Tried to remove a stateful element, this is not allowed without setting allowStatefulRemoval=true in remove" }
+        return amount
+      }
+    }
     var stockToRemove = amount
     var i = 0
     val length = content.size

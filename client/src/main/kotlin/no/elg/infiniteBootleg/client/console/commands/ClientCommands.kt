@@ -169,7 +169,7 @@ class ClientCommands : CommonCommands() {
   @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun take(elementName: String, quantity: Int) {
     takeOrGive(elementName, quantity, "take", "give") { container, element ->
-      val notRemoved = container.remove(element, quantity.toUInt())
+      val notRemoved = container.remove(element, quantity.toUInt(), allowStatefulRemoval = true)
       if (notRemoved == 0u) {
         logger.info { "Took $quantity ${element.displayName} from player" }
       } else {
