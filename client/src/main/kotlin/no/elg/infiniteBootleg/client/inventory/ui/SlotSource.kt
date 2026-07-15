@@ -127,7 +127,8 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
     val sourceItem = sourceSlot.item ?: return false
     val targetItem = targetSlot.item
 
-    if (targetItem == null || targetItem.element != sourceItem.element) {
+    if (targetItem == null || targetItem.element != sourceItem.element || !sourceItem.element.stateless) {
+      // Stateful items cannot not be merged or split
       targetContainer[targetSlot.index] = sourceItem
       sourceContainer[sourceSlot.index] = targetItem
     } else if (targetItem.element == sourceItem.element) {
