@@ -36,6 +36,13 @@ class FullChunkLoader(override val world: World, generator: ChunkGenerator) : Ch
     }
     val protoChunk = readChunkFile(chunkX, chunkY)
     return if (protoChunk != null) {
+      val chunkPosition = protoChunk.position
+      if (chunkPosition.x != chunkX || chunkPosition.y != chunkY) {
+        logger.error { "Found a corrupt chunk ${stringifyCompactLoc(chunkX, chunkY)} it said it was the chunk at ${stringifyCompactLoc(chunkPosition)}" }
+        deleteChunkFile(chunkX, chunkY)
+        return null
+      }
+
       loadChunkFromProto(protoChunk)
     } else {
       logger.trace { "Chunk ${stringifyCompactLoc(chunkX, chunkY)} did not exist on file" }
