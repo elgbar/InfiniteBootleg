@@ -588,11 +588,7 @@ abstract class World(
         chunk
       }
     }
-
-    if (toReturn == null) {
-      logger.warn { "Failed to write chunk" }
-      throw IllegalStateException("Failed to write chunk")
-    }
+    checkNotNull(toReturn) { "Failed to write chunk ${stringifyCompactLoc(chunk)}" }
     if (chunkToDispose !== toReturn) {
       chunkToDispose?.dispose()
     }
