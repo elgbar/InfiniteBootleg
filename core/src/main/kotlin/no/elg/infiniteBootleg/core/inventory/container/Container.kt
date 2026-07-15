@@ -127,10 +127,12 @@ interface Container : Iterable<IndexedItem> {
 
   /**
    * Remove element stacks in the container that match the given element
+   * **Note!** Stock is not checked in the equally check
    *
    * @param item The item to remove
+   * @param item The item to remove (excluding stock-check)
    */
-  fun remove(item: Item)
+  fun removeAll(item: Item)
 
   /**
    * Remove the item at [index]

@@ -187,7 +187,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
     }
   }
 
-  override fun remove(item: Item) {
+  override fun removeAll(item: Item) {
     if ((validOnly && !item.isValid()) || item.stock == 0u) {
       return
     }
