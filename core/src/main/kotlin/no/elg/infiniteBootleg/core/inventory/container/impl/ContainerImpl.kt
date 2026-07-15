@@ -99,7 +99,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
 
   override fun remove(element: ContainerElement, amount: UInt): UInt {
     if (amount == 0u) return 0u
-    logger.debug { "Removing $amount of $element" }
+    logger.debug { "Removing $amount of ${element.displayName}" }
     var stockToRemove = amount
     var i = 0
     val length = content.size

@@ -1,16 +1,15 @@
 package no.elg.infiniteBootleg.core.inventory.container
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import no.elg.infiniteBootleg.core.inventory.container.Container.Companion.NOT_FOUND
 import no.elg.infiniteBootleg.core.inventory.container.impl.AutoSortedContainer
 import no.elg.infiniteBootleg.core.inventory.container.impl.ContainerImpl
 import no.elg.infiniteBootleg.core.items.Item
-import no.elg.infiniteBootleg.core.items.Item.Companion.DEFAULT_MAX_STOCK
 import no.elg.infiniteBootleg.core.items.Item.Companion.asProto
 import no.elg.infiniteBootleg.core.items.Item.Companion.fromProto
 import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.core.world.ecs.api.ProtoConverter
 import no.elg.infiniteBootleg.protobuf.ContainerKt
-import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.container
 import no.elg.infiniteBootleg.protobuf.itemOrNull
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Container as ProtoContainer
@@ -42,31 +41,31 @@ interface Container : Iterable<IndexedItem> {
   fun isNotEmpty(): Boolean = !isEmpty()
 
   /**
-   * @return The first empty slot in the container or -1 if none is found
+   * @return The first empty slot in the container or [NOT_FOUND] if there is no empty slot
    */
   fun indexOfFirstEmpty(): Int
 
   /**
    * @param element The element to match against
-   * @return The index of the first element of type `element` and where the stock is less than max stock or -1 if none is found
+   * @return The index of the first element of type `element` and where the stock is less than max stock, or [NOT_FOUND] if none is found
    */
   fun indexOfFirstNonFull(element: ContainerElement): Int
 
   /**
    * @param element The element to match against
-   * @return The index of in the container where the [element] can be added
+   * @return The index of in the container where the [element] can be added, or [NOT_FOUND] if the container does not contain such item
    */
-  fun indexOfFirstCanAdd(element: ContainerElement): Int = indexOfFirstNonFull(element).let { if (it < 0) indexOfFirstEmpty() else it }
+  fun indexOfFirstCanAdd(element: ContainerElement): Int = indexOfFirstNonFull(element).let { if (it == NOT_FOUND) indexOfFirstEmpty() else it }
 
   /**
    * @param element The element to match against
-   * @return The index of the first element of type `element` or -1 if none is found
+   * @return The index of the first element of type `element` or [NOT_FOUND] if the container does not contain such item
    */
   fun indexOfFirst(element: ContainerElement): Int
 
   /**
    * @param filter The filter to match against
-   * @return The index of the first slot that matches the given filter
+   * @return The index of the first slot that matches the given filter, or [NOT_FOUND] if the container does not contain such item
    */
   fun indexOfFirst(filter: (Item?) -> Boolean): Int
 
@@ -109,7 +108,7 @@ interface Container : Iterable<IndexedItem> {
       val failedToAdd = add(element, stock)
       // if any elements failed to be added, add them here
       if (failedToAdd > 0u) {
-        notAdded += element.toItem(DEFAULT_MAX_STOCK, failedToAdd)
+        notAdded += element.toItem(stock = failedToAdd)
       }
     }
     return notAdded
@@ -149,7 +148,7 @@ interface Container : Iterable<IndexedItem> {
   /**
    * Remove element stacks in the container that match the given element
    *
-   * @param Item The item to remove
+   * @param item The item to remove
    */
   fun remove(item: Item)
 
@@ -177,7 +176,7 @@ interface Container : Iterable<IndexedItem> {
     if (element == null || size < 0) {
       return false
     }
-    return contains(element.toItem(DEFAULT_MAX_STOCK, size.toUInt()))
+    return contains(element.toItem(stock = size.toUInt()))
   }
 
   /**
@@ -193,7 +192,7 @@ interface Container : Iterable<IndexedItem> {
    * it is the same as calling [remove].
    *
    * @param index The index to place the `Item` at
-   * @param Item The Item to put at `index`
+   * @param item The Item to put at `index`
    * @throws IndexOutOfBoundsException if the index is less than 0 or greater than or equal to [size]
    */
   operator fun set(index: Int, item: Item?)
@@ -218,10 +217,12 @@ interface Container : Iterable<IndexedItem> {
   companion object : ProtoConverter<Container, ProtoContainer> {
     private val logger = KotlinLogging.logger {}
 
-    override fun ProtoWorld.Container.fromProto(): Container =
+    const val NOT_FOUND = -1
+
+    override fun ProtoContainer.fromProto(): Container =
       when (type) {
-        ProtoWorld.Container.Type.GENERIC -> ContainerImpl(name, maxSize)
-        ProtoWorld.Container.Type.AUTO_SORTED -> AutoSortedContainer(name, maxSize)
+        ProtoContainer.Type.GENERIC -> ContainerImpl(name, maxSize)
+        ProtoContainer.Type.AUTO_SORTED -> AutoSortedContainer(name, maxSize)
         else -> ContainerImpl(name, maxSize).also { logger.error { "Unknown container type $type" } }
       }.apply {
         // note: if an index does not exist in the proto, the slot is implicitly empty
@@ -230,7 +231,7 @@ interface Container : Iterable<IndexedItem> {
         }
       }
 
-    override fun Container.asProto(): ProtoWorld.Container =
+    override fun Container.asProto(): ProtoContainer =
       container {
         maxSize = this@asProto.size
         name = this@asProto.name
