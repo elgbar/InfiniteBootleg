@@ -96,7 +96,8 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
 
     val draggingItem = sourceSlot.item ?: return false
     val targetItem = targetSlot.item ?: if (splitStack) draggingItem.element.toItem(stock = 0u) else null
-    if (targetItem?.element != draggingItem.element) {
+    if (targetItem?.element != draggingItem.element || !draggingItem.element.stateless) {
+      // Stateful items cannot not be merged or split
       container.swap(targetSlot.index, sourceSlot.index)
     } else {
       // cannot split stack when stock is size 1
