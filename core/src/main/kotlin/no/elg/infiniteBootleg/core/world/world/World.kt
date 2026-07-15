@@ -593,7 +593,9 @@ abstract class World(
       logger.warn { "Failed to write chunk" }
       throw IllegalStateException("Failed to write chunk")
     }
-    chunkToDispose?.dispose()
+    if (chunkToDispose !== toReturn) {
+      chunkToDispose?.dispose()
+    }
 
     if (chunkToDispose === chunk) {
       logger.warn { "Unexpected chunk when updating chunk, will not write chunk. Given chunk was disposed" }
