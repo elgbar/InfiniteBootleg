@@ -29,6 +29,8 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
     check(gems.isNotEmpty()) { "A staff must have at least one gem" }
   }
 
+  override val stateless: Boolean get() = false
+
   override val displayName: String
     get() = wood.displayName
 

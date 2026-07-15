@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Element.ToolElement as ProtoTo
 @Suppress("unused")
 sealed interface Tool<DATA : ToolData> : TexturedContainerElement {
   override val itemType: ItemType get() = ItemType.TOOL
+  override val stateless: Boolean get() = false
 
   /**
    * The categories this tool works better on

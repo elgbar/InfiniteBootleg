@@ -111,6 +111,8 @@ sealed interface Material : ContainerElement {
 
   val category: MaterialCategory?
 
+  override val stateless: Boolean get() = true
+
   override val itemType: ItemType get() = ItemType.BLOCK
   override fun toItem(maxStock: UInt, stock: UInt): MaterialItem = MaterialItem(this, maxStock, stock)
 //  val textureName: String? get() = if (canBeHandled) if (customTextureName != null) customTextureName else this::class.simpleName. else null

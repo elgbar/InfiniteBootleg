@@ -17,6 +17,11 @@ sealed interface ContainerElement {
 
   val itemType: ItemType
 
+  /**
+   * If container element does not hold a state
+   */
+  val stateless: Boolean
+
   val displayName: String get() = (this as? Enum<*>)?.name ?: this::class.simpleName ?: itemType.name
 
   fun toItem(maxStock: UInt = Item.DEFAULT_MAX_STOCK, stock: UInt = Item.DEFAULT_MAX_STOCK): Item
