@@ -95,16 +95,18 @@ interface Container : Iterable<IndexedItem> {
   fun add(items: List<Item>): List<Item>
 
   /**
-   * Check if there exists at least `amount` of the given element type in the container
+   * Check if there exists at least [amount] of the given element type in the container. Does not care for the statefulness of the [ContainerElement]
    */
   fun exists(element: ContainerElement, amount: UInt): Boolean
 
   /**
-   * Count how many of the given element type is in the container
+   * Count how many of the given element type is in the container. Does not care for the statefulness of the [ContainerElement]
    */
   fun count(element: ContainerElement): UInt
 
-  /** Remove all element stacks with the given element type  */
+  /**
+   *  Remove all element stacks with the given element type. Will remove stateful [ContainerElement]s.
+   */
   fun removeAll(element: ContainerElement)
 
   /**
@@ -112,24 +114,25 @@ interface Container : Iterable<IndexedItem> {
    *
    * @param amount How many to remove
    * @param element What element to remove
+   * @param allowStatefulRemoval Allow the method to remove stateful items. Normally this is bad, as it simply removed the first [amount] of elements.
    * @return How many elements that were not removed, i.e., `0u` means everything was removed
    */
-  fun remove(element: ContainerElement, amount: UInt): UInt
+  fun remove(element: ContainerElement, amount: UInt, allowStatefulRemoval: Boolean = false): UInt
 
   /**
-   * Remove `amount` of the given item's element type
+   * Remove `amount` of the given item's element type.
    *
    * @param amount How many to remove
    * @param item What item's element to remove
-   * @return How many elements that were not removed, i.e., `0u` means everything was removed
+   * @return How many stacks of the item that were **not** removed, i.e., `0u` means everything was removed. If the item is a [ContainerElement.stateless], then more than the item might be removed. If the item is not [ContainerElement.stateless], then only the item will be removed and
    */
   fun remove(item: Item, amount: UInt): UInt
 
   /**
-   * Remove element stacks in the container that match the given element
+   * Remove all [Item]s in the container that is equal the given [item].
+   *
    * **Note!** Stock is not checked in the equally check
    *
-   * @param item The item to remove
    * @param item The item to remove (excluding stock-check)
    */
   fun removeAll(item: Item)
