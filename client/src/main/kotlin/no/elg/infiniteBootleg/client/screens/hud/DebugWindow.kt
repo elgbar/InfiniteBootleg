@@ -188,7 +188,7 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           { false },
           {
             world.readChunks { readableChunks ->
-              readableChunks.values().mapNotNull { it as? TexturedChunk }.forEach { it.queueForRendering(false) }
+              readableChunks.values.filterIsInstance<TexturedChunk>().forEach { it.queueForRendering(false) }
             }
           }
         )

@@ -1,8 +1,6 @@
 package no.elg.infiniteBootleg.core.world.ecs.system
 
 import com.badlogic.ashley.core.EntitySystem
-import com.badlogic.gdx.utils.LongMap
-import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
@@ -15,9 +13,6 @@ private val logger = KotlinLogging.logger {}
 
 class ChunkTickSystem(private val world: World) : EntitySystem(UPDATE_PRIORITY_LAST) {
 
-  @GuardedBy("world.chunksLock")
-  private val chunkIterator: LongMap.Entries<Chunk> = world.createChunkIterator()
-
   override fun update(deltaTime: Float) {
     val tps = world.worldTicker.tps
     val chunkUnloadTime = tps * CHUNK_UNLOAD_SECONDS
@@ -28,12 +23,11 @@ class ChunkTickSystem(private val world: World) : EntitySystem(UPDATE_PRIORITY_L
       !chunk.isDisposed && chunk.allowedToUnload && world.render.isOutOfView(chunk) && (chunk is ViewableChunk && tick - chunk.lastViewedTick > chunkUnloadTime)
 
     world.readChunks {
-      chunkIterator.reset()
-      while (chunkIterator.hasNext()) {
-        val chunk: Chunk? = chunkIterator.next().value
+      val iterator = it.values
+      for (chunk: Chunk? in iterator) {
         if (chunk == null) {
           logger.warn { "Found null chunk when ticking world" }
-          chunkIterator.remove()
+          iterator.remove(null)
         } else if (chunk.isDisposed) {
           logger.warn { "Found disposed chunk ${stringifyCompactLoc(chunk)} when ticking world" }
           launchOnAsyncSuspendable {

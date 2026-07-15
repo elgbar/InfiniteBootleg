@@ -207,7 +207,7 @@ abstract class World(
    */
   @get:GuardedBy("chunksLock")
   @GuardedBy("chunksLock")
-  private val chunks = LongMap<Chunk>()
+  private val chunks = Long2ObjectOpenHashMap<Chunk>()
 
   private val chunksLock: StampedLock = StampedLock()
 
@@ -284,7 +284,7 @@ abstract class World(
     EventManager.oneShotListener<InitialChunksOfWorldLoadedEvent> {
       launchOnMainSuspendable {
         readChunks { readableChunks ->
-          readableChunks.values().forEach(Chunk::updateAllBlockLights)
+          readableChunks.values.forEach(Chunk::updateAllBlockLights)
         }
         if (Main.isAuthoritative) {
           // Add a delay to make sure the light is calculated
@@ -400,11 +400,9 @@ abstract class World(
     updateSavePeriod()
   }
 
-  fun createChunkIterator(): LongMap.Entries<Chunk> = LongMap.Entries(chunks)
+  fun readChunks(onFailure: (() -> Unit)? = null, action: (readableChunks: Long2ObjectMap<Chunk>) -> Unit): Unit = readChunks<Unit>(onFailure ?: { }, action)
 
-  fun readChunks(onFailure: (() -> Unit)? = null, action: (readableChunks: LongMap<Chunk>) -> Unit): Unit = readChunks<Unit>(onFailure ?: { }, action)
-
-  fun <R> readChunks(onFailure: () -> R, action: (readableChunks: LongMap<Chunk>) -> R): R {
+  fun <R> readChunks(onFailure: () -> R, action: (readableChunks: Long2ObjectMap<Chunk>) -> R): R {
     contract { callsInPlace(action, InvocationKind.AT_MOST_ONCE) }
     assertNotDisposed()
     chunkReads.incrementAndGet()
@@ -421,7 +419,7 @@ abstract class World(
     }
   }
 
-  private fun <R> writeChunks(onFailure: (() -> R?)? = null, action: (writableChunks: LongMap<Chunk>) -> R): R? {
+  private fun <R> writeChunks(onFailure: (() -> R?)? = null, action: (writableChunks: Long2ObjectMap<Chunk>) -> R): R? {
     contract { callsInPlace(action, InvocationKind.AT_MOST_ONCE) }
     assertNotDisposed()
     chunkWrites.incrementAndGet()
@@ -438,7 +436,7 @@ abstract class World(
     }
   }
 
-  fun <R> readChunks(timeoutMillis: Long, onFailure: (() -> R?)? = null, onSuccess: (readableChunks: LongMap<Chunk>) -> R?): R? {
+  fun <R> readChunks(timeoutMillis: Long, onFailure: (() -> R?)? = null, onSuccess: (readableChunks: Long2ObjectMap<Chunk>) -> R?): R? {
     contract { callsInPlace(onSuccess, InvocationKind.AT_MOST_ONCE) }
     assertNotDisposed()
     chunkReads.incrementAndGet()
@@ -515,7 +513,7 @@ abstract class World(
     readChunks { readableChunks ->
       val chunkLoader = chunkLoader
       if (chunkLoader is FullChunkLoader) {
-        for (chunk in readableChunks.values()) {
+        for (chunk in readableChunks.values) {
           chunkLoader.save(chunk)
         }
       }
@@ -1086,7 +1084,7 @@ abstract class World(
     get() {
       return readChunks<GdxArray<Chunk>>({ GdxArray<Chunk>(0) }) { readableChunks ->
         val loadedChunks = GdxArray<Chunk>(true, readableChunks.size)
-        for (chunk in readableChunks.values()) {
+        for (chunk in readableChunks.values) {
           if (chunk != null && chunk.isNotDisposed) {
             loadedChunks.add(chunk)
           }
@@ -1361,7 +1359,7 @@ abstract class World(
     logger.debug { "Switching thread for disposal of $this to physics thread" }
     val job = ThreadType.PHYSICS.launchOrRunSuspended(this) {
       writeChunks { writableChunks ->
-        writableChunks.values().forEach(Chunk::dispose)
+        writableChunks.values.forEach(Chunk::dispose)
         writableChunks.clear()
       }
 

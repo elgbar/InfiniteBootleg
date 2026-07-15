@@ -103,13 +103,13 @@ abstract class ClientWorld : World {
 
   fun recalculateLights() {
     readChunks { readableChunks ->
-      readableChunks.values().forEach(Chunk::updateAllBlockLights)
+      readableChunks.values.forEach(Chunk::updateAllBlockLights)
     }
   }
 
   fun redraw() {
     readChunks { readableChunks ->
-      readableChunks.values().forEach(Chunk::dirty)
+      readableChunks.values.forEach(Chunk::dirty)
     }
   }
 }

@@ -224,7 +224,7 @@ class ClientCommands : CommonCommands() {
     val world = world ?: return
 
     world.readChunks { readableChunks ->
-      readableChunks.values().forEach {
+      readableChunks.values.forEach {
         if (Settings.renderLight) {
           it.updateAllBlockLights()
         }
