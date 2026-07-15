@@ -47,13 +47,13 @@ interface Container : Iterable<IndexedItem> {
 
   /**
    * @param element The element to match against
-   * @return The index of the first element of type `element` and where the stock is less than max stock, or [NOT_FOUND] if none is found
+   * @return The index of the first element of type `element` and where the stock is less than max stock, or [NOT_FOUND] if either none is found or the [element] is not [ContainerElement.stateless]
    */
   fun indexOfFirstNonFull(element: ContainerElement): Int
 
   /**
    * @param element The element to match against
-   * @return The index of in the container where the [element] can be added, or [NOT_FOUND] if the container does not contain such item
+   * @return The index of in the container where the [element] can be added, or [NOT_FOUND] if there is no slot to add the element to
    */
   fun indexOfFirstCanAdd(element: ContainerElement): Int = indexOfFirstNonFull(element).let { if (it == NOT_FOUND) indexOfFirstEmpty() else it }
 

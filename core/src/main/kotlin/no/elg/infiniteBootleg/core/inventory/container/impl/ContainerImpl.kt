@@ -27,7 +27,13 @@ open class ContainerImpl(override val name: String, final override val size: Int
   }
 
   override fun indexOfFirstEmpty(): Int = content.indexOfFirst { it == null }
-  override fun indexOfFirstNonFull(element: ContainerElement): Int = content.indexOfFirst { it?.element == element && it.stock < it.maxStock }
+  override fun indexOfFirstNonFull(element: ContainerElement): Int =
+    if (element.stateless) {
+      content.indexOfFirst { it?.element == element && it.stock < it.maxStock }
+    } else {
+      NOT_FOUND
+    }
+
   override fun indexOfFirst(element: ContainerElement): Int = content.indexOfFirst { it?.element == element }
 
   override fun indexOfFirst(filter: (Item?) -> Boolean): Int = content.indexOfFirst(filter)
