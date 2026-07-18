@@ -5,6 +5,7 @@ import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.compactInt
+import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.toProtoEntityRef
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.blocks.Block
@@ -39,7 +40,7 @@ sealed interface ContainerOwner {
   }
 
   data class BlockOwner(val loc: WorldCompactLoc) : ContainerOwner {
-    override fun toInterfaceId() = "{loc=$loc}"
+    override fun toInterfaceId() = "{loc=${stringifyCompactLoc(loc)}}"
 
     /**
      * Check if the owner is valid in the given world
