@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.items.Item.Companion.displayName
 import no.elg.infiniteBootleg.core.items.Item.Companion.stockText
 import no.elg.infiniteBootleg.core.world.blocks.Block
+import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 
 object HeldBlockRenderer {
@@ -26,10 +27,15 @@ object HeldBlockRenderer {
   fun render(screenRenderer: ScreenRenderer, world: ClientWorld) {
     val entity = world.controlledPlayerEntities.firstOrNull() ?: return
     val item = entity.selectedItem ?: return
+    val stockText: String = if (item.element.stateless) {
+      entity.containerOrNull?.let { "${item.stock} (${it.count(item.element)})" } ?: item.stockText
+    } else {
+      item.stockText
+    }
     val texture = item.element.textureRegion?.textureRegionOrNull ?: ClientMain.inst().assets.breakableBlockTexture.textureRegion
     with(screenRenderer) {
       batch.draw(texture, Gdx.graphics.width - x4Block, Gdx.graphics.height - x3Block, x2Block, x2Block)
-      layout.setText(font, "${item.displayName}\n${item.stockText}", Color.WHITE, x10Block, Align.center, true)
+      layout.setText(font, "${item.displayName}\n$stockText", Color.WHITE, x10Block, Align.center, true)
       font.draw(batch, layout, Gdx.graphics.width - x10Block - blockScale / 2, Gdx.graphics.height - x4Block)
     }
   }
