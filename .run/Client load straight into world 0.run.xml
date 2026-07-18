@@ -3,7 +3,7 @@
     <option name="MAIN_CLASS_NAME" value="no.elg.infiniteBootleg.client.ClientLauncherKt" />
     <module name="InfiniteBootleg.client.main" />
     <option name="PROGRAM_PARAMETERS" value="--run_cmd=&quot;loadworld 0 false&quot;" />
-    <option name="VM_PARAMETERS" value="-XX:+UseZGC -XX:+UseStringDeduplication " />
+    <option name="VM_PARAMETERS" value="-XX:+UseZGC -XX:+UseStringDeduplication --enable-native-access=ALL-UNNAMED" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/core/src/main/resources" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="false" />
