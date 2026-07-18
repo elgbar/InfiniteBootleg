@@ -133,6 +133,8 @@ object Settings {
 
   var validateEntityFamilies = true
 
+  const val LOG_PACKET_SECRET = false
+
   var handleWrongThreadAsyncEvents: IllegalAction = IllegalAction.STACKTRACE
   var handleChangingBlockInDeposedChunk: IllegalAction = IllegalAction.STACKTRACE
   var handleInvalidBox2dRef: IllegalAction = IllegalAction.STACKTRACE

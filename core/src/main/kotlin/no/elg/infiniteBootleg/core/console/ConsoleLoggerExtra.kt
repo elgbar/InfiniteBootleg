@@ -5,6 +5,7 @@ import io.github.oshai.kotlinlogging.Marker
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.util.singleLinePrinter
 import no.elg.infiniteBootleg.protobuf.Packets
+import no.elg.infiniteBootleg.protobuf.copy
 
 private val logger = KotlinLogging.logger {}
 
@@ -28,6 +29,13 @@ fun temporallyFilterPacket(vararg packets: Packets.Packet.Type, block: () -> Uni
 
 fun logPacket(directionMarker: Marker, packet: Packets.Packet) {
   if (Settings.logPackets && packet.type !in filterOutPackets) {
-    logger.debug(directionMarker) { singleLinePrinter.printToString(packet) }
+    logger.debug(directionMarker) {
+      val maskedPacket = if (Settings.LOG_PACKET_SECRET) {
+        packet
+      } else {
+        packet.copy { clearSecret() }
+      }
+      singleLinePrinter.printToString(maskedPacket)
+    }
   }
 }
