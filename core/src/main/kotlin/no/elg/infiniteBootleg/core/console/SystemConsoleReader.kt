@@ -9,31 +9,29 @@ import java.util.Scanner
 private val logger = KotlinLogging.logger {}
 
 /** Read input from [System.console] or [System. in] if no console exists.  */
-class SystemConsoleReader(private val consoleHandler: GameConsoleHandler) :
-  Runnable,
-  Disposable {
-  private var running = false
-  fun start() {
-    val thread = Thread(this, "System Console Reader Thread")
-    thread.isDaemon = true
-    thread.start()
-  }
+class SystemConsoleReader(private val consoleHandler: GameConsoleHandler) : Disposable {
 
-  override fun run() {
-    if (running) {
-      return
-    }
-    running = true
-    val scanner = System.console()?.run(Console::reader)?.let(::Scanner) ?: Scanner(System.`in`)
-    scanner.use { openScanner ->
-      while (running) {
-        var read: String?
-        try {
-          read = openScanner.nextLine()
-          launchOnMainSuspendable { consoleHandler.execCommand(read) }
-        } catch (e: Exception) {
-          logger.error(e) { "Console reader closed due to exception" }
-          dispose()
+  private var running = false
+  private var started = false
+
+  fun start() {
+    require(!started) { "cannot start SystemConsoleReader twice" }
+    started = true
+    Thread.ofPlatform().daemon().name("System Console Reader Thread").start {
+      running = true
+      val scanner = System.console()?.run(Console::reader)?.let(::Scanner) ?: Scanner(System.`in`)
+      scanner.use { openScanner ->
+        while (running) {
+          var read: String?
+          try {
+            if (openScanner.hasNextLine()) {
+              read = openScanner.nextLine()
+              launchOnMainSuspendable { consoleHandler.execCommand(read) }
+            }
+          } catch (e: Exception) {
+            logger.error(e) { "Console reader closed due to exception" }
+            dispose()
+          }
         }
       }
     }
