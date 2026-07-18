@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.math.Vector2
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.console.logPacket
-import no.elg.infiniteBootleg.core.console.serverSideServerBoundMarker
 import no.elg.infiniteBootleg.core.console.temporallyFilterPacket
 import no.elg.infiniteBootleg.core.events.api.ThreadType.PHYSICS
 import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner
@@ -72,6 +71,7 @@ import no.elg.infiniteBootleg.protobuf.updateBlockOrNull
 import no.elg.infiniteBootleg.protobuf.updateSelectedSlotOrNull
 import no.elg.infiniteBootleg.protobuf.worldSettingsOrNull
 import no.elg.infiniteBootleg.server.ServerMain
+import no.elg.infiniteBootleg.server.console.serverSideServerBoundMarker
 import no.elg.infiniteBootleg.server.world.ecs.components.transients.LastPositionComponent.Companion.lastPositionUpdatedComponent
 import no.elg.infiniteBootleg.server.world.ecs.components.transients.ServerClientChunksInViewComponent.Companion.chunksInView
 import no.elg.infiniteBootleg.server.world.loader.ServerWorldLoader

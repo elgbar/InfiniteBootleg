@@ -7,11 +7,11 @@ import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.channel.group.ChannelGroup
 import io.netty.channel.group.DefaultChannelGroup
 import io.netty.util.concurrent.GlobalEventExecutor
-import no.elg.infiniteBootleg.core.console.serverSideClientBoundMarker
 import no.elg.infiniteBootleg.core.net.ChannelHandlerContextWrapper
 import no.elg.infiniteBootleg.core.net.SharedInformation
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.server.ServerMain
+import no.elg.infiniteBootleg.server.console.serverSideClientBoundMarker
 import java.util.concurrent.ConcurrentHashMap
 
 private val logger = KotlinLogging.logger {}
