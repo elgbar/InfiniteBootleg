@@ -20,18 +20,17 @@ class ECSInputListener(val world: World) :
   }
 
   private val buttonsDownSet: MutableSet<Int> = CopyOnWriteArraySet()
-  private val keysDownSet: MutableSet<Int> = CopyOnWriteArraySet()
-
-  val keysDown: Set<Int> get() = keysDownSet
+  val keysDown: Set<Int>
+    field: MutableSet<Int> = CopyOnWriteArraySet()
 
   override fun keyDown(keycode: Int): Boolean {
-    keysDownSet += keycode
+    keysDown += keycode
     handleEvent(InputEvent.KeyDownEvent(keycode))
     return handleEvent(InputEvent.KeyIsDownEvent(keycode))
   }
 
   override fun keyUp(keycode: Int): Boolean {
-    keysDownSet -= keycode
+    keysDown -= keycode
     // handleEvent(InputEvent.KeyUpEvent(keycode))
     return false
   }
