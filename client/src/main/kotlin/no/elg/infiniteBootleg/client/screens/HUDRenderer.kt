@@ -29,6 +29,7 @@ class HUDRenderer :
   private var modus = DISPLAY_CURRENT_BLOCK or DISPLAY_CONTAINER_CHANGE
   private val builder = StringBuilder()
   val containerChangeRenderer = ContainerChangeRenderer()
+  private val heldBlockRenderer = HeldBlockRenderer()
 
   init {
     modus = modus or if (Settings.debug) DISPLAY_DEBUG else DISPLAY_NOTHING
@@ -70,7 +71,7 @@ class HUDRenderer :
         sr.drawTop(builder.toString(), 1f)
       }
       if (hasMode(DISPLAY_CURRENT_BLOCK)) {
-        HeldBlockRenderer.render(sr, world)
+        heldBlockRenderer.render(sr, world)
       }
       if (hasMode(DISPLAY_CONTAINER_CHANGE)) {
         containerChangeRenderer.render()
@@ -107,6 +108,7 @@ class HUDRenderer :
 
   override fun dispose() {
     containerChangeRenderer.dispose()
+    heldBlockRenderer.dispose()
   }
 
   companion object {

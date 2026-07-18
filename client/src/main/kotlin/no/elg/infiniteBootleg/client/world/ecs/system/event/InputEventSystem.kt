@@ -14,6 +14,8 @@ import no.elg.infiniteBootleg.client.util.isAltPressed
 import no.elg.infiniteBootleg.client.util.placeBlocks
 import no.elg.infiniteBootleg.client.util.setVel
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
+import no.elg.infiniteBootleg.core.events.HotbarItemScrolled
+import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.core.items.ToolItem
@@ -157,7 +159,9 @@ object InputEventSystem : EventSystem<InputEvent, InputEventQueueComponent>(
 
   private fun WorldEntity.updateSelectedItem(hotbarComponent: HotbarComponent, slot: HotbarSlot) {
     ThreadType.PHYSICS.launchOrRun(world) {
+      val oldSlot = hotbarComponent.selected
       hotbarComponent.selected = slot
+      EventManager.dispatchEvent(HotbarItemScrolled(oldSlot, slot))
       ClientMain.inst().serverClient.sendServerBoundPacket { serverBoundUpdateSelectedSlot(slot) }
     }
   }
