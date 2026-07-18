@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.core.events.api
 
-import no.elg.infiniteBootleg.core.events.api.RegisteredEventListener.Companion.createRegisteredEventListener
 import kotlin.reflect.KClass
 
 /**

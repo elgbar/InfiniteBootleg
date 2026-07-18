@@ -125,10 +125,6 @@ import no.elg.infiniteBootleg.core.world.managers.container.WorldContainerManage
 import no.elg.infiniteBootleg.core.world.render.WorldRender
 import no.elg.infiniteBootleg.core.world.ticker.CommonWorldTicker
 import no.elg.infiniteBootleg.core.world.ticker.WorldTicker
-import no.elg.infiniteBootleg.core.world.world.World.Companion.forEachCompactLocationInAABBFromCenter
-import no.elg.infiniteBootleg.core.world.world.World.Companion.forEachLocationInAABBFromCenter
-import no.elg.infiniteBootleg.core.world.world.World.Companion.forEachNonCompactLocationInAABBFromCenter
-import no.elg.infiniteBootleg.core.world.world.World.Companion.getLocationsAABBFromCenter
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.WorldKt

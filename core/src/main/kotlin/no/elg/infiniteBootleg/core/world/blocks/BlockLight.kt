@@ -18,7 +18,6 @@ import no.elg.infiniteBootleg.core.util.dst2
 import no.elg.infiniteBootleg.core.world.Material.Companion.emitsLight
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
-import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.LIGHT_RESOLUTION
 import no.elg.infiniteBootleg.core.world.blocks.LightMap.Companion.Brightness
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn

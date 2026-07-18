@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.core.inventory.container
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.core.inventory.container.Container.Companion.NOT_FOUND
 import no.elg.infiniteBootleg.core.inventory.container.impl.AutoSortedContainer
 import no.elg.infiniteBootleg.core.inventory.container.impl.ContainerImpl
 import no.elg.infiniteBootleg.core.items.Item

@@ -9,7 +9,6 @@ import no.elg.infiniteBootleg.core.world.ecs.api.TagLoadableMapper
 import no.elg.infiniteBootleg.core.world.ecs.api.TagSavableComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dOrNull
-import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 

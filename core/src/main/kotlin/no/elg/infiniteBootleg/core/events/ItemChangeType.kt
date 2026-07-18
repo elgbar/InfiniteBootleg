@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.core.events
 
-import no.elg.infiniteBootleg.core.events.ItemStockChangeType.Companion.calculateStockChange
 import no.elg.infiniteBootleg.core.items.Item
 import no.elg.infiniteBootleg.core.util.IllegalAction
 

@@ -3,8 +3,6 @@ package no.elg.infiniteBootleg.core.events.api
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.core.events.api.EventManager.dispatchEvent
-import no.elg.infiniteBootleg.core.events.api.EventManager.dispatchEventAsync
 import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnEventsSuspendable
 import java.lang.Boolean.TRUE

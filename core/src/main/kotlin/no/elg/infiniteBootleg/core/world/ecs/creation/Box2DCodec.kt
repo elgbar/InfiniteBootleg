@@ -14,7 +14,6 @@ import com.badlogic.gdx.math.Vector2
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.ashley.EngineEntity
 import ktx.ashley.plusAssign
-import no.elg.infiniteBootleg.core.util.EntityFlags.enableFlag
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.isInvalid
 import no.elg.infiniteBootleg.core.util.toRadians

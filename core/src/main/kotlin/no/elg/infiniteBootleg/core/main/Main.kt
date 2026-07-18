@@ -9,7 +9,6 @@ import no.elg.infiniteBootleg.core.net.PacketSender
 import no.elg.infiniteBootleg.core.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkFactory
 import no.elg.infiniteBootleg.core.world.world.World
-import java.io.File
 import java.time.Instant
 
 /**
