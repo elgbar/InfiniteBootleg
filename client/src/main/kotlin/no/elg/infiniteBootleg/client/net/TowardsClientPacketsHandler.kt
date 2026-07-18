@@ -27,6 +27,7 @@ import no.elg.infiniteBootleg.core.net.serverBoundHeartbeat
 import no.elg.infiniteBootleg.core.net.serverBoundPacketBuilder
 import no.elg.infiniteBootleg.core.util.chunkOffset
 import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
+import no.elg.infiniteBootleg.core.util.launchOnBox2d
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.util.toCompact
@@ -128,7 +129,7 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
 
     CB_LOGIN_STATUS -> packet.serverLoginStatusOrNull?.let { handleLoginStatus(it) }
 
-    CB_INITIAL_CHUNKS_SENT -> handleInitialChunkSent()
+    CB_INITIAL_CHUNKS_SENT -> world.launchOnBox2d { handleInitialChunkSent() }
 
     // Misc packets
     DX_DISCONNECT -> handleDisconnect(packet.disconnectOrNull)
