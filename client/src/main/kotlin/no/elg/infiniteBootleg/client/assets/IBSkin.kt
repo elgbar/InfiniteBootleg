@@ -52,7 +52,7 @@ fun InfAssets.loadInfBootSkin() {
       window(extend = "default") { titleFont = boldNotFlippedFont }
       window(extend = "resizable") { titleFont = boldNotFlippedFont }
       window(extend = "noborder") { titleFont = boldNotFlippedFont }
-      window(extend = "dialog") { titleFont = boldNotFlippedFont }
+//      window(extend = "dialog") { titleFont = boldNotFlippedFont } //adding this makes the background darker !?!?!?
 
       selectBox(extend = "default") { font = notFlippedFont }
 
