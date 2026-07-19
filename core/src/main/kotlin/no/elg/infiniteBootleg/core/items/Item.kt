@@ -32,11 +32,6 @@ sealed interface Item {
   val stock: UInt
 
   /**
-   * The type of this item
-   */
-  val itemType: ItemType
-
-  /**
    * Use the item by [usages] amount, removes [stock] from the item
    *
    * @return The resulting item, or `null` if the item would be depleted
@@ -111,6 +106,11 @@ sealed interface Item {
     val Item?.displayName: String get() = this?.run { element.displayName.lowercase().toTitleCase().replace('_', ' ') } ?: "<Empty>"
     val Item?.fullName: String get() = "$displayName ($stockText)"
 
+    /**
+     * The type of this item
+     */
+    val Item.itemType: ItemType get() = element.itemType
+
     fun mergeAll(items: List<Item>, newElementMaxStock: UInt = DEFAULT_MAX_STOCK): List<Item> {
       if (items.isEmpty()) {
         return items
@@ -149,8 +149,7 @@ sealed interface Item {
 
     private fun Item.elementAsProto(): ProtoElement =
       element {
-        val item = this@elementAsProto
-        when (item) {
+        when (val item = this@elementAsProto) {
           is MaterialItem -> material = namedElement {
             name = Material.nameOf(item.element)
           }

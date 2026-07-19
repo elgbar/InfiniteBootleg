@@ -22,6 +22,12 @@ sealed interface ContainerElement {
    */
   val stateless: Boolean
 
+  /**
+   *
+   * @return If this element can be handled by the player
+   */
+  val canBeHandled: Boolean
+
   val displayName: String get() = (this as? Enum<*>)?.name ?: this::class.simpleName ?: itemType.name
 
   fun toItem(maxStock: UInt = Item.DEFAULT_MAX_STOCK, stock: UInt = Item.DEFAULT_MAX_STOCK): Item

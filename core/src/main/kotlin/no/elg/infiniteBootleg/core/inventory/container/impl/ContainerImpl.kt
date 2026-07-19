@@ -58,6 +58,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
 
   override fun add(element: ContainerElement, amount: UInt): UInt {
     if (amount == 0u) return 0u
+    if (!element.canBeHandled) return amount
     var amountNotAdded = amount
     try {
       while (amountNotAdded > 0u) {
@@ -87,7 +88,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
 
   override fun add(items: List<Item>): List<Item> {
     if (items.isEmpty()) return emptyList()
-    val (stateless, stateful) = items.partition { it.element.stateless }
+    val (stateless, stateful) = items.filter { it.element.canBeHandled }.partition { it.element.stateless }
     val collector: MutableMap<ContainerElement, UInt> = HashMap()
 
     // tally up how many we got of each type
@@ -246,7 +247,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
     require(index in 0 until size) { "Index out of bounds: $index" }
     require(!(validOnly && item != null && !item.isValid())) { "This container does not allow invalid stacks" }
     val old = content[index]
-    content[index] = item
+    content[index] = if (item != null && item.element.canBeHandled) item else null
     updateContainer(addedItem = item, removedItem = old)
   }
 

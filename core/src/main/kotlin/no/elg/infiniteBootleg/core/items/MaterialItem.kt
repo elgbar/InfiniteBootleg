@@ -11,8 +11,6 @@ import no.elg.infiniteBootleg.core.world.Material
  */
 data class MaterialItem(override val element: Material, override val maxStock: UInt = Item.DEFAULT_MAX_STOCK, override val stock: UInt = Item.DEFAULT_MAX_STOCK) : Item {
 
-  override val itemType: ItemType get() = ItemType.BLOCK
-
   /**
    * Change the charge of this item by [usages] amount
    *

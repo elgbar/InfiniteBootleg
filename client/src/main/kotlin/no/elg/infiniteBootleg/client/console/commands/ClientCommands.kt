@@ -114,7 +114,7 @@ class ClientCommands : CommonCommands() {
   @ConsoleDoc(description = "Give one of each element to player", paramDescriptions = ["Quantity to give, default 100"])
   @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun giveAll(quantity: Int = 100) {
-    (Tool.tools + Material.normalMaterials).forEach { give(it::class.simpleName!!, quantity) }
+    (Tool.normalTools + Material.normalMaterials).forEach { give(it::class.simpleName!!, quantity) }
   }
 
   @CmdArgNames("quantity")

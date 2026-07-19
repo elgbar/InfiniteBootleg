@@ -30,6 +30,7 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
   }
 
   override val stateless: Boolean get() = false
+  override val canBeHandled: Boolean get() = true
 
   override val displayName: String
     get() = wood.displayName
@@ -86,7 +87,7 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
     rings.forEach { it.onUnequip(entity) }
   }
 
-  override val itemType: ItemType = ItemType.TOOL
+  override val itemType: ItemType get() = ItemType.TOOL
   override fun toItem(maxStock: UInt, stock: UInt): Item = StaffItem(this, maxStock, stock)
 
   companion object {

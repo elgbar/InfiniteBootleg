@@ -7,8 +7,6 @@ data class StaffItem(override val element: Staff, override val maxStock: UInt, o
   Item,
   Description {
 
-  override val itemType: ItemType get() = ItemType.TOOL
-
   override fun remove(usages: UInt): StaffItem? {
     if (willBeDepleted(usages)) return null
     return copy(stock = stock - usages)

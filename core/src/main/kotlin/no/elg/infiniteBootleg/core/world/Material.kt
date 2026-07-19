@@ -92,7 +92,7 @@ sealed interface Material : ContainerElement {
    *
    * @return If this material can be handled by the player, otherwise this is a _meta material_
    */
-  val canBeHandled: Boolean get() = true
+  override val canBeHandled: Boolean get() = true
 
   /**
    * Remember to set [canBeCreated] accordingly if you set this!
@@ -435,7 +435,7 @@ sealed interface Material : ContainerElement {
     /**
      * All materials that can be interacted in a normal fashion by the player
      */
-    val normalMaterials: List<Material> = materials.filter(Material::canBeHandled)
+    val normalMaterials: List<Material> = materials.filter(ContainerElement::canBeHandled)
 
     private val nameToMaterial: Map<String, Material> = materials.associateBy { it.javaClass.simpleName.lowercase() } + mapOf("" to Air)
 
