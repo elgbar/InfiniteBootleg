@@ -67,7 +67,11 @@ abstract class GameConsoleHandler :
 
     val methods: Array<Method> = ClassReflection.getMethods(exec.javaClass)
     val potentialMethods = methods.asSequence()
-      .filter { method: Method -> HelpfulConsoleHelpUtil.allowedToExecute(method) && method.name.startsWith(commandPart, ignoreCase = true) }
+      .filter { method: Method ->
+        HelpfulConsoleHelpUtil.allowedToExecute(method) &&
+          method.name.startsWith(commandPart, ignoreCase = true) &&
+          !method.name.endsWith($$"$default")
+      }
       .mapNotNull { method: Method -> HelpfulConsoleHelpUtil.generateCommandSignature(method) }
       .toList()
 
