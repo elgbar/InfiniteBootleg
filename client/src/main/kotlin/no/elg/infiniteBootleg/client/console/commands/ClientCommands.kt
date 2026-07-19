@@ -187,6 +187,10 @@ class ClientCommands : CommonCommands() {
   @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun give(elementName: String, quantity: Int) {
     takeOrGive(elementName, quantity, "give", "take") { container, element ->
+      if (!element.canBeHandled) {
+        logger.error { "Cannot give unhandable element '$elementName'" }
+        return@takeOrGive
+      }
       val item = element.toItem(stock = quantity.toUInt())
       val notAdded = container.add(item)
       if (notAdded.isEmpty()) {
