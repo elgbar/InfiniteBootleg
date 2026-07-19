@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.core.events.api.RegisteredEventListener
 import no.elg.infiniteBootleg.core.items.Item
 import no.elg.infiniteBootleg.core.items.Item.Companion.displayName
 import no.elg.infiniteBootleg.core.items.Item.Companion.stockText
+import no.elg.infiniteBootleg.core.items.ToolItemFist
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
@@ -45,14 +46,14 @@ class HeldBlockRenderer : Disposable {
       val currItem = lastItem
       if (currItem == null || updateItem) {
         val entity = world.controlledPlayerEntities.firstOrNull() ?: return
-        val item = entity.selectedItem ?: return
+        val item = entity.selectedItem ?: ToolItemFist
         updateItem = false
         lastItem = item
 
-        val stockText: String = if (item.element.stateless) {
-          entity.containerOrNull?.let { "${item.stock} (${it.count(item.element)})" } ?: item.stockText
-        } else {
-          item.stockText
+        val stockText: String = when {
+          item is ToolItemFist -> ""
+          item.element.stateless -> entity.containerOrNull?.let { "${item.stock} (${it.count(item.element)})" } ?: item.stockText
+          else -> item.stockText
         }
         layout.setText(font, "${item.displayName}\n$stockText", Color.WHITE, x10Block, Align.center, true)
       }

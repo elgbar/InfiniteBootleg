@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import no.elg.infiniteBootleg.core.items.Item
+import no.elg.infiniteBootleg.core.items.ToolItemFist
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.core.world.ecs.api.EntityLoadableMapper
@@ -32,7 +33,7 @@ data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: Object2Int
    */
   val selectedIndex: Int get() = hotbarItems.getOrDefault(selected, EMPTY_INDEX)
 
-  fun selectedItem(entity: Entity): Item? {
+  fun selectedItemOrNull(entity: Entity): Item? {
     val containerComponent = entity.containerOrNull ?: return null
     val index = selectedIndex
     if (index !in 0 until containerComponent.size) {
@@ -43,6 +44,11 @@ data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: Object2Int
     }
     return containerComponent[index]
   }
+
+  /**
+   * The selected item or [ToolItemFist] if nothing is selected
+   */
+  fun selectedItem(entity: Entity): Item = selectedItemOrNull(entity) ?: ToolItemFist
 
   override fun hudDebug(): String = selected.name
 
@@ -65,14 +71,19 @@ data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: Object2Int
       }
 
     /**
-     * @return The selected item in the entity container or `null` if there is no selected item (or the index is invalid)  or the [remoteEntityHoldingItemOrNull]
+     * @return The selected item in the entity container or `null` if there is no selected item (or the index is invalid) or the [remoteEntityHoldingItemOrNull]
      */
-    val Entity.selectedItem: Item? get() = hotbarComponentOrNull?.selectedItem(this) ?: remoteEntityHoldingItemOrNull
+    val Entity.selectedItemOrNull: Item? get() = hotbarComponentOrNull?.selectedItemOrNull(this) ?: remoteEntityHoldingItemOrNull
+
+    /**
+     * @return The selected item in the entity container or [ToolItemFist] if there is no selected item (or the index is invalid) or the [remoteEntityHoldingItemOrNull]
+     */
+    val Entity.selectedItem: Item get() = selectedItemOrNull ?: ToolItemFist
 
     /**
      * @return The selected element in the entity container or the [remoteEntityHoldingItemOrNull]
      */
-    val Entity.selectedElement: ContainerElement? get() = selectedItem?.element
+    val Entity.selectedElement: ContainerElement get() = selectedItem.element
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) =
       safeWith {

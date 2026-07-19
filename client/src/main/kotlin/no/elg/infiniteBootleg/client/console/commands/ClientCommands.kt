@@ -47,6 +47,7 @@ import no.elg.infiniteBootleg.core.util.toAbled
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.BroadaxeToolData
 import no.elg.infiniteBootleg.core.world.ContainerElement
+import no.elg.infiniteBootleg.core.world.FistToolData
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.PickaxeToolData
 import no.elg.infiniteBootleg.core.world.ReclaimerToolData
@@ -510,6 +511,7 @@ class ClientCommands : CommonCommands() {
         is PickaxeToolData -> data.brushRadius
         is ReclaimerToolData -> data.brushRadius
         is BroadaxeToolData -> data.brushMajorAxisSize
+        is FistToolData -> INITIAL_BRUSH_SIZE
       }
       logger.info { "Brush size for player ${entity.nameOrNull ?: "Unknown"} is $brushSize" }
       return brushSize
@@ -535,8 +537,15 @@ class ClientCommands : CommonCommands() {
       @Suppress("UNCHECKED_CAST")
       val toolData = when (val data = item.data) {
         is PickaxeToolData -> data.brushRadius = newBrushSize
+
         is ReclaimerToolData -> data.brushRadius = newBrushSize
+
         is BroadaxeToolData -> data.brushMajorAxisSize = newBrushSize
+
+        is FistToolData -> {
+          logger.error { "Cannot change brush size of hands" }
+          return
+        }
       }
 
       logger.info { "New brush size is now $newBrushSize" }
@@ -562,8 +571,15 @@ class ClientCommands : CommonCommands() {
       @Suppress("UNCHECKED_CAST")
       val toolData = when (val data = item.data) {
         is PickaxeToolData -> data.interactionRadius = interactionRadius
+
         is ReclaimerToolData -> data.interactionRadius = interactionRadius
+
         is BroadaxeToolData -> data.interactionRadius = interactionRadius
+
+        is FistToolData -> {
+          logger.error { "Cannot change interaction radius of hands" }
+          return
+        }
       }
 
       logger.info { "New interaction radius is now $interactionRadius" }

@@ -26,6 +26,7 @@ import no.elg.infiniteBootleg.core.util.JUMP_VERTICAL_VEL
 import no.elg.infiniteBootleg.core.util.MAX_X_VEL
 import no.elg.infiniteBootleg.core.world.HorizontalDirection
 import no.elg.infiniteBootleg.core.world.Material
+import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.box2d.extensions.mass
 import no.elg.infiniteBootleg.core.world.box2d.extensions.set
 import no.elg.infiniteBootleg.core.world.box2d.extensions.velocity
@@ -121,8 +122,8 @@ object InputEventSystem : EventSystem<InputEvent, InputEventQueueComponent>(
     val hotbarComponent = entity.hotbarComponentOrNull ?: return
     val direction = sign(amountY).toInt()
     if (isAltPressed()) {
-      val selectedItem = hotbarComponent.selectedItem(entity) ?: return
-      if (selectedItem is ToolItem<*>) {
+      val selectedItem = hotbarComponent.selectedItem(entity)
+      if (selectedItem is ToolItem<*> && selectedItem.element !is Tool.Fist) {
         val oldBrushSize = ClientMain.inst().console.exec.brush()
         val newBrushSize = oldBrushSize + direction * 0.25f
         ClientMain.inst().console.exec.brush(newBrushSize)

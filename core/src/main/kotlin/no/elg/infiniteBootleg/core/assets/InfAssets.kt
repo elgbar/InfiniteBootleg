@@ -20,6 +20,7 @@ interface InfAssets {
 
   val breakableBlockTexture: RotatableTextureRegion
   val handTexture: RotatableTextureRegion
+  val fistTexture: RotatableTextureRegion
   val playerTexture: RotatableTextureRegion
   val doorOpenTexture: RotatableTextureRegion
   val doorClosedTexture: RotatableTextureRegion
@@ -60,6 +61,7 @@ interface InfAssets {
 
     const val BREAKING_BLOCK_TEXTURE = "breaking_block"
     const val HAND_TEXTURE = "hand"
+    const val FIST_TEXTURE = "fist"
     const val PLAYER_TEXTURE = "player"
     const val DOOR_OPEN_TEXTURE = "door_open"
     const val DOOR_CLOSED_TEXTURE = "door_closed"

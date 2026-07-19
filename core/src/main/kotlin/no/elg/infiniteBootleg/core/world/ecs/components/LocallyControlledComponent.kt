@@ -26,7 +26,7 @@ data class LocallyControlledComponent(var instantBreak: Boolean = INITIAL_INSTAN
   /**
    * Bare minimum check if we are breaking a block
    */
-  fun isBreaking(entity: Entity) = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT) && entity.selectedItem?.element is Tool<*>
+  fun isBreaking(entity: Entity) = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT) && entity.selectedItem.element is Tool<*>
 
   override fun hudDebug(): String = "instantBreak: $instantBreak"
 

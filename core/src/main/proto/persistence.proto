@@ -81,6 +81,7 @@ message Element {
       PickaxeData pickaxe = 2;
       ReclaimerData reclaimer = 3;
       BroadaxeData broadaxe = 4;
+      HandData hand = 5;
     }
 
     message PickaxeData {
@@ -100,6 +101,8 @@ message Element {
         VERTICAL = 1;
       }
     }
+
+    message HandData {}
   }
 
   message NamedElement {

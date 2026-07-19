@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.core.world
 
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.core.items.ToolItem
+import no.elg.infiniteBootleg.core.items.ToolItemFist
 import no.elg.infiniteBootleg.core.util.BlockUnitF
 import no.elg.infiniteBootleg.core.util.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.core.util.INITIAL_INTERACT_RADIUS
@@ -18,6 +19,7 @@ import no.elg.infiniteBootleg.protobuf.ElementKt.ToolElementKt.pickaxeData
 import no.elg.infiniteBootleg.protobuf.ElementKt.ToolElementKt.reclaimerData
 import no.elg.infiniteBootleg.protobuf.ElementKt.toolElement
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Element.ToolElement.BroadaxeData.MajorAxis
+import no.elg.infiniteBootleg.protobuf.ProtoWorld.Element.ToolElement.HandData
 import no.elg.infiniteBootleg.protobuf.broadaxeOrNull
 import no.elg.infiniteBootleg.protobuf.pickaxeOrNull
 import no.elg.infiniteBootleg.protobuf.reclaimerOrNull
@@ -132,4 +134,23 @@ data class BroadaxeToolData(
       )
     }
   }
+}
+
+object FistToolData : ToolData {
+  override val interactionRadius: BlockUnitF = 3f
+
+  override fun breakableLocs(entity: Entity, world: World, blockX: WorldCoord, blockY: WorldCoord): Sequence<WorldCompactLoc> {
+    val baseSeq = World.getLocationsWithin(blockX, blockY, INITIAL_BRUSH_SIZE).asSequence()
+    return entity
+      .interactableBlocksWithinRadius(world, interactionRadius, baseSeq)
+      .filterNotAirBlock(world)
+  }
+
+  override fun asProto(): ProtoToolElement =
+    toolElement {
+      interactionRadius = 0f
+      hand = HandData.getDefaultInstance()
+    }
+
+  override fun toItem(maxStock: UInt, stock: UInt): ToolItem<FistToolData> = ToolItemFist
 }

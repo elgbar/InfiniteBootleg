@@ -36,7 +36,6 @@ import no.elg.infiniteBootleg.core.util.toCompact
 import no.elg.infiniteBootleg.core.util.toComponentsString
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.Direction
-import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Staff
 import no.elg.infiniteBootleg.core.world.ecs.components.InputEventQueueComponent.Companion.inputEventQueueOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
@@ -429,7 +428,7 @@ private fun physicsHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entity
 
 private fun physicsHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
   val player = ctx.getCurrentPlayer() ?: return
-  val staff = player.selectedItem?.element as? Staff ?: return
+  val staff = player.selectedItem.element as? Staff ?: return
   val inputEventQueue = player.inputEventQueueOrNull ?: return
   ServerMain.inst().serverWorld.launchOnBox2d { inputEventQueue.enqueue(InputEvent.SpellCastEvent(staff)) }
 }
@@ -442,7 +441,7 @@ private fun physicsHandleUpdateSelectedSlot(ctx: ChannelHandlerContextWrapper, u
     return
   }
   hotbarComponent.selected = slot
-  val selectedElement = hotbarComponent.selectedItem(entity) ?: Material.Air.toItem()
+  val selectedElement = hotbarComponent.selectedItem(entity)
   ServerMain.inst().packetSender.broadcast(clientBoundHoldingItem(entity, selectedElement)) { c -> c != ctx.channel() }
 }
 
