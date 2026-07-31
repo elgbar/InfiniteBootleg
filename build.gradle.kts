@@ -102,20 +102,13 @@ subprojects {
       freeCompilerArgs.add("-Xdebug")
       freeCompilerArgs.add("-Xwarning-level=UNUSED_VARIABLE:disabled")
       freeCompilerArgs.add("-Xwarning-level=NOTHING_TO_INLINE:disabled")
-      freeCompilerArgs.add("-Xwarning-level=MISSING_DEPENDENCY_SUPERCLASS_IN_TYPE_ARGUMENT:disabled")
-//      allWarningsAsErrors = true
+      allWarningsAsErrors = true
 
       // https://kotlinlang.org/docs/whatsnew22.html#changes-to-default-method-generation-for-interface-functions
       freeCompilerArgs.add("-jvm-default=no-compatibility")
 
       // https://kotlinlang.org/docs/whatsnew22.html#preview-of-context-sensitive-resolution (experimental in 2.2)
       freeCompilerArgs.add("-Xcontext-sensitive-resolution")
-      // https://kotlinlang.org/docs/whatsnew22.html#all-meta-target-for-properties (experimental in 2.2)
-      freeCompilerArgs.add("-Xannotation-target-all")
-      // https://kotlinlang.org/docs/whatsnew22.html#new-defaulting-rules-for-use-site-annotation-targets (experimental in 2.2)
-      freeCompilerArgs.add("-Xannotation-default-target=param-property")
-      // https://kotlinlang.org/docs/whatsnew2220.html#support-for-reified-types-in-catch-clauses (experimental in 2.2.20)
-      freeCompilerArgs.add("-Xallow-reified-type-in-catch")
     }
   }
 
