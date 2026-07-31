@@ -97,18 +97,35 @@ subprojects {
     compilerOptions {
       languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_5)
       progressiveMode.set(true)
-      extraWarnings.set(false)
+      extraWarnings.set(true)
+      allWarningsAsErrors.set(false)
       optIn.add("kotlin.contracts.ExperimentalContracts")
+      optIn.add("kotlin.ExperimentalStdlibApi")
       freeCompilerArgs.add("-Xdebug")
       freeCompilerArgs.add("-Xwarning-level=UNUSED_VARIABLE:disabled")
       freeCompilerArgs.add("-Xwarning-level=NOTHING_TO_INLINE:disabled")
       freeCompilerArgs.add("-Xwarning-level=DSL_MARKER_APPLIED_TO_WRONG_TARGET:disabled")
+      freeCompilerArgs.add("-Xwarning-level=REDUNDANT_VISIBILITY_MODIFIER:disabled") // disable for generated proto files
+
+      freeCompilerArgs.add("-Xrender-internal-diagnostic-names") // https://kotlinlang.org/docs/compiler-reference.html#xrender-internal-diagnostic-names
 
       // https://kotlinlang.org/docs/whatsnew22.html#changes-to-default-method-generation-for-interface-functions
       freeCompilerArgs.add("-jvm-default=no-compatibility")
 
       // https://kotlinlang.org/docs/whatsnew22.html#preview-of-context-sensitive-resolution (experimental in 2.2)
       freeCompilerArgs.add("-Xcontext-sensitive-resolution")
+
+      // https://kotlinlang.org/docs/compiler-reference.html#xintrinsic-const-evaluation (experimental in 2.4)
+      freeCompilerArgs.add("-Xintrinsic-const-evaluation")
+
+      // https://kotlinlang.org/docs/compiler-reference.html#xreturn-value-checker (experimental in 2.4)
+      freeCompilerArgs.add("-Xreturn-value-checker=full")
+
+      //https://kotlinlang.org/docs/compiler-reference.html#xcollection-literals  (experimental in 2.4)
+      freeCompilerArgs.add("-Xcollection-literals=complete")
+
+      // https://kotlinlang.org/docs/compiler-reference.html#xname-based-destructuring (experimental in 2.4)
+      freeCompilerArgs.add("-Xname-based-destructuring=only-syntax")
     }
   }
 
