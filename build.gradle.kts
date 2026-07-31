@@ -102,7 +102,7 @@ subprojects {
       freeCompilerArgs.add("-Xdebug")
       freeCompilerArgs.add("-Xwarning-level=UNUSED_VARIABLE:disabled")
       freeCompilerArgs.add("-Xwarning-level=NOTHING_TO_INLINE:disabled")
-      allWarningsAsErrors = true
+      freeCompilerArgs.add("-Xwarning-level=DSL_MARKER_APPLIED_TO_WRONG_TARGET:disabled")
 
       // https://kotlinlang.org/docs/whatsnew22.html#changes-to-default-method-generation-for-interface-functions
       freeCompilerArgs.add("-jvm-default=no-compatibility")

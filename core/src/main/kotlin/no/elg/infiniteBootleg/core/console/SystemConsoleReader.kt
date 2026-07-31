@@ -22,10 +22,9 @@ class SystemConsoleReader(private val consoleHandler: GameConsoleHandler) : Disp
       val scanner = System.console()?.run(Console::reader)?.let(::Scanner) ?: Scanner(System.`in`)
       scanner.use { openScanner ->
         while (running) {
-          var read: String?
           try {
             if (openScanner.hasNextLine()) {
-              read = openScanner.nextLine()
+              val read = openScanner.nextLine()
               launchOnMainSuspendable { consoleHandler.execCommand(read) }
             }
           } catch (e: Exception) {

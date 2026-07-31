@@ -436,7 +436,7 @@ abstract class World(
     assertNotDisposed()
     chunkReads.incrementAndGet()
     // This is a long lock, it must appear to be an atomic operation though
-    var result: R?
+    val result: R?
     var acquiredLock = 0L
     val acquireTime = measureTimeMillis {
       acquiredLock = chunksLock.tryReadLock(timeoutMillis, TimeUnit.MILLISECONDS)
