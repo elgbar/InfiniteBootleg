@@ -17,9 +17,9 @@ netty = "4.2.16.Final"
 kotlinCoroutines = "1.11.0"
 
 stacktracedecoroutinator = "2.6.4"
-spotless = "8.4.0"
-versionsPlugin = "0.53.0"
-protobufPlugin = "0.9.6"
+spotless = "8.9.0"
+versionsPlugin = "0.57.0"
+protobufPlugin = "0.10.0"
 
 [libraries]
 gdx-core = { group = "com.badlogicgames.gdx", name = "gdx", version.ref = "gdx" }
@@ -86,6 +86,6 @@ junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
-versions = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }
+versions = { id = "io.github.ben-manes.versions", version.ref = "versionsPlugin" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
 stacktracedecoroutinator = { id = "dev.reformator.stacktracedecoroutinator", version.ref = "stacktracedecoroutinator" }
