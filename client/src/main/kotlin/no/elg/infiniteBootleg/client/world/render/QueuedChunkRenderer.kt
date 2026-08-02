@@ -25,7 +25,9 @@ typealias SystemTimeMillis = Long
  *
  * @author Elg
  */
-class QueuedChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable {
+class QueuedChunkRenderer(private val worldRender: WorldRender) :
+  Renderer,
+  Disposable {
 
   private val actualRenderer = ChunkRenderer(worldRender.world)
 

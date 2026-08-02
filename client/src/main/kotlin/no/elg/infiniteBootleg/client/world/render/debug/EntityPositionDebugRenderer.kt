@@ -15,7 +15,9 @@ import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Compa
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.compactLocWithOffset
 import kotlin.math.round
 
-class EntityPositionDebugRenderer(private val worldRender: ClientWorldRender) : OverlayRenderer, Disposable {
+class EntityPositionDebugRenderer(private val worldRender: ClientWorldRender) :
+  OverlayRenderer,
+  Disposable {
 
   private val shapeRenderer: ShapeRenderer = ShapeRenderer(1000)
 

@@ -62,6 +62,7 @@ allprojects {
           "ktlint_function_signature_rule_force_multiline_when_parameter_count_greater_or_equal_than" to "5",
           "ktlint_function_signature_body_expression_wrapping" to "multiline",
           "ktlint_standard_comment-wrapping" to "disabled",
+          "max_line_length" to "180",
           "ktlint_class_signature_rule_force_multiline_when_parameter_count_greater_or_equal_than" to "unset"
         )
       )
