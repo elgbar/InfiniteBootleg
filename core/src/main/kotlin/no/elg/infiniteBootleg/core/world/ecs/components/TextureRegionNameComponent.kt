@@ -12,9 +12,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.texture
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
-data class TextureRegionNameComponent(var textureName: String) :
-  EntitySavableComponent,
-  ClientComponent {
+data class TextureRegionNameComponent(var textureName: String) : EntitySavableComponent, ClientComponent {
 
   override fun hudDebug(): String = "texture $textureName"
 

@@ -20,10 +20,11 @@ import no.elg.infiniteBootleg.core.world.magic.Wood.Companion.VARIABLE_DELAY_PER
 import no.elg.infiniteBootleg.protobuf.ElementKt.staff
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Element as ProtoElement
 
-data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
-  Equippable,
-  ContainerElement,
-  Description {
+data class Staff(
+  val wood: Wood,
+  val gems: List<Gem>,
+  val rings: List<Ring>
+) : Equippable, ContainerElement, Description {
 
   init {
     check(gems.isNotEmpty()) { "A staff must have at least one gem" }

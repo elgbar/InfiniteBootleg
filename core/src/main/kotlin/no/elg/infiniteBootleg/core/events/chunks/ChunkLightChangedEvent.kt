@@ -9,10 +9,11 @@ import no.elg.infiniteBootleg.core.util.LocalCoord
 /**
  * Indicates that a chunk's light is about to be updated
  */
-data class ChunkLightChangedEvent(override val chunkLoc: ChunkCompactLoc, val localX: LocalCoord, val localY: LocalCoord) :
-  ThreadedEvent(ThreadType.ASYNC, ThreadType.PHYSICS),
-  ChunkPositionEvent,
-  ReasonedEvent {
+data class ChunkLightChangedEvent(
+  override val chunkLoc: ChunkCompactLoc,
+  val localX: LocalCoord,
+  val localY: LocalCoord
+) : ThreadedEvent(ThreadType.ASYNC, ThreadType.PHYSICS), ChunkPositionEvent, ReasonedEvent {
 
   override val reason: String
     get() = "Chunk light changed"

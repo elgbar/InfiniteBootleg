@@ -10,9 +10,7 @@ import no.elg.infiniteBootleg.core.world.ecs.entityContainerFamily
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
-class AuthoritativeWorldContainerManager(engine: Engine) :
-  Disposable,
-  WorldContainerManager {
+class AuthoritativeWorldContainerManager(engine: Engine) : Disposable, WorldContainerManager {
 
   private val internalContainers = ConcurrentHashMap<ContainerOwner, OwnedContainer>()
 

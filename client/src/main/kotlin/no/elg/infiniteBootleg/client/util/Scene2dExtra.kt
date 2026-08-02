@@ -224,17 +224,24 @@ fun ClientWorld.okWindow(title: String, labelUpdater: MutableMap<VisWindow, VisW
  * A [IBVisWindow] that is initially closed
  */
 @Scene2dDsl
-inline fun ClientWorld.ibVisWindowClosed(title: String, interfaceId: InterfaceId = title, style: String = defaultStyle, init: IBVisWindow.() -> Unit = {}): IBVisWindow {
+inline fun ClientWorld.ibVisWindowClosed(
+  title: String,
+  interfaceId: InterfaceId = title,
+  style: String = defaultStyle,
+  init: IBVisWindow.() -> Unit = {}
+): IBVisWindow {
   contract { callsInPlace(init, InvocationKind.EXACTLY_ONCE) }
   return IBVisWindow(title, style, this, interfaceId).apply(init)
 }
 
 @Suppress("jol")
 @Scene2dDsl
-class IBVisWindow(title: String, styleName: String, val world: ClientWorld, val interfaceId: InterfaceId) :
-  VisWindow(title, styleName),
-  KTable,
-  Disposable {
+class IBVisWindow(
+  title: String,
+  styleName: String,
+  val world: ClientWorld,
+  val interfaceId: InterfaceId
+) : VisWindow(title, styleName), KTable, Disposable {
 
   private val interfaceManager = world.render.interfaceManager
 

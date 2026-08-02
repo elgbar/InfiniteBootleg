@@ -15,11 +15,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Element as ProtoElement
 
 private val logger = KotlinLogging.logger {}
 
-data class Wood(val type: WoodType, val rating: WoodRating) :
-  MagicEffects,
-  Equippable,
-  Named,
-  Description {
+data class Wood(val type: WoodType, val rating: WoodRating) : MagicEffects, Equippable, Named, Description {
 
   override val displayName: String
     get() = "${rating.displayName} ${type.displayName}"
@@ -44,11 +40,7 @@ data class Wood(val type: WoodType, val rating: WoodRating) :
   }
 }
 
-data class Gem(val type: GemType, val rating: GemRating) :
-  MagicEffects,
-  Equippable,
-  Named,
-  Description {
+data class Gem(val type: GemType, val rating: GemRating) : MagicEffects, Equippable, Named, Description {
 
   override val displayName: String
     get() = "${rating.displayName} ${type.displayName}"
@@ -71,10 +63,7 @@ data class Gem(val type: GemType, val rating: GemRating) :
   }
 }
 
-data class Ring(val type: RingType<RingRating?>, val rating: RingRating?) :
-  MagicEffects,
-  Named,
-  Equippable {
+data class Ring(val type: RingType<RingRating?>, val rating: RingRating?) : MagicEffects, Named, Equippable {
 
   override val displayName: String = if (rating != null) {
     "${rating.displayName} ${type.displayName}"

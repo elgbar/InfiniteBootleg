@@ -34,9 +34,7 @@ private val logger = KotlinLogging.logger {}
  *
  * @author Elg
  */
-class ChunkBody(val chunk: Chunk) :
-  Updatable,
-  CheckableDisposable {
+class ChunkBody(val chunk: Chunk) : Updatable, CheckableDisposable {
 
   // unsynchronized lazy is ok since this will only be accessed from the physics thread
   // we also want it lazy to not allocate chunk shapes for empty chunks

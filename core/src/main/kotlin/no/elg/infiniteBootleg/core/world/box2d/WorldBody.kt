@@ -45,9 +45,7 @@ private val logger = KotlinLogging.logger {}
  *
  * @author Elg
  */
-open class WorldBody(private val world: World) :
-  Ticking,
-  CheckableDisposable {
+open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
 
   private val postRunnable: PostRunnableHandler = PostRunnableHandler()
 

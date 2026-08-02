@@ -60,7 +60,10 @@ data class PickaxeToolData(override var interactionRadius: BlockUnitF = INITIAL_
   }
 }
 
-data class ReclaimerToolData(override var interactionRadius: BlockUnitF = INITIAL_INTERACT_RADIUS, var brushRadius: BlockUnitF = INITIAL_BRUSH_SIZE) : ToolData {
+data class ReclaimerToolData(
+  override var interactionRadius: BlockUnitF = INITIAL_INTERACT_RADIUS,
+  var brushRadius: BlockUnitF = INITIAL_BRUSH_SIZE
+) : ToolData {
 
   override fun breakableLocs(entity: Entity, world: World, blockX: WorldCoord, blockY: WorldCoord): Sequence<WorldCompactLoc> {
     val baseSeq = World.getLocationsWithin(blockX, blockY, brushRadius).asSequence()

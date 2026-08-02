@@ -19,9 +19,10 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.locallyControlled
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
-data class LocallyControlledComponent(var instantBreak: Boolean = INITIAL_INSTANT_BREAK, var placeRadius: BlockUnitF = INITIAL_PLACE_RADIUS) :
-  EntitySavableComponent,
-  AuthoritativeOnlyComponent {
+data class LocallyControlledComponent(
+  var instantBreak: Boolean = INITIAL_INSTANT_BREAK,
+  var placeRadius: BlockUnitF = INITIAL_PLACE_RADIUS
+) : EntitySavableComponent, AuthoritativeOnlyComponent {
 
   /**
    * Bare minimum check if we are breaking a block

@@ -8,9 +8,10 @@ typealias ChunkTextureChangeRejectionReason = Int
 /**
  * Chunk texture will not be updated
  */
-data class ChunkTextureChangeRejectedEvent(override val chunkLoc: ChunkCompactLoc, val rejectReason: ChunkTextureChangeRejectionReason) :
-  ChunkPositionEvent,
-  ReasonedEvent {
+data class ChunkTextureChangeRejectedEvent(
+  override val chunkLoc: ChunkCompactLoc,
+  val rejectReason: ChunkTextureChangeRejectionReason
+) : ChunkPositionEvent, ReasonedEvent {
 
   override val reason: String
     get() = when (rejectReason) {

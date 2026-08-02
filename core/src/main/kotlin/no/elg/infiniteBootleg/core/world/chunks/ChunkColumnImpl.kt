@@ -26,8 +26,12 @@ import kotlin.math.max
 
 private val logger = KotlinLogging.logger {}
 
-class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord, initialTopSolid: WorldCoordArray? = null, initialTopLight: WorldCoordArray? = null) :
-  ChunkColumn {
+class ChunkColumnImpl(
+  override val world: World,
+  override val chunkX: ChunkCoord,
+  initialTopSolid: WorldCoordArray? = null,
+  initialTopLight: WorldCoordArray? = null
+) : ChunkColumn {
 
   private val topWorldYSolid = IntArray(Chunk.CHUNK_SIZE)
   private val topWorldYLight = IntArray(Chunk.CHUNK_SIZE)

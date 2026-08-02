@@ -21,9 +21,7 @@ import no.elg.infiniteBootleg.core.world.world.World
 /**
  * @author Elg
  */
-class PerlinChunkGenerator(override val seed: Long) :
-  ChunkGenerator,
-  Disposable {
+class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable {
 
   private val chunkGeneratedListener = ChunkGeneratedListener(this)
   private val sparseTreeGenerator = ForestGenerator(seed, 0.8)

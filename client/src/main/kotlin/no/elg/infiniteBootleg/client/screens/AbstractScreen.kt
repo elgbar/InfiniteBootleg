@@ -8,9 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
 
 /** @author Elg */
-abstract class AbstractScreen(private val yDown: Boolean = true) :
-  ScreenAdapter(),
-  CheckableDisposable {
+abstract class AbstractScreen(private val yDown: Boolean = true) : ScreenAdapter(), CheckableDisposable {
 
   val batch: SpriteBatch by lazy { SpriteBatch() }
   private val lineRenderer: ShapeRenderer by lazy { ShapeRenderer() }

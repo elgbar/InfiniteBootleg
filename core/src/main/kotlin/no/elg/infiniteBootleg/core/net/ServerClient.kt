@@ -21,7 +21,11 @@ import java.time.Duration
  *
  * @author Elg
  */
-class ServerClient(val name: String, var worldOrNull: World? = null, var protoEntity: ProtoWorld.Entity? = null) : Disposable {
+class ServerClient(
+  val name: String,
+  var worldOrNull: World? = null,
+  var protoEntity: ProtoWorld.Entity? = null
+) : Disposable {
 
   private var _ctx: ChannelHandlerContextWrapper? = null
   val ctx: ChannelHandlerContextWrapper get() = _ctx!!
