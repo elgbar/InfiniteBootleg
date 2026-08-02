@@ -98,7 +98,10 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
             fbo = null
             defaultDrawable
           }
-          val description = (item as? Description)?.run { "\n $description" } ?: ""
+          val description = (item as? Description)?.run {
+            val desc = description
+            if (desc.isNotBlank()) "\n $desc" else ""
+          } ?: ""
           tooltip.setText(item.fullName + description)
         }
 

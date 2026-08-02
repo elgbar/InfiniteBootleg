@@ -1,8 +1,10 @@
 package no.elg.infiniteBootleg.core.items
 
+import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.world.FistToolData
 import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.ToolData
+import no.elg.infiniteBootleg.core.world.magic.Description
 
 /**
  * Represent a tool the player can use on blocks in the world
@@ -15,11 +17,14 @@ data class ToolItemImpl<DATA : ToolData>(
   override val maxStock: UInt = Item.DEFAULT_MAX_STOCK,
   override val stock: UInt = Item.DEFAULT_MAX_STOCK,
   override val data: DATA
-) : ToolItem<DATA> {
+) : ToolItem<DATA>, Description {
 
   init {
     require(data != FistToolData) { "use FistItem for Fist" }
   }
+
+  override val description: String
+    get() = if (Settings.debug) "tool data: $data" else ""
 
   /**
    * Change the charge of this item by [usages] amount
