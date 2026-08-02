@@ -6,7 +6,6 @@ import no.elg.infiniteBootleg.core.events.ItemChangeType
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.inventory.container.Container
 import no.elg.infiniteBootleg.core.inventory.container.Container.Companion.NOT_FOUND
-import no.elg.infiniteBootleg.core.inventory.container.IndexedItem
 import no.elg.infiniteBootleg.core.items.Item
 import no.elg.infiniteBootleg.core.util.IllegalAction
 import no.elg.infiniteBootleg.core.world.ContainerElement
@@ -26,39 +25,65 @@ open class ContainerImpl(override val name: String, final override val size: Int
     require(size > 0) { "Inventory size must be greater than zero" }
   }
 
-  override fun indexOfFirstEmpty(): Int = content.indexOfFirst { it == null }
-  override fun indexOfFirstNonFull(element: ContainerElement): Int =
+  override fun indexOfFirstEmpty(): Int = indexOfFirst { it == null }
+
+  /**
+   * @param element The element to match against
+   * @return The index of the first element of type `element` and where the stock is less than max stock, or [NOT_FOUND] if either none is found or the [element] is not [ContainerElement.stateless]
+   */
+  private fun indexOfFirstNonFull(element: ContainerElement): Int =
     if (element.stateless) {
       content.indexOfFirst { it?.element == element && it.stock < it.maxStock }
     } else {
       NOT_FOUND
     }
 
-  override fun indexOfFirst(element: ContainerElement): Int = content.indexOfFirst { it?.element == element }
+  /**
+   * @param filter The filter to match against
+   * @return The index of the first slot that matches the given filter, or [NOT_FOUND] if the container does not contain such item
+   */
+  private fun indexOfFirst(filter: (Item?) -> Boolean): Int = content.indexOfFirst(filter)
 
-  override fun indexOfFirst(filter: (Item?) -> Boolean): Int = content.indexOfFirst(filter)
+  /**
+   * @param element The element to match against
+   * @return The index of in the container where the [element] can be added, or [NOT_FOUND] if there is no slot to add the element to
+   */
+  private fun indexOfFirstCanAdd(element: ContainerElement): Int = indexOfFirstNonFull(element).let { if (it == NOT_FOUND) indexOfFirstEmpty() else it }
 
   @Suppress("UNCHECKED_CAST")
   private fun filterElementType(element: ContainerElement): Sequence<Item> =
-    // "it" Can not be null because the input element can't be null
-    content.asSequence().filter { it?.element == element } as Sequence<Item>
+    if (element.canBeHandled) {
+      // "it" Can not be null because the input element can't be null
+      content.asSequence().filter { it?.element == element } as Sequence<Item>
+    } else {
+      emptySequence()
+    }
 
   override fun exists(element: ContainerElement, amount: UInt): Boolean {
-    var amountNeeded = amount
-    filterElementType(element).forEach { item ->
-      amountNeeded -= item.stock
-      if (amountNeeded <= 0u) {
-        return true
+    if (element.isAlwaysPresent) {
+      return true
+    } else if (element.canBeHandled) {
+      var amountNeeded = amount
+      filterElementType(element).forEach { item ->
+        amountNeeded -= item.stock
+        if (amountNeeded <= 0u) {
+          return true
+        }
       }
     }
     return false
   }
 
-  override fun count(element: ContainerElement): UInt = filterElementType(element).sumOf(Item::stock)
+  override fun count(element: ContainerElement): UInt =
+    when {
+      element.isAlwaysPresent -> UInt.MAX_VALUE
+      element.canBeHandled -> filterElementType(element).sumOf(Item::stock)
+      else -> 0u // If it cant be handled we cant have it in the inventory
+    }
 
   override fun add(element: ContainerElement, amount: UInt): UInt {
-    if (amount == 0u) return 0u
-    if (!element.canBeHandled) return amount
+    if (isNoopAmountOrElement(element, amount)) return 0u
+    require(!validOnly || element.canBeHandled) { "This container does not allow invalid elements" }
     var amountNotAdded = amount
     try {
       while (amountNotAdded > 0u) {
@@ -86,9 +111,10 @@ open class ContainerImpl(override val name: String, final override val size: Int
     }
   }
 
-  override fun add(items: List<Item>): List<Item> {
-    if (items.isEmpty()) return emptyList()
-    val (stateless, stateful) = items.filter { it.element.canBeHandled }.partition { it.element.stateless }
+  override fun add(items: Iterable<Item>): List<Item> {
+    val filteredItems = items.filter(::isItemValid)
+    if (filteredItems.isEmpty()) return emptyList()
+    val (stateless, stateful) = filteredItems.partition { it.element.stateless }
     val collector: MutableMap<ContainerElement, UInt> = HashMap()
 
     // tally up how many we got of each type
@@ -118,6 +144,10 @@ open class ContainerImpl(override val name: String, final override val size: Int
   }
 
   override fun removeAll(element: ContainerElement) {
+    if (element.isAlwaysPresent) {
+      return
+    }
+    // Note: element.canBeHandled is not checked as this is a corrective action
     var removedStock = 0u
     try {
       for (i in content.indices) {
@@ -133,7 +163,8 @@ open class ContainerImpl(override val name: String, final override val size: Int
   }
 
   override fun remove(item: Item, amount: UInt): UInt {
-    if (amount == 0u) return 0u
+    if (isNoopAmountOrElement(item.element, amount)) return 0u
+    require(isItemValid(item)) { "This container does not allow invalid items" }
     val index = indexOfFirst { it === item }
     if (item.isValid() && index != NOT_FOUND) {
       if (item.canBeUsed(amount)) {
@@ -155,15 +186,11 @@ open class ContainerImpl(override val name: String, final override val size: Int
   }
 
   override fun remove(element: ContainerElement, amount: UInt, allowStatefulRemoval: Boolean): UInt {
-    if (amount == 0u) return 0u
+    if (isNoopAmountOrElement(element, amount)) return 0u
+    // Note: element.canBeHandled is not checked as this is a corrective action
     logger.debug { "Removing $amount of ${element.displayName}" }
-    if (!element.stateless) {
-      if (allowStatefulRemoval) {
-        logger.debug { "Element is stateful, but allowStatefulRemoval=true so it is allowed" }
-      } else {
-        IllegalAction.STACKTRACE.handle { "Tried to remove a stateful element, this is not allowed without setting allowStatefulRemoval=true in remove" }
-        return amount
-      }
+    if (checkAllowStatefulRemoval(element, allowStatefulRemoval)) {
+      return amount
     }
     var stockToRemove = amount
     var i = 0
@@ -195,7 +222,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
   }
 
   override fun removeAll(item: Item) {
-    if ((validOnly && !item.isValid()) || item.stock == 0u) {
+    if (isItemValid(item) || isNoopAmountOrElement(item)) {
       return
     }
     var i = 0
@@ -212,6 +239,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
   }
 
   override fun remove(index: Int) {
+    requireValidIndex(index)
     val old = content[index]
     if (old != null) {
       content[index] = null
@@ -226,34 +254,24 @@ open class ContainerImpl(override val name: String, final override val size: Int
     updateContainer(changeType = null)
   }
 
-  override fun contains(item: Item?): Boolean {
-    if (item == null || (validOnly && !item.isValid())) {
-      return false
-    }
-    for (slot in this) {
-      if (item == slot.content) {
-        return true
-      }
-    }
-    return false
-  }
+  override fun contains(item: Item?): Boolean = item != null && content.contains(item)
 
   override fun get(index: Int): Item? {
-    require(index in 0 until size) { "Index out of bounds: $index" }
+    requireValidIndex(index)
     return content[index]
   }
 
   override fun set(index: Int, item: Item?) {
-    require(index in 0 until size) { "Index out of bounds: $index" }
-    require(!(validOnly && item != null && !item.isValid())) { "This container does not allow invalid stacks" }
+    requireValidIndex(index)
+    require(isItemValid(item, nullItemHasValidity = true)) { "This container does not allow invalid items" }
     val old = content[index]
     content[index] = if (item != null && item.element.canBeHandled) item else null
     updateContainer(addedItem = item, removedItem = old)
   }
 
   override fun swap(index1: Int, index2: Int) {
-    require(index1 in 0 until size) { "Index 1 out of bounds: $index1" }
-    require(index2 in 0 until size) { "Index 2 out of bounds: $index2" }
+    requireValidIndex(index1)
+    requireValidIndex(index2)
     val item1 = content[index1]
     val item2 = content[index2]
     if (item1 != null || item2 != null) {
@@ -264,8 +282,8 @@ open class ContainerImpl(override val name: String, final override val size: Int
   }
 
   private fun updateContainer(addedItem: Item? = null, removedItem: Item? = null) {
-    if (addedItem == removedItem && addedItem != null && addedItem.equalsIncludingStock(removedItem)) {
-      // Do not send an update when the items are the same
+    if ((addedItem == removedItem && addedItem != null && addedItem.equalsIncludingStock(removedItem)) || ((addedItem?.stock ?: 0u) == 0u && (removedItem?.stock ?: 0u) == 0u)) {
+      // Do not send an update when the items are the same or there are no changed items
       return
     }
     updateContainer(ItemChangeType.getItemChangeType(addedItem, removedItem))
@@ -275,15 +293,15 @@ open class ContainerImpl(override val name: String, final override val size: Int
     EventManager.dispatchEvent(ContainerEvent.ContentChanged(this, changeType = changeType))
   }
 
-  override fun iterator(): MutableIterator<IndexedItem> {
-    return object : MutableIterator<IndexedItem> {
+  override fun iterator(): MutableIterator<Item?> {
+    return object : MutableIterator<Item?> {
       var index: Int = -1
 
       override fun hasNext(): Boolean = index < size - 1
 
-      override fun next(): IndexedItem {
+      override fun next(): Item? {
         val nextIndex = ++index
-        return IndexedItem(nextIndex, content[nextIndex])
+        return content[nextIndex]
       }
 
       override fun remove() {
@@ -314,6 +332,25 @@ open class ContainerImpl(override val name: String, final override val size: Int
   }
 
   override fun toString(): String = "ContainerImpl(name='$name', size=$size, type=$type)"
+
+  fun isNoopAmountOrElement(element: ContainerElement, amount: UInt): Boolean = amount == 0u || element.isAlwaysPresent
+  fun isNoopAmountOrElement(item: Item): Boolean = isNoopAmountOrElement(item.element, item.stock)
+
+  private fun checkAllowStatefulRemoval(element: ContainerElement, allowStatefulRemoval: Boolean): Boolean {
+    if (!element.stateless) {
+      if (allowStatefulRemoval) {
+        logger.debug { "Element is stateful, but allowStatefulRemoval=true so it is allowed" }
+      } else {
+        IllegalAction.STACKTRACE.handle { "Tried to remove a stateful element, this is not allowed without setting allowStatefulRemoval=true in remove" }
+        return true
+      }
+    }
+    return false
+  }
+
+  fun isItemValid(item: Item): Boolean = !validOnly || item.isValid()
+  fun isItemValid(item: Item?, nullItemHasValidity: Boolean): Boolean = !validOnly || (item?.isValid() ?: nullItemHasValidity)
+  fun requireValidIndex(index: Int) = require(index in 0..<size) { "Index out of bounds: $index. bounds are 0 ..< $size" }
 
   companion object {
     const val DEFAULT_SIZE = 40

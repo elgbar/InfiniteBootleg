@@ -99,8 +99,8 @@ class ItemStockChangeType private constructor(override val removedItem: Item?, o
   }
 
   override fun hashCode(): Int {
-    var result = removedItem?.hashCode() ?: 0
-    result = 31 * result + (addedItem?.hashCode() ?: 0)
+    var result = removedItem.hashCode()
+    result = 31 * result + addedItem.hashCode()
     return result
   }
 }

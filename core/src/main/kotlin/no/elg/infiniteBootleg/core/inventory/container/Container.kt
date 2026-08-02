@@ -23,7 +23,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Container as ProtoContainer
  *
  * @author kheba
  */
-interface Container : Iterable<IndexedItem> {
+interface Container : Iterable<Item?> {
   /**
    * @return The name of the container
    */
@@ -45,30 +45,6 @@ interface Container : Iterable<IndexedItem> {
   fun indexOfFirstEmpty(): Int
 
   /**
-   * @param element The element to match against
-   * @return The index of the first element of type `element` and where the stock is less than max stock, or [NOT_FOUND] if either none is found or the [element] is not [ContainerElement.stateless]
-   */
-  fun indexOfFirstNonFull(element: ContainerElement): Int
-
-  /**
-   * @param element The element to match against
-   * @return The index of in the container where the [element] can be added, or [NOT_FOUND] if there is no slot to add the element to
-   */
-  fun indexOfFirstCanAdd(element: ContainerElement): Int = indexOfFirstNonFull(element).let { if (it == NOT_FOUND) indexOfFirstEmpty() else it }
-
-  /**
-   * @param element The element to match against
-   * @return The index of the first element of type `element` or [NOT_FOUND] if the container does not contain such item
-   */
-  fun indexOfFirst(element: ContainerElement): Int
-
-  /**
-   * @param filter The filter to match against
-   * @return The index of the first slot that matches the given filter, or [NOT_FOUND] if the container does not contain such item
-   */
-  fun indexOfFirst(filter: (Item?) -> Boolean): Int
-
-  /**
    * Add an item to the container
    *
    * @return How many of the given element not added
@@ -82,7 +58,7 @@ interface Container : Iterable<IndexedItem> {
    *
    * @param items What to add
    */
-  fun add(vararg items: Item): List<Item> = add(items.toList())
+  fun add(vararg items: Item): List<Item> = add(items.asIterable())
 
   /**
    * Add one or more items to the container
@@ -91,7 +67,7 @@ interface Container : Iterable<IndexedItem> {
    * @return A list of all elements not added, the returned stack might not be valid.
    * @throws IllegalArgumentException if one of the `Item`s is `null`
    */
-  fun add(items: List<Item>): List<Item>
+  fun add(items: Iterable<Item>): List<Item>
 
   /**
    * Check if there exists at least [amount] of the given element type in the container. Does not care for the statefulness of the [ContainerElement]

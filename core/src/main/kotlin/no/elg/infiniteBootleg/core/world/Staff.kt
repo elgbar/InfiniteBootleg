@@ -31,6 +31,7 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) :
 
   override val stateless: Boolean get() = false
   override val canBeHandled: Boolean get() = true
+  override val isAlwaysPresent: Boolean get() = false
 
   override val displayName: String
     get() = wood.displayName

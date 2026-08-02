@@ -63,7 +63,7 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
     }
 
     val filter: (InterfaceEvent) -> Boolean = { it.interfaceId == interfaceId }
-    arrayOf(
+    val listeners = arrayOf(
       registerListener<ContainerEvent.ContentChanged>({ it.container === container || it.owner?.toInterfaceId() == interfaceId }) {
         val serverContainer = this.container
         launchOnMainSuspendable {
@@ -80,15 +80,15 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
       }
     )
 
-    for (containerSlot in container) {
+    for ((index) in container.withIndex()) {
       visImageButton { it ->
         val tooltip = visTextTooltip("")
 
         var fbo: FrameBuffer? = null
         fun updateSlot() {
-          val item = container[containerSlot.index]
+          val item = container[index]
 
-          val slotDrawable = createDrawable(batch, item, containerSlot.index, fbo)
+          val slotDrawable = createDrawable(batch, item, index, fbo)
           style.imageUp = if (slotDrawable != null) {
             val (newFbo, drawable) = slotDrawable
             fbo = newFbo
@@ -106,13 +106,13 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
         updateSlot()
         updateFunctions += ::updateSlot
 
-        val slot = InventorySlot(ownedContainer, containerSlot.index)
+        val slot = InventorySlot(ownedContainer, index)
         userObject = slot
         dragAndDrop.addSource(SlotSource(this@visImageButton, slot))
         dragAndDrop.addTarget(SlotTarget(this@visImageButton))
         pack()
       }
-      if ((containerSlot.index + 1) % 10 == 0) row()
+      if ((index + 1) % 10 == 0) row()
     }
   }
 }

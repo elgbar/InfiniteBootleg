@@ -78,7 +78,7 @@ sealed interface Item {
    */
   fun canBeUsed(usages: UInt = 1u): Boolean = usages <= stock
 
-  fun isValid(): Boolean = stock <= maxStock
+  fun isValid(): Boolean = stock <= maxStock && element.canBeHandled && !element.isAlwaysPresent
 
   /**
    * Merge two items, they must be of the same type, material/tool, and max stock to be merged otherwise `null` is returned

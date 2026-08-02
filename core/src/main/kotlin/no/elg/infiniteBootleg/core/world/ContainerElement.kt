@@ -24,9 +24,16 @@ sealed interface ContainerElement {
 
   /**
    *
-   * @return If this element can be handled by the player
+   * If it cannot be handled it is a meta container element, such as [Material.Air] which the player should never be able to hold or use.
+   *
+   * @return If this element can be handled by the player.
    */
   val canBeHandled: Boolean
+
+  /**
+   * @return Whether this element should be considered to always be present in containers. Thus, adding or removing it to a container have no effect.
+   */
+  val isAlwaysPresent: Boolean
 
   val displayName: String get() = (this as? Enum<*>)?.name ?: this::class.simpleName ?: itemType.name
 

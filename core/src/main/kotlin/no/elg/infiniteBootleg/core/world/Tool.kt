@@ -16,11 +16,8 @@ sealed interface Tool<DATA : ToolData> : TexturedContainerElement {
   override val itemType: ItemType get() = ItemType.TOOL
   override val stateless: Boolean get() = false
 
-  /**
-   *
-   * @return If this tool can be handled by the player
-   */
   override val canBeHandled: Boolean get() = true
+  override val isAlwaysPresent: Boolean get() = false
 
   /**
    * The categories this tool works better on
@@ -91,7 +88,9 @@ sealed interface Tool<DATA : ToolData> : TexturedContainerElement {
     override val destroyIneffectiveAgainst: Boolean get() = true
     override val effectiveEfficiency: Float get() = 0.1f
     override val ineffectiveEfficiency: Float get() = Float.MIN_VALUE
+
     override val canBeHandled: Boolean get() = false
+    override val isAlwaysPresent: Boolean get() = true
 
     @Suppress("OVERRIDE_DEPRECATION") // not really deprecated here anymore
     override fun toItem(maxStock: UInt, stock: UInt): Item = ToolItemFist

@@ -88,11 +88,9 @@ sealed interface Material : ContainerElement {
    */
   val canFormStair: Boolean get() = isCollidable && !invisibleBlock
 
-  /**
-   *
-   * @return If this material can be handled by the player, otherwise this is a _meta material_
-   */
   override val canBeHandled: Boolean get() = true
+
+  override val isAlwaysPresent: Boolean get() = false
 
   /**
    * Remember to set [canBeCreated] accordingly if you set this!
@@ -118,7 +116,7 @@ sealed interface Material : ContainerElement {
 //  val textureName: String? get() = if (canBeHandled) if (customTextureName != null) customTextureName else this::class.simpleName. else null
 
   object Air : Material {
-    override val hardness get() = 0f
+    override val hardness get() = 0.0f
     override val hasTransparentTexture get() = true
     override val isCollidable get() = false
     override val blocksLight get() = false
@@ -134,13 +132,13 @@ sealed interface Material : ContainerElement {
   }
 
   object Brick : Material, TexturedContainerElement {
-    override val hardness get() = 2f
+    override val hardness get() = 2.0f
     override val textureName: String get() = "brick"
     override val category: MaterialCategory get() = PLAIN_ROCK
   }
 
   object Dirt : Material, TexturedContainerElement {
-    override val hardness get() = 1f
+    override val hardness get() = 1.0f
     override val textureName: String get() = "dirt"
     override val category: MaterialCategory get() = SOIL
   }
@@ -239,7 +237,7 @@ sealed interface Material : ContainerElement {
   }
 
   object Door : Material, TexturedContainerElement {
-    override val hardness get() = 1f
+    override val hardness get() = 1.0f
     override val textureName: String get() = "door"
     override val hasTransparentTexture get() = true
     override val isCollidable get() = false
@@ -288,13 +286,13 @@ sealed interface Material : ContainerElement {
   }
 
   object Sandstone : Material, TexturedContainerElement {
-    override val hardness get() = 1f
+    override val hardness get() = 1.0f
     override val textureName: String get() = "sandstone"
     override val category: MaterialCategory get() = PLAIN_ROCK
   }
 
   object Container : Material, TexturedContainerElement {
-    override val hardness get() = 1f
+    override val hardness get() = 1.0f
     override val textureName: String get() = "container"
     override val category: MaterialCategory get() = CRAFTED
     override val isCollidable get() = false
@@ -310,19 +308,19 @@ sealed interface Material : ContainerElement {
   }
 
   object CopperOre : Material, TexturedContainerElement {
-    override val hardness get() = 2f
+    override val hardness get() = 2.0f
     override val textureName: String get() = "copper_ore"
     override val category: MaterialCategory get() = ORE
   }
 
   object IronOre : Material, TexturedContainerElement {
-    override val hardness get() = 3f
+    override val hardness get() = 3.0f
     override val textureName: String get() = "iron_ore"
     override val category: MaterialCategory get() = ORE
   }
 
   object GoldOre : Material, TexturedContainerElement {
-    override val hardness get() = 1f
+    override val hardness get() = 1.0f
     override val textureName: String get() = "gold_ore"
     override val category: MaterialCategory get() = ORE
   }
