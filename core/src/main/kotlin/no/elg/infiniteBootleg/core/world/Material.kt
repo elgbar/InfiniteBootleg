@@ -428,7 +428,7 @@ sealed interface Material : ContainerElement {
      */
     private val CAN_ALWAYS_BE_CREATED: ((World, WorldCoord, WorldCoord) -> Boolean) = { _, _, _ -> true }
 
-    val materials: List<Material> = sealedSubclassObjectInstances<Material>()
+    val materials: List<Material> by lazy { sealedSubclassObjectInstances<Material>() }
 
     /**
      * All materials that can be interacted in a normal fashion by the player

@@ -100,8 +100,8 @@ sealed interface Tool<DATA : ToolData> : TexturedContainerElement {
   }
 
   companion object {
-    val tools: List<Tool<*>> = sealedSubclassObjectInstances<Tool<*>>()
-    val normalTools: List<Tool<*>> = tools.filter(ContainerElement::canBeHandled)
+    val tools: List<Tool<*>> by lazy { sealedSubclassObjectInstances<Tool<*>>() }
+    val normalTools: List<Tool<*>> by lazy { tools.filter(ContainerElement::canBeHandled) }
 
     private val nameToTool: Map<String, Tool<*>> = tools.associateBy { it.javaClass.simpleName.lowercase() }
     private val toolToName: Map<Tool<*>, String> = tools.associateWith { it.javaClass.simpleName.lowercase() }

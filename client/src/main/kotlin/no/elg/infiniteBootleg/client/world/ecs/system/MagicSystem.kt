@@ -17,7 +17,7 @@ import no.elg.infiniteBootleg.core.world.Staff.Companion.DEFAULT_SPELL_SPEED
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityCompacted
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
-import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
+import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItemOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.LastSpellCastComponent
@@ -36,8 +36,8 @@ object MagicSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFAULT)
       return
     }
     val world = entity.world as? ClientWorld ?: return
-    val selectedItem = entity.selectedItem
-    val heldStaff = selectedItem?.element as? Staff ?: return
+    val selectedItem = entity.selectedItemOrNull ?: return
+    val heldStaff = selectedItem.element as? Staff ?: return
     val existingSpellState = entity.lastSpellCastOrNull
     val doCastNow = Gdx.input.isButtonPressed(Input.Buttons.LEFT)
     if (existingSpellState.canCastAgain() && doCastNow) {

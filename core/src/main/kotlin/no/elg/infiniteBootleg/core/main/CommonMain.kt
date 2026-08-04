@@ -12,13 +12,17 @@ import ktx.async.KtxAsync
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.args.ProgramArgs
 import no.elg.infiniteBootleg.core.console.GameConsoleHandler
+import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.logging.Slf4jApplicationLogger
 import no.elg.infiniteBootleg.core.util.Util
 import no.elg.infiniteBootleg.core.util.diffTimePretty
 import no.elg.infiniteBootleg.core.world.Material
+import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkFactory
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkImplFactory
+import no.elg.infiniteBootleg.core.world.magic.parts.RingType
+import no.elg.infiniteBootleg.core.world.magic.parts.WoodType
 import org.fusesource.jansi.AnsiConsole
 import java.time.Instant
 
@@ -48,12 +52,27 @@ abstract class CommonMain<CONSOLE : GameConsoleHandler>(
 
   abstract fun createConsole(): CONSOLE
 
+  /**
+   * Eagerly load these classes to make the app not crash
+   */
+  protected fun initialize() {
+    val eager = listOf(
+      Tool,
+      Material,
+      ThreadType,
+      RingType,
+      WoodType
+    )
+    logger.trace { "Eagerly loading the classes ${eager.map { it::class.qualifiedName }}" }
+  }
+
   override fun create() {
     AnsiConsole.systemInstall()
     KtxAsync.initiate()
     Thread.currentThread().priority = Thread.MAX_PRIORITY
 
     Box2d.initialize()
+    initialize()
     renderThreadName = Thread.currentThread().name
     console = createConsole().apply {
       alpha = 0.85f
