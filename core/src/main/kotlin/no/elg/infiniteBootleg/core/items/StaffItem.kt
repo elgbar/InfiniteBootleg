@@ -3,11 +3,9 @@ package no.elg.infiniteBootleg.core.items
 import no.elg.infiniteBootleg.core.world.Staff
 import no.elg.infiniteBootleg.core.world.magic.Description
 
-data class StaffItem(
-  override val element: Staff,
-  override val maxStock: UInt,
-  override val stock: UInt
-) : Item, Description {
+data class StaffItem(override val element: Staff, override val maxStock: UInt, override val stock: UInt) :
+  Item,
+  Description {
 
   override fun remove(usages: UInt): StaffItem? {
     if (willBeDepleted(usages)) return null

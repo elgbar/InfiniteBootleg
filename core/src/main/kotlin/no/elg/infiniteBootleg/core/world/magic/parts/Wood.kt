@@ -21,12 +21,10 @@ enum class WoodRating(val powerPercent: Double, timeToNext: Duration) : Named {
   override val displayName: String = name.toTitleCase()
 }
 
-sealed class WoodType(
-  val gemSlots: UInt,
-  val ringSlots: UInt,
-  val dryingRate: Double,
-  val castDelay: Duration
-) : MagicEffectsWithRating<WoodRating>, Named, Description {
+sealed class WoodType(val gemSlots: UInt, val ringSlots: UInt, val dryingRate: Double, val castDelay: Duration) :
+  MagicEffectsWithRating<WoodRating>,
+  Named,
+  Description {
 
   companion object {
     val woodTypes: List<WoodType> by lazy { sealedSubclassObjectInstances<WoodType>() }

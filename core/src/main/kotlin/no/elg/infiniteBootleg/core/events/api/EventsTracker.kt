@@ -73,12 +73,7 @@ interface EventEvent {
   val time: ZonedDateTime
 }
 
-data class RecordedEvent(
-  val event: Event,
-  override val thread: String,
-  override val tick: Long?,
-  override val time: ZonedDateTime
-) : EventEvent
+data class RecordedEvent(val event: Event, override val thread: String, override val tick: Long?, override val time: ZonedDateTime) : EventEvent
 
 data class ListenerEvent(
   val action: String,
@@ -89,10 +84,5 @@ data class ListenerEvent(
   override val time: ZonedDateTime
 ) : EventEvent
 
-data class EventListenedToEvent(
-  val event: Event,
-  val listener: EventListener<out Event>,
-  override val thread: String,
-  override val tick: Long?,
-  override val time: ZonedDateTime
-) : EventEvent
+data class EventListenedToEvent(val event: Event, val listener: EventListener<out Event>, override val thread: String, override val tick: Long?, override val time: ZonedDateTime) :
+  EventEvent

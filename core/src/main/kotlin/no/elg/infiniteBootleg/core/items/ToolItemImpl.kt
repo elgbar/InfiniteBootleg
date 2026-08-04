@@ -17,7 +17,8 @@ data class ToolItemImpl<DATA : ToolData>(
   override val maxStock: UInt = Item.DEFAULT_MAX_STOCK,
   override val stock: UInt = Item.DEFAULT_MAX_STOCK,
   override val data: DATA
-) : ToolItem<DATA>, Description {
+) : ToolItem<DATA>,
+  Description {
 
   init {
     require(data != FistToolData) { "use FistItem for Fist" }

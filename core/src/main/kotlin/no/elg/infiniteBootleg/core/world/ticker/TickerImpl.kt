@@ -21,7 +21,9 @@ import no.elg.infiniteBootleg.core.util.FailureWatchdog
  *
  * @author Elg
  */
-class TickerImpl(private val ticking: Ticking, name: String, tps: Long, nagDelay: Double) : Ticker, Runnable {
+class TickerImpl(private val ticking: Ticking, name: String, tps: Long, nagDelay: Double) :
+  Ticker,
+  Runnable {
 
   /**
    * How many ticks between each rare update. Currently, each rare tick is the same as one second

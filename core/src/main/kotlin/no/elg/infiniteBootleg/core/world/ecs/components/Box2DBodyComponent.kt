@@ -43,13 +43,9 @@ private val logger = KotlinLogging.logger {}
  * @param box2dWidth  The height of this entity in box2d view
  * @param box2dHeight The width of this entity in box2d view
  */
-class Box2DBodyComponent(
-  body: b2BodyId,
-  val type: ProtoWorld.Entity.Box2D.BodyType,
-  val box2dWidth: Float,
-  val box2dHeight: Float,
-  val fixedRotation: Boolean
-) : EntitySavableComponent, CheckableDisposable {
+class Box2DBodyComponent(body: b2BodyId, val type: ProtoWorld.Entity.Box2D.BodyType, val box2dWidth: Float, val box2dHeight: Float, val fixedRotation: Boolean) :
+  EntitySavableComponent,
+  CheckableDisposable {
 
   private var internalBody: b2BodyId? = body
     get() {

@@ -12,7 +12,9 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.tinted
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
-data class TintedComponent(val tint: Color) : EntitySavableComponent, ClientComponent {
+data class TintedComponent(val tint: Color) :
+  EntitySavableComponent,
+  ClientComponent {
 
   override fun hudDebug(): String = "tint (RRGGBBAA) $tint"
 

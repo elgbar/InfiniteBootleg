@@ -51,11 +51,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 private val logger = KotlinLogging.logger {}
 
-open class ChunkImpl(
-  final override val world: World,
-  final override val chunkX: ChunkCoord,
-  final override val chunkY: ChunkCoord
-) : Chunk, LitChunk {
+open class ChunkImpl(final override val world: World, final override val chunkX: ChunkCoord, final override val chunkY: ChunkCoord) :
+  Chunk,
+  LitChunk {
 
   val blocks: Array<Array<Block?>> = Array(Chunk.CHUNK_SIZE) { arrayOfNulls(Chunk.CHUNK_SIZE) }
 

@@ -21,11 +21,7 @@ sealed interface ContainerEvent : Event {
   /**
    * Fired when the content of the container has changed
    */
-  data class ContentChanged(
-    override val container: Container,
-    override val owner: ContainerOwner? = null,
-    val changeType: ItemChangeType? = null
-  ) : ContainerEvent {
+  data class ContentChanged(override val container: Container, override val owner: ContainerOwner? = null, val changeType: ItemChangeType? = null) : ContainerEvent {
     constructor(ownedContainer: OwnedContainer, changeType: ItemChangeType? = null) : this(ownedContainer.container, ownedContainer.owner, changeType)
   }
 

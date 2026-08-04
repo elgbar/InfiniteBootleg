@@ -169,7 +169,8 @@ abstract class World(
    */
   name: String,
   forceTransient: Boolean = false
-) : CheckableDisposable, Resizable {
+) : CheckableDisposable,
+  Resizable {
 
   constructor(protoWorld: ProtoWorld.World, forceTransient: Boolean = false) : this(
     WorldLoader.generatorFromProto(
