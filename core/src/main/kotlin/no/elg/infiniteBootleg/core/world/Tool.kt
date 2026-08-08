@@ -46,9 +46,9 @@ sealed interface Tool<DATA : ToolData> : TexturedContainerElement {
 
   object Pickaxe : Tool<PickaxeToolData> {
     override val textureName: String = InfAssets.PICKAXE_TEXTURE
-    override val effectiveAgainst: Set<MaterialCategory> = setOf(MaterialCategory.ORE)
+    override val effectiveAgainst: Set<MaterialCategory> = setOf(MaterialCategory.ORE, MaterialCategory.PLAIN_ROCK)
     override val destroyIneffectiveAgainst: Boolean get() = false
-    override val effectiveEfficiency: Float get() = 1f
+    override val effectiveEfficiency: Float get() = 2f
     override val ineffectiveEfficiency: Float get() = 0.75f
 
     @Deprecated("Use the toItem function with data exposed", replaceWith = ReplaceWith("toItem(maxStock, stock, PickaxeToolData())"))
@@ -61,7 +61,7 @@ sealed interface Tool<DATA : ToolData> : TexturedContainerElement {
     override val textureName: String = InfAssets.BROADAXE_TEXTURE
     override val effectiveAgainst: Set<MaterialCategory> = setOf(MaterialCategory.PLAIN_ROCK, MaterialCategory.SOIL, MaterialCategory.ORGANIC)
     override val destroyIneffectiveAgainst: Boolean get() = true
-    override val effectiveEfficiency: Float get() = 2f
+    override val effectiveEfficiency: Float get() = 1f
     override val ineffectiveEfficiency: Float get() = 0.25f
 
     @Deprecated("Use the toItem function with data exposed", replaceWith = ReplaceWith("toItem(maxStock, stock, BroadaxeToolData())"))
