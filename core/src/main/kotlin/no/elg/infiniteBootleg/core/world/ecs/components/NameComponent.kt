@@ -22,7 +22,11 @@ data class NameComponent(val name: String) : EntitySavableComponent {
   companion object : EntityLoadableMapper<NameComponent>() {
     val Entity.name get() = nameComponent.name
     val Entity.nameOrNull get() = nameComponentOrNull?.name
-    val Entity.nameOrToString get() = nameOrNull ?: toString()
+
+    /** Use for informal logging */
+    val Entity.nameOrUnknown get() = nameOrNull ?: "<unnamed>"
+
+    /** Use when we must be able to identify the entity */
     val Entity.idAndName get() = "${id}${nameOrNull?.let { " ($it)" } ?: ""}"
     var Entity.nameComponent by propertyFor(mapper)
     var Entity.nameComponentOrNull by optionalPropertyFor(mapper)

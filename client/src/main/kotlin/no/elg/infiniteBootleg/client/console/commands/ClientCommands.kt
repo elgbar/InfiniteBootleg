@@ -65,7 +65,7 @@ import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.idAndName
-import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrUnknown
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
@@ -492,11 +492,11 @@ class ClientCommands : CommonCommands() {
     val entities = localControlledPlayer() ?: return INITIAL_INTERACT_RADIUS
     for (entity in entities) {
       val value = entity.selectedItem as? ToolItem<*> ?: run {
-        logger.info { "Player ${entity.nameOrNull ?: "Unknown"} is not holding a tool" }
+        logger.info { "Player ${entity.nameOrUnknown} is not holding a tool" }
         continue
       }
       val interactionRadius = value.data.interactionRadius
-      logger.info { "Interaction size for player ${entity.nameOrNull ?: "Unknown"} is $interactionRadius" }
+      logger.info { "Interaction size for player ${entity.nameOrUnknown} is $interactionRadius" }
       return interactionRadius
     }
     return INITIAL_INTERACT_RADIUS
@@ -508,7 +508,7 @@ class ClientCommands : CommonCommands() {
     val entities = localControlledPlayer() ?: return INITIAL_BRUSH_SIZE
     for (entity in entities) {
       val value = entity.selectedItem as? ToolItem<*> ?: run {
-        logger.info { "Player ${entity.nameOrNull ?: "Unknown"} is not holding a tool" }
+        logger.info { "Player ${entity.nameOrUnknown} is not holding a tool" }
         continue
       }
       val brushSize = when (val data = value.data) {
@@ -517,7 +517,7 @@ class ClientCommands : CommonCommands() {
         is BroadaxeToolData -> data.brushMajorAxisSize
         is FistToolData -> INITIAL_BRUSH_SIZE
       }
-      logger.info { "Brush size for player ${entity.nameOrNull ?: "Unknown"} is $brushSize" }
+      logger.info { "Brush size for player ${entity.nameOrUnknown} is $brushSize" }
       return brushSize
     }
     return INITIAL_BRUSH_SIZE
@@ -534,7 +534,7 @@ class ClientCommands : CommonCommands() {
     }
     for (entity in entities) {
       val item = entity.selectedItem as? ToolItem<*> ?: run {
-        logger.info { "Player ${entity.nameOrNull ?: "Unknown"} is not holding a tool" }
+        logger.info { "Player ${entity.nameOrUnknown} is not holding a tool" }
         continue
       }
 
@@ -568,7 +568,7 @@ class ClientCommands : CommonCommands() {
 
     for (entity in entities) {
       val item = entity.selectedItem as? ToolItem<*> ?: run {
-        logger.info { "Player ${entity.nameOrNull ?: "Unknown"} is not holding a tool" }
+        logger.info { "Player ${entity.nameOrUnknown} is not holding a tool" }
         continue
       }
 
@@ -597,7 +597,7 @@ class ClientCommands : CommonCommands() {
     for (entity in entities) {
       val locallyControlledComponent = entity.locallyControlledComponent
       locallyControlledComponent.instantBreak = !locallyControlledComponent.instantBreak
-      logger.info { "Instant break for ${entity.nameOrNull} is now ${locallyControlledComponent.instantBreak.toAbled()}" }
+      logger.info { "Instant break for ${entity.idAndName} is now ${locallyControlledComponent.instantBreak.toAbled()}" }
     }
   }
 

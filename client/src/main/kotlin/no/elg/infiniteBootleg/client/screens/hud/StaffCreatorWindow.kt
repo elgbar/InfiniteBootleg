@@ -17,7 +17,7 @@ import no.elg.infiniteBootleg.client.util.ibVisWindowClosed
 import no.elg.infiniteBootleg.client.util.setIBDefaults
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.world.Staff
-import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrUnknown
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.core.world.magic.Gem
 import no.elg.infiniteBootleg.core.world.magic.Ring
@@ -148,7 +148,7 @@ fun addStaffCreatorOverlay(world: ClientWorld): IBVisWindow {
           val newStaff = Staff(wood(), gems.mapNotNull { it() }, rings.mapNotNull { it() })
 
           for (player in world.controlledPlayerEntities) {
-            logger.info { "Giving player ${player.nameOrNull} a new staff $newStaff" }
+            logger.info { "Giving player ${player.nameOrUnknown} a new staff $newStaff" }
             val container = player.containerOrNull ?: continue
             container += newStaff.toItem()
           }

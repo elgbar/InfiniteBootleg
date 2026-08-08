@@ -39,8 +39,9 @@ import no.elg.infiniteBootleg.core.world.Direction
 import no.elg.infiniteBootleg.core.world.Staff
 import no.elg.infiniteBootleg.core.world.ecs.components.InputEventQueueComponent.Companion.inputEventQueueOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.idAndName
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.name
-import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrUnknown
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityOrZero
 import no.elg.infiniteBootleg.core.world.ecs.components.events.InputEvent
@@ -273,12 +274,12 @@ private fun physicsHandleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntit
   val isFalling = velocity.y < NEG_Y_VEL_TO_BE_FALLING
   val maxMovement = if (isFalling) MAX_BLOCKS_PER_SECOND_FALLING_SQUARED else MAX_BLOCKS_PER_SECOND_SQUARED
   logger.debug {
-    "Player ${player.nameOrNull} moved $deltaPos blocks in $elapsedSeconds seconds (falling? $isFalling). " + "Max allowed for this timeframe is ${elapsedSeconds * maxMovement})"
+    "Player ${player.idAndName} moved $deltaPos blocks in $elapsedSeconds seconds (falling? $isFalling). " + "Max allowed for this timeframe is ${elapsedSeconds * maxMovement})"
   }
 
   val maxDistance = maxMovement * elapsedSeconds
   if (deltaPos > maxDistance) {
-    logger.warn { "Player ${player.nameOrNull} moved too fast, delta: $deltaPos, maxDistance: $maxDistance" }
+    logger.warn { "Player ${player.idAndName} moved too fast, delta: $deltaPos, maxDistance: $maxDistance" }
     // ignore update packet, will force client backwards next update
     ctx.writeAndFlushPacket(clientBoundMoveEntity(player))
     player.teleport(posX, posY)
@@ -365,7 +366,7 @@ private fun physicsHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
     return
   }
 
-  logger.debug { "Client world ready, sending chunks to client ${player.nameOrNull}" }
+  logger.debug { "Client world ready, sending chunks to client ${player.idAndName}" }
 
   // Send chunk packets to client
   val chunksInView = chunksInView(ctx) ?: run {
@@ -388,7 +389,7 @@ private fun physicsHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
     }
   if (validEntitiesToSendToClient.isNotEmpty()) {
     for (entity in validEntitiesToSendToClient) {
-      logger.debug { "Sending entity ${entity.nameOrNull ?: "<unnamed>"} id ${entity.id} to client. ${entity.toComponentsString()}" }
+      logger.debug { "Sending entity ${entity.idAndName} to client. ${entity.toComponentsString()}" }
       ctx.writePacket(clientBoundSpawnEntity(entity))
     }
     ctx.flush()
@@ -437,7 +438,7 @@ private fun physicsHandleUpdateSelectedSlot(ctx: ChannelHandlerContextWrapper, u
   val entity = ctx.getCurrentPlayer() ?: return
   val slot = HotbarComponent.Companion.HotbarSlot.fromOrdinalOrNull(updateSelectedSlot.slot) ?: return
   val hotbarComponent = entity.hotbarComponentOrNull ?: run {
-    logger.debug { "No hotbar component found on player ${entity.nameOrNull}" }
+    logger.debug { "No hotbar component found on player ${entity.nameOrUnknown}" }
     return
   }
   hotbarComponent.selected = slot

@@ -92,7 +92,8 @@ import no.elg.infiniteBootleg.core.world.ecs.ThreadSafeEntitySet
 import no.elg.infiniteBootleg.core.world.ecs.basicRequiredEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrToString
+import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.idAndName
+import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrUnknown
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.compactLocWithOffset
@@ -979,13 +980,13 @@ abstract class World(
       val container = giveTo?.containerOrNull
       if (container != null) {
         val items = blocks.partitionCount { it.material }.map { (mat, count) -> mat.toItem(stock = count.toUInt()) }
-        logger.trace { "Will give ${items.map { it.fullName }} to ${giveTo.nameOrToString}" }
+        logger.trace { "Will give ${items.map { it.fullName }} to ${giveTo.nameOrUnknown}" }
         val notAdded = container.add(items)
         if (notAdded.isNotEmpty()) {
-          logger.debug { "Failed to add items when removing block, not enough space for $notAdded" }
+          logger.debug { "Failed to add items when removing block, not enough space for $notAdded in the container of ${giveTo.idAndName}" }
         }
       } else if (giveTo != null) {
-        logger.debug { "Cannot give items to ${giveTo.nameOrToString}, failed to find a container" }
+        logger.debug { "Cannot give items to ${giveTo.idAndName}, failed to find a container" }
       }
     }
   }
