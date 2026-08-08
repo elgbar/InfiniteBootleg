@@ -21,7 +21,6 @@ import no.elg.infiniteBootleg.core.api.Renderer
 import no.elg.infiniteBootleg.core.util.safeUse
 import no.elg.infiniteBootleg.core.util.worldToBlock
 import no.elg.infiniteBootleg.core.util.worldToScreen
-import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.core.world.Staff
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.HALF_BLOCK_TEXTURE_SIZE_F
@@ -42,6 +41,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.
 import no.elg.infiniteBootleg.core.world.ecs.components.TintedComponent.Companion.tintedComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.EFFECTIVE_ZERO
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.canNotHoldItems
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedElement
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FollowedByCameraTag.Companion.followedByCamera
@@ -151,9 +151,12 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     }
   }
 
-  fun drawHolding(entity: Entity, holding: ContainerElement?, screenX: Float, screenY: Float) {
-    if (holding == null) return
+  fun drawHolding(entity: Entity, screenX: Float, screenY: Float) {
+    if (entity.canNotHoldItems) {
+      return
+    }
     val size = Block.BLOCK_TEXTURE_SIZE / 2f
+    val holding = entity.selectedElement
     val holdingTexture = holding.textureRegion?.textureRegionOrNull
     if (holdingTexture != null) {
       val ratio = holdingTexture.regionWidth.toFloat() / holdingTexture.regionHeight.toFloat()
@@ -268,7 +271,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     } else {
       drawBox2d(box2d, texture, activeScreenX, activeScreenY)
     }
-    drawHolding(entity, entity.selectedElement, activeScreenX, activeScreenY)
+    drawHolding(entity, activeScreenX, activeScreenY)
     drawName(entity, box2d, activeScreenX, activeScreenY)
     debugEntityLight()
   }

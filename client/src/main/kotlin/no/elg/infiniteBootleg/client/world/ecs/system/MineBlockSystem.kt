@@ -91,8 +91,8 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
     launchOnMultithreadedAsyncSuspendable {
       if (entity.isValid) {
         if (justMinedGive.isNotEmpty() || justMinedDiscard.isNotEmpty()) {
-          val selectedItem = entity.selectedItem ?: return@launchOnMultithreadedAsyncSuspendable
-          val selectedTool = entity.selectedItem?.element as? Tool<*> ?: return@launchOnMultithreadedAsyncSuspendable
+          val selectedItem = entity.selectedItem
+          val selectedTool = entity.selectedItem.element as? Tool<*> ?: return@launchOnMultithreadedAsyncSuspendable
           val container = entity.containerOrNull ?: return@launchOnMultithreadedAsyncSuspendable
 
           // first remove those blocks which the tool is effective against

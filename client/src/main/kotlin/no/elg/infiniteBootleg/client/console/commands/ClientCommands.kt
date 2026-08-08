@@ -71,7 +71,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerCompo
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.ownedContainerOrNull
-import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
+import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItemOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.ensureFlyingStatus
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.flying
@@ -492,7 +492,7 @@ class ClientCommands : CommonCommands() {
   fun interactionRadius(): BlockUnitF {
     val entities = localControlledPlayer() ?: return INITIAL_INTERACT_RADIUS
     for (entity in entities) {
-      val value = entity.selectedItem as? ToolItem<*> ?: run {
+      val value = entity.selectedItemOrNull as? ToolItem<*> ?: run {
         logger.info { "Player ${entity.nameOrUnknown} is not holding a tool" }
         continue
       }
@@ -508,7 +508,7 @@ class ClientCommands : CommonCommands() {
   fun brush(): BlockUnitF {
     val entities = localControlledPlayer() ?: return INITIAL_BRUSH_SIZE
     for (entity in entities) {
-      val value = entity.selectedItem as? ToolItem<*> ?: run {
+      val value = entity.selectedItemOrNull as? ToolItem<*> ?: run {
         logger.info { "Player ${entity.nameOrUnknown} is not holding a tool" }
         continue
       }
@@ -534,7 +534,7 @@ class ClientCommands : CommonCommands() {
       return
     }
     for (entity in entities) {
-      val item = entity.selectedItem as? ToolItem<*> ?: run {
+      val item = entity.selectedItemOrNull as? ToolItem<*> ?: run {
         logger.info { "Player ${entity.nameOrUnknown} is not holding a tool" }
         continue
       }
@@ -568,7 +568,7 @@ class ClientCommands : CommonCommands() {
     }
 
     for (entity in entities) {
-      val item = entity.selectedItem as? ToolItem<*> ?: run {
+      val item = entity.selectedItemOrNull as? ToolItem<*> ?: run {
         logger.info { "Player ${entity.nameOrUnknown} is not holding a tool" }
         continue
       }

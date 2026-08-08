@@ -5,6 +5,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap
 import it.unimi.dsi.fastutil.objects.Object2IntMap
 import ktx.ashley.EngineEntity
+import ktx.ashley.has
 import ktx.ashley.optionalPropertyFor
 import no.elg.infiniteBootleg.core.items.Item
 import no.elg.infiniteBootleg.core.items.ToolItemFist
@@ -14,6 +15,7 @@ import no.elg.infiniteBootleg.core.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.core.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.idAndName
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityHoldingItem
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityHoldingItem.Companion.remoteEntityHoldingItemOrNull
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.hotbar
@@ -76,9 +78,14 @@ data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: Object2Int
     val Entity.selectedItemOrNull: Item? get() = hotbarComponentOrNull?.selectedItemOrNull(this) ?: remoteEntityHoldingItemOrNull
 
     /**
+     * Note this assumes the entity should have an selected element! Check with [canHoldItems]
+     *
      * @return The selected item in the entity container or [ToolItemFist] if there is no selected item (or the index is invalid) or the [remoteEntityHoldingItemOrNull]
      */
     val Entity.selectedItem: Item get() = selectedItemOrNull ?: ToolItemFist
+
+    val Entity.canHoldItems: Boolean get() = has(mapper) || has(RemoteEntityHoldingItem.mapper)
+    val Entity.canNotHoldItems: Boolean get() = !canHoldItems
 
     /**
      * @return The selected element in the entity container or the [remoteEntityHoldingItemOrNull]

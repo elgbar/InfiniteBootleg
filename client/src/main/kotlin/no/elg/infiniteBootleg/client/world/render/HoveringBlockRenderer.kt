@@ -17,6 +17,7 @@ import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.canNotHoldItems
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.CurrentlyBreakingComponent.Companion.currentlyBreakingComponentOrNull
 import no.elg.infiniteBootleg.core.world.world.World
@@ -38,9 +39,10 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
     val mouseLocator = ClientMain.inst().mouseLocator
 
     for (entity in worldRender.world.selectedMaterialEntities) {
+      if (entity.canNotHoldItems) continue
       val controls = entity.locallyControlledComponentOrNull ?: continue
       val selectedItem = entity.selectedItem
-      val element = selectedItem?.element ?: continue
+      val element = selectedItem.element
       val isBreaking = controls.isBreaking(entity)
       val breakingComponent = entity.currentlyBreakingComponentOrNull
 

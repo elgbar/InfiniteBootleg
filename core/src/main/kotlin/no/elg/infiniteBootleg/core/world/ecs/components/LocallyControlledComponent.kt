@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.core.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.canHoldItems
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.locallyControlled
@@ -26,7 +27,7 @@ data class LocallyControlledComponent(var instantBreak: Boolean = INITIAL_INSTAN
   /**
    * Bare minimum check if we are breaking a block
    */
-  fun isBreaking(entity: Entity) = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT) && entity.selectedItem.element is Tool<*>
+  fun isBreaking(entity: Entity) = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT) && entity.canHoldItems && entity.selectedItem.element is Tool<*>
 
   override fun hudDebug(): String = "instantBreak: $instantBreak"
 

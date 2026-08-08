@@ -47,7 +47,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Compan
 import no.elg.infiniteBootleg.core.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.hotbarComponentOrNull
-import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
+import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItemOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.teleport
@@ -429,7 +429,7 @@ private fun physicsHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entity
 
 private fun physicsHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
   val player = ctx.getCurrentPlayer() ?: return
-  val staff = player.selectedItem.element as? Staff ?: return
+  val staff = player.selectedItemOrNull?.element as? Staff ?: return
   val inputEventQueue = player.inputEventQueueOrNull ?: return
   ServerMain.inst().serverWorld.launchOnBox2d { inputEventQueue.enqueue(InputEvent.SpellCastEvent(staff)) }
 }

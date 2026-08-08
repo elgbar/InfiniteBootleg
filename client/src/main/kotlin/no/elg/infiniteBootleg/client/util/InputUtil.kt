@@ -20,6 +20,8 @@ import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledCompone
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.canNotHoldItems
+import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedElement
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker
@@ -51,7 +53,8 @@ private var lastCreateBlockTick: Long = 0
 
 fun breakBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean =
   with(worldEntity) {
-    val item = (entity.selectedItem ?: return false)
+    if (entity.canNotHoldItems) return@with false
+    val item = entity.selectedItem
     if (item is ToolItem<*>) {
       if (canNotInteract(worldEntity, blockX, blockY) || entity.locallyControlledComponentOrNull?.instantBreak == false) return false
       val breakableBlocks = item.data.breakableLocs(entity, world, blockX, blockY).asIterable()
@@ -62,9 +65,8 @@ fun breakBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean =
 
 fun placeBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean =
   with(worldEntity) {
-    if (canNotInteract(worldEntity, blockX, blockY)) return false
-    val item = entity.selectedItem ?: return false
-    val element = item.element
+    if (canNotInteract(worldEntity, blockX, blockY) || entity.canNotHoldItems) return false
+    val element = entity.selectedElement
 
     if (element is Material) {
       val world = entity.world

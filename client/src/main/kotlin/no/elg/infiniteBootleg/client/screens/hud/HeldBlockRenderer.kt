@@ -19,6 +19,7 @@ import no.elg.infiniteBootleg.core.items.Item.Companion.stockText
 import no.elg.infiniteBootleg.core.items.ToolItemFist
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.canNotHoldItems
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 
 class HeldBlockRenderer : Disposable {
@@ -46,7 +47,8 @@ class HeldBlockRenderer : Disposable {
       val currItem = lastItem
       if (currItem == null || updateItem) {
         val entity = world.controlledPlayerEntities.firstOrNull() ?: return
-        val item = entity.selectedItem ?: ToolItemFist
+        if (entity.canNotHoldItems) return
+        val item = entity.selectedItem
         updateItem = false
         lastItem = item
 

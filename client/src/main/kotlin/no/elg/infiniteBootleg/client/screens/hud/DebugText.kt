@@ -24,7 +24,8 @@ import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.idAndName
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
+import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedElement
+import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItemOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.core.world.generator.chunk.PerlinChunkGenerator
@@ -181,7 +182,7 @@ object DebugText {
     val leftArmContacts = grounded?.westArmContacts?.size ?: 0
     val rightArmContacts = grounded?.eastArmContacts?.size ?: 0
     val flying = player.flying
-    val holding = player.selectedItem?.element?.textureRegion?.name ?: "N/A"
+    val holding = player.selectedItemOrNull?.element?.textureRegion?.name ?: "null (${player.selectedElement.textureRegion?.name})"
     sb.append(
       String.format(
         "p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) php: (% 8.2f,% 8.2f) g? %-5b j? %-5b (%-5b <> %-5b) (g%d h%d l%d r%d)) f? %-5b h %s",
