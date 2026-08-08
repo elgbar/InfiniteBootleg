@@ -8,7 +8,6 @@ import kotlinx.coroutines.delay
 import no.elg.infiniteBootleg.client.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.core.util.ChunkCoord
 import no.elg.infiniteBootleg.core.util.WorldCompactLocArray
-import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.ChunkImpl
@@ -93,7 +92,8 @@ class TexturedChunkImpl(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord) :
 
   override fun finishLoading() {
     super.finishLoading()
-    launchOnAsyncSuspendable {
+    // Must be launched on main to prevent deadlock
+    launchOnMainSuspendable {
       delay(200L)
       updateAllBlockLights()
     }

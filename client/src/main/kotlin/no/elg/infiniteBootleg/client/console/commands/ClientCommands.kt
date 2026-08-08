@@ -707,6 +707,7 @@ class ClientCommands : CommonCommands() {
     paramDescriptions = ["Load a single player world from the given seed"]
   )
   @CmdArgNames("worldSeed")
+  @CallOnThreadyType(ExecutionThread.RENDER)
   fun loadWorld(worldSeed: String) = loadWorld(worldSeed, false)
 
   @ConsoleDoc(
@@ -714,6 +715,7 @@ class ClientCommands : CommonCommands() {
     paramDescriptions = ["Load a single player world from the given seed", "Whether to force the world to be transient"]
   )
   @CmdArgNames("worldSeed", "forceTransient")
+  @CallOnThreadyType(ExecutionThread.RENDER)
   fun loadWorld(worldSeed: String, forceTransient: Boolean) {
     val seed = worldSeed.asWorldSeed()
 
