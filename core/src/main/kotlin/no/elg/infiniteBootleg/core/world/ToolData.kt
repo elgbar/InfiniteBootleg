@@ -96,47 +96,41 @@ data class BroadaxeToolData(
     horizontalIsMajorAxis = !horizontalIsMajorAxis
   }
 
-  override fun breakableLocs(entity: Entity, world: World, blockX: WorldCoord, blockY: WorldCoord): Sequence<WorldCompactLoc> =
-    if (horizontalIsMajorAxis) {
-      breakableLocsHorizontally(entity, world, blockX, blockY)
+  override fun breakableLocs(entity: Entity, world: World, blockX: WorldCoord, blockY: WorldCoord): Sequence<WorldCompactLoc> {
+    val majorOffset = calculateMajorAxisOffset(entity, blockX, blockY)
+
+    val locationsAABBFromCorner = if (horizontalIsMajorAxis) {
+      getLocationsAABBFromLowerLeftCorner(
+        blockX.toDouble(),
+        blockY.toDouble() - MINOR_AXIS_OFFSET_HALF,
+        majorOffset,
+        MINOR_AXIS_OFFSET
+      )
     } else {
-      breakableLocsVertically(entity, world, blockX, blockY)
+      getLocationsAABBFromLowerLeftCorner(
+        blockX.toDouble() - MINOR_AXIS_OFFSET_HALF,
+        blockY.toDouble(),
+        MINOR_AXIS_OFFSET,
+        majorOffset
+      )
     }
-
-  private fun breakableLocsVertically(entity: Entity, world: World, blockX: WorldCoord, blockY: WorldCoord): Sequence<WorldCompactLoc> {
-    val ifAboveOfEntity = entity.positionComponent.y <= blockY.centerOfBlock()
-    val topWorldY = blockY.toDouble()
-    val offsetY = when {
-      brushMajorAxisSize == 1f -> 0.0
-      ifAboveOfEntity -> floor(brushMajorAxisSize) - 1.0
-      else -> -floor(brushMajorAxisSize) + 1.0
-    }
-
-    val locationsAABBFromCorner = getLocationsAABBFromLowerLeftCorner(
-      blockX.toDouble() - (MINOR_AXIS_OFFSET / 2.0),
-      topWorldY,
-      MINOR_AXIS_OFFSET,
-      offsetY
-    )
     return locationsAABBFromCorner.asSequence().filterNotAirBlock(world)
   }
 
-  private fun breakableLocsHorizontally(entity: Entity, world: World, blockX: WorldCoord, blockY: WorldCoord): Sequence<WorldCompactLoc> {
-    val ifLeftOfEntity = entity.positionComponent.x <= blockX.centerOfBlock()
-    val leftWorldX = blockX.toDouble()
-    val offsetX = when {
+  private fun calculateMajorAxisOffset(entity: Entity, blockX: WorldCoord, blockY: WorldCoord): Double {
+    fun flipOffset(): Boolean {
+      val positionComponent = entity.positionComponent
+      return if (horizontalIsMajorAxis) {
+        positionComponent.x <= blockX.centerOfBlock()
+      } else {
+        positionComponent.y <= blockY.centerOfBlock()
+      }
+    }
+    return when {
       brushMajorAxisSize == 1f -> 0.0
-      ifLeftOfEntity -> floor(brushMajorAxisSize) - 1.0
+      flipOffset() -> floor(brushMajorAxisSize) - 1.0
       else -> -floor(brushMajorAxisSize) + 1.0
     }
-
-    val locationsAABBFromCorner = getLocationsAABBFromLowerLeftCorner(
-      leftWorldX,
-      blockY.toDouble() - (MINOR_AXIS_OFFSET / 2.0),
-      offsetX,
-      MINOR_AXIS_OFFSET
-    )
-    return locationsAABBFromCorner.asSequence().filterNotAirBlock(world)
   }
 
   override fun asProto(): ProtoToolElement =
@@ -155,6 +149,7 @@ data class BroadaxeToolData(
      * Always 3 blocks in the minor axis, to calculate offset we remove one
      */
     private const val MINOR_AXIS_OFFSET: Double = 3 - 1.0
+    private const val MINOR_AXIS_OFFSET_HALF: Double = MINOR_AXIS_OFFSET / 2.0
 
     private const val INITIAL_MAJOR_AXIS = true
 
