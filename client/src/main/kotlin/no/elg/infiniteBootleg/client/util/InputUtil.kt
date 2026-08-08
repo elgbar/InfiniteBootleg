@@ -7,7 +7,6 @@ import com.badlogic.gdx.math.Vector2
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.client.input.MouseLocator
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
-import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.items.ToolItem
 import no.elg.infiniteBootleg.core.util.compactInt
@@ -129,14 +128,14 @@ fun WorldEntity.interpolate(justPressed: Boolean, action: (WorldEntity, blockX: 
   prevPos.y = inputMouseLocator.previousMouseWorldY
 
   val distance = currPos.dstd(prevPos)
-  // Limit max distance to draw
-  val maxDistance = 20.0
+  // Limit max distance to draw in blocks
+  val maxDistance = 100.0
 
   var update = false
   if (distance in 0.0..maxDistance) {
     val iterations = ceil(distance).toInt()
 
-    val logging = Settings.debug && Gdx.graphics.frameId % 100 == 0L && distance > Int.MAX_VALUE
+    val logging = false
     if (logging) {
       logger.info { "---START SMOOTH PLACEMENT---" }
       logger.info { "(pos) prev: $prevPos, curr $currPos" }
