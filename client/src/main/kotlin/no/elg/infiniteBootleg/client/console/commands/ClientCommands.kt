@@ -61,6 +61,7 @@ import no.elg.infiniteBootleg.core.world.box2d.extensions.gravity
 import no.elg.infiniteBootleg.core.world.box2d.extensions.isValid
 import no.elg.infiniteBootleg.core.world.box2d.extensions.makeB2Vec2
 import no.elg.infiniteBootleg.core.world.box2d.extensions.position
+import no.elg.infiniteBootleg.core.world.box2d.extensions.sleepingEnabled
 import no.elg.infiniteBootleg.core.world.box2d.extensions.userData
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
@@ -816,7 +817,11 @@ class ClientCommands : CommonCommands() {
   @CmdArgNames("gravityY")
   fun gravity(gravityY: Float = Y_WORLD_GRAVITY) {
     val world = clientWorld ?: return
-    world.worldBody.box2dWorld.gravity = makeB2Vec2(0, gravityY)
+    val box2dWorld = world.worldBody.box2dWorld
+    // awaken all entities to make sure they act on the changed gravity
+    box2dWorld.sleepingEnabled = false
+    box2dWorld.gravity = makeB2Vec2(0, gravityY)
+    box2dWorld.sleepingEnabled = true
     logger.info { "World Y gravity changed to $gravityY" }
   }
 
