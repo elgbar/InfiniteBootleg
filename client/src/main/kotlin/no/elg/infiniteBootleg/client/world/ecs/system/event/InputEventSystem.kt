@@ -38,6 +38,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.HotbarSlot
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.hotbarComponentOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItemOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.flying
@@ -77,12 +78,15 @@ object InputEventSystem : EventSystem<InputEvent, InputEventQueueComponent>(
   private fun WorldEntity.ClientWorldEntity.openChest(button: Int) {
     when (button) {
       Input.Buttons.RIGHT -> {
-        val block = world.getBlock(inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY) ?: return
-        if (block.material == Material.Container) {
+        val block = world.getBlock(inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY)
+        if (block != null && block.material == Material.Container) {
           val owner = ContainerOwner.from(inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY)
           world.worldContainerManager.find(owner).thenApply { container ->
             container?.open()
           }
+        } else {
+          val selectedItem = entity.selectedItemOrNull as? ToolItem<*>
+          selectedItem?.data?.onRightClick()
         }
       }
     }
@@ -134,13 +138,13 @@ object InputEventSystem : EventSystem<InputEvent, InputEventQueueComponent>(
     }
   }
 
-  private fun WorldEntity.keyDown(keycode: Int): Boolean {
+  private fun WorldEntity.keyDown(keycode: Int) {
     when (keycode) {
       Input.Keys.T -> entity.teleport(inputMouseLocator.mouseWorldX, inputMouseLocator.mouseWorldY, killVelocity = true)
       Input.Keys.Q -> interpolate(true, ::placeBlocks)
     }
 
-    val hotbarComponent = entity.hotbarComponentOrNull ?: return false
+    val hotbarComponent = entity.hotbarComponentOrNull ?: return
     val hotbarSlot = when (keycode) {
       Input.Keys.NUM_1, Input.Keys.NUMPAD_1 -> HotbarSlot.ONE
       Input.Keys.NUM_2, Input.Keys.NUMPAD_2 -> HotbarSlot.TWO
@@ -152,10 +156,10 @@ object InputEventSystem : EventSystem<InputEvent, InputEventQueueComponent>(
       Input.Keys.NUM_8, Input.Keys.NUMPAD_8 -> HotbarSlot.EIGHT
       Input.Keys.NUM_9, Input.Keys.NUMPAD_9 -> HotbarSlot.NINE
       Input.Keys.NUM_0, Input.Keys.NUMPAD_0 -> HotbarSlot.TEN
-      else -> return false
+      else -> return
     }
     updateSelectedItem(hotbarComponent, hotbarSlot)
-    return true
+    return
   }
 
   private fun WorldEntity.updateSelectedItem(hotbarComponent: HotbarComponent, slot: HotbarSlot) {
