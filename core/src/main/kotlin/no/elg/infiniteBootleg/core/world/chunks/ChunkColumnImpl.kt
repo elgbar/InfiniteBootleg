@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.core.world.chunks
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.events.ChunkColumnUpdatedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
+import no.elg.infiniteBootleg.core.exceptions.checkChunkColumnCorrupt
 import no.elg.infiniteBootleg.core.util.ChunkColumnFeatureFlag
 import no.elg.infiniteBootleg.core.util.ChunkCoord
 import no.elg.infiniteBootleg.core.util.LocalCoord
@@ -26,8 +27,7 @@ import kotlin.math.max
 
 private val logger = KotlinLogging.logger {}
 
-class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord, initialTopSolid: WorldCoordArray? = null, initialTopLight: WorldCoordArray? = null) :
-  ChunkColumn {
+class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord, initialTopSolid: WorldCoordArray?, initialTopLight: WorldCoordArray?) : ChunkColumn {
 
   private val topWorldYSolid = IntArray(Chunk.CHUNK_SIZE)
   private val topWorldYLight = IntArray(Chunk.CHUNK_SIZE)
@@ -35,10 +35,10 @@ class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord
 
   init {
     if (initialTopSolid != null && initialTopLight != null) {
-      require(initialTopSolid.size == Chunk.CHUNK_SIZE) {
+      checkChunkColumnCorrupt(chunkX, initialTopSolid.size == Chunk.CHUNK_SIZE) {
         "Chunk column was given initial top solid blocks with wrong size! Expected ${Chunk.CHUNK_SIZE}, got ${initialTopSolid.size}"
       }
-      require(initialTopLight.size == Chunk.CHUNK_SIZE) {
+      checkChunkColumnCorrupt(chunkX, initialTopLight.size == Chunk.CHUNK_SIZE) {
         "Chunk column was given initial top light blocks with wrong size! Expected ${Chunk.CHUNK_SIZE}, got ${initialTopLight.size}"
       }
       initialTopSolid.copyInto(topWorldYSolid, endIndex = Chunk.CHUNK_SIZE)
@@ -222,7 +222,11 @@ class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord
     }
 
   companion object {
-    const val MAX_CHUNKS_TO_LOOK = Chunk.CHUNK_SIZE
+
+    /** Chunk size agnostic way to check how far up and down we look for top block */
+    const val MAX_BLOCKS_TO_LOOK = 256
+    const val MAX_CHUNKS_TO_LOOK = MAX_BLOCKS_TO_LOOK / Chunk.CHUNK_SIZE
+
     fun fromProtobuf(world: World, protoCC: ProtoWorld.ChunkColumn): ChunkColumn =
       ChunkColumnImpl(world, protoCC.chunkX, protoCC.topSolidBlocksList.toIntArray(), protoCC.topTransparentBlocksList.toIntArray())
   }

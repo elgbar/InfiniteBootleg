@@ -2,9 +2,13 @@ package no.elg.infiniteBootleg.core.world.chunks
 
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.IntMap
+import io.github.oshai.kotlinlogging.KotlinLogging
+import no.elg.infiniteBootleg.core.exceptions.CorruptChunkColumnException
 import no.elg.infiniteBootleg.core.util.ChunkCoord
 import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+
+private val logger = KotlinLogging.logger {}
 
 class ChunkColumnsManager(val world: World) : Disposable {
 
@@ -16,9 +20,20 @@ class ChunkColumnsManager(val world: World) : Disposable {
 
   fun fromProtobuf(columns: List<ProtoWorld.ChunkColumn>) {
     synchronized(chunkColumns) {
+      var foundChunkXColumn = false
       for (protoCC in columns) {
-        val chunkColumn = ChunkColumnImpl.fromProtobuf(world, protoCC)
-        chunkColumns.put(chunkColumn.chunkX, chunkColumn)
+        try {
+          if (protoCC.chunkX == 0) {
+            if (foundChunkXColumn) {
+              throw CorruptChunkColumnException("Got multiple chunks columns with chunkX=0. Discarding all but the first zero chunk column")
+            }
+            foundChunkXColumn = true
+          }
+          val chunkColumn = ChunkColumnImpl.fromProtobuf(world, protoCC)
+          chunkColumns.put(chunkColumn.chunkX, chunkColumn)
+        } catch (e: CorruptChunkColumnException) {
+          logger.warn(e) { "Corrupt chunk column loaded at chunk x ${protoCC.chunkX}, ignoring it" }
+        }
       }
     }
   }
