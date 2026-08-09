@@ -52,7 +52,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
 
   @Suppress("UNCHECKED_CAST")
   private fun filterElementType(element: ContainerElement): Sequence<Item> =
-    if (element.canBeHandled) {
+    if (isElementValid(element)) {
       // "it" Can not be null because the input element can't be null
       content.asSequence().filter { it?.element == element } as Sequence<Item>
     } else {
@@ -62,7 +62,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
   override fun exists(element: ContainerElement, amount: UInt): Boolean {
     if (element.isAlwaysPresent) {
       return true
-    } else if (element.canBeHandled) {
+    } else if (isElementValid(element)) {
       var amountNeeded = amount
       filterElementType(element).forEach { item ->
         amountNeeded -= item.stock
@@ -77,13 +77,13 @@ open class ContainerImpl(override val name: String, final override val size: Int
   override fun count(element: ContainerElement): UInt =
     when {
       element.isAlwaysPresent -> UInt.MAX_VALUE
-      element.canBeHandled -> filterElementType(element).sumOf(Item::stock)
+      isElementValid(element) -> filterElementType(element).sumOf(Item::stock)
       else -> 0u // If it cant be handled we cant have it in the inventory
     }
 
   override fun add(element: ContainerElement, amount: UInt): UInt {
     if (isNoopAmountOrElement(element, amount)) return 0u
-    require(!validOnly || element.canBeHandled) { "This container does not allow invalid elements" }
+    require(isElementValid(element)) { "This container does not allow invalid elements" }
     var amountNotAdded = amount
     try {
       while (amountNotAdded > 0u) {
@@ -147,7 +147,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
     if (element.isAlwaysPresent) {
       return
     }
-    // Note: element.canBeHandled is not checked as this is a corrective action
+    // Note: isElementValid(element) is not checked as this is a corrective action
     var removedStock = 0u
     try {
       for (i in content.indices) {
@@ -187,7 +187,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
 
   override fun remove(element: ContainerElement, amount: UInt, allowStatefulRemoval: Boolean): UInt {
     if (isNoopAmountOrElement(element, amount)) return 0u
-    // Note: element.canBeHandled is not checked as this is a corrective action
+    // Note: isElementValid(element) is not checked as this is a corrective action
     logger.debug { "Removing $amount of ${element.displayName}" }
     if (checkAllowStatefulRemoval(element, allowStatefulRemoval)) {
       return amount
@@ -265,7 +265,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
     requireValidIndex(index)
     require(isItemValid(item, nullItemHasValidity = true)) { "This container does not allow invalid items" }
     val old = content[index]
-    content[index] = if (item != null && item.element.canBeHandled) item else null
+    content[index] = item
     updateContainer(addedItem = item, removedItem = old)
   }
 
@@ -350,6 +350,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
 
   fun isItemValid(item: Item): Boolean = !validOnly || item.isValid()
   fun isItemValid(item: Item?, nullItemHasValidity: Boolean): Boolean = !validOnly || (item?.isValid() ?: nullItemHasValidity)
+  fun isElementValid(element: ContainerElement) = !validOnly || element.canBeHandled
   fun requireValidIndex(index: Int) = require(index in 0..<size) { "Index out of bounds: $index. bounds are 0 ..< $size" }
 
   companion object {
