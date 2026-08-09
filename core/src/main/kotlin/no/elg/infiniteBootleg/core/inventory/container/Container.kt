@@ -205,5 +205,25 @@ interface Container : Iterable<Item?> {
           }
         }.filterNotNull()
       }
+
+    /**
+     * @return Whether the [item] is valid for this container
+     */
+    fun Container.isItemValid(item: Item): Boolean = !validOnly || item.isValid()
+
+    /**
+     * @return Whether the item is valid for this container. Defaults to [nullItemHasValidity] if [validOnly] and [item] is `null`
+     */
+    fun Container.isItemValid(item: Item?, nullItemHasValidity: Boolean): Boolean = !validOnly || (item?.isValid() ?: nullItemHasValidity)
+
+    /**
+     * @return Whether the [element] is valid for this container
+     */
+    fun Container.isElementValid(element: ContainerElement) = !validOnly || element.canBeHandled
+
+    /**
+     * @throws IllegalArgumentException If the index is not valid
+     */
+    fun Container.requireValidIndex(index: Int) = require(index in 0..<size) { "Index out of bounds: $index. bounds are 0 ..< $size" }
   }
 }

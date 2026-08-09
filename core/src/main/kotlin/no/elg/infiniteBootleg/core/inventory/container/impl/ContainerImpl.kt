@@ -6,6 +6,9 @@ import no.elg.infiniteBootleg.core.events.ItemChangeType
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.inventory.container.Container
 import no.elg.infiniteBootleg.core.inventory.container.Container.Companion.NOT_FOUND
+import no.elg.infiniteBootleg.core.inventory.container.Container.Companion.isElementValid
+import no.elg.infiniteBootleg.core.inventory.container.Container.Companion.isItemValid
+import no.elg.infiniteBootleg.core.inventory.container.Container.Companion.requireValidIndex
 import no.elg.infiniteBootleg.core.items.Item
 import no.elg.infiniteBootleg.core.util.IllegalAction
 import no.elg.infiniteBootleg.core.world.ContainerElement
@@ -112,7 +115,7 @@ open class ContainerImpl(override val name: String, final override val size: Int
   }
 
   override fun add(items: Iterable<Item>): List<Item> {
-    val filteredItems = items.filter(::isItemValid)
+    val filteredItems = items.filter { isItemValid(it) }
     if (filteredItems.isEmpty()) return emptyList()
     val (stateless, stateful) = filteredItems.partition { it.element.stateless }
     val collector: MutableMap<ContainerElement, UInt> = HashMap()
@@ -347,11 +350,6 @@ open class ContainerImpl(override val name: String, final override val size: Int
     }
     return false
   }
-
-  fun isItemValid(item: Item): Boolean = !validOnly || item.isValid()
-  fun isItemValid(item: Item?, nullItemHasValidity: Boolean): Boolean = !validOnly || (item?.isValid() ?: nullItemHasValidity)
-  fun isElementValid(element: ContainerElement) = !validOnly || element.canBeHandled
-  fun requireValidIndex(index: Int) = require(index in 0..<size) { "Index out of bounds: $index. bounds are 0 ..< $size" }
 
   companion object {
     const val DEFAULT_SIZE = 40

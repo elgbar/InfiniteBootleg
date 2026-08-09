@@ -25,6 +25,7 @@ import no.elg.infiniteBootleg.core.console.ExecutionThread
 import no.elg.infiniteBootleg.core.console.commands.CommonCommands
 import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.inventory.container.Container
+import no.elg.infiniteBootleg.core.inventory.container.Container.Companion.isElementValid
 import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.core.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.core.inventory.container.impl.AutoSortedContainer
@@ -188,7 +189,7 @@ class ClientCommands : CommonCommands() {
   @CallOnThreadyType(ExecutionThread.PHYSICS)
   fun give(elementName: String, quantity: Int) {
     takeOrGive(elementName, quantity, "give", "take") { container, element ->
-      if (!element.canBeHandled) {
+      if (!container.isElementValid(element)) {
         logger.error { "Cannot give unhandable element '$elementName'" }
         return@takeOrGive
       }
