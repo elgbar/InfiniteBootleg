@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.client.screens.hud
 import com.badlogic.gdx.box2d.structs.b2DebugDraw
 import com.badlogic.gdx.scenes.scene2d.Stage
 import kotlinx.coroutines.withContext
-import ktx.actors.isShown
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.vis.visTable
 import no.elg.infiniteBootleg.client.main.ClientMain
@@ -15,6 +14,7 @@ import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.events.api.EventsTracker
+import no.elg.infiniteBootleg.core.inventory.container.InterfaceId
 import no.elg.infiniteBootleg.core.util.INITIAL_INSTANT_BREAK
 import no.elg.infiniteBootleg.core.util.launchOnAsyncSuspendable
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
@@ -23,32 +23,13 @@ import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledCompone
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.core.world.render.WorldRender.Companion.MAX_ZOOM
 
-class DebugWindow(
-  private val stage: Stage,
-  private val debugMenu: IBVisWindow,
-  private val onAnyElementChanged: MutableList<suspend () -> Unit>,
-  private val debugWindows: List<IBVisWindow>
-) {
+const val DEBUG_MENU_ID: InterfaceId = "Debug Menu"
 
-  val isDebugMenuVisible: Boolean get() = debugWindows.any { it.isShown() }
-
-  fun toggleShown() {
-    if (!isDebugMenuVisible) {
-      updateAllValues(onAnyElementChanged)
-    }
-    debugMenu.toggleShown(stage, true)
-  }
-
-  fun close() {
-    debugMenu.close()
-  }
-}
-
-fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWindow {
+fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): IBVisWindow {
   val debugWindows = mutableListOf<IBVisWindow>()
   val onAnyElementChanged: MutableList<suspend () -> Unit> = mutableListOf()
   debugWindows += staffMenu
-  val debugMenu = world.ibVisWindowClosed("Debug Menu") {
+  val debugMenu = world.ibVisWindowClosed(DEBUG_MENU_ID) {
     closeOnEscape()
 
     visTable {
@@ -527,5 +508,5 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
     }
     pack()
   }.also { debugWindows += it }
-  return DebugWindow(this@addDebugOverlay, debugMenu, onAnyElementChanged, debugWindows)
+  return debugMenu
 }

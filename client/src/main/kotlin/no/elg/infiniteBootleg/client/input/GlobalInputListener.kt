@@ -5,6 +5,10 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.screens.WorldScreen
+import no.elg.infiniteBootleg.client.screens.hud.DEBUG_MENU_ID
+import no.elg.infiniteBootleg.client.screens.hud.STAFF_CREATOR_ID
+import no.elg.infiniteBootleg.client.screens.hud.addDebugOverlay
+import no.elg.infiniteBootleg.client.screens.hud.addStaffCreatorOverlay
 import no.elg.infiniteBootleg.core.main.Main
 
 object GlobalInputListener : InputAdapter() {
@@ -16,9 +20,8 @@ object GlobalInputListener : InputAdapter() {
     when (keycode) {
       Input.Keys.ESCAPE -> {
         val screen = ClientMain.inst().screen
-        if (screen is WorldScreen && screen.isDebugMenuVisible) {
-          screen.debugMenu.close()
-          screen.staffMenu.close()
+        if (screen is WorldScreen && screen.isAnyDebugMenuVisible) {
+          screen.world.render.interfaceManager.closeAllInterfaces()
         }
         if (Main.inst().console.isVisible) {
           Main.inst().console.isVisible = false
@@ -47,7 +50,9 @@ object GlobalInputListener : InputAdapter() {
         if (Main.isClient) {
           val screen = ClientMain.inst().screen
           if (screen is WorldScreen) {
-            screen.staffMenu.toggleShown(screen.stage)
+            val _ = screen.world.render.interfaceManager.toggleInterface(STAFF_CREATOR_ID, screen.stage) {
+              addStaffCreatorOverlay(screen.world)
+            }
           }
         }
       }
@@ -56,7 +61,12 @@ object GlobalInputListener : InputAdapter() {
         if (Main.isClient) {
           val screen = ClientMain.inst().screen
           if (screen is WorldScreen) {
-            screen.debugMenu.toggleShown()
+            val clientWorld = screen.world
+            val interfaceManager = clientWorld.render.interfaceManager
+            val _ = interfaceManager.toggleInterface(DEBUG_MENU_ID, screen.stage) {
+              val staffMenu = interfaceManager.getOrCreate(STAFF_CREATOR_ID) { addStaffCreatorOverlay(clientWorld) }
+              screen.stage.addDebugOverlay(clientWorld, staffMenu)
+            }
           }
         }
       }

@@ -4,10 +4,8 @@ import com.badlogic.gdx.Gdx
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.assets.dispose
 import no.elg.infiniteBootleg.client.main.ClientMain
-import no.elg.infiniteBootleg.client.screens.hud.DebugWindow
-import no.elg.infiniteBootleg.client.screens.hud.addDebugOverlay
-import no.elg.infiniteBootleg.client.screens.hud.addStaffCreatorOverlay
-import no.elg.infiniteBootleg.client.util.IBVisWindow
+import no.elg.infiniteBootleg.client.screens.hud.DEBUG_MENU_ID
+import no.elg.infiniteBootleg.client.screens.hud.STAFF_CREATOR_ID
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
@@ -24,11 +22,6 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     private set
 
   private var worldFinishedLoading = false
-
-  lateinit var debugMenu: DebugWindow
-    private set
-  lateinit var staffMenu: IBVisWindow
-    private set
 
   override fun render(delta: Float) {
     if (worldFinishedLoading) {
@@ -81,11 +74,9 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     hud.dispose()
   }
 
-  val isDebugMenuVisible: Boolean get() = ::debugMenu.isInitialized && debugMenu.isDebugMenuVisible
-
-  override fun create() {
-    super.create()
-    staffMenu = addStaffCreatorOverlay(world)
-    debugMenu = stage.addDebugOverlay(world, staffMenu)
-  }
+  val isAnyDebugMenuVisible: Boolean
+    get() {
+      val interfaceManager = world.render.interfaceManager
+      return interfaceManager.isOpen(DEBUG_MENU_ID) || interfaceManager.isOpen(STAFF_CREATOR_ID)
+    }
 }

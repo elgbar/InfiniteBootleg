@@ -167,7 +167,7 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<InGameC
   fun shouldNotIgnoreWorldInput(): Boolean = !shouldIgnoreWorldInput()
 
   fun shouldIgnoreWorldInput(): Boolean {
-    val debugMenuVisible = worldScreen?.isDebugMenuVisible ?: false
+    val debugMenuVisible = worldScreen?.isAnyDebugMenuVisible ?: false
     val consoleVisible = console.isVisible
     val containerVisible = world?.render?.interfaceManager?.areAnyOpen() ?: false
     return consoleVisible || debugMenuVisible || containerVisible

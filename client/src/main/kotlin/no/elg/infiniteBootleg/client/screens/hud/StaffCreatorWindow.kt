@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.client.util.IBVisWindow
 import no.elg.infiniteBootleg.client.util.ibVisWindowClosed
 import no.elg.infiniteBootleg.client.util.setIBDefaults
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
+import no.elg.infiniteBootleg.core.inventory.container.InterfaceId
 import no.elg.infiniteBootleg.core.world.Staff
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrUnknown
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
@@ -62,9 +63,11 @@ inline fun <reified TYPE : Any, reified RATING : Enum<RATING>, RESULT> KVisTable
   return { if (enabledBox.isChecked) gen(type, rating) else null }
 }
 
+const val STAFF_CREATOR_ID: InterfaceId = "Staff Creator"
+
 fun addStaffCreatorOverlay(world: ClientWorld): IBVisWindow {
   val onAnyElementChanged: MutableList<suspend () -> Unit> = mutableListOf()
-  return world.ibVisWindowClosed("Staff Creator") {
+  return world.ibVisWindowClosed(STAFF_CREATOR_ID) {
     closeOnEscape()
     addCloseButton()
 
