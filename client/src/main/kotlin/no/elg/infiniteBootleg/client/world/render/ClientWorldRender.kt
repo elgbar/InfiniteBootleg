@@ -112,7 +112,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
 
   val interfaceManager = InterfaceManager(world)
 
-  fun openInterface(interfaceId: InterfaceId, createIfMissing: () -> IBVisWindow? = { null }) {
+  fun openInterface(interfaceId: InterfaceId, createIfMissing: () -> IBVisWindow) {
     interfaceManager.openInterface(interfaceId, maybeStage ?: return, createIfMissing)
   }
 
@@ -120,7 +120,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     interfaceManager.closeInterface(interfaceId)
   }
 
-  fun toggleInterface(interfaceId: InterfaceId, createIfMissing: () -> IBVisWindow? = { null }) {
+  fun toggleInterface(interfaceId: InterfaceId, createIfMissing: () -> IBVisWindow) {
     interfaceManager.toggleInterface(interfaceId, maybeStage ?: return, createIfMissing)
   }
 

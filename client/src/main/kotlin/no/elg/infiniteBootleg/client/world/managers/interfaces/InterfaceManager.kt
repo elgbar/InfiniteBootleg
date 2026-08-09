@@ -3,7 +3,10 @@ package no.elg.infiniteBootleg.client.world.managers.interfaces
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Disposable
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.Job
 import ktx.actors.isShown
+import ktx.assets.disposeSafely
+import ktx.async.onRenderingThread
 import no.elg.infiniteBootleg.client.util.IBVisWindow
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.events.BlockChangedEvent
@@ -14,8 +17,8 @@ import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.core.inventory.container.InterfaceId
 import no.elg.infiniteBootleg.core.util.launchOnMainSuspendable
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.ownedContainerOrNull
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.contracts.contract
 
 private val logger = KotlinLogging.logger {}
 
@@ -54,11 +57,16 @@ class InterfaceManager(private val world: ClientWorld) : Disposable {
   }
 
   fun removeInterface(interfaceId: InterfaceId) {
-    interfaces.remove(interfaceId)?.let { removedWindow ->
+    interfaces.remove(interfaceId)?.also { removedWindow ->
       removedWindow.close()
       logger.debug { "Removing interface id $interfaceId, closing and removing old window" }
       EventManager.dispatchEvent(InterfaceEvent.Removed(interfaceId))
+      removedWindow.disposeSafely()
     }
+  }
+
+  fun closeAllInterfaces() {
+    interfaces.keys.forEach(::closeInterface)
   }
 
   /**
@@ -73,46 +81,43 @@ class InterfaceManager(private val world: ClientWorld) : Disposable {
 
   fun areAnyOpen(): Boolean = interfaces.keys.any(::isOpen)
 
-  fun isOpen(interfaceId: InterfaceId): Boolean = interfaces[interfaceId]?.isShown() ?: false
+  fun isOpen(interfaceId: InterfaceId): Boolean = get(interfaceId)?.isShown() ?: false
 
-  private fun getOrCreate(interfaceId: InterfaceId, createIfMissing: () -> IBVisWindow?): CompletableFuture<IBVisWindow?> =
-    CompletableFuture<IBVisWindow?>().also { future ->
-      launchOnMainSuspendable {
-        synchronized(interfaces) {
-          interfaces[interfaceId] ?: createIfMissing()
-        }.also { future.complete(it) }
-      }
+  suspend fun getOrCreate(interfaceId: InterfaceId, createIfMissing: suspend () -> IBVisWindow): IBVisWindow {
+    contract {
+      returnsResultOf(createIfMissing)
     }
-
-  fun openInterface(interfaceId: InterfaceId, stage: Stage, createIfMissing: () -> IBVisWindow? = { null }) {
-    getOrCreate(interfaceId, createIfMissing).thenApply {
-      it?.show(stage) ?: run {
-        logger.debug { "Failed to open unknown interface with id $interfaceId" }
-      }
+    return get(interfaceId) ?: onRenderingThread {
+      // Extra get-check to make sure we do not create duplicated interfaces
+      get(interfaceId) ?: createIfMissing()
     }
   }
 
+  fun openInterface(interfaceId: InterfaceId, stage: Stage, createIfMissing: suspend () -> IBVisWindow): Job =
+    launchOnMainSuspendable {
+      val window = getOrCreate(interfaceId, createIfMissing)
+      window.show(stage)
+    }
+
   fun closeInterface(interfaceId: InterfaceId) {
     // No point in creating a new interface if we are just to close it
-    interfaces[interfaceId]?.close() ?: run {
+    get(interfaceId)?.close() ?: run {
       logger.debug { "Failed to close unknown interface with id $interfaceId" }
     }
   }
 
-  fun toggleInterface(interfaceId: InterfaceId, stage: Stage, createIfMissing: () -> IBVisWindow? = { null }) {
-    getOrCreate(interfaceId, createIfMissing).thenApply {
-      it?.toggleShown(stage) ?: run {
-        logger.debug { "Failed to toggle unknown interface with id $interfaceId" }
-      }
+  fun toggleInterface(interfaceId: InterfaceId, stage: Stage, createIfMissing: suspend () -> IBVisWindow): Job =
+    launchOnMainSuspendable {
+      val window = getOrCreate(interfaceId, createIfMissing)
+      window.toggleShown(stage)
     }
-  }
 
-  fun getInterface(interfaceId: InterfaceId): IBVisWindow? = interfaces[interfaceId]
+  operator fun get(interfaceId: InterfaceId): IBVisWindow? = interfaces[interfaceId]
 
   override fun dispose() {
-    interfaces.values.forEach(IBVisWindow::dispose)
-    interfaces.clear()
     containerDestroyedEvent.removeListener()
     containerChunkUnloadedEvent.removeListener()
+    // Clear after we remove listeners to not having interfaces we haven't cleared
+    val _ = clearInterfaces()
   }
 }
