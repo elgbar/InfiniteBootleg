@@ -211,6 +211,13 @@ class ClientCommands : CommonCommands() {
     }
   }
 
+  @ConsoleDoc(description = "Clear interface cache")
+  fun clearInterfaces() {
+    val world = clientWorld ?: return
+    val removed = world.render.interfaceManager.clearInterfaces()
+    logger.info { "Cleared cache of $removed interfaces" }
+  }
+
   @CmdArgNames("color")
   @ConsoleDoc(description = "Set the color of the sky", paramDescriptions = ["Name of color"])
   fun skyColor(colorName: String) {

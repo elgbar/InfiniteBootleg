@@ -61,6 +61,16 @@ class InterfaceManager(private val world: ClientWorld) : Disposable {
     }
   }
 
+  /**
+   * @return The number of interfaces removed
+   */
+  fun clearInterfaces(): Int {
+    val keys = interfaces.keys
+    val size = keys.size
+    keys.forEach(::removeInterface)
+    return size
+  }
+
   fun areAnyOpen(): Boolean = interfaces.keys.any(::isOpen)
 
   fun isOpen(interfaceId: InterfaceId): Boolean = interfaces[interfaceId]?.isShown() ?: false
